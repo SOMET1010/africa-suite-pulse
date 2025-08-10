@@ -10,6 +10,7 @@ export default function RackGrid() {
   const { data, kpis } = useRackData();
   const [zoom, setZoom] = useState(100);
   const [query, setQuery] = useState("");
+  const [mode, setMode] = useState<"compact" | "detailed">("compact");
   const [highlight, setHighlight] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,6 +49,8 @@ export default function RackGrid() {
         setZoom={setZoom}
         query={query}
         setQuery={setQuery}
+        mode={mode}
+        setMode={setMode}
         onFullscreen={() => {
           const el = document.documentElement;
           el.requestFullscreen?.();
@@ -66,7 +69,7 @@ export default function RackGrid() {
             ))}
             {/* Rows */}
             {filteredRooms.map((room) => (
-              <RackRow key={room.id} room={room} days={data.days} reservations={data.reservations} highlight={highlight === room.id} onHighlight={() => setHighlight(room.id)} />
+              <RackRow key={room.id} room={room} days={data.days} reservations={data.reservations} mode={mode} highlight={highlight === room.id} onHighlight={() => setHighlight(room.id)} />
             ))}
           </div>
         </div>

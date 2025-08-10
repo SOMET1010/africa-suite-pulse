@@ -1,15 +1,16 @@
-import { Reservation } from "./types";
+import { Reservation, Room } from "./types";
 import { RackCell } from "./RackCell";
 
 interface Props {
-  room: { id: string; number: string; type: string; floor: number; };
+  room: Room;
   days: string[];
   reservations: Reservation[];
+  mode: "compact" | "detailed";
   highlight?: boolean;
   onHighlight?: () => void;
 }
 
-export function RackRow({ room, days, reservations, highlight, onHighlight }: Props) {
+export function RackRow({ room, days, reservations, mode, highlight, onHighlight }: Props) {
   const resForRoom = reservations.filter(r => r.roomId === room.id);
 
   return (
@@ -22,7 +23,7 @@ export function RackRow({ room, days, reservations, highlight, onHighlight }: Pr
         <div className="text-xs text-muted-foreground">Étage {room.floor}</div>
       </div>
       {days.map((d) => (
-        <RackCell key={room.id + d} date={d} roomId={room.id} reservations={resForRoom} />
+        <RackCell key={room.id + d} date={d} roomId={room.id} roomStatus={room.status} mode={mode} reservations={resForRoom} />
       ))}
     </>
   );

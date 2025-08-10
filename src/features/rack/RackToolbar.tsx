@@ -8,9 +8,11 @@ interface Props {
   setZoom: (z: number) => void;
   query: string;
   setQuery: (q: string) => void;
+  mode: "compact" | "detailed";
+  setMode: (m: "compact" | "detailed") => void;
 }
 
-export function RackToolbar({ onFullscreen, zoom, setZoom, query, setQuery }: Props) {
+export function RackToolbar({ onFullscreen, zoom, setZoom, query, setQuery, mode, setMode }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -42,6 +44,10 @@ export function RackToolbar({ onFullscreen, zoom, setZoom, query, setQuery }: Pr
         </select>
       </div>
       <div className="flex items-center gap-3">
+        <div className="inline-flex rounded-xl border border-border overflow-hidden">
+          <button onClick={()=>setMode('compact')} className={"px-3 h-10 " + (mode==='compact'?"bg-secondary":"bg-background")}>Compact</button>
+          <button onClick={()=>setMode('detailed')} className={"px-3 h-10 " + (mode==='detailed'?"bg-secondary":"bg-background")}>Détaillé</button>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Zoom</span>
           <input type="range" min={80} max={140} value={zoom} onChange={(e)=>setZoom(Number(e.target.value))} />
@@ -53,3 +59,4 @@ export function RackToolbar({ onFullscreen, zoom, setZoom, query, setQuery }: Pr
     </div>
   );
 }
+
