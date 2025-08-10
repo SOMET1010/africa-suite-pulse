@@ -7,21 +7,34 @@ export interface RoomTypeWithStock extends RoomType {
 
 export class RoomTypesService {
   static async getAll(orgId: string): Promise<RoomTypeWithStock[]> {
-    const { data, error } = await supabase
+    // Step 1: Get room types
+    const { data: roomTypes, error: typesError } = await supabase
       .from('room_types')
-      .select(`
-        *,
-        stock:rooms(count)
-      `)
+      .select('*')
       .eq('org_id', orgId)
       .order('code');
 
-    if (error) throw error;
-    
-    // Transform the data to include stock count
-    return (data || []).map(item => ({
-      ...item,
-      stock: Array.isArray(item.stock) ? item.stock[0]?.count || 0 : 0
+    if (typesError) throw typesError;
+
+    // Step 2: Get room count by type
+    const { data: roomCounts, error: countsError } = await supabase
+      .from('rooms')
+      .select('type')
+      .eq('org_id', orgId);
+
+    if (countsError) throw countsError;
+
+    // Step 3: Calculate stock for each room type
+    const stockByType = (roomCounts || []).reduce((acc, room) => {
+      const type = room.type || '';
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Step 4: Merge room types with stock counts
+    return (roomTypes || []).map(roomType => ({
+      ...roomType,
+      stock: stockByType[roomType.code] || 0
     }));
   }
 
