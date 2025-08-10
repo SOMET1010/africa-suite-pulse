@@ -55,7 +55,7 @@ function toUIReservation(r: SBReservation): UIReservation {
 }
 
 export function useRackData() {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const startISO = useMemo(() => toISODate(new Date()), []);
   const days = useMemo(() => daysRange(startISO, 7), [startISO]);
   const endISO = days[days.length - 1];

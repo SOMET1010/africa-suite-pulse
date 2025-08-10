@@ -20,7 +20,7 @@ export default function HotelSettingsForm() {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<HotelSettings | null>(null);
   const { toast } = useToast();
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
 
   const form = useForm<HotelSettingsFormData>({
     resolver: zodResolver(hotelSettingsSchema),

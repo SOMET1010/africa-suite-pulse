@@ -16,7 +16,7 @@ import { ServicesTab } from './components/ServicesTab';
 import { ArrangementsTab } from './components/ArrangementsTab';
 
 export default function ServicesPage() {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const {
     families,
     services,

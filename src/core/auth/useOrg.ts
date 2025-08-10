@@ -1,33 +1,88 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useEffect, useState, useCallback, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
-export function useOrgId(): string | null {
-  const [orgId, setOrgId] = useState<string | null>(null);
+type ProfileRow = {
+  user_id: string;
+  org_id: string | null;
+};
 
-  useEffect(() => {
-    const getCurrentOrgId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        // Get the user's organization from their profile
-        const { data: profile, error } = await (supabase as any)
-          .from('profiles')
-          .select('org_id')
-          .eq('user_id', user.id)
-          .single();
-        
-        if (error) {
-          console.error('Error fetching user profile:', error);
-          setOrgId(null);
-        } else {
-          setOrgId((profile as any)?.org_id || null);
-        }
-      } else {
+type UseOrgIdResult = {
+  orgId: string | null;
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+};
+
+const CACHE_KEY = "org_id_cache";
+
+export function useOrgId(): UseOrgIdResult {
+  const [orgId, setOrgId] = useState<string | null>(() => {
+    // petit cache pour éviter 1 requête au 1er render si dispo
+    try {
+      return sessionStorage.getItem(CACHE_KEY);
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState<boolean>(!orgId);
+  const [error, setError] = useState<string | null>(null);
+  const alive = useRef(true);
+
+  const loadOrgId = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data: { user }, error: authErr } = await supabase.auth.getUser();
+      if (authErr) throw authErr;
+      if (!user) {
         setOrgId(null);
+        try { sessionStorage.removeItem(CACHE_KEY); } catch {}
+        return;
       }
-    };
 
-    getCurrentOrgId();
+      const { data, error: dbErr } = await (supabase as any)
+        .from("profiles")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+
+      if (dbErr) throw dbErr;
+
+      const org = data?.org_id ?? null;
+      if (!alive.current) return;
+      setOrgId(org);
+      try {
+        if (org) sessionStorage.setItem(CACHE_KEY, org);
+        else sessionStorage.removeItem(CACHE_KEY);
+      } catch {}
+    } catch (e: any) {
+      if (!alive.current) return;
+      setError(e?.message ?? "Erreur inconnue lors de la récupération de l'organisation");
+      setOrgId(null);
+      try { sessionStorage.removeItem(CACHE_KEY); } catch {}
+    } finally {
+      if (alive.current) setLoading(false);
+    }
   }, []);
 
-  return orgId;
+  // première charge
+  useEffect(() => {
+    alive.current = true;
+    // si pas de cache, on charge; sinon on valide en arrière-plan
+    if (!orgId) loadOrgId();
+    else loadOrgId(); // "revalidate on mount" pour rafraîchir le cache
+    return () => { alive.current = false; };
+  }, [loadOrgId]);
+
+  // suivre les changements d'auth
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, _session) => {
+      // re-fetch org à chaque changement (login, logout, token refresh…)
+      loadOrgId();
+    });
+    return () => { sub.subscription.unsubscribe(); };
+  }, [loadOrgId]);
+
+  return { orgId, loading, error, refresh: loadOrgId };
 }

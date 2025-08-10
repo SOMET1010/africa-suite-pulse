@@ -19,7 +19,7 @@ interface ServicesTabProps {
 }
 
 export function ServicesTab({ services, families, searchQuery, onExport }: ServicesTabProps) {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const { saveService, deleteService } = useServices(orgId);
   const [editingService, setEditingService] = useState<Partial<Service> | null>(null);
   const [isCreating, setIsCreating] = useState(false);

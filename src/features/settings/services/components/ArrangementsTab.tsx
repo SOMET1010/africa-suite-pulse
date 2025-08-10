@@ -19,7 +19,7 @@ interface ArrangementsTabProps {
 }
 
 export function ArrangementsTab({ arrangements, services, searchQuery, onExport }: ArrangementsTabProps) {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const { saveArrangement, deleteArrangement } = useServices(orgId);
   const [editingArrangement, setEditingArrangement] = useState<Partial<Arrangement> | null>(null);
   const [isCreating, setIsCreating] = useState(false);

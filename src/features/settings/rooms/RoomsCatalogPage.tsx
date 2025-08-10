@@ -19,7 +19,7 @@ import { CreateSeriesModal } from './components/CreateSeriesModal';
 import { BulkActionsMenu } from './components/BulkActionsMenu';
 
 export default function RoomsCatalogPage() {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const {
     rooms,
     stats,

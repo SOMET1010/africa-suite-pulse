@@ -18,7 +18,7 @@ interface FamiliesTabProps {
 }
 
 export function FamiliesTab({ families, searchQuery, onExport }: FamiliesTabProps) {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const { saveFamily, deleteFamily } = useServices(orgId);
   const [editingFamily, setEditingFamily] = useState<Partial<ServiceFamily> | null>(null);
   const [isCreating, setIsCreating] = useState(false);
