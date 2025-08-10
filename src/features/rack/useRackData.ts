@@ -31,6 +31,7 @@ function diffDays(aISO: string, bISO: string) {
 }
 
 function toUIReservation(r: SBReservation): UIReservation {
+  console.log('🔄 Transformation réservation:', { id: r.id, room_id: r.room_id, reference: r.reference });
   return {
     id: r.id,
     guestName: r.reference ?? "Réservation",
@@ -38,7 +39,7 @@ function toUIReservation(r: SBReservation): UIReservation {
     ae: (r.adults ?? 0) > 0 ? 'A' : 'E',
     nights: diffDays(r.date_arrival, r.date_departure),
     rate: r.rate_total ?? 0,
-    roomId: r.room_id ?? "",
+    roomId: r.room_id || "",
     start: r.date_arrival,
     end: r.date_departure,
   } as UIReservation;
