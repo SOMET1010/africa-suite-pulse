@@ -1,17 +1,20 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useCallback } from "react";
 import { useRackData } from "./useRackData";
 import { useRackState } from "./hooks/useRackState";
 import { useRackActions } from "./hooks/useRackActions";
 import RackToolbar from "./components/RackToolbar";
 import RackLegend from "./components/RackLegend";
 import { RackStatusBar } from "./RackStatusBar";
-import { RackGridTable } from "./components/RackGridTable";
 import RoomDetailSheet from "./components/RoomDetailSheet";
 import { NewConflictDialog } from "./components/NewConflictDialog";
 import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
+
+// Import du nouveau système drag & drop
+import { DragDropProvider, DragDropStyles } from "./hooks/useDragDrop";
+import { ModernRackGrid } from "./components/ModernRackGrid";
 
 export default function RackGrid() {
   const { data, kpis, reload } = useRackData();
@@ -30,7 +33,6 @@ export default function RackGrid() {
   } = useRackState();
 
   const {
-    onDropReservation,
     handleConflict,
     onContext,
     closeConflictDialog,
@@ -49,6 +51,25 @@ export default function RackGrid() {
     setMoveConfirmDialog,
     setManualRelodgeDialog
   });
+
+  // Gestion du déplacement de réservation
+  const handleReservationMove = useCallback(async (reservationId: string, targetRoomId: string, targetDay: string) => {
+    try {
+      await reassignReservation(reservationId, targetRoomId);
+      await reload();
+      toast({ title: "✅ Réservation déplacée", description: `Chambre ${targetRoomId}` });
+    } catch (error) {
+      toast({ title: "❌ Erreur", description: "Impossible de déplacer la réservation", variant: "destructive" });
+    }
+  }, [reload]);
+
+  // Injection des styles CSS
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = DragDropStyles;
+    document.head.appendChild(styleSheet);
+    return () => { if (document.head.contains(styleSheet)) document.head.removeChild(styleSheet); };
+  }, []);
 
   // expose read-only data for validation util (évite de propager 1000 props)
   useEffect(() => { 
@@ -283,8 +304,9 @@ export default function RackGrid() {
   if (!data) return null;
 
   return (
-    <div className="page-enter">
-      <main className="min-h-screen px-2 sm:px-4 lg:px-6 pt-4 sm:pt-6 pb-20 sm:pb-12 space-y-4 sm:space-y-6">
+    <DragDropProvider onReservationMove={handleReservationMove}>
+      <div className="page-enter">
+        <main className="min-h-screen px-2 sm:px-4 lg:px-6 pt-4 sm:pt-6 pb-20 sm:pb-12 space-y-4 sm:space-y-6">
         <header className="animate-fade-in">
           <div className="text-center space-y-1 sm:space-y-2">
             <h1 className="text-2xl sm:text-3xl font-display font-bold text-gradient">Rack Visuel</h1>
@@ -301,18 +323,15 @@ export default function RackGrid() {
 
         <RackLegend />
 
-        <RackGridTable
-          days={data.days}
+        <ModernRackGrid
+          days={data.days.map(dateISO => ({ date: dateISO, dayName: new Date(dateISO).toLocaleDateString('fr-FR', { weekday: 'short' }), dayNumber: new Date(dateISO).getDate().toString() }))}
           filteredRooms={filteredRooms}
           reservations={data.reservations}
-          allRooms={data.rooms}
           compact={compact}
-          mode={mode}
           vivid={vivid}
           zoom={zoom}
-          onDropReservation={onDropReservation}
-          onContext={onContext}
-          onConflict={handleConflict}
+          onReservationMove={handleReservationMove}
+          onCellClick={(room, day, reservation) => setDetailSheet({ open: true, room, dayISO: day, reservation: reservation || null })}
           selectionMode={selectionMode}
           onLeftClick={(room, reservation) => {
             setSelectionMode(prev => ({
@@ -418,8 +437,9 @@ export default function RackGrid() {
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+    </DragDropProvider>
   );
 }
