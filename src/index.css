@@ -136,4 +136,23 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Minimum tap target size for mobile accessibility */
+  .tap-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Touch optimization */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
 }

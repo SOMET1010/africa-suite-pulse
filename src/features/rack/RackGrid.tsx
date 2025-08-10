@@ -59,11 +59,11 @@ export default function RackGrid() {
 
   return (
     <div className="page-enter">
-      <main className="min-h-screen px-4 sm:px-6 pt-6 pb-12 space-y-6">
+      <main className="min-h-screen px-2 sm:px-4 lg:px-6 pt-4 sm:pt-6 pb-20 sm:pb-12 space-y-4 sm:space-y-6">
         <header className="animate-fade-in">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-display font-bold text-gradient">Rack Visuel</h1>
-            <p className="text-muted-foreground font-medium">Interface tactile moderne avec animations fluides</p>
+          <div className="text-center space-y-1 sm:space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-gradient">Rack Visuel</h1>
+            <p className="text-sm sm:text-base text-muted-foreground font-medium">Interface tactile moderne avec animations fluides</p>
           </div>
         </header>
 
@@ -76,12 +76,12 @@ export default function RackGrid() {
 
         <RackLegend />
 
-        <div className="card-elevated overflow-auto bg-gradient-secondary/30 backdrop-blur-sm animate-fade-in" 
-             style={{ fontSize: `${Math.max(12, Math.min(16, (zoom/100)*14))}px` }}>
+        <div className="card-elevated overflow-auto bg-gradient-secondary/30 backdrop-blur-sm animate-fade-in scrollbar-thin touch-pan-x" 
+             style={{ fontSize: `${Math.max(10, Math.min(16, (zoom/100)*14))}px` }}>
           <div style={{ width: 'max-content' }}>
-            <div className="grid" style={{ gridTemplateColumns: `260px repeat(${data.days.length}, 1fr)` }}>
+            <div className="grid touch-manipulation" style={{ gridTemplateColumns: `${compact ? '200px' : '260px'} repeat(${data.days.length}, ${compact ? '60px' : '80px'})` }}>
               {/* Header row avec amélioration aujourd'hui/weekend */}
-              <div className="sticky left-0 z-20 bg-gradient-primary text-primary-foreground px-4 py-3 font-display font-bold shadow-soft">
+              <div className="sticky left-0 z-20 bg-gradient-primary text-primary-foreground px-2 sm:px-4 py-2 sm:py-3 font-display font-bold shadow-soft text-sm sm:text-base">
                 Chambres
               </div>
               {data.days.map(d=>{
@@ -90,14 +90,19 @@ export default function RackGrid() {
                 const isWE = [0,6].includes(dt.getDay());
                 return (
                   <div key={d}
-                    className={`px-3 py-3 text-xs font-semibold text-center border-l border-border transition-all duration-300
+                    className={`px-1 sm:px-3 py-2 sm:py-3 text-xs font-semibold text-center border-l border-border transition-all duration-300 touch-manipulation
                       ${isToday 
                         ? "bg-gradient-primary text-primary-foreground shadow-glow animate-glow-pulse" 
                         : isWE 
                         ? "bg-warning/20 text-warning-foreground" 
-                        : "bg-card/80 backdrop-blur-sm hover:bg-card"}`}>
-                    <div className="font-display">
-                      {dt.toLocaleDateString("fr-FR",{weekday:"short", day:"2-digit", month:"2-digit"})}
+                        : "bg-card/80 backdrop-blur-sm hover:bg-card active:bg-card/90"}`}>
+                    <div className="font-display leading-tight">
+                      <div className="hidden sm:block">
+                        {dt.toLocaleDateString("fr-FR",{weekday:"short", day:"2-digit", month:"2-digit"})}
+                      </div>
+                      <div className="sm:hidden">
+                        {dt.toLocaleDateString("fr-FR",{day:"2-digit", month:"2-digit"})}
+                      </div>
                     </div>
                   </div>
                 );
@@ -132,14 +137,17 @@ export default function RackGrid() {
 
         <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
 
-        <div className="fixed inset-x-0 bottom-0">
-          <div className="mx-auto max-w-screen-2xl px-4">
-            <div className="bg-card/90 backdrop-blur border-t border-border rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
-              <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>[F1] Check-in</span>
-                  <span>[F2] Assigner</span>
-                  <span>[F5] Note</span>
+        <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
+          <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
+            <div className="bg-card/95 backdrop-blur border-t border-border sm:rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
+              <div className="px-2 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+                  <span className="whitespace-nowrap">[F1] Check-in</span>
+                  <span className="whitespace-nowrap">[F2] Assigner</span>
+                  <span className="whitespace-nowrap">[F5] Note</span>
+                </div>
+                <div className="text-xs text-muted-foreground/80 font-mono">
+                  {filteredRooms.length} chambres
                 </div>
               </div>
             </div>

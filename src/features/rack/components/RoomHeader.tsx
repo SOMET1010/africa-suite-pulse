@@ -13,13 +13,14 @@ function roomDotClass(status: Room["status"]) {
 
 export default function RoomHeader({ room }:{room: Room}){
   return (
-    <div className="px-3 py-3 sticky left-0 bg-card/95 backdrop-blur-sm z-10 border-r border-border/50 hover-lift transition-all duration-300">
-      <div className="flex items-center gap-3">
-        <span className={`w-3 h-3 rounded-full ${roomDotClass(room.status)} animate-scale-in shadow-sm`} />
-        <div className="font-display font-semibold text-foreground">Ch. {room.number}</div>
+    <div className="px-2 sm:px-3 py-2 sm:py-3 sticky left-0 bg-card/95 backdrop-blur-sm z-10 border-r border-border/50 hover-lift transition-all duration-300 touch-manipulation">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <span className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${roomDotClass(room.status)} animate-scale-in shadow-sm flex-shrink-0`} />
+        <div className="font-display font-semibold text-foreground text-sm sm:text-base truncate">Ch. {room.number}</div>
       </div>
-      <div className="text-xs font-medium text-muted-foreground mt-1">
-        {room.type} • <span className="text-primary font-semibold">Étage {room.floor ?? 0}</span>
+      <div className="text-xs font-medium text-muted-foreground mt-0.5 sm:mt-1 truncate">
+        <span className="hidden sm:inline">{room.type} • </span>
+        <span className="text-primary font-semibold">Ét. {room.floor ?? 0}</span>
       </div>
     </div>
   );

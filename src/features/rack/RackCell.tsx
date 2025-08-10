@@ -61,8 +61,9 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
 
   return (
     <div
-      className={`relative h-16 rounded-lg border border-border/50 ${baseBg} ${dropClass} 
-        transition-all duration-300 hover:shadow-soft group ${resForCell.length > 0 ? 'hover-lift' : 'hover:bg-card/90'}`}
+      className={`relative h-12 sm:h-16 rounded-lg border border-border/50 ${baseBg} ${dropClass} 
+        transition-all duration-300 hover:shadow-soft group touch-manipulation tap-target
+        ${resForCell.length > 0 ? 'hover-lift active:scale-95' : 'hover:bg-card/90 active:bg-card'}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -73,14 +74,15 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
       aria-disabled={isBlockedRoom(room.status)}
       title={isBlockedRoom(room.status) ? "Chambre indisponible" : ""}
     >
-      <div className="absolute inset-1 flex gap-1 overflow-hidden">
+      <div className="absolute inset-0.5 sm:inset-1 flex gap-0.5 sm:gap-1 overflow-hidden">
         {resForCell.length === 0 && (
           <div className="flex items-center justify-center w-full h-full text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
-            <span className="text-xs font-medium">Libre</span>
+            <span className="text-xs font-medium hidden sm:inline">Libre</span>
+            <span className="text-xs font-medium sm:hidden">•</span>
           </div>
         )}
         {resForCell.map((r, index) => (
-          <div key={r.id} className="animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>
+          <div key={r.id} className="animate-scale-in touch-manipulation" style={{ animationDelay: `${index * 100}ms` }}>
             <BookingPill r={r} />
           </div>
         ))}
