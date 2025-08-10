@@ -90,12 +90,17 @@ export function useRackData() {
       console.log("🔍 All reservation room assignments:", uiResas.map(r => ({ id: r.id, roomId: r.roomId, guest: r.guestName })));
       
       const prevData = data;
-      setData({ days, rooms: uiRooms, reservations: uiResas });
+      const newData = { days, rooms: uiRooms, reservations: uiResas };
+      
+      // Force un nouveau objet pour garantir le re-render
+      setData(newData);
+      
       console.log("🎯 State updated with new data");
       console.log("🔄 Previous data vs new data:", {
         prevReservations: prevData?.reservations.length || 0,
         newReservations: uiResas.length,
-        changed: JSON.stringify(prevData?.reservations) !== JSON.stringify(uiResas)
+        changed: JSON.stringify(prevData?.reservations.map(r => ({ id: r.id, roomId: r.roomId }))) !== 
+                JSON.stringify(uiResas.map(r => ({ id: r.id, roomId: r.roomId })))
       });
     } catch (error) {
       console.error("❌ Erreur rechargement Rack:", error);

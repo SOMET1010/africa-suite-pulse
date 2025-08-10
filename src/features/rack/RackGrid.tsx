@@ -285,22 +285,31 @@ export default function RackGrid() {
                   <div className={`animate-fade-in`} style={{ animationDelay: `${index * 50}ms` }}>
                     <RoomHeader room={room} />
                   </div>
-                  {data.days.map((day, dayIndex) => (
-                    <div key={`${room.id}-${day}`} 
-                         className={`animate-fade-in`} 
-                         style={{ animationDelay: `${(index * 50) + (dayIndex * 10)}ms` }}>
-                       <RackCell
-                         room={room}
-                         dayISO={day}
-                         reservations={data.reservations}
-                         allRooms={data.rooms}
-                         mode={compact ? "compact" : mode}
-                         onDropReservation={onDropReservation}
-                         onContext={onContext}
-                         vivid={vivid}
-                       />
-                    </div>
-                  ))}
+                  {data.days.map((day, dayIndex) => {
+                    // Générer une clé unique basée sur les réservations pour forcer le re-render
+                    const cellReservations = data.reservations.filter(r => 
+                      r.roomId === room.id && 
+                      ((r.start <= day && r.end > day) || (r.start === day))
+                    );
+                    const cellKey = `${room.id}-${day}-${cellReservations.map(r => r.id).sort().join(',')}`;
+                    
+                    return (
+                      <div key={cellKey} 
+                           className={`animate-fade-in`} 
+                           style={{ animationDelay: `${(index * 50) + (dayIndex * 10)}ms` }}>
+                         <RackCell
+                           room={room}
+                           dayISO={day}
+                           reservations={data.reservations}
+                           allRooms={data.rooms}
+                           mode={compact ? "compact" : mode}
+                           onDropReservation={onDropReservation}
+                           onContext={onContext}
+                           vivid={vivid}
+                         />
+                      </div>
+                    );
+                  })}
                 </React.Fragment>
               ))}
             </div>
