@@ -17,7 +17,10 @@ type Props = {
 export function RackCell({ room, dayISO, reservations, mode, onDropReservation, onContext, vivid }: Props) {
   const [over, setOver] = useState<"ok"|"bad"|null>(null);
   const resForCell = reservations.filter(r => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, dayISO));
+  
+  // Log pour debug le re-render
   console.log(`🔍 RackCell ${room.number} day ${dayISO}: found ${resForCell.length} reservations for room ${room.id}`, resForCell.map(r => r.id));
+  console.log(`🔍 All reservations passed to cell:`, reservations.length, "total");
 
   function handleDoubleClick() {
     onContext(room, dayISO, resForCell[0]);

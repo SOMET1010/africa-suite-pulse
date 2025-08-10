@@ -87,7 +87,10 @@ export function useRackData() {
 
       console.log("✅ Rack set:", { rooms: uiRooms.length, reservations: uiResas.length });
       console.log("🔍 Sample reservations:", uiResas.slice(0, 3).map(r => ({ id: r.id, roomId: r.roomId, start: r.start, end: r.end, guest: r.guestName })));
+      console.log("🔍 All reservation room assignments:", uiResas.map(r => ({ id: r.id, roomId: r.roomId, guest: r.guestName })));
+      
       setData({ days, rooms: uiRooms, reservations: uiResas });
+      console.log("🎯 State updated with new data");
     } catch (error) {
       console.error("❌ Erreur rechargement Rack:", error);
     }
