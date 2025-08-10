@@ -8,8 +8,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { listUsers, updateUser, createInvitation, listUserProfiles } from "../profiles.api";
-import { updateProfile } from "../users.api";
+import { listUsers, updateUser, listUserProfiles } from "../profiles.api";
+import { updateProfile, createInvitation } from "../users.api";
 import { CalendarIcon, Pencil, Save } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
