@@ -17,6 +17,7 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation }
   const [over, setOver] = useState<"ok"|"bad"|null>(null);
 
   const resForCell = reservations.filter(r => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, dayISO));
+  console.log(`🔍 RackCell ${room.number} day ${dayISO}: found ${resForCell.length} reservations for room ${room.id}`, resForCell.map(r => r.id));
 
   function handleDragStart(e: React.DragEvent, resId: string) {
     setDragData(e, resId);

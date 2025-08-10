@@ -3,6 +3,7 @@ import type { RackData, Room as UIRoom, Reservation as UIReservation } from "./t
 import { fetchRooms, fetchReservationsRange } from "./rack.service";
 import type { Room as SBRoom, Reservation as SBReservation } from "./rack.types";
 import { useOrgId } from "@/core/auth/useOrg";
+import { overlapsDay } from "./rack.adapters";
 
 // --- utils dates (UTC-safe, jour civil par ISO 'YYYY-MM-DD') ---
 function toISODate(d: Date) {
@@ -24,10 +25,6 @@ function diffNights(startISO: string, endISO: string) {
   const b = new Date(endISO + "T00:00:00");
   const ms = b.getTime() - a.getTime();
   return Math.max(1, Math.round(ms / 86400000));
-}
-function overlapsDay(res: { date_arrival: string; date_departure: string }, dayISO: string) {
-  // Occupe la nuit de dayISO si arrival <= dayISO < departure
-  return res.date_arrival <= dayISO && dayISO < res.date_departure;
 }
 
 // --- mapping UI ---
@@ -86,6 +83,7 @@ export function useRackData() {
         .map(toUIReservation);
 
       console.log("✅ Rack set:", { rooms: uiRooms.length, reservations: uiResas.length });
+      console.log("🔍 Sample reservations:", uiResas.slice(0, 3).map(r => ({ id: r.id, roomId: r.roomId, start: r.start, end: r.end, guest: r.guestName })));
       setData({ days, rooms: uiRooms, reservations: uiResas });
     } catch (error) {
       console.error("❌ Erreur rechargement Rack:", error);
