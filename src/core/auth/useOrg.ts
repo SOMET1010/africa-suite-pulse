@@ -19,7 +19,12 @@ export function useOrgId(): UseOrgIdResult {
   const [orgId, setOrgId] = useState<string | null>(() => {
     // petit cache pour éviter 1 requête au 1er render si dispo
     try {
-      return sessionStorage.getItem(CACHE_KEY);
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      // Vérifier que c'est un UUID valide et pas la string "null"
+      if (cached && cached !== "null" && cached.length === 36) {
+        return cached;
+      }
+      return null;
     } catch {
       return null;
     }

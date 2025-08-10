@@ -21,6 +21,12 @@ export function useRoomsCatalog(orgId: string) {
   const loadRooms = useCallback(async () => {
     try {
       setLoading(true);
+      // Vérifier que orgId est valide avant de faire la requête
+      if (!orgId || orgId === "null") {
+        console.warn('Invalid orgId:', orgId);
+        setRooms([]);
+        return;
+      }
       const data = await RoomsCatalogService.getAll(orgId);
       setRooms(data);
     } catch (error) {

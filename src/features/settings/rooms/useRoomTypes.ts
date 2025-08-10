@@ -12,6 +12,12 @@ export function useRoomTypes(orgId: string) {
   const loadRoomTypes = useCallback(async () => {
     try {
       setLoading(true);
+      // Vérifier que orgId est valide avant de faire la requête
+      if (!orgId || orgId === "null") {
+        console.warn('Invalid orgId:', orgId);
+        setRoomTypes([]);
+        return;
+      }
       const data = await RoomTypesService.getAll(orgId);
       setRoomTypes(data);
     } catch (error) {
