@@ -14,6 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      arrangement_services: {
+        Row: {
+          arrangement_id: string
+          created_at: string
+          id: string
+          is_included: boolean
+          is_optional: boolean
+          order_index: number
+          quantity: number
+          service_id: string
+          unit_price: number | null
+        }
+        Insert: {
+          arrangement_id: string
+          created_at?: string
+          id?: string
+          is_included?: boolean
+          is_optional?: boolean
+          order_index?: number
+          quantity?: number
+          service_id: string
+          unit_price?: number | null
+        }
+        Update: {
+          arrangement_id?: string
+          created_at?: string
+          id?: string
+          is_included?: boolean
+          is_optional?: boolean
+          order_index?: number
+          quantity?: number
+          service_id?: string
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arrangement_services_arrangement_id_fkey"
+            columns: ["arrangement_id"]
+            isOneToOne: false
+            referencedRelation: "arrangements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arrangement_services_arrangement_id_fkey"
+            columns: ["arrangement_id"]
+            isOneToOne: false
+            referencedRelation: "arrangements_with_calculated_price"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arrangement_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "arrangement_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_with_family"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      arrangements: {
+        Row: {
+          base_price: number | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          label: string
+          max_nights: number | null
+          min_nights: number | null
+          org_id: string
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          base_price?: number | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          max_nights?: number | null
+          min_nights?: number | null
+          org_id: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          base_price?: number | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          max_nights?: number | null
+          min_nights?: number | null
+          org_id?: string
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       hotel_settings: {
         Row: {
           activation_code: string | null
@@ -71,6 +184,30 @@ export type Database = {
           timezone?: string | null
           updated_at?: string
           website?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -151,33 +288,226 @@ export type Database = {
       }
       rooms: {
         Row: {
+          created_at: string
+          features: Json | null
           floor: string | null
           id: string
+          is_fictive: boolean
           number: string
           org_id: string
+          room_type_id: string | null
           status: string
           type: string | null
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
+          created_at?: string
+          features?: Json | null
           floor?: string | null
           id?: string
+          is_fictive?: boolean
           number: string
           org_id: string
+          room_type_id?: string | null
           status?: string
           type?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
+          created_at?: string
+          features?: Json | null
           floor?: string | null
           id?: string
+          is_fictive?: boolean
           number?: string
           org_id?: string
+          room_type_id?: string | null
           status?: string
           type?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_room_type_id_fkey"
+            columns: ["room_type_id"]
+            isOneToOne: false
+            referencedRelation: "room_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_families: {
+        Row: {
+          code: string
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          label: string
+          order_index: number
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          order_index?: number
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          order_index?: number
+          org_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          code: string
+          cost_price: number | null
+          created_at: string
+          description: string | null
+          family_id: string
+          id: string
+          is_active: boolean
+          is_free_price: boolean
+          label: string
+          max_quantity: number | null
+          min_quantity: number | null
+          org_id: string
+          price: number
+          profit_margin: number | null
+          tags: string[] | null
+          unit: string | null
+          updated_at: string
+          vat_rate: number
+        }
+        Insert: {
+          code: string
+          cost_price?: number | null
+          created_at?: string
+          description?: string | null
+          family_id: string
+          id?: string
+          is_active?: boolean
+          is_free_price?: boolean
+          label: string
+          max_quantity?: number | null
+          min_quantity?: number | null
+          org_id: string
+          price?: number
+          profit_margin?: number | null
+          tags?: string[] | null
+          unit?: string | null
+          updated_at?: string
+          vat_rate?: number
+        }
+        Update: {
+          code?: string
+          cost_price?: number | null
+          created_at?: string
+          description?: string | null
+          family_id?: string
+          id?: string
+          is_active?: boolean
+          is_free_price?: boolean
+          label?: string
+          max_quantity?: number | null
+          min_quantity?: number | null
+          org_id?: string
+          price?: number
+          profit_margin?: number | null
+          tags?: string[] | null
+          unit?: string | null
+          updated_at?: string
+          vat_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "service_families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
+      arrangements_with_calculated_price: {
+        Row: {
+          base_price: number | null
+          calculated_price: number | null
+          code: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          is_active: boolean | null
+          label: string | null
+          max_nights: number | null
+          min_nights: number | null
+          org_id: string | null
+          services_count: number | null
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          base_price?: number | null
+          calculated_price?: never
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          label?: string | null
+          max_nights?: number | null
+          min_nights?: number | null
+          org_id?: string | null
+          services_count?: never
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          base_price?: number | null
+          calculated_price?: never
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          label?: string | null
+          max_nights?: number | null
+          min_nights?: number | null
+          org_id?: string | null
+          services_count?: never
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       reservations_view_arrivals: {
         Row: {
           adults: number | null
@@ -194,6 +524,41 @@ export type Database = {
           status: string | null
         }
         Relationships: []
+      }
+      services_with_family: {
+        Row: {
+          code: string | null
+          cost_price: number | null
+          created_at: string | null
+          description: string | null
+          family_code: string | null
+          family_color: string | null
+          family_icon: string | null
+          family_id: string | null
+          family_label: string | null
+          id: string | null
+          is_active: boolean | null
+          is_free_price: boolean | null
+          label: string | null
+          max_quantity: number | null
+          min_quantity: number | null
+          org_id: string | null
+          price: number | null
+          profit_margin: number | null
+          tags: string[] | null
+          unit: string | null
+          updated_at: string | null
+          vat_rate: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "service_families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
