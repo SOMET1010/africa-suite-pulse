@@ -4,6 +4,9 @@ import CheckinExpressPage from "@/features/arrivals/CheckinExpressPage";
 import RackGrid from "@/features/rack/RackGrid";
 import NotFound from "@/pages/NotFound";
 import { Link } from "react-router-dom";
+import AuthPage from "@/pages/AuthPage";
+import RequireAuth from "@/core/auth/RequireAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 function Layout() {
   return (
@@ -14,6 +17,7 @@ function Layout() {
           <div className="ml-auto flex items-center gap-2">
             <Link to="/arrivals" className="text-sm text-muted-foreground hover:underline">Arrivées</Link>
             <Link to="/reservations/rack" className="text-sm text-muted-foreground hover:underline">Rack</Link>
+            <button onClick={() => supabase.auth.signOut()} className="text-sm text-muted-foreground hover:underline">Logout</button>
           </div>
         </div>
       </nav>
@@ -25,7 +29,8 @@ function Layout() {
 export function AppRoutes() {
   return (
     <Routes>
-      <Route element={<Layout />}>
+      <Route path="/auth" element={<AuthPage />} />
+      <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
         <Route path="reservations/rack" element={<RackGrid />} />
