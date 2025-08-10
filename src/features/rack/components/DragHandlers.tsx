@@ -24,11 +24,14 @@ export function useDragHandlers(
     if (resId) {
       const dragged = reservations.find(r => r.id === resId);
       if (dragged) {
+        const today = new Date().toISOString().split('T')[0];
         const validation = validateDrop(
           (window as any).__RACK_DATA__,
           dragged,
-          room.id
+          room.id,
+          today
         );
+        console.log(`🔍 Drag validation for ${room.number}:`, validation);
         if (!validation.ok && "reason" in validation && validation.reason === "CONFLICT") {
           setOver("conflict");
           e.preventDefault();
@@ -68,14 +71,23 @@ export function useDragHandlers(
     }
     
     const dragged = reservations.find(r => r.id === resId);
-    if (!dragged) return;
+    if (!dragged) {
+      console.warn(`❌ Dragged reservation not found: ${resId}`);
+      return;
+    }
+
+    console.log(`🔍 Validating drop for reservation ${dragged.guestName} (${dragged.start} → ${dragged.end}) on room ${room.number}`);
 
     // Valide sur l'ensemble de la période de la résa avec la nouvelle logique
+    const today = new Date().toISOString().split('T')[0];
     const validation = validateDrop(
       (window as any).__RACK_DATA__,
       dragged,
-      room.id
+      room.id,
+      today
     );
+
+    console.log(`📊 Drop validation result:`, validation);
 
     if (validation.ok) {
       console.log(`✅ No conflict, calling onDropReservation directly`);
@@ -85,13 +97,21 @@ export function useDragHandlers(
 
     if (!validation.ok && "reason" in validation) {
       if (validation.reason === "BLOCKED") {
+        console.log(`🚫 Room blocked`);
         alert("Chambre indisponible (HS/Maintenance).");
         return;
       }
 
       if (validation.reason === "CONFLICT" && validation.conflicts) {
-        console.log(`⚠️ Conflict detected, opening conflict dialog`);
+        console.log(`⚠️ CONFLICT detected, opening conflict dialog with ${validation.conflicts.length} conflicts`);
         onConflict({ draggedId: resId, targetRoomId: room.id, conflicts: validation.conflicts });
+        return;
+      }
+      
+      if (validation.reason === "FUTURE_CONFLICT" && validation.conflicts) {
+        console.log(`🔮 FUTURE_CONFLICT detected, opening conflict dialog`);
+        onConflict({ draggedId: resId, targetRoomId: room.id, conflicts: validation.conflicts });
+        return;
       }
     }
   }
