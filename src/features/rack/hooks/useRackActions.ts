@@ -42,25 +42,8 @@ export function useRackActions({
       return;
     }
     
-    console.log(`🔍 Checking same room: reservation.roomId=${reservation.roomId}, targetRoomId=${roomId}`);
-    
-    // CRITIQUE : Vérifier si c'est la même chambre (en gérant les null)
-    if (reservation.roomId && reservation.roomId === roomId) {
-      console.log(`🔄 Same room drop detected: ${reservation.guestName} already in room ${targetRoom.number}, ignoring completely`);
-      return; // Ne rien faire silencieusement
-    }
-    
-    // CORRECTION : Trouver la vraie chambre source basée sur la réservation
+    // Trouver la chambre source basée sur la réservation
     const sourceRoom = reservation.roomId ? data.rooms.find(r => r.id === reservation.roomId) : null;
-    
-    console.log(`🔍 Move confirmation details:`, {
-      reservation: reservation.guestName,
-      sourceRoom: sourceRoom ? `${sourceRoom.number} (${sourceRoom.type})` : 'Unassigned',
-      targetRoom: `${targetRoom.number} (${targetRoom.type})`,
-      sourceRoomId: reservation.roomId,
-      targetRoomId: roomId,
-      sameRoom: reservation.roomId === roomId
-    });
     
     // Afficher le dialog de confirmation (pas de conflit car déjà validé)
     setMoveConfirmDialog({
