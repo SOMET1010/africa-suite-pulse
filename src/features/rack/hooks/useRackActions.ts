@@ -60,12 +60,16 @@ export function useRackActions({
     
     const dragged = data?.reservations.find(r => r.id === draggedId) || null;
     
-    // Déterminer le type de conflit (aujourd'hui pour l'exemple)
+    // CORRIGÉ : Utiliser la logique centralisée de validateDrop pour déterminer le type
     const today = new Date().toISOString().split('T')[0];
     const conflictType = conflicts.length > 0 ? 
-      (conflicts.some(c => c.start > today) ? "FUTURE" : "CURRENT") : null;
+      (conflicts.some(c => c.start <= today) ? "CURRENT" : "FUTURE") : null;
 
-    console.log("📊 Conflict analysis:", { conflictType, today, conflictDates: conflicts.map(c => c.start) });
+    console.log("📊 Conflict analysis:", { 
+      conflictType, 
+      today, 
+      conflictDates: conflicts.map(c => ({ start: c.start, guest: c.guestName, isCurrent: c.start <= today }))
+    });
 
     // Calculer la preview seulement pour les conflits actuels
     const preview = conflictType === "CURRENT" && data ? 
@@ -74,7 +78,15 @@ export function useRackActions({
         today 
       }) : [];
       
-    console.log("📋 Preview calculation:", { preview: preview.length, conflictType });
+    console.log("📋 Preview calculation:", { 
+      preview: preview.length, 
+      conflictType,
+      previewDetails: preview.map(p => ({ 
+        guest: p.conflict.guestName, 
+        target: p.target?.number || 'NONE', 
+        score: p.score 
+      }))
+    });
     
     setConflictDialog({ 
       open: true, 

@@ -32,11 +32,13 @@ export function useDragHandlers(
           today
         );
         console.log(`🔍 Drag validation for ${room.number}:`, validation);
-        if (!validation.ok && "reason" in validation && validation.reason === "CONFLICT") {
-          setOver("conflict");
-          e.preventDefault();
-          e.dataTransfer.dropEffect = "move";
-          return;
+        if (!validation.ok && "reason" in validation) {
+          if (validation.reason === "CONFLICT" || validation.reason === "FUTURE_CONFLICT") {
+            setOver("conflict");
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            return;
+          }
         }
       }
     }

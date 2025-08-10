@@ -42,15 +42,16 @@ export function NewConflictDialog({
       <AlertDialogContent className="sm:max-w-[700px]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-destructive flex items-center gap-2">
-            ⚠️ {conflictType === "FUTURE" ? "Conflit avec séjour futur" : "Conflit de délogement"}
+            ⚠️ {conflictType === "FUTURE" ? "Conflit avec réservation future" : "Conflit avec séjour en cours"}
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-4">
               {conflictType === "FUTURE" ? (
                 <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
                   <p className="text-sm text-warning-foreground">
-                    Impossible de déloger vers la chambre {targetRoom.number} : conflit avec un séjour futur. 
-                    Utilisez TopRésa pour déplacer manuellement la réservation.
+                    Impossible de déloger vers la chambre {targetRoom.number} : conflit avec une réservation future. 
+                    Le délogement automatique n'est autorisé que pour les séjours en cours. 
+                    Utilisez TopRésa pour gérer manuellement cette situation.
                   </p>
                 </div>
               ) : (

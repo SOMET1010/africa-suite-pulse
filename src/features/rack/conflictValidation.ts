@@ -107,7 +107,7 @@ export function findFirstFreeRoom(
 }
 
 /** score d'aptitude d'une chambre pour reloger une résa */
-function scoreRoomFit(room: UIRoom, conflict: UIReservation, ref?: { type?: string; floor?: number }) {
+function scoreRoomFit(room: UIRoom, conflict: UIReservation, ref?: { type?: string; floor?: number }, allRooms?: UIRoom[]) {
   let s = 0;
 
   // 1) disponibilité stricte
@@ -121,11 +121,19 @@ function scoreRoomFit(room: UIRoom, conflict: UIReservation, ref?: { type?: stri
   if (room.status === "clean" || room.status === "inspected") s += 2;
   if (room.status === "dirty") s += 1;
 
-  // 4) proximité par numéro (si format numérique)
+  // 4) proximité par numéro (si format numérique) - CORRIGÉ : utilise les numéros de chambre, pas les IDs
   const rn = parseInt(String(room.number), 10);
-  const roomIdNum = conflict.roomId ? parseInt(String(conflict.roomId), 10) : null;
-  if (!Number.isNaN(rn) && roomIdNum && !Number.isNaN(roomIdNum)) {
-    const dist = Math.abs(rn - roomIdNum);
+  let refRoomNumber: number | null = null;
+  
+  if (conflict.roomId && allRooms) {
+    const originalRoom = allRooms.find(r => r.id === conflict.roomId);
+    if (originalRoom) {
+      refRoomNumber = parseInt(String(originalRoom.number), 10);
+    }
+  }
+  
+  if (!Number.isNaN(rn) && refRoomNumber && !Number.isNaN(refRoomNumber)) {
+    const dist = Math.abs(rn - refRoomNumber);
     // plus c'est proche, mieux c'est
     s += Math.max(0, 3 - Math.min(3, Math.floor(dist / 5)));
   }
@@ -193,7 +201,7 @@ export function findBestRelocationRooms(
     // on essaye d'utiliser les attributs de la chambre d'origine comme "référence"
     const refRoom = data.rooms.find(r => r.id === conflict.roomId);
     const candidatesWithScore = candidates.map(room => {
-      const baseScore = scoreRoomFit(room, conflict, { type: refRoom?.type, floor: refRoom?.floor });
+      const baseScore = scoreRoomFit(room, conflict, { type: refRoom?.type, floor: refRoom?.floor }, data.rooms);
       const priceScore = scorePriceFit(room, conflict, data.reservations);
       return { 
         room, 
