@@ -24,10 +24,13 @@ export function useDragHandlers(
     if (resId) {
       const dragged = reservations.find(r => r.id === resId);
       if (dragged) {
+        console.log(`🔍 DRAG OVER DEBUG: dragged.roomId=${dragged.roomId}, room.id=${room.id}, room.number=${room.number}`);
+        
         // CRITIQUE : Empêcher complètement le drag sur la même chambre
         if (dragged.roomId === room.id) {
           console.log(`🚫 BLOCKED: Same room drag for ${dragged.guestName} on room ${room.number}`);
-          setOver(null);
+          setOver("bad");
+          e.preventDefault();
           return;
         }
 
@@ -84,6 +87,8 @@ export function useDragHandlers(
       console.warn(`❌ Dragged reservation not found: ${resId}`);
       return;
     }
+
+    console.log(`🔍 DROP DEBUG: dragged.roomId=${dragged.roomId}, room.id=${room.id}, room.number=${room.number}`);
 
     // CRITIQUE : Empêcher complètement le drop sur la même chambre
     if (dragged.roomId === room.id) {
