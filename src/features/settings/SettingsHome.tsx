@@ -28,6 +28,13 @@ const settingsTiles = [
     color: 'from-green-500 to-green-600',
   },
   {
+    title: 'Catalogue Chambres',
+    description: 'Gestion complète des chambres réelles et fictives',
+    to: '/settings/rooms-catalog',
+    icon: Building2,
+    color: 'from-emerald-500 to-emerald-600',
+  },
+  {
     title: 'Catalogue Prestations',
     description: 'Services et prestations disponibles',
     to: '/settings/services',
