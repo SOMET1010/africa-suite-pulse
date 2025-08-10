@@ -4,19 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { CalendarDays, Users, MapPin, Clock, Euro, Phone, Mail, User } from "lucide-react";
-import type { Room, Reservation } from "../types";
+import type { UIRoom, UIReservation } from "../rack.types";
 
 interface RoomDetailSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  room: Room | null;
+  room: UIRoom | null;
   dayISO: string;
-  reservation?: Reservation;
+  reservation?: UIReservation;
   onCheckin?: (reservationId: string) => void;
   onNewReservation?: (roomId: string, dayISO: string) => void;
 }
 
-function roomStatusBadge(status: Room["status"]) {
+function roomStatusBadge(status: UIRoom["status"]) {
   const variants = {
     clean: "bg-emerald-500/20 text-emerald-700 border-emerald-500/30",
     inspected: "bg-blue-500/20 text-blue-700 border-blue-500/30", 
@@ -40,7 +40,7 @@ function roomStatusBadge(status: Room["status"]) {
   );
 }
 
-function reservationStatusBadge(status: Reservation["status"]) {
+function reservationStatusBadge(status: UIReservation["status"]) {
   const variants = {
     confirmed: "bg-primary/20 text-primary border-primary/30",
     present: "bg-emerald-500/20 text-emerald-700 border-emerald-500/30",

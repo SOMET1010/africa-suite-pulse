@@ -6,13 +6,12 @@ import RoomHeader from "./components/RoomHeader";
 import { RackCell } from "./RackCell";
 import { RackStatusBar } from "./RackStatusBar";
 import RoomDetailSheet from "./components/RoomDetailSheet";
-import { ConflictDialog } from "./components/ConflictDialog";
+import { NewConflictDialog } from "./components/NewConflictDialog";
 import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
-import { detectConflicts } from "./conflictValidation";
-import type { Room, Reservation } from "./types";
-import type { ConflictInfo } from "./conflictValidation";
+import { canSwap, findFirstFreeRoom } from "./conflictValidation";
+import type { UIRoom, UIReservation } from "./rack.types";
 
 export default function RackGrid() {
   const { data, kpis, reload } = useRackData();
@@ -24,9 +23,9 @@ export default function RackGrid() {
   const [vivid, setVivid] = useState(false);
   const [detailSheet, setDetailSheet] = useState<{
     open: boolean;
-    room: Room | null;
+    room: UIRoom | null;
     dayISO: string;
-    reservation?: Reservation;
+    reservation?: UIReservation;
   }>({
     open: false,
     room: null,
@@ -36,19 +35,21 @@ export default function RackGrid() {
   
   const [conflictDialog, setConflictDialog] = useState<{
     open: boolean;
-    conflictInfo: ConflictInfo | null;
-    pendingDrop: { resId: string; roomId: string } | null;
+    dragged: UIReservation | null;
+    targetRoomId: string | null;
+    conflicts: UIReservation[];
   }>({
     open: false,
-    conflictInfo: null,
-    pendingDrop: null
+    dragged: null,
+    targetRoomId: null,
+    conflicts: []
   });
 
   const [moveConfirmDialog, setMoveConfirmDialog] = useState<{
     open: boolean;
-    reservation: Reservation | null;
-    sourceRoom: Room | null;
-    targetRoom: Room | null;
+    reservation: UIReservation | null;
+    sourceRoom: UIRoom | null;
+    targetRoom: UIRoom | null;
     pendingDrop: { resId: string; roomId: string } | null;
   }>({
     open: false,
@@ -58,8 +59,15 @@ export default function RackGrid() {
     pendingDrop: null
   });
 
-  async function onDropReservation(resId: string, roomId: string, hasConflict: boolean = false) {
-    console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}, hasConflict: ${hasConflict}`);
+  // expose read-only data for validation util (évite de propager 1000 props)
+  useEffect(() => { 
+    if (data) {
+      (window as any).__RACK_DATA__ = data; 
+    }
+  }, [data]);
+
+  async function onDropReservation(resId: string, roomId: string) {
+    console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
     
     if (!data) return;
     
@@ -72,18 +80,7 @@ export default function RackGrid() {
       return;
     }
     
-    if (hasConflict) {
-      // Afficher le dialog de conflit
-      const conflictInfo = detectConflicts(resId, roomId, data.reservations, data.rooms);
-      setConflictDialog({
-        open: true,
-        conflictInfo,
-        pendingDrop: { resId, roomId }
-      });
-      return;
-    }
-    
-    // Pas de conflit, afficher le dialog de confirmation
+    // Afficher le dialog de confirmation (pas de conflit car déjà validé)
     setMoveConfirmDialog({
       open: true,
       reservation,
@@ -91,6 +88,11 @@ export default function RackGrid() {
       targetRoom,
       pendingDrop: { resId, roomId }
     });
+  }
+
+  function handleConflict({ draggedId, targetRoomId, conflicts }: { draggedId: string; targetRoomId: string; conflicts: UIReservation[] }) {
+    const dragged = data?.reservations.find(r => r.id === draggedId) || null;
+    setConflictDialog({ open: true, dragged, targetRoomId, conflicts });
   }
   
   async function performDrop(resId: string, roomId: string) {
@@ -126,7 +128,7 @@ export default function RackGrid() {
     }
   }
 
-  function onContext(room: Room, dayISO: string, res?: Reservation) {
+  function onContext(room: UIRoom, dayISO: string, res?: UIReservation) {
     setDetailSheet({
       open: true,
       room,
@@ -134,17 +136,92 @@ export default function RackGrid() {
       reservation: res
     });
   }
-  
-  function handleConflictConfirm() {
-    const { pendingDrop } = conflictDialog;
-    if (pendingDrop) {
-      performDrop(pendingDrop.resId, pendingDrop.roomId);
-    }
-    setConflictDialog({ open: false, conflictInfo: null, pendingDrop: null });
+
+  function closeConflictDialog() {
+    setConflictDialog({ open: false, dragged: null, targetRoomId: null, conflicts: [] });
   }
-  
-  function handleConflictCancel() {
-    setConflictDialog({ open: false, conflictInfo: null, pendingDrop: null });
+
+  // Échange de chambres (swap) si 1 seul conflit et mêmes dates
+  async function doSwap() {
+    const { dragged, targetRoomId, conflicts } = conflictDialog;
+    if (!dragged || !targetRoomId || !data) return;
+    
+    if (!canSwap(dragged, conflicts)) {
+      toast({ 
+        title: "❌ Échange impossible", 
+        description: "Plusieurs conflits ou dates différentes",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const other = conflicts[0];
+
+    try {
+      // 1) déplacer 'other' vers l'ancienne chambre de dragged
+      if (!dragged.roomId) {
+        toast({ title: "❌ Erreur", description: "Ancienne chambre introuvable", variant: "destructive" });
+        return;
+      }
+      
+      await reassignReservation(other.id, dragged.roomId);
+      // 2) déplacer 'dragged' vers la chambre cible
+      await reassignReservation(dragged.id, targetRoomId);
+
+      toast({ 
+        title: "✅ Échange effectué", 
+        description: "Les réservations ont été échangées" 
+      });
+      
+      closeConflictDialog();
+      await reload();
+    } catch (error) {
+      console.error("❌ Error during swap:", error);
+      toast({ 
+        title: "❌ Erreur", 
+        description: "Impossible d'effectuer l'échange",
+        variant: "destructive" 
+      });
+    }
+  }
+
+  // Délogement automatique : chaque conflit est déplacé vers la 1ère chambre libre compatible
+  async function doAutoRelodge() {
+    const { dragged, targetRoomId, conflicts } = conflictDialog;
+    if (!dragged || !targetRoomId || !data) return;
+
+    try {
+      // déloger chaque conflit
+      for (const c of conflicts) {
+        const free = findFirstFreeRoom(data, c, [targetRoomId]); // évite la cible
+        if (!free) {
+          toast({ 
+            title: "❌ Délogement impossible", 
+            description: `Aucune chambre libre trouvée pour ${c.guestName}`,
+            variant: "destructive"
+          });
+          return;
+        }
+        await reassignReservation(c.id, free.id);
+      }
+      // puis déplacer la résa d'origine
+      await reassignReservation(dragged.id, targetRoomId);
+
+      toast({ 
+        title: "✅ Délogement effectué", 
+        description: `${conflicts.length} réservation${conflicts.length > 1 ? 's' : ''} délogée${conflicts.length > 1 ? 's' : ''} automatiquement` 
+      });
+
+      closeConflictDialog();
+      await reload();
+    } catch (error) {
+      console.error("❌ Error during auto relodge:", error);
+      toast({ 
+        title: "❌ Erreur", 
+        description: "Impossible d'effectuer le délogement automatique",
+        variant: "destructive" 
+      });
+    }
   }
 
   function handleMoveConfirm() {
@@ -305,6 +382,7 @@ export default function RackGrid() {
                            mode={compact ? "compact" : mode}
                            onDropReservation={onDropReservation}
                            onContext={onContext}
+                           onConflict={handleConflict}
                            vivid={vivid}
                          />
                       </div>
@@ -328,12 +406,14 @@ export default function RackGrid() {
           onNewReservation={handleNewReservation}
         />
 
-        <ConflictDialog
+        <NewConflictDialog
           open={conflictDialog.open}
-          onOpenChange={(open) => !open && handleConflictCancel()}
-          conflictInfo={conflictDialog.conflictInfo}
-          onConfirm={handleConflictConfirm}
-          onCancel={handleConflictCancel}
+          dragged={conflictDialog.dragged}
+          targetRoom={data.rooms.find(r => r.id === conflictDialog.targetRoomId) || null}
+          conflicts={conflictDialog.conflicts}
+          onCancel={closeConflictDialog}
+          onSwap={doSwap}
+          onAutoRelodge={doAutoRelodge}
         />
 
         <MoveConfirmationDialog

@@ -1,8 +1,8 @@
 import React, { useRef, useState } from "react";
-import type { Room as UIRoom, Reservation as UIReservation } from "./types";
+import type { UIRoom, UIReservation } from "./rack.types";
 import { DND_MIME, isBlockedRoom, getDragData } from "./rack.dnd";
 import { overlapsDay } from "./rack.adapters";
-import { detectConflicts } from "./conflictValidation";
+import { validateDrop } from "./conflictValidation";
 import BookingPill from "./components/BookingPill";
 
 type Props = {
@@ -11,12 +11,13 @@ type Props = {
   reservations: UIReservation[];
   allRooms: UIRoom[];
   mode: "compact" | "detailed";
-  onDropReservation: (reservationId: string, roomId: string, hasConflict: boolean) => Promise<void> | void;
+  onDropReservation: (reservationId: string, roomId: string) => Promise<void> | void;
   onContext: (room: UIRoom, dayISO: string, res?: UIReservation)=>void;
+  onConflict: (opts: { draggedId: string; targetRoomId: string; conflicts: UIReservation[] }) => void;
   vivid?: boolean;
 };
 
-export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropReservation, onContext, vivid }: Props) {
+export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropReservation, onContext, onConflict, vivid }: Props) {
   const [over, setOver] = useState<"ok"|"bad"|"conflict"|null>(null);
   const resForCell = reservations.filter(r => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, dayISO));
   
@@ -35,15 +36,22 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
       return; 
     }
     
-    // Vérifier les conflits potentiels
+    // Vérifier les conflits potentiels avec la nouvelle logique
     const resId = getDragData(e);
     if (resId) {
-      const conflictInfo = detectConflicts(resId, room.id, reservations, allRooms);
-      if (conflictInfo.hasConflict) {
-        setOver("conflict");
-        e.preventDefault();
-        e.dataTransfer.dropEffect = "move";
-        return;
+      const dragged = reservations.find(r => r.id === resId);
+      if (dragged) {
+        const validation = validateDrop(
+          (window as any).__RACK_DATA__,
+          dragged,
+          room.id
+        );
+        if (!validation.ok && "reason" in validation && validation.reason === "CONFLICT") {
+          setOver("conflict");
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          return;
+        }
       }
     }
     
@@ -76,12 +84,33 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
       return; 
     }
     
-    // Détecter les conflits
-    const conflictInfo = detectConflicts(resId, room.id, reservations, allRooms);
-    console.log(`🔍 Conflict detection result:`, conflictInfo);
-    
-    console.log(`✅ Calling onDropReservation with resId=${resId}, roomId=${room.id}, hasConflict=${conflictInfo.hasConflict}`);
-    await onDropReservation(resId, room.id, conflictInfo.hasConflict);
+    const dragged = reservations.find(r => r.id === resId);
+    if (!dragged) return;
+
+    // Valide sur l'ensemble de la période de la résa avec la nouvelle logique
+    const validation = validateDrop(
+      (window as any).__RACK_DATA__,
+      dragged,
+      room.id
+    );
+
+    if (validation.ok) {
+      console.log(`✅ No conflict, calling onDropReservation directly`);
+      await onDropReservation(resId, room.id);
+      return;
+    }
+
+    if (!validation.ok && "reason" in validation) {
+      if (validation.reason === "BLOCKED") {
+        alert("Chambre indisponible (HS/Maintenance).");
+        return;
+      }
+
+      if (validation.reason === "CONFLICT" && validation.conflicts) {
+        console.log(`⚠️ Conflict detected, opening conflict dialog`);
+        onConflict({ draggedId: resId, targetRoomId: room.id, conflicts: validation.conflicts });
+      }
+    }
   }
 
   // long-press tactile : ouvre menu

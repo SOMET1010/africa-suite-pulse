@@ -1,12 +1,12 @@
 // Date and overlap utilities for the Rack
-import type { Room } from "./types";
+import type { UIRoom } from "./rack.types";
 
 export function overlapsDay(res: { date_arrival: string; date_departure: string }, dayISO: string) {
   // Occupe la nuit de dayISO si arrival <= dayISO < departure
   return res.date_arrival <= dayISO && dayISO < res.date_departure;
 }
 
-export function roomDotClass(status: Room["status"]) {
+export function roomDotClass(status: UIRoom["status"]) {
   switch (status) {
     case "clean": return "bg-green-200";
     case "inspected": return "bg-blue-200";

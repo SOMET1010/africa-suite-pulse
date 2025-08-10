@@ -1,21 +1,21 @@
 import { setDragData } from "../rack.dnd";
-import type { Reservation } from "../types";
+import type { UIReservation } from "../rack.types";
 
-function pillStatusClass(s: Reservation["status"]) {
+function pillStatusClass(s: UIReservation["status"]) {
   if (s==="present") return "status-present";
   if (s==="option") return "status-option";
   if (s==="cancelled") return "status-cancelled";
   return "status-confirmed"; // confirmed
 }
 
-function statusLabel(s: Reservation["status"]) {
+function statusLabel(s: UIReservation["status"]) {
   if (s==="present") return "P";
   if (s==="option") return "O";
   if (s==="cancelled") return "X";
   return "C"; // confirmed
 }
 
-export default function BookingPill({ r }:{ r: Reservation }) {
+export default function BookingPill({ r }:{ r: UIReservation }) {
   const handleDragStart = (e: React.DragEvent) => {
     console.log(`🟢 Starting drag for reservation ${r.id}`);
     setDragData(e, r.id);

@@ -1,6 +1,6 @@
-import type { Room } from "../types";
+import type { UIRoom } from "../rack.types";
 
-function roomDotClass(status: Room["status"]) {
+function roomDotClass(status: UIRoom["status"]) {
   switch (status) {
     case "clean": return "room-dot-clean";
     case "inspected": return "room-dot-inspected";
@@ -11,7 +11,7 @@ function roomDotClass(status: Room["status"]) {
   }
 }
 
-export default function RoomHeader({ room }:{room: Room}){
+export default function RoomHeader({ room }:{room: UIRoom}){
   return (
     <div className="px-2 sm:px-3 py-2 sm:py-3 sticky left-0 bg-card/95 backdrop-blur-sm z-10 border-r border-border/50 hover-lift transition-all duration-300 touch-manipulation">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">

@@ -1,8 +1,8 @@
-import type { Room } from "./types";
+import type { UIRoom } from "./rack.types";
 
 export const DND_MIME = "text/x-reservation-id";
 
-export function isBlockedRoom(status: Room["status"]) {
+export function isBlockedRoom(status: UIRoom["status"]) {
   return status === "out_of_order" || status === "maintenance";
 }
 

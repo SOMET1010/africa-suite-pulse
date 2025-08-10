@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
-import type { RackData, Room as UIRoom, Reservation as UIReservation } from "./types";
+import type { RackData, UIRoom, UIReservation } from "./rack.types";
 import { fetchRooms, fetchReservationsRange } from "./rack.service";
 import type { Room as SBRoom, Reservation as SBReservation } from "./rack.types";
 import { useOrgId } from "@/core/auth/useOrg";

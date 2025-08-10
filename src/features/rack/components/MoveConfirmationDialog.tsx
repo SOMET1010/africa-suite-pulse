@@ -9,14 +9,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { Room, Reservation } from "../types";
+import type { UIRoom, UIReservation } from "../rack.types";
 
 interface MoveConfirmationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  reservation: Reservation | null;
-  sourceRoom: Room | null;
-  targetRoom: Room | null;
+  reservation: UIReservation | null;
+  sourceRoom: UIRoom | null;
+  targetRoom: UIRoom | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
