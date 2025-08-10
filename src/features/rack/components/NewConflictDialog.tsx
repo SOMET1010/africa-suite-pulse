@@ -53,6 +53,7 @@ export function NewConflictDialog({
                     <thead>
                       <tr className="text-left text-xs text-muted-foreground border-b">
                         <th className="py-2 pr-3">Client en conflit</th>
+                        <th className="py-2 pr-3">Tarif actuel</th>
                         <th className="py-2 pr-3">Dates</th>
                         <th className="py-2 pr-3">Depuis</th>
                         <th className="py-2 pr-3">→ Vers</th>
@@ -63,6 +64,7 @@ export function NewConflictDialog({
                       {preview.map(p => (
                         <tr key={p.conflict.id} className="border-b border-border/50">
                           <td className="py-2 pr-3 font-medium">{p.conflict.guestName}</td>
+                          <td className="py-2 pr-3 text-xs font-mono">{p.conflict.rate}€</td>
                           <td className="py-2 pr-3 text-xs">{p.conflict.start} → {p.conflict.end}</td>
                           <td className="py-2 pr-3">Ch. {p.conflict.roomId || "?"}</td>
                           <td className="py-2 pr-3">
@@ -74,8 +76,15 @@ export function NewConflictDialog({
                               <span className="text-destructive text-xs">Aucune dispo</span>
                             )}
                           </td>
-                          <td className="py-2 text-right text-xs font-mono">
-                            {p.score >= 0 ? p.score : "-"}
+                          <td className="py-2 text-right">
+                            <span className={`text-xs font-mono px-2 py-1 rounded ${
+                              p.score >= 5 ? 'bg-success/20 text-success' :
+                              p.score >= 2 ? 'bg-primary/20 text-primary' :
+                              p.score >= 0 ? 'bg-muted text-muted-foreground' :
+                              'bg-warning/20 text-warning'
+                            }`}>
+                              {p.score >= 0 ? `+${p.score}` : p.score.toString()}
+                            </span>
                           </td>
                         </tr>
                       ))}

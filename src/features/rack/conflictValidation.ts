@@ -67,11 +67,12 @@ export function findFirstFreeRoom(
 }
 
 /** score d'aptitude d'une chambre pour reloger une résa */
-function scoreRoomFit(room: UIRoom, r: UIReservation, ref?: { type?: string; floor?: number }) {
+function scoreRoomFit(room: UIRoom, conflict: UIReservation, ref?: { type?: string; floor?: number }) {
   let s = 0;
 
   // 1) disponibilité stricte
   // (le filtre d'indisponibilité est géré avant; ici, on score les préférences)
+  
   // 2) préférences de matching
   if (ref?.type && room.type === ref.type) s += 3;
   if (ref?.floor != null && room.floor === ref.floor) s += 2;
@@ -82,14 +83,42 @@ function scoreRoomFit(room: UIRoom, r: UIReservation, ref?: { type?: string; flo
 
   // 4) proximité par numéro (si format numérique)
   const rn = parseInt(String(room.number), 10);
-  const base = parseInt(String(r.roomId ?? ""), 10);
-  if (!Number.isNaN(rn) && !Number.isNaN(base)) {
-    const dist = Math.abs(rn - base);
+  const roomIdNum = conflict.roomId ? parseInt(String(conflict.roomId), 10) : null;
+  if (!Number.isNaN(rn) && roomIdNum && !Number.isNaN(roomIdNum)) {
+    const dist = Math.abs(rn - roomIdNum);
     // plus c'est proche, mieux c'est
     s += Math.max(0, 3 - Math.min(3, Math.floor(dist / 5)));
   }
 
   return s;
+}
+
+/**
+ * Score basé sur la différence de prix entre la réservation en conflit et les autres réservations
+ * dans la chambre cible. Favorise les chambres avec des tarifs similaires ou supérieurs.
+ */
+function scorePriceFit(targetRoom: UIRoom, conflict: UIReservation, allReservations: UIReservation[]) {
+  // Trouver les autres réservations dans la chambre cible
+  const roomReservations = allReservations.filter(r => r.roomId === targetRoom.id && r.id !== conflict.id);
+  
+  if (roomReservations.length === 0) {
+    // Chambre vide, score neutre
+    return 0;
+  }
+
+  // Calculer le tarif moyen de la chambre cible
+  const avgRate = roomReservations.reduce((sum, r) => sum + r.rate, 0) / roomReservations.length;
+  
+  // Score basé sur la différence de prix
+  const priceDiff = avgRate - conflict.rate;
+  
+  if (priceDiff >= 0) {
+    // Chambre avec tarif égal ou supérieur = bonus
+    return Math.min(4, Math.floor(priceDiff / 50) + 1); // +1 à +4 points selon l'écart
+  } else {
+    // Chambre avec tarif inférieur = malus léger
+    return Math.max(-2, Math.floor(priceDiff / 100)); // -1 à -2 points selon l'écart
+  }
 }
 
 export type Relocation = { conflict: UIReservation; target: UIRoom | null; score: number };
@@ -118,9 +147,18 @@ export function findBestRelocationRooms(
 
     // on essaye d'utiliser les attributs de la chambre d'origine comme "référence"
     const refRoom = data.rooms.find(r => r.id === conflict.roomId);
-    const best = candidates
-      .map(room => ({ room, score: scoreRoomFit(room, conflict, { type: refRoom?.type, floor: refRoom?.floor }) }))
-      .sort((a, b) => b.score - a.score)[0];
+    const candidatesWithScore = candidates.map(room => {
+      const baseScore = scoreRoomFit(room, conflict, { type: refRoom?.type, floor: refRoom?.floor });
+      const priceScore = scorePriceFit(room, conflict, data.reservations);
+      return { 
+        room, 
+        score: baseScore + priceScore,
+        baseScore,
+        priceScore 
+      };
+    });
+    
+    const best = candidatesWithScore.sort((a, b) => b.score - a.score)[0];
 
     return best ? { conflict, target: best.room, score: best.score } : { conflict, target: null, score: -1 };
   });
