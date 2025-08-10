@@ -12,6 +12,7 @@ interface Props {
 
 export function RackRow({ room, days, reservations, mode, highlight, onHighlight }: Props) {
   const resForRoom = reservations.filter(r => r.roomId === room.id);
+  console.log(`🏠 Chambre ${room.number} (${room.id}):`, resForRoom.length, 'réservations');
 
   return (
     <>

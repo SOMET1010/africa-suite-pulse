@@ -13,6 +13,7 @@ interface Props {
 
 export function RackCell({ date, roomId, roomStatus, mode, reservations }: Props) {
   const res = reservations.find(r => r.start <= date && date < r.end);
+  console.log(`📅 Cellule ${date} room ${roomId}:`, res ? `Résa ${res.id}` : 'Vide');
   const colorVar = roomStatus === 'clean'
     ? '--status-confirmed'
     : roomStatus === 'dirty'
