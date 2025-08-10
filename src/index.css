@@ -1,3 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Drag & Drop styles for Rack */
+.cursor-move {
+  cursor: grab;
+}
+
+.cursor-move:active {
+  cursor: grabbing;
+}
+
+/* Drop zone highlight */
+.bg-primary\/10 {
+  background-color: hsl(var(--primary) / 0.1) !important;
+  border-color: hsl(var(--primary)) !important;
+}
+
+/* Reservation status cell backgrounds */
+.cell-soft--confirmed {
+  background-color: hsl(var(--status-confirmed) / 0.1);
+}
+
+.cell-soft--present {
+  background-color: hsl(var(--status-present) / 0.1);
+}
+
+.cell-soft--option {
+  background-color: hsl(var(--status-option) / 0.1);
+}
+
+.cell-soft--cancelled {
+  background-color: hsl(var(--status-cancelled) / 0.1);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

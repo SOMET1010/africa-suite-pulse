@@ -40,8 +40,11 @@ export default function RackGrid() {
 
   return (
     <main className="min-h-screen px-4 sm:px-6 pt-6 pb-12">
-      <header className="mb-3">
-        <h1 className="text-xl font-semibold">Rack visuel</h1>
+      <header className="mb-3 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold">Rack visuel</h1>
+          <p className="text-sm text-muted-foreground">Glissez-déposez les réservations pour les réassigner</p>
+        </div>
       </header>
 
       <RackToolbar

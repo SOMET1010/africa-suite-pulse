@@ -1,4 +1,4 @@
-import { Reservation, RoomStatus } from "./types";
+import type { Reservation, Room } from "./types";
 import { Badge } from "@/core/ui/Badge";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
@@ -6,7 +6,7 @@ import { reassignReservation } from "./rack.service";
 interface Props {
   date: string; // ISO
   roomId: string;
-  roomStatus: RoomStatus;
+  roomStatus: Room["status"];
   mode: "compact" | "detailed";
   reservations: Reservation[];
 }
@@ -31,19 +31,21 @@ export function RackCell({ date, roomId, roomStatus, mode, reservations }: Props
   if (!res) {
     return (
       <div
-        className="relative bg-background border-b border-l border-border px-3 py-2 cursor-pointer hover:bg-secondary/40"
+        className="relative bg-background border-b border-l border-border px-3 py-2 cursor-pointer hover:bg-secondary/40 transition-colors"
         onClick={() => toast({ title: "Créer réservation", description: `Chambre ${roomId} - ${date}` })}
-        onDragOver={(e)=>e.preventDefault()}
+        onDragOver={(e)=>{e.preventDefault(); e.currentTarget.classList.add('bg-primary/10');}}
+        onDragLeave={(e)=>{e.currentTarget.classList.remove('bg-primary/10');}}
         onDrop={async (e)=>{
           e.preventDefault();
+          e.currentTarget.classList.remove('bg-primary/10');
           const id = e.dataTransfer.getData('text/res-id');
           if (!id) return;
           try{
             await reassignReservation(id, roomId);
-            toast({ title: "Réservation réassignée", description: `${id} → ${roomId}` });
+            toast({ title: "✅ Réservation réassignée", description: `Nouvelle chambre assignée` });
             window.dispatchEvent(new CustomEvent('rack-refresh'));
           }catch(err:any){
-            toast({ title: "Erreur réassignation", description: err.message });
+            toast({ title: "❌ Erreur réassignation", description: err.message });
           }
         }}
       >
@@ -57,12 +59,16 @@ export function RackCell({ date, roomId, roomStatus, mode, reservations }: Props
 
   return (
     <div
-      className={`relative border-b border-l border-border px-3 py-2 cursor-pointer transition-smooth hover:opacity-95 ${cellSoftClass}`}
+      className={`relative border-b border-l border-border px-3 py-2 cursor-move transition-all hover:shadow-md hover:scale-[1.02] ${cellSoftClass}`}
       onClick={() => toast({ title: "Détails réservation", description: `${res.guestName} (${res.id})` })}
       draggable
       onDragStart={(e)=>{
         e.dataTransfer.setData('text/res-id', res.id);
-        console.log('Drag réservation', res.id);
+        e.dataTransfer.effectAllowed = 'move';
+        e.currentTarget.style.opacity = '0.5';
+      }}
+      onDragEnd={(e)=>{
+        e.currentTarget.style.opacity = '1';
       }}
     >
       {stateDot}
