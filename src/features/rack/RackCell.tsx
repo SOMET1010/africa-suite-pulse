@@ -22,6 +22,13 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
   
   // Log pour debug le re-render
   console.log(`🔍 RackCell ${room.number} day ${dayISO}: found ${resForCell.length} reservations for room ${room.id}`, resForCell.map(r => r.id));
+  
+  // CRITIQUE : Détecter et signaler les conflits existants dans les données
+  const hasConflict = resForCell.length > 1;
+  if (hasConflict) {
+    console.warn(`⚠️ CONFLIT DÉTECTÉ: Chambre ${room.number} le ${dayISO} a ${resForCell.length} réservations simultanées:`, 
+      resForCell.map(r => ({ id: r.id, guest: r.guestName, dates: `${r.start} → ${r.end}` })));
+  }
 
   const {
     handleDragOver,
@@ -48,15 +55,18 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
   : over === "conflict" ? "drop-zone-conflict animate-scale-in"
                         : "";
 
-  const baseBg = vivid
-    ? "bg-gradient-secondary/50 backdrop-blur-sm"
-    : "bg-card/80 backdrop-blur-sm";
+  const baseBg = hasConflict
+    ? "bg-destructive/20 border-destructive/50" // Style spécial pour les conflits
+    : vivid
+      ? "bg-gradient-secondary/50 backdrop-blur-sm"
+      : "bg-card/80 backdrop-blur-sm";
 
   return (
     <div
       className={`relative h-12 sm:h-16 rounded-lg border border-border/50 ${baseBg} ${dropClass} 
         transition-all duration-300 hover:shadow-soft group touch-manipulation tap-target
-        ${resForCell.length > 0 ? 'hover-lift active:scale-95' : 'hover:bg-card/90 active:bg-card'}`}
+        ${resForCell.length > 0 ? 'hover-lift active:scale-95' : 'hover:bg-card/90 active:bg-card'}
+        ${hasConflict ? 'ring-2 ring-destructive/30 animate-pulse' : ''}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -66,13 +76,22 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
       onTouchEnd={endPress}
       role="gridcell"
       aria-disabled={room.status === "out_of_order" || room.status === "maintenance"}
-      title={room.status === "out_of_order" || room.status === "maintenance" ? "Chambre indisponible" : ""}
+      title={hasConflict 
+        ? `⚠️ CONFLIT: ${resForCell.length} réservations simultanées dans cette chambre` 
+        : room.status === "out_of_order" || room.status === "maintenance" 
+          ? "Chambre indisponible" 
+          : ""}
     >
       <div className="absolute inset-0.5 sm:inset-1 flex gap-0.5 sm:gap-1 overflow-hidden">
         {resForCell.length === 0 && (
           <div className="flex items-center justify-center w-full h-full text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
             <span className="text-xs font-medium hidden sm:inline">Libre</span>
             <span className="text-xs font-medium sm:hidden">•</span>
+          </div>
+        )}
+        {hasConflict && (
+          <div className="absolute top-0 right-0 w-3 h-3 bg-destructive rounded-full animate-pulse border border-destructive-foreground/20" 
+               title={`⚠️ ${resForCell.length} réservations en conflit`}>
           </div>
         )}
         {resForCell.map((r, index) => (
