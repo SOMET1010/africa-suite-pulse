@@ -14,13 +14,197 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      hotel_settings: {
+        Row: {
+          activation_code: string | null
+          address: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          currency: string | null
+          description: string | null
+          email: string | null
+          id: string
+          is_activated: boolean | null
+          logo_url: string | null
+          name: string
+          org_id: string
+          phone: string | null
+          timezone: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          activation_code?: string | null
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          is_activated?: boolean | null
+          logo_url?: string | null
+          name: string
+          org_id: string
+          phone?: string | null
+          timezone?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          activation_code?: string | null
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          is_activated?: boolean | null
+          logo_url?: string | null
+          name?: string
+          org_id?: string
+          phone?: string | null
+          timezone?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          adults: number | null
+          children: number | null
+          date_arrival: string
+          date_departure: string | null
+          id: string
+          org_id: string
+          planned_time: string | null
+          rate_total: number | null
+          reference: string | null
+          room_id: string | null
+          status: string
+        }
+        Insert: {
+          adults?: number | null
+          children?: number | null
+          date_arrival: string
+          date_departure?: string | null
+          id?: string
+          org_id: string
+          planned_time?: string | null
+          rate_total?: number | null
+          reference?: string | null
+          room_id?: string | null
+          status: string
+        }
+        Update: {
+          adults?: number | null
+          children?: number | null
+          date_arrival?: string
+          date_departure?: string | null
+          id?: string
+          org_id?: string
+          planned_time?: string | null
+          rate_total?: number | null
+          reference?: string | null
+          room_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      room_types: {
+        Row: {
+          capacity: number | null
+          code: string
+          created_at: string
+          id: string
+          label: string
+          note: string | null
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          capacity?: number | null
+          code: string
+          created_at?: string
+          id?: string
+          label: string
+          note?: string | null
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          capacity?: number | null
+          code?: string
+          created_at?: string
+          id?: string
+          label?: string
+          note?: string | null
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rooms: {
+        Row: {
+          floor: string | null
+          id: string
+          number: string
+          org_id: string
+          status: string
+          type: string | null
+        }
+        Insert: {
+          floor?: string | null
+          id?: string
+          number: string
+          org_id: string
+          status?: string
+          type?: string | null
+        }
+        Update: {
+          floor?: string | null
+          id?: string
+          number?: string
+          org_id?: string
+          status?: string
+          type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      reservations_view_arrivals: {
+        Row: {
+          adults: number | null
+          children: number | null
+          date_arrival: string | null
+          guest_name: string | null
+          id: string | null
+          org_id: string | null
+          planned_time: string | null
+          rate_total: number | null
+          reference: string | null
+          room_id: string | null
+          room_number: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      pms_assign_room: {
+        Args: { p_res: string; p_room: string }
+        Returns: undefined
+      }
+      pms_checkin: {
+        Args: { p_res: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
