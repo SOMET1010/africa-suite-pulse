@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { SettingsHome, HotelSettingsForm } from "@/features/settings";
 import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
+import PaymentsPage from "@/features/payments/PaymentsPage";
+import UsersPage from "@/features/users/UsersPage";
 
 function Layout() {
   return (
@@ -45,6 +47,8 @@ export function AppRoutes() {
         <Route path="settings/room-types" element={<RoomsPage />} />
         <Route path="settings/rooms-catalog" element={<RoomsPage />} />
         <Route path="settings/services" element={<ServicesPage />} />
+        <Route path="settings/payments" element={<PaymentsPage />} />
+        <Route path="settings/users" element={<UsersPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
