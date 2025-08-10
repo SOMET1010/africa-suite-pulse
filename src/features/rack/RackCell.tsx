@@ -32,12 +32,21 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
 
   async function handleDrop(e: React.DragEvent) {
     const resId = e.dataTransfer.getData(DND_MIME) || getDragData(e);
+    console.log(`📍 Drop event on room ${room.id}: resId=${resId}`);
     setOver(null);
-    if (!resId) return;
+    
+    if (!resId) {
+      console.warn("❌ No reservation ID found in drop data");
+      return;
+    }
+    
     if (isBlockedRoom(room.status)) { 
+      console.warn(`❌ Cannot drop on blocked room ${room.number} (${room.status})`);
       alert("Chambre indisponible (HS/Maintenance)"); 
       return; 
     }
+    
+    console.log(`✅ Calling onDropReservation with resId=${resId}, roomId=${room.id}`);
     await onDropReservation(resId, room.id);
   }
 

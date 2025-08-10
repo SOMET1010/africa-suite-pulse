@@ -18,9 +18,22 @@ export default function RackGrid() {
   const [vivid, setVivid] = useState(false);
 
   async function onDropReservation(resId: string, roomId: string) {
-    await reassignReservation(resId, roomId);
-    toast({ title: "✅ Réservation réassignée", description: "Nouvelle chambre assignée" });
-    await reload();
+    console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
+    try {
+      const updatedReservation = await reassignReservation(resId, roomId);
+      toast({ 
+        title: "✅ Réservation réassignée", 
+        description: `Déplacée vers la chambre ${updatedReservation?.room_id || roomId}` 
+      });
+      await reload();
+    } catch (error) {
+      console.error("❌ Error in onDropReservation:", error);
+      toast({ 
+        title: "❌ Erreur", 
+        description: "Impossible de réassigner la réservation",
+        variant: "destructive" 
+      });
+    }
   }
 
   function onContext(room: any, dayISO: string, res?: any) {

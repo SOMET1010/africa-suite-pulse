@@ -32,7 +32,19 @@ export async function fetchReservationsRange(orgId: string, startISO: string, en
 
 /** Réassigner une résa (drag&drop) à une chambre */
 export async function reassignReservation(reservationId: string, roomId: string) {
-  const { error } = await sb.rpc("pms_assign_room", { p_res: reservationId, p_room: roomId });
-  if (error) throw error;
-  return true;
+  console.log(`🔄 Reassigning reservation ${reservationId} to room ${roomId}`);
+  
+  const { data, error } = await sb
+    .from("reservations")
+    .update({ room_id: roomId })
+    .eq("id", reservationId)
+    .select();
+    
+  if (error) {
+    console.error("❌ Error reassigning reservation:", error);
+    throw error;
+  }
+  
+  console.log("✅ Reservation reassigned successfully:", data);
+  return data[0];
 }
