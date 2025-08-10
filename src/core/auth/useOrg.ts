@@ -10,9 +10,9 @@ export function useOrgId(): string | null {
     const getCurrentOrgId = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Retourner l'org_id de l'utilisateur connecté
-        // Pour l'instant, on utilise un ID fixe pour les tests
-        setOrgId('your-org-id-here');
+        // Pour l'instant, on utilise l'organisation qui a le plus de chambres
+        // Dans un vrai système, cela viendrait d'une table de profils utilisateur
+        setOrgId('7e389008-3dd1-4f54-816d-4f1daff1f435');
       }
     };
 
