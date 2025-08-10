@@ -5,8 +5,10 @@ import RackLegend from "./components/RackLegend";
 import RoomHeader from "./components/RoomHeader";
 import { RackCell } from "./RackCell";
 import { RackStatusBar } from "./RackStatusBar";
+import RoomDetailSheet from "./components/RoomDetailSheet";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
+import type { Room, Reservation } from "./types";
 
 export default function RackGrid() {
   const { data, kpis, reload } = useRackData();
@@ -16,6 +18,17 @@ export default function RackGrid() {
   const [statusFilter, setStatusFilter] = useState<"all"|"clean"|"inspected"|"dirty"|"maintenance"|"out_of_order">("all");
   const [compact, setCompact] = useState(false);
   const [vivid, setVivid] = useState(false);
+  const [detailSheet, setDetailSheet] = useState<{
+    open: boolean;
+    room: Room | null;
+    dayISO: string;
+    reservation?: Reservation;
+  }>({
+    open: false,
+    room: null,
+    dayISO: "",
+    reservation: undefined
+  });
 
   async function onDropReservation(resId: string, roomId: string) {
     console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
@@ -36,11 +49,43 @@ export default function RackGrid() {
     }
   }
 
-  function onContext(room: any, dayISO: string, res?: any) {
-    toast({ 
-      title: "Menu contextuel", 
-      description: `Chambre ${room.number} - ${dayISO}${res ? ` - ${res.guestName}` : ''}` 
+  function onContext(room: Room, dayISO: string, res?: Reservation) {
+    setDetailSheet({
+      open: true,
+      room,
+      dayISO,
+      reservation: res
     });
+  }
+
+  async function handleCheckin(reservationId: string) {
+    try {
+      // TODO: Implémenter le check-in avec la fonction Supabase
+      console.log("🏨 Check-in reservation:", reservationId);
+      toast({ 
+        title: "✅ Check-in effectué", 
+        description: "Client enregistré avec succès" 
+      });
+      setDetailSheet(prev => ({ ...prev, open: false }));
+      await reload();
+    } catch (error) {
+      console.error("❌ Error during checkin:", error);
+      toast({ 
+        title: "❌ Erreur", 
+        description: "Impossible d'effectuer le check-in",
+        variant: "destructive" 
+      });
+    }
+  }
+
+  function handleNewReservation(roomId: string, dayISO: string) {
+    // TODO: Ouvrir un formulaire de nouvelle réservation
+    console.log("📝 New reservation for room:", roomId, "on", dayISO);
+    toast({ 
+      title: "🆕 Nouvelle réservation", 
+      description: `Chambre ${roomId} - ${dayISO}` 
+    });
+    setDetailSheet(prev => ({ ...prev, open: false }));
   }
 
   useEffect(() => {
@@ -149,6 +194,16 @@ export default function RackGrid() {
         </div>
 
         <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
+
+        <RoomDetailSheet
+          open={detailSheet.open}
+          onOpenChange={(open) => setDetailSheet(prev => ({ ...prev, open }))}
+          room={detailSheet.room}
+          dayISO={detailSheet.dayISO}
+          reservation={detailSheet.reservation}
+          onCheckin={handleCheckin}
+          onNewReservation={handleNewReservation}
+        />
 
         <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
           <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
