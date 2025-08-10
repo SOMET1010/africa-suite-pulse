@@ -86,10 +86,12 @@ export default function RackGrid() {
     }
   }
 
-  function handleMoveConfirm() {
+  async function handleMoveConfirm() {
     const { pendingDrop } = moveConfirmDialog;
     if (pendingDrop) {
-      performDrop(pendingDrop.resId, pendingDrop.roomId);
+      console.log("🔄 Starting move confirmation process...");
+      await performDrop(pendingDrop.resId, pendingDrop.roomId);
+      console.log("✅ Move confirmation completed, closing dialog");
     }
     setMoveConfirmDialog({ 
       open: false, 
