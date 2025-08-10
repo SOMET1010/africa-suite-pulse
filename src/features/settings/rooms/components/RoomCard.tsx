@@ -3,7 +3,7 @@ import {
   Building, Edit3, Copy, Trash2, MoreHorizontal, Check,
   Wifi, Coffee, Waves, Sun, Package, Users, Car, MapPin
 } from 'lucide-react';
-import { Room } from '../roomsCatalogService';
+import type { Room } from '@/types/room';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';

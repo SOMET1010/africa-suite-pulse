@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, Edit3, Trash2, Wifi, Coffee, Sun, Building, Package } from 'lucide-react';
-import { Room } from '../roomsCatalogService';
+import type { Room } from '@/types/room';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';

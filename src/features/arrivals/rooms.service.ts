@@ -1,12 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type PickableRoom = {
-  id: string;
-  number: string;
-  type: string;
-  floor: string | null;
-  status: "clean" | "inspected" | "dirty" | "maintenance" | "out_of_order";
-};
+import type { PickableRoom } from '@/types/room';
+
+export type { PickableRoom };
 
 export async function fetchPickableRooms(q = ""): Promise<PickableRoom[]> {
   const sb = supabase as any;

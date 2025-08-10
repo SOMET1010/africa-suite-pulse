@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RoomTypesService, RoomTypeWithStock } from './roomTypesService';
+import { RoomTypesService } from './roomTypesService';
+import type { RoomTypeWithStock } from '@/types/roomType';
 import { useToast } from '@/hooks/use-toast';
 
 export function useRoomTypes(orgId: string) {

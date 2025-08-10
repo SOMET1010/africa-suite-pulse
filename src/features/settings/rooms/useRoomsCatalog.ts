@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { RoomsCatalogService, Room, RoomFilters, RoomStats, CreateSeriesData } from './roomsCatalogService';
+import { RoomsCatalogService } from './roomsCatalogService';
+import type { Room, RoomFilters, RoomStats, CreateSeriesData } from '@/types/room';
 import { useToast } from '@/hooks/use-toast';
 
 export function useRoomsCatalog(orgId: string) {

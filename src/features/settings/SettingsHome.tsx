@@ -21,17 +21,10 @@ const settingsTiles = [
     color: 'from-blue-500 to-blue-600',
   },
   {
-    title: 'Types de Chambres',
-    description: 'Gérer les catégories de chambres',
-    to: '/settings/room-types',
+    title: 'Gestion des Chambres',
+    description: 'Catalogue et types de chambres',
+    to: '/settings/rooms',
     icon: Bed,
-    color: 'from-green-500 to-green-600',
-  },
-  {
-    title: 'Catalogue Chambres',
-    description: 'Gestion complète des chambres réelles et fictives',
-    to: '/settings/rooms-catalog',
-    icon: Building2,
     color: 'from-emerald-500 to-emerald-600',
   },
   {

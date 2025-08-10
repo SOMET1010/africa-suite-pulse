@@ -8,8 +8,7 @@ import AuthPage from "@/pages/AuthPage";
 import RequireAuth from "@/core/auth/RequireAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SettingsHome, HotelSettingsForm } from "@/features/settings";
-import RoomTypesPage from "@/features/settings/rooms/RoomTypesPage";
-import RoomsCatalogPage from "@/features/settings/rooms/RoomsCatalogPage";
+import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
 
 function Layout() {
@@ -41,8 +40,10 @@ export function AppRoutes() {
         <Route path="reservations/rack" element={<RackGrid />} />
         <Route path="settings" element={<SettingsHome />} />
         <Route path="settings/hotel" element={<HotelSettingsForm />} />
-        <Route path="settings/room-types" element={<RoomTypesPage />} />
-        <Route path="settings/rooms-catalog" element={<RoomsCatalogPage />} />
+        <Route path="settings/rooms" element={<RoomsPage />} />
+        {/* Legacy redirects */}
+        <Route path="settings/room-types" element={<RoomsPage />} />
+        <Route path="settings/rooms-catalog" element={<RoomsPage />} />
         <Route path="settings/services" element={<ServicesPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>

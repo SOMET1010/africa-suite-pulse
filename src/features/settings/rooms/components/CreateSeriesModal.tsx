@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { CreateSeriesData } from '../roomsCatalogService';
-import { RoomTypeWithStock } from '../roomTypesService';
+import type { CreateSeriesData } from '@/types/room';
+import type { RoomTypeWithStock } from '@/types/roomType';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

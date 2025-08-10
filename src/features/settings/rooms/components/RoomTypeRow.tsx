@@ -1,6 +1,6 @@
 import React from 'react';
 import { Trash2 } from 'lucide-react';
-import { RoomTypeWithStock } from '../roomTypesService';
+import type { RoomTypeWithStock } from '@/types/roomType';
 
 interface RoomTypeRowProps {
   type: RoomTypeWithStock & { 

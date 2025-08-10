@@ -1,15 +1,11 @@
-export type RoomStatus = "clean" | "inspected" | "dirty" | "maintenance" | "out_of_order";
+// Re-export for backwards compatibility
+export type { RoomStatus } from '@/types/room';
 export type ReservationStatus = "option" | "confirmed" | "present" | "cancelled" | "noshow";
 
-// Database types (from Supabase)
-export type Room = {
-  id: string;
-  org_id: string;
-  number: string;
-  type: string;
-  floor: string | null;
-  status: RoomStatus;
-};
+// Import unified Room type and re-export what we need for backwards compatibility
+import type { Room as UnifiedRoom, RoomStatus } from '@/types/room';
+
+export type Room = UnifiedRoom;
 
 export type Reservation = {
   id: string;

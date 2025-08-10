@@ -1,9 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { RoomType } from '../types';
-
-export interface RoomTypeWithStock extends RoomType {
-  stock?: number;
-}
+import type { RoomType, RoomTypeWithStock } from '@/types/roomType';
 
 export class RoomTypesService {
   static async getAll(orgId: string): Promise<RoomTypeWithStock[]> {

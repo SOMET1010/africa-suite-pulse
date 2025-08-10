@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Settings, ChevronDown, Package, Building, Target, Trash2 } from 'lucide-react';
-import { Room } from '../roomsCatalogService';
-import { RoomTypeWithStock } from '../roomTypesService';
+import type { Room } from '@/types/room';
+import type { RoomTypeWithStock } from '@/types/roomType';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
