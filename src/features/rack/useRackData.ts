@@ -63,7 +63,10 @@ export function useRackData() {
   const [data, setData] = useState<RackData | null>(null);
 
   const load = useCallback(async () => {
-    if (!orgId) return;
+    if (!orgId) {
+      console.log("⏭️ No orgId, skipping rack load");
+      return;
+    }
     console.log("🔄 Rack reload… org:", orgId, "range:", startISO, "→", endISO);
     try {
       const [rooms, resas] = await Promise.all([

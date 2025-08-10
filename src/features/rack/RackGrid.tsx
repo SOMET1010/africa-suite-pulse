@@ -34,11 +34,16 @@ export default function RackGrid() {
     console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
     try {
       const updatedReservation = await reassignReservation(resId, roomId);
+      console.log(`✅ Reservation updated in DB:`, updatedReservation);
+      
       toast({ 
         title: "✅ Réservation réassignée", 
         description: `Déplacée vers la chambre ${updatedReservation?.room_id || roomId}` 
       });
+      
+      console.log(`🔄 Calling reload() to refresh UI...`);
       await reload();
+      console.log(`✅ Reload completed`);
     } catch (error) {
       console.error("❌ Error in onDropReservation:", error);
       toast({ 
