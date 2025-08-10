@@ -178,6 +178,22 @@ export default function RackGrid() {
           toast({ title: "❌ Sélection annulée", description: "Mode de délogement manuel désactivé" });
         }
       }
+      
+      // NOUVEAU: Clic droit pour changer la destination
+      if (e.key === 'c' || e.key === 'C') {
+        e.preventDefault();
+        if (selectionMode.sourceRoom) {
+          toast({ 
+            title: "🎯 Changement de destination", 
+            description: "Clic droit sur une nouvelle chambre pour changer la destination" 
+          });
+        } else {
+          toast({ 
+            title: "🎯 Mode délogement", 
+            description: "Sélectionnez d'abord une chambre source avec clic gauche" 
+          });
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
