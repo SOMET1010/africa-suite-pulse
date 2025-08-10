@@ -14,10 +14,12 @@ import { useToast } from "@/hooks/use-toast";
 const kinds = ["cash","card","bank","mobile","other"] as const;
 
 export default function PaymentsPage() {
-  const { orgId } = useOrgId();
+  const { orgId, loading, error } = useOrgId();
   const [tab, setTab] = useState("methods");
 
-  if (!orgId) return <div className="p-6">Organisation requise…</div>;
+  if (loading) return <div className="p-6">Chargement de l'organisation...</div>;
+  if (error) return <div className="p-6 text-destructive">Erreur: {error}</div>;
+  if (!orgId) return <div className="p-6">Aucune organisation trouvée. Veuillez configurer votre profil.</div>;
 
   return (
     <div className="p-4 md:p-6">

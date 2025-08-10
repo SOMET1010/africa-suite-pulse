@@ -127,6 +127,42 @@ export type Database = {
         }
         Relationships: []
       }
+      currencies: {
+        Row: {
+          active: boolean | null
+          code: string
+          created_at: string | null
+          id: string
+          is_base: boolean | null
+          label: string
+          org_id: string
+          rate_to_base: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          created_at?: string | null
+          id?: string
+          is_base?: boolean | null
+          label: string
+          org_id: string
+          rate_to_base?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_base?: boolean | null
+          label?: string
+          org_id?: string
+          rate_to_base?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       hotel_settings: {
         Row: {
           activation_code: string | null
@@ -187,25 +223,112 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          active: boolean | null
+          code: string
+          commission_percent: number | null
+          created_at: string | null
+          id: string
+          kind: string
+          label: string
+          org_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          commission_percent?: number | null
+          created_at?: string | null
+          id?: string
+          kind: string
+          label: string
+          org_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          commission_percent?: number | null
+          created_at?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          org_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      payment_terminals: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          device_id: string | null
+          id: string
+          name: string
+          org_id: string
+          provider: string | null
+          take_commission: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          device_id?: string | null
+          id?: string
+          name: string
+          org_id: string
+          provider?: string | null
+          take_commission?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          device_id?: string | null
+          id?: string
+          name?: string
+          org_id?: string
+          provider?: string | null
+          take_commission?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          active: boolean | null
           created_at: string
+          email: string | null
+          full_name: string | null
           id: string
+          last_login_at: string | null
           org_id: string
+          role: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          active?: boolean | null
           created_at?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
+          last_login_at?: string | null
           org_id: string
+          role?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          active?: boolean | null
           created_at?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
+          last_login_at?: string | null
           org_id?: string
+          role?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -451,6 +574,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff_invitations: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          invited_by: string | null
+          org_id: string
+          role: string
+          status: string
+          token: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          invited_by?: string | null
+          org_id: string
+          role?: string
+          status?: string
+          token: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          invited_by?: string | null
+          org_id?: string
+          role?: string
+          status?: string
+          token?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
