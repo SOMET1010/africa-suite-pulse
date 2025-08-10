@@ -51,17 +51,18 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
   };
 
   const dropClass =
-    over === "ok"  ? "ring-2 ring-green-500 ring-offset-1"
-  : over === "bad" ? "ring-2 ring-red-500 ring-offset-1"
+    over === "ok"  ? "drop-zone-valid animate-scale-in"
+  : over === "bad" ? "drop-zone-invalid animate-scale-in"
                    : "";
 
   const baseBg = vivid
-    ? "bg-secondary/30"
-    : "bg-background";
+    ? "bg-gradient-secondary/50 backdrop-blur-sm"
+    : "bg-card/80 backdrop-blur-sm";
 
   return (
     <div
-      className={`relative h-14 rounded-lg border border-border ${baseBg} ${dropClass} transition-all`}
+      className={`relative h-16 rounded-lg border border-border/50 ${baseBg} ${dropClass} 
+        transition-all duration-300 hover:shadow-soft group ${resForCell.length > 0 ? 'hover-lift' : 'hover:bg-card/90'}`}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -73,7 +74,16 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
       title={isBlockedRoom(room.status) ? "Chambre indisponible" : ""}
     >
       <div className="absolute inset-1 flex gap-1 overflow-hidden">
-        {resForCell.map(r => <BookingPill key={r.id} r={r} />)}
+        {resForCell.length === 0 && (
+          <div className="flex items-center justify-center w-full h-full text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
+            <span className="text-xs font-medium">Libre</span>
+          </div>
+        )}
+        {resForCell.map((r, index) => (
+          <div key={r.id} className="animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>
+            <BookingPill r={r} />
+          </div>
+        ))}
       </div>
     </div>
   );

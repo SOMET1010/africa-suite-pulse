@@ -2,23 +2,25 @@ import type { Room } from "../types";
 
 function roomDotClass(status: Room["status"]) {
   switch (status) {
-    case "clean": return "bg-green-200";
-    case "inspected": return "bg-blue-200";
-    case "dirty": return "bg-yellow-200";
-    case "maintenance": return "bg-orange-200";
-    case "out_of_order": return "bg-red-200";
-    default: return "bg-gray-200";
+    case "clean": return "room-dot-clean";
+    case "inspected": return "room-dot-inspected";
+    case "dirty": return "room-dot-dirty";
+    case "maintenance": return "room-dot-maintenance";
+    case "out_of_order": return "room-dot-out_of_order";
+    default: return "bg-muted";
   }
 }
 
 export default function RoomHeader({ room }:{room: Room}){
   return (
-    <div className="px-2 py-2 sticky left-0 bg-card z-10 rounded-l-lg border-r border-border">
-      <div className="flex items-center gap-2">
-        <span className={`w-2.5 h-2.5 rounded-full ${roomDotClass(room.status)}`} />
-        <div className="font-semibold">Ch. {room.number}</div>
+    <div className="px-3 py-3 sticky left-0 bg-card/95 backdrop-blur-sm z-10 border-r border-border/50 hover-lift transition-all duration-300">
+      <div className="flex items-center gap-3">
+        <span className={`w-3 h-3 rounded-full ${roomDotClass(room.status)} animate-scale-in shadow-sm`} />
+        <div className="font-display font-semibold text-foreground">Ch. {room.number}</div>
       </div>
-      <div className="text-xs text-muted-foreground">{room.type} • Étage {room.floor ?? 0}</div>
+      <div className="text-xs font-medium text-muted-foreground mt-1">
+        {room.type} • <span className="text-primary font-semibold">Étage {room.floor ?? 0}</span>
+      </div>
     </div>
   );
 }

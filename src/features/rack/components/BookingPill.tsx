@@ -1,11 +1,11 @@
 import { setDragData } from "../rack.dnd";
 import type { Reservation } from "../types";
 
-function borderByStatus(s: Reservation["status"]) {
-  if (s==="present") return "border-green-500";
-  if (s==="option") return "border-purple-500";
-  if (s==="cancelled") return "border-red-500";
-  return "border-blue-500"; // confirmed
+function pillStatusClass(s: Reservation["status"]) {
+  if (s==="present") return "status-present";
+  if (s==="option") return "status-option";
+  if (s==="cancelled") return "status-cancelled";
+  return "status-confirmed"; // confirmed
 }
 
 function statusLabel(s: Reservation["status"]) {
@@ -20,15 +20,18 @@ export default function BookingPill({ r }:{ r: Reservation }) {
     <div
       draggable
       onDragStart={(e)=>setDragData(e, r.id)}
-      className={`min-w-0 truncate px-2 py-1 text-xs rounded-md border-l-4 ${borderByStatus(r.status)} 
-        border border-border bg-card/80 cursor-grab active:cursor-grabbing hover:shadow-md transition-all`}
+      className={`group min-w-0 truncate px-3 py-2 text-xs rounded-xl ${pillStatusClass(r.status)} 
+        cursor-move hover-lift hover-glow transition-all duration-300 animate-scale-in`}
       title={`${r.guestName} • ${r.nights} nuit(s) • ${r.rate}€`}
     >
       <div className="flex items-center gap-2">
-        <span className="font-medium truncate">{r.guestName}</span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded-full border border-border bg-background/50">
+        <span className="font-semibold truncate">{r.guestName}</span>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-background/80 font-mono font-bold backdrop-blur-sm">
           {statusLabel(r.status)}
         </span>
+      </div>
+      <div className="text-[10px] opacity-75 mt-1 font-medium">
+        {r.nights}n • {r.rate}€
       </div>
     </div>
   );

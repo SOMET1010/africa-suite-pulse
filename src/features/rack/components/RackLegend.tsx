@@ -1,23 +1,35 @@
 export default function RackLegend(){
-  const Item = ({c,label}:{c:string;label:string})=>(
-    <div className="flex items-center gap-2">
-      <span className={`inline-block w-3 h-3 rounded-full ${c}`} />
-      <span className="text-xs text-muted-foreground">{label}</span>
+  const Item = ({c,label, glow}:{c:string;label:string; glow?:boolean})=>(
+    <div className="flex items-center gap-2 group">
+      <span className={`inline-block w-3 h-3 rounded-full ${c} ${glow ? 'animate-glow-pulse' : ''} group-hover:scale-110 transition-transform`} />
+      <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">{label}</span>
     </div>
   );
   
   return (
-    <div className="flex flex-wrap items-center gap-4 text-xs px-2 py-2 bg-card/50 rounded-lg border border-border">
-      <Item c="bg-green-500" label="Présent"/>
-      <Item c="bg-blue-500" label="Confirmé"/>
-      <Item c="bg-purple-500" label="Option"/>
-      <Item c="bg-red-500" label="Annulé/No-show"/>
-      <span className="mx-2 text-muted-foreground">|</span>
-      <Item c="bg-green-200" label="Ch. propre"/>
-      <Item c="bg-blue-200" label="Contrôlée"/>
-      <Item c="bg-yellow-200" label="Sale"/>
-      <Item c="bg-orange-200" label="Maintenance"/>
-      <Item c="bg-red-200" label="HS"/>
+    <div className="animate-fade-in">
+      <div className="card-elevated p-4 bg-gradient-secondary/50 backdrop-blur-sm">
+        <div className="flex flex-wrap items-center gap-6 text-xs">
+          <div className="flex items-center gap-4">
+            <span className="font-semibold text-sm text-foreground">Réservations :</span>
+            <Item c="bg-success" label="Présent" glow />
+            <Item c="bg-info" label="Confirmé" />
+            <Item c="bg-warning" label="Option" />
+            <Item c="bg-danger" label="Annulé/No-show" />
+          </div>
+          
+          <div className="w-px h-6 bg-border" />
+          
+          <div className="flex items-center gap-4">
+            <span className="font-semibold text-sm text-foreground">Chambres :</span>
+            <Item c="room-dot-clean" label="Propre" />
+            <Item c="room-dot-inspected" label="Contrôlée" />
+            <Item c="room-dot-dirty" label="Sale" />
+            <Item c="room-dot-maintenance" label="Maintenance" />
+            <Item c="room-dot-out_of_order" label="Hors service" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

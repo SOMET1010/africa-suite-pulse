@@ -58,77 +58,94 @@ export default function RackGrid() {
   if (!data) return null;
 
   return (
-    <main className="min-h-screen px-4 sm:px-6 pt-6 pb-12">
-      <header className="mb-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Rack visuel</h1>
-          <p className="text-sm text-muted-foreground">Interface tactile améliorée avec long-press et couleurs vives</p>
-        </div>
-      </header>
+    <div className="page-enter">
+      <main className="min-h-screen px-4 sm:px-6 pt-6 pb-12 space-y-6">
+        <header className="animate-fade-in">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-display font-bold text-gradient">Rack Visuel</h1>
+            <p className="text-muted-foreground font-medium">Interface tactile moderne avec animations fluides</p>
+          </div>
+        </header>
 
-      <RackToolbar
-        onFilterStatus={setStatusFilter}
-        onToggleCompact={setCompact}
-        onZoom={setZoom}
-        onVivid={setVivid}
-      />
+        <RackToolbar
+          onFilterStatus={setStatusFilter}
+          onToggleCompact={setCompact}
+          onZoom={setZoom}
+          onVivid={setVivid}
+        />
 
-      <RackLegend />
+        <RackLegend />
 
-      <div className="mt-4 overflow-auto rounded-xl border border-border" style={{ fontSize: `${Math.max(12, Math.min(16, (zoom/100)*14))}px` }}>
-        <div style={{ width: 'max-content' }}>
-          <div className="grid" style={{ gridTemplateColumns: `240px repeat(${data.days.length}, 1fr)` }}>
-            {/* Header row */}
-            <div className="sticky left-0 z-10 bg-card border-b border-border px-3 py-2 font-medium">Chambre</div>
-            {data.days.map(d=>{
-              const dt = new Date(d);
-              const isToday = d === new Date().toISOString().slice(0,10);
-              const isWE = [0,6].includes(dt.getDay());
-              return (
-                <div key={d}
-                  className={`px-2 py-2 text-xs text-center border-b border-l border-border
-                    ${isToday ? "bg-blue-100" : isWE ? "bg-secondary/30" : "bg-card"}`}>
-                  {dt.toLocaleDateString("fr-FR",{weekday:"short", day:"2-digit", month:"2-digit"})}
-                </div>
-              );
-            })}
-            {/* Rows */}
-            {filteredRooms.map((room) => (
-              <React.Fragment key={room.id}>
-                <RoomHeader room={room} />
-                {data.days.map((day) => (
-                  <RackCell
-                    key={`${room.id}-${day}`}
-                    room={room}
-                    dayISO={day}
-                    reservations={data.reservations}
-                    mode={compact ? "compact" : mode}
-                    onDropReservation={onDropReservation}
-                    onContext={onContext}
-                    vivid={vivid}
-                  />
-                ))}
-              </React.Fragment>
-            ))}
+        <div className="card-elevated overflow-auto bg-gradient-secondary/30 backdrop-blur-sm animate-fade-in" 
+             style={{ fontSize: `${Math.max(12, Math.min(16, (zoom/100)*14))}px` }}>
+          <div style={{ width: 'max-content' }}>
+            <div className="grid" style={{ gridTemplateColumns: `260px repeat(${data.days.length}, 1fr)` }}>
+              {/* Header row avec amélioration aujourd'hui/weekend */}
+              <div className="sticky left-0 z-20 bg-gradient-primary text-primary-foreground px-4 py-3 font-display font-bold shadow-soft">
+                Chambres
+              </div>
+              {data.days.map(d=>{
+                const dt = new Date(d);
+                const isToday = d === new Date().toISOString().slice(0,10);
+                const isWE = [0,6].includes(dt.getDay());
+                return (
+                  <div key={d}
+                    className={`px-3 py-3 text-xs font-semibold text-center border-l border-border transition-all duration-300
+                      ${isToday 
+                        ? "bg-gradient-primary text-primary-foreground shadow-glow animate-glow-pulse" 
+                        : isWE 
+                        ? "bg-warning/20 text-warning-foreground" 
+                        : "bg-card/80 backdrop-blur-sm hover:bg-card"}`}>
+                    <div className="font-display">
+                      {dt.toLocaleDateString("fr-FR",{weekday:"short", day:"2-digit", month:"2-digit"})}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Rows avec animations */}
+              {filteredRooms.map((room, index) => (
+                <React.Fragment key={room.id}>
+                  <div className={`animate-fade-in`} style={{ animationDelay: `${index * 50}ms` }}>
+                    <RoomHeader room={room} />
+                  </div>
+                  {data.days.map((day, dayIndex) => (
+                    <div key={`${room.id}-${day}`} 
+                         className={`animate-fade-in`} 
+                         style={{ animationDelay: `${(index * 50) + (dayIndex * 10)}ms` }}>
+                      <RackCell
+                        room={room}
+                        dayISO={day}
+                        reservations={data.reservations}
+                        mode={compact ? "compact" : mode}
+                        onDropReservation={onDropReservation}
+                        onContext={onContext}
+                        vivid={vivid}
+                      />
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
+        <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
 
-      <div className="fixed inset-x-0 bottom-0">
-        <div className="mx-auto max-w-screen-2xl px-4">
-          <div className="bg-card/90 backdrop-blur border-t border-border rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
-            <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>[F1] Check-in</span>
-                <span>[F2] Assigner</span>
-                <span>[F5] Note</span>
+        <div className="fixed inset-x-0 bottom-0">
+          <div className="mx-auto max-w-screen-2xl px-4">
+            <div className="bg-card/90 backdrop-blur border-t border-border rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
+              <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>[F1] Check-in</span>
+                  <span>[F2] Assigner</span>
+                  <span>[F5] Note</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
