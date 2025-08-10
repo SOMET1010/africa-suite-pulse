@@ -57,8 +57,57 @@ export default function RackGrid() {
     }
   }, [data]);
 
+  // 🆕 FONCTION DE VALIDATION : Vérifie si le déplacement est valide
+  function validateMove(reservation: any, targetRoomId: string): { isValid: boolean; reason?: string } {
+    if (!reservation || !targetRoomId) {
+      return { isValid: false, reason: "Données manquantes" };
+    }
+
+    // Vérification principale : même chambre
+    if (reservation.room_id === targetRoomId) {
+      return { 
+        isValid: false, 
+        reason: "La réservation est déjà dans cette chambre" 
+      };
+    }
+
+    // Vérification de l'existence de la chambre cible
+    const targetRoom = data?.rooms.find(r => r.id === targetRoomId);
+    if (!targetRoom) {
+      return { 
+        isValid: false, 
+        reason: "Chambre de destination introuvable" 
+      };
+    }
+
+    // Vérification du statut de la chambre (optionnel)
+    if (targetRoom.status === 'out_of_order') {
+      return { 
+        isValid: false, 
+        reason: "Chambre hors service" 
+      };
+    }
+
+    return { isValid: true };
+  }
+
   async function performDrop(resId: string, roomId: string) {
     console.log(`🎯 Performing drop: reservation ${resId} to room ${roomId}`);
+    
+    // 🆕 VALIDATION AVANT EXÉCUTION
+    const reservation = data?.reservations.find(r => r.id === resId);
+    const validation = validateMove(reservation, roomId);
+    
+    if (!validation.isValid) {
+      console.log(`❌ Invalid move: ${validation.reason}`);
+      toast({ 
+        title: "❌ Déplacement impossible", 
+        description: validation.reason,
+        variant: "destructive" 
+      });
+      return;
+    }
+
     try {
       console.log(`📡 Calling reassignReservation API...`);
       const updatedReservation = await reassignReservation(resId, roomId);
@@ -140,6 +189,29 @@ export default function RackGrid() {
     setDetailSheet(prev => ({ ...prev, open: false }));
   }
 
+  // 🆕 FONCTION AMÉLIORÉE : Validation pour délogement manuel
+  function handleManualRelodgingWithValidation(sourceRoom: any, destinationRoom: any) {
+    // Vérification : même chambre
+    if (sourceRoom?.id === destinationRoom?.id) {
+      toast({ 
+        title: "❌ Délogement impossible", 
+        description: "Vous ne pouvez pas déloger vers la même chambre",
+        variant: "destructive" 
+      });
+      
+      // Reset de la sélection
+      setSelectionMode({
+        sourceRoom: null,
+        sourceReservation: null,
+        destinationRoom: null
+      });
+      return;
+    }
+
+    // Si validation OK, procéder avec la logique originale
+    handleManualRelodging(sourceRoom, destinationRoom);
+  }
+
   useEffect(() => {
     document.title = "Rack visuel - AfricaSuite";
     const meta = document.querySelector('meta[name="description"]');
@@ -155,11 +227,11 @@ export default function RackGrid() {
       if (e.key === 'F2') { e.preventDefault(); toast({ title: "[F2] Assigner (Rack)", description: "Action de démonstration" }); }
       if (e.key === 'F5') { e.preventDefault(); toast({ title: "[F5] Note (Rack)", description: "Action de démonstration" }); }
       
-      // NOUVEAU: Délogement manuel avec touche 'D'
+      // 🆕 DÉLOGEMENT MANUEL AVEC VALIDATION
       if (e.key === 'D' || e.key === 'd') {
         e.preventDefault();
         if (selectionMode.sourceRoom && selectionMode.destinationRoom) {
-          handleManualRelodging(selectionMode.sourceRoom, selectionMode.destinationRoom);
+          handleManualRelodgingWithValidation(selectionMode.sourceRoom, selectionMode.destinationRoom);
         } else {
           toast({ 
             title: "🎯 Délogement manuel", 
@@ -254,6 +326,16 @@ export default function RackGrid() {
             });
           }}
           onRightClick={(room) => {
+            // 🆕 VALIDATION LORS DE LA SÉLECTION DE DESTINATION
+            if (selectionMode.sourceRoom && selectionMode.sourceRoom.id === room.id) {
+              toast({ 
+                title: "⚠️ Même chambre", 
+                description: "Sélectionnez une chambre différente comme destination",
+                variant: "destructive" 
+              });
+              return;
+            }
+            
             setSelectionMode(prev => ({
               ...prev,
               destinationRoom: room
@@ -327,6 +409,8 @@ export default function RackGrid() {
                   <span className="whitespace-nowrap">[F1] Check-in</span>
                   <span className="whitespace-nowrap">[F2] Assigner</span>
                   <span className="whitespace-nowrap">[F5] Note</span>
+                  <span className="whitespace-nowrap">[D] Déloger</span>
+                  <span className="whitespace-nowrap">[Esc] Annuler</span>
                 </div>
                 <div className="text-xs text-muted-foreground/80 font-mono">
                   {filteredRooms.length} chambres
