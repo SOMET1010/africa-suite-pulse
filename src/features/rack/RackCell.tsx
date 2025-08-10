@@ -24,7 +24,12 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
   }
 
   function handleDragOver(e: React.DragEvent) {
-    if (isBlockedRoom(room.status)) { setOver("bad"); return; }
+    console.log(`🟡 Drag over room ${room.number}`);
+    if (isBlockedRoom(room.status)) { 
+      console.log(`❌ Room ${room.number} is blocked: ${room.status}`);
+      setOver("bad"); 
+      return; 
+    }
     e.preventDefault(); 
     e.dataTransfer.dropEffect = "move"; 
     setOver("ok");
@@ -35,12 +40,19 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
   }
 
   async function handleDrop(e: React.DragEvent) {
-    const resId = e.dataTransfer.getData(DND_MIME) || getDragData(e);
+    e.preventDefault();
+    console.log(`🔵 Drop event triggered on room ${room.number} (${room.id})`);
+    
+    const resId = getDragData(e);
     console.log(`📍 Drop event on room ${room.id}: resId=${resId}`);
+    console.log(`📍 DataTransfer types:`, e.dataTransfer.types);
+    console.log(`📍 DataTransfer effectAllowed:`, e.dataTransfer.effectAllowed);
+    
     setOver(null);
     
     if (!resId) {
       console.warn("❌ No reservation ID found in drop data");
+      console.warn("❌ Available data:", e.dataTransfer.getData("text/plain"));
       return;
     }
     

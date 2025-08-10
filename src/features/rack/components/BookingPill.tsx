@@ -16,10 +16,16 @@ function statusLabel(s: Reservation["status"]) {
 }
 
 export default function BookingPill({ r }:{ r: Reservation }) {
+  const handleDragStart = (e: React.DragEvent) => {
+    console.log(`🟢 Starting drag for reservation ${r.id}`);
+    setDragData(e, r.id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
   return (
     <div
-      draggable
-      onDragStart={(e)=>setDragData(e, r.id)}
+      draggable={true}
+      onDragStart={handleDragStart}
       className={`group min-w-0 truncate px-2 sm:px-3 py-1 sm:py-2 text-xs rounded-xl ${pillStatusClass(r.status)} 
         cursor-move hover-lift hover-glow transition-all duration-300 animate-scale-in touch-manipulation tap-target active:scale-95`}
       title={`${r.guestName} • ${r.nights} nuit(s) • ${r.rate}€`}
