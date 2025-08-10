@@ -64,7 +64,7 @@ export default function RackGrid() {
     }
 
     // Vérification principale : même chambre
-    if (reservation.room_id === targetRoomId) {
+    if (reservation.roomId === targetRoomId) {
       return { 
         isValid: false, 
         reason: "La réservation est déjà dans cette chambre" 
@@ -115,7 +115,7 @@ export default function RackGrid() {
       
       toast({ 
         title: "✅ Réservation réassignée", 
-        description: `Déplacée vers la chambre ${updatedReservation?.room_id || roomId}` 
+        description: `Déplacée vers la chambre ${roomId}` 
       });
       
       console.log(`🔄 Calling reload() to refresh UI...`);
