@@ -95,11 +95,24 @@ export class RoomsCatalogService {
   }
 
   static async create(orgId: string, room: Partial<Room>): Promise<Room> {
+    // Get room type ID
+    const { data: roomType, error: typeError } = await supabase
+      .from('room_types')
+      .select('id')
+      .eq('code', room.type!)
+      .eq('org_id', orgId)
+      .single();
+
+    if (typeError || !roomType) {
+      throw new Error(`Type de chambre '${room.type}' introuvable`);
+    }
+
     const { data, error } = await supabase
       .from('rooms')
       .insert({
         org_id: orgId,
         number: room.number!,
+        room_type_id: roomType.id,
         type: room.type!,
         floor: room.floor,
         status: room.status || 'clean',
@@ -144,15 +157,28 @@ export class RoomsCatalogService {
   }
 
   static async createSeries(orgId: string, data: CreateSeriesData): Promise<Room[]> {
-    const newRooms = [];
+    // First get the room type to get its ID
+    const { data: roomType, error: typeError } = await supabase
+      .from('room_types')
+      .select('id')
+      .eq('code', data.typeCode)
+      .eq('org_id', orgId)
+      .single();
 
+    if (typeError || !roomType) {
+      throw new Error(`Type de chambre '${data.typeCode}' introuvable`);
+    }
+
+    const newRooms = [];
+    
     for (let i = data.startNumber; i <= data.endNumber; i++) {
       const number = `${data.prefix || ''}${i.toString().padStart(3, '0')}${data.suffix || ''}`;
       
       newRooms.push({
         org_id: orgId,
         number,
-        type: data.typeCode,
+        room_type_id: roomType.id,
+        type: data.typeCode, // Keep for compatibility
         floor: data.floor,
         status: 'clean' as const,
         is_fictive: data.isFictive,
