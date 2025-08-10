@@ -295,6 +295,69 @@ export type Database = {
         }
         Relationships: []
       }
+      permissions: {
+        Row: {
+          category: string
+          code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          label: string
+        }
+        Insert: {
+          category?: string
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          label: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          label?: string
+        }
+        Relationships: []
+      }
+      profile_permissions: {
+        Row: {
+          created_at: string | null
+          id: string
+          permission_id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          permission_id: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          permission_id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_permissions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active: boolean | null
@@ -304,6 +367,7 @@ export type Database = {
           id: string
           last_login_at: string | null
           org_id: string
+          profile_id: string | null
           role: string | null
           updated_at: string
           user_id: string
@@ -316,6 +380,7 @@ export type Database = {
           id?: string
           last_login_at?: string | null
           org_id: string
+          profile_id?: string | null
           role?: string | null
           updated_at?: string
           user_id: string
@@ -328,11 +393,20 @@ export type Database = {
           id?: string
           last_login_at?: string | null
           org_id?: string
+          profile_id?: string | null
           role?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservations: {
         Row: {
@@ -607,6 +681,39 @@ export type Database = {
           role?: string
           status?: string
           token?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          access_level: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          org_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_level?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          org_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_level?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          org_id?: string
           updated_at?: string | null
         }
         Relationships: []
