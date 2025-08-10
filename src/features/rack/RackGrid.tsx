@@ -32,7 +32,8 @@ export default function RackGrid() {
     onContext,
     closeConflictDialog,
     doSwap,
-    doAutoRelodge
+    doAutoRelodge,
+    doConfirmRelodge
   } = useRackActions({
     data,
     reload,
@@ -207,9 +208,11 @@ export default function RackGrid() {
           dragged={conflictDialog.dragged}
           targetRoom={data.rooms.find(r => r.id === conflictDialog.targetRoomId) || null}
           conflicts={conflictDialog.conflicts}
+          preview={conflictDialog.preview}
           onCancel={closeConflictDialog}
           onSwap={doSwap}
           onAutoRelodge={doAutoRelodge}
+          onConfirmRelodge={doConfirmRelodge}
         />
 
         <MoveConfirmationDialog

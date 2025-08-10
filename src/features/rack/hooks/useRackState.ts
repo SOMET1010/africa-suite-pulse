@@ -26,11 +26,13 @@ export function useRackState() {
     dragged: UIReservation | null;
     targetRoomId: string | null;
     conflicts: UIReservation[];
+    preview: any[];
   }>({
     open: false,
     dragged: null,
     targetRoomId: null,
-    conflicts: []
+    conflicts: [],
+    preview: []
   });
 
   const [moveConfirmDialog, setMoveConfirmDialog] = useState<{

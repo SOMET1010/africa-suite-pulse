@@ -66,6 +66,66 @@ export function findFirstFreeRoom(
   return null;
 }
 
+/** score d'aptitude d'une chambre pour reloger une résa */
+function scoreRoomFit(room: UIRoom, r: UIReservation, ref?: { type?: string; floor?: number }) {
+  let s = 0;
+
+  // 1) disponibilité stricte
+  // (le filtre d'indisponibilité est géré avant; ici, on score les préférences)
+  // 2) préférences de matching
+  if (ref?.type && room.type === ref.type) s += 3;
+  if (ref?.floor != null && room.floor === ref.floor) s += 2;
+
+  // 3) état de chambre (propre/contrôlée > sale > maintenance/hs déjà exclus)
+  if (room.status === "clean" || room.status === "inspected") s += 2;
+  if (room.status === "dirty") s += 1;
+
+  // 4) proximité par numéro (si format numérique)
+  const rn = parseInt(String(room.number), 10);
+  const base = parseInt(String(r.roomId ?? ""), 10);
+  if (!Number.isNaN(rn) && !Number.isNaN(base)) {
+    const dist = Math.abs(rn - base);
+    // plus c'est proche, mieux c'est
+    s += Math.max(0, 3 - Math.min(3, Math.floor(dist / 5)));
+  }
+
+  return s;
+}
+
+export type Relocation = { conflict: UIReservation; target: UIRoom | null; score: number };
+
+/**
+ * Trouve la *meilleure* chambre libre pour chaque conflit, avec un score.
+ * - respecte la disponibilité
+ * - favorise même type / même étage / état propre/contrôlé / proximité numéro
+ * - évite les rooms exclues
+ */
+export function findBestRelocationRooms(
+  data: RackData,
+  conflicts: UIReservation[],
+  opts?: { excludeRoomIds?: string[] }
+): Relocation[] {
+  const exclude = new Set(opts?.excludeRoomIds ?? []);
+  return conflicts.map(conflict => {
+    const candidates = data.rooms.filter(room => {
+      if (exclude.has(room.id)) return false;
+      if (isRoomBlocked(room.status)) return false;
+      const busy = data.reservations.some(
+        x => x.roomId === room.id && overlapsRange(x.start, x.end, conflict.start, conflict.end)
+      );
+      return !busy;
+    });
+
+    // on essaye d'utiliser les attributs de la chambre d'origine comme "référence"
+    const refRoom = data.rooms.find(r => r.id === conflict.roomId);
+    const best = candidates
+      .map(room => ({ room, score: scoreRoomFit(room, conflict, { type: refRoom?.type, floor: refRoom?.floor }) }))
+      .sort((a, b) => b.score - a.score)[0];
+
+    return best ? { conflict, target: best.room, score: best.score } : { conflict, target: null, score: -1 };
+  });
+}
+
 /** Cas spécial : swap simple entre deux chambres si un seul conflit sur la cible */
 export function canSwap(dragged: UIReservation, conflicts: UIReservation[]) {
   if (conflicts.length !== 1) return false;

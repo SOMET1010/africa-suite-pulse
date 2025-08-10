@@ -1,6 +1,6 @@
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "../rack.service";
-import { canSwap, findFirstFreeRoom } from "../conflictValidation";
+import { canSwap, findFirstFreeRoom, findBestRelocationRooms, type Relocation } from "../conflictValidation";
 import type { UIRoom, UIReservation, RackData } from "../rack.types";
 
 interface UseRackActionsProps {
@@ -11,6 +11,7 @@ interface UseRackActionsProps {
     dragged: UIReservation | null;
     targetRoomId: string | null;
     conflicts: UIReservation[];
+    preview: Relocation[];
   };
   setConflictDialog: (state: any) => void;
   setDetailSheet: (state: any) => void;
@@ -56,7 +57,9 @@ export function useRackActions({
     conflicts: UIReservation[] 
   }) {
     const dragged = data?.reservations.find(r => r.id === draggedId) || null;
-    setConflictDialog({ open: true, dragged, targetRoomId, conflicts });
+    // calcule la preview dès l'ouverture
+    const preview = data ? findBestRelocationRooms(data, conflicts, { excludeRoomIds: [targetRoomId] }) : [];
+    setConflictDialog({ open: true, dragged, targetRoomId, conflicts, preview });
   }
 
   function onContext(room: UIRoom, dayISO: string, res?: UIReservation) {
@@ -69,7 +72,7 @@ export function useRackActions({
   }
 
   function closeConflictDialog() {
-    setConflictDialog({ open: false, dragged: null, targetRoomId: null, conflicts: [] });
+    setConflictDialog({ open: false, dragged: null, targetRoomId: null, conflicts: [], preview: [] });
   }
 
   async function doSwap() {
@@ -149,12 +152,51 @@ export function useRackActions({
     }
   }
 
+  /** Exécute le plan validé (avec preview déjà affichée) */
+  async function doConfirmRelodge(plan: Relocation[]) {
+    const { dragged, targetRoomId } = conflictDialog;
+    if (!dragged || !targetRoomId) return;
+
+    try {
+      // 1) déplacer tous les conflits selon le plan
+      for (const p of plan) {
+        if (!p.target) {
+          toast({
+            title: "❌ Erreur",
+            description: `Aucune solution pour ${p.conflict.guestName}`,
+            variant: "destructive"
+          });
+          return;
+        }
+        await reassignReservation(p.conflict.id, p.target.id);
+      }
+      // 2) déplacer la réservation d'origine vers la cible
+      await reassignReservation(dragged.id, targetRoomId);
+
+      toast({ 
+        title: "✅ Plan de délogement exécuté", 
+        description: `${plan.length} réservation${plan.length > 1 ? 's' : ''} relocalisée${plan.length > 1 ? 's' : ''} avec succès` 
+      });
+
+      closeConflictDialog();
+      await reload();
+    } catch (error) {
+      console.error("❌ Error during plan execution:", error);
+      toast({ 
+        title: "❌ Erreur", 
+        description: "Impossible d'exécuter le plan de délogement",
+        variant: "destructive" 
+      });
+    }
+  }
+
   return {
     onDropReservation,
     handleConflict,
     onContext,
     closeConflictDialog,
     doSwap,
-    doAutoRelodge
+    doAutoRelodge,
+    doConfirmRelodge
   };
 }
