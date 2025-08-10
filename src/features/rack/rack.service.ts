@@ -9,19 +9,21 @@ function throwIfError<T>(data: T | null, error: any): T {
   return data;
 }
 
-export async function fetchRooms(): Promise<Room[]> {
+export async function fetchRooms(orgId: string): Promise<Room[]> {
   const { data, error } = await sb
     .from("rooms")
     .select("*")
+    .eq("org_id", orgId)
     .order("number", { ascending: true });
   return throwIfError(data, error) as Room[];
 }
 
-export async function fetchReservationsRange(startISO: string, endISO: string): Promise<Reservation[]> {
-  // Réservations qui chevauchent l’intervalle [start, end]
+export async function fetchReservationsRange(orgId: string, startISO: string, endISO: string): Promise<Reservation[]> {
+  // Réservations qui chevauchent l'intervalle [start, end]
   const { data, error } = await sb
     .from("reservations")
     .select("*")
+    .eq("org_id", orgId)
     .lte("date_arrival", endISO)
     .gte("date_departure", startISO)
     .order("date_arrival", { ascending: true });

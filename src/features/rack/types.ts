@@ -1,4 +1,4 @@
-export type RoomStatus = "clean" | "dirty" | "maintenance" | "out_of_order";
+export type RoomStatus = "clean" | "inspected" | "dirty" | "maintenance" | "out_of_order";
 export type ReservationStatus = "confirmed" | "present" | "option" | "cancelled";
 
 export interface Room {

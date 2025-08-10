@@ -2,89 +2,127 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import type { RackData, Room as UIRoom, Reservation as UIReservation } from "./types";
 import { fetchRooms, fetchReservationsRange } from "./rack.service";
 import type { Room as SBRoom, Reservation as SBReservation } from "./rack.types";
+import { useOrgId } from "@/core/auth/useOrg";
 
-function generateDays(): string[] {
-  const days: string[] = [];
-  const today = new Date();
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    days.push(d.toISOString().slice(0, 10));
-  }
-  return days;
+// --- utils dates (UTC-safe, jour civil par ISO 'YYYY-MM-DD') ---
+function toISODate(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
+function addDays(iso: string, n: number) {
+  const d = new Date(iso + "T00:00:00");
+  d.setDate(d.getDate() + n);
+  return toISODate(d);
+}
+function daysRange(startISO: string, len: number) {
+  return Array.from({ length: len }, (_, i) => addDays(startISO, i));
+}
+function diffNights(startISO: string, endISO: string) {
+  const a = new Date(startISO + "T00:00:00");
+  const b = new Date(endISO + "T00:00:00");
+  const ms = b.getTime() - a.getTime();
+  return Math.max(1, Math.round(ms / 86400000));
+}
+function overlapsDay(res: { date_arrival: string; date_departure: string }, dayISO: string) {
+  // Occupe la nuit de dayISO si arrival <= dayISO < departure
+  return res.date_arrival <= dayISO && dayISO < res.date_departure;
 }
 
+// --- mapping UI ---
 function toUIRoom(r: SBRoom): UIRoom {
   return {
     id: r.id,
     number: r.number,
     type: r.type,
     floor: r.floor ? parseInt(r.floor, 10) || 0 : 0,
-    status: (r.status === 'inspected' ? 'clean' : r.status) as UIRoom["status"],
-  } as UIRoom;
+    // on garde 'inspected' tel quel pour un dot distinct
+    status: r.status as UIRoom["status"],
+  };
 }
-
-function diffDays(aISO: string, bISO: string) {
-  const a = new Date(aISO);
-  const b = new Date(bISO);
-  return Math.max(1, Math.round((new Date(b.toISOString().slice(0,10)).getTime() - new Date(a.toISOString().slice(0,10)).getTime()) / (1000*60*60*24)));
-}
-
 function toUIReservation(r: SBReservation): UIReservation {
-  console.log('🔄 Transformation réservation:', { id: r.id, room_id: r.room_id, reference: r.reference });
+  // log de diag
+  console.log("🔄 map résa:", { id: r.id, room_id: r.room_id, ref: r.reference, org: (r as any).org_id });
   return {
     id: r.id,
     guestName: r.reference ?? "Réservation",
-    status: (r.status === 'noshow' ? 'cancelled' : r.status) as UIReservation["status"],
-    ae: (r.adults ?? 0) > 0 ? 'A' : 'E',
-    nights: diffDays(r.date_arrival, r.date_departure),
+    status: (r.status === "noshow" ? "cancelled" : r.status) as UIReservation["status"],
+    ae: (r.children ?? 0) > 0 ? "E" : "A",
+    nights: diffNights(r.date_arrival, r.date_departure),
     rate: r.rate_total ?? 0,
     roomId: r.room_id || "",
     start: r.date_arrival,
     end: r.date_departure,
-  } as UIReservation;
+  };
 }
 
 export function useRackData() {
+  const orgId = useOrgId();
+  const startISO = useMemo(() => toISODate(new Date()), []);
+  const days = useMemo(() => daysRange(startISO, 7), [startISO]);
+  const endISO = days[days.length - 1];
+
   const [data, setData] = useState<RackData | null>(null);
-  const days = useMemo(() => generateDays(), []);
 
   const load = useCallback(async () => {
-    console.log('🔄 Rechargement des données Rack...');
+    if (!orgId) return;
+    console.log("🔄 Rack reload… org:", orgId, "range:", startISO, "→", endISO);
     try {
-      const [rooms, resas] = await Promise.all([fetchRooms(), fetchReservationsRange(days[0], days[days.length - 1])]);
+      const [rooms, resas] = await Promise.all([
+        fetchRooms(orgId),
+        fetchReservationsRange(orgId, startISO, endISO),
+      ]);
+
+      // logs de diag par chambre
+      rooms.forEach((room) => {
+        const linked = resas.filter((r) => r.room_id === room.id).length;
+        console.log(`🏠 Ch ${room.number} (${room.id}) → ${linked} résa(s) liées`);
+      });
+
       const uiRooms: UIRoom[] = rooms.map(toUIRoom);
       const uiResas: UIReservation[] = resas
-        .filter(r => r.room_id !== null) // Ne garder que les réservations avec une chambre assignée
+        .filter((r) => r.room_id !== null) // on ignore les non assignées dans la grille (elles restent visibles dans Arrivées)
         .map(toUIReservation);
-      console.log('✅ Données Rack rechargées:', { rooms: uiRooms.length, reservations: uiResas.length });
+
+      console.log("✅ Rack set:", { rooms: uiRooms.length, reservations: uiResas.length });
       setData({ days, rooms: uiRooms, reservations: uiResas });
     } catch (error) {
-      console.error('❌ Erreur rechargement Rack:', error);
+      console.error("❌ Erreur rechargement Rack:", error);
     }
-  }, [days]);
+  }, [orgId, startISO, endISO, days]);
 
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    const handler = () => { 
-      console.log('🎯 Événement rack-refresh reçu');
-      load(); 
-    };
-    window.addEventListener('rack-refresh', handler as EventListener);
-    return () => window.removeEventListener('rack-refresh', handler as EventListener);
-  }, [load]); // Maintenant load est stable grâce à useCallback
+    const handler = () => { console.log("🎯 rack-refresh"); load(); };
+    window.addEventListener("rack-refresh", handler as EventListener);
+    return () => window.removeEventListener("rack-refresh", handler as EventListener);
+  }, [load]);
 
+  // KPI corrects : on compte (chambre × jour) occupés
   const kpis = useMemo(() => {
     if (!data) return { occ: 0, arrivals: 0, presents: 0, hs: 0 };
-    const totalNights = data.rooms.length * data.days.length;
-    const occupiedCells = data.reservations.reduce((acc, r) => acc + r.nights, 0);
-    const occ = totalNights ? Math.round((occupiedCells / totalNights) * 100) : 0;
-    const arrivals = data.reservations.filter(r => r.start === data.days[0]).length;
-    const presents = data.reservations.filter(r => r.status === 'present').length;
-    const hs = data.rooms.filter(r => r.status === 'out_of_order').length;
+
+    const totalCells = data.rooms.length * data.days.length || 1;
+    let occupiedCells = 0;
+
+    for (const room of data.rooms) {
+      for (const day of data.days) {
+        const hasRes = data.reservations.some(
+          (r) => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, day)
+        );
+        if (hasRes) occupiedCells++;
+      }
+    }
+
+    const occ = Math.round((occupiedCells / totalCells) * 100);
+    const arrivals = data.reservations.filter((r) => r.start === data.days[0]).length;
+    const presents = data.reservations.filter((r) => r.status === "present").length;
+    const hs = data.rooms.filter((r) => r.status === "out_of_order").length;
+
     return { occ, arrivals, presents, hs };
   }, [data]);
 
-  return { data, kpis };
+  return { data, kpis, reload: load };
 }
