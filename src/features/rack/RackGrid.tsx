@@ -96,6 +96,7 @@ export default function RackGrid() {
   async function performDrop(resId: string, roomId: string) {
     console.log(`🎯 Performing drop: reservation ${resId} to room ${roomId}`);
     try {
+      console.log(`📡 Calling reassignReservation API...`);
       const updatedReservation = await reassignReservation(resId, roomId);
       console.log(`✅ Reservation updated in DB:`, updatedReservation);
       
@@ -105,8 +106,16 @@ export default function RackGrid() {
       });
       
       console.log(`🔄 Calling reload() to refresh UI...`);
+      console.log(`📊 Current data before reload:`, data?.reservations.length, "reservations");
+      
       await reload();
+      
       console.log(`✅ Reload completed`);
+      console.log(`📊 Data after reload should be different now`);
+      
+      // Force un re-render en déclenchant un event custom
+      window.dispatchEvent(new CustomEvent('rack-updated'));
+      
     } catch (error) {
       console.error("❌ Error in performDrop:", error);
       toast({ 
