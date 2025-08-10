@@ -54,7 +54,9 @@ export function useRackData() {
     try {
       const [rooms, resas] = await Promise.all([fetchRooms(), fetchReservationsRange(days[0], days[days.length - 1])]);
       const uiRooms: UIRoom[] = rooms.map(toUIRoom);
-      const uiResas: UIReservation[] = resas.map(toUIReservation);
+      const uiResas: UIReservation[] = resas
+        .filter(r => r.room_id !== null) // Ne garder que les réservations avec une chambre assignée
+        .map(toUIReservation);
       console.log('✅ Données Rack rechargées:', { rooms: uiRooms.length, reservations: uiResas.length });
       setData({ days, rooms: uiRooms, reservations: uiResas });
     } catch (error) {
