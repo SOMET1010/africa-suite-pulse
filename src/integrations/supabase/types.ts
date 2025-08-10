@@ -363,9 +363,11 @@ export type Database = {
           active: boolean | null
           created_at: string
           email: string | null
+          expires_at: string | null
           full_name: string | null
           id: string
           last_login_at: string | null
+          login_code: string | null
           org_id: string
           profile_id: string | null
           role: string | null
@@ -376,9 +378,11 @@ export type Database = {
           active?: boolean | null
           created_at?: string
           email?: string | null
+          expires_at?: string | null
           full_name?: string | null
           id?: string
           last_login_at?: string | null
+          login_code?: string | null
           org_id: string
           profile_id?: string | null
           role?: string | null
@@ -389,9 +393,11 @@ export type Database = {
           active?: boolean | null
           created_at?: string
           email?: string | null
+          expires_at?: string | null
           full_name?: string | null
           id?: string
           last_login_at?: string | null
+          login_code?: string | null
           org_id?: string
           profile_id?: string | null
           role?: string | null
