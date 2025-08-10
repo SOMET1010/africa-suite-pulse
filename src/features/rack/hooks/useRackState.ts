@@ -9,6 +9,17 @@ export function useRackState() {
   const [compact, setCompact] = useState(false);
   const [vivid, setVivid] = useState(false);
   
+  // Manuel re-lodging selection state
+  const [selectionMode, setSelectionMode] = useState<{
+    sourceRoom: UIRoom | null;
+    sourceReservation: UIReservation | null;
+    destinationRoom: UIRoom | null;
+  }>({
+    sourceRoom: null,
+    sourceReservation: null,
+    destinationRoom: null
+  });
+  
   const [detailSheet, setDetailSheet] = useState<{
     open: boolean;
     room: UIRoom | null;
@@ -51,6 +62,20 @@ export function useRackState() {
     pendingDrop: null
   });
 
+  const [manualRelodgeDialog, setManualRelodgeDialog] = useState<{
+    open: boolean;
+    sourceRoom: UIRoom | null;
+    destinationRoom: UIRoom | null;
+    conflicts: UIReservation[];
+    preview: any[];
+  }>({
+    open: false,
+    sourceRoom: null,
+    destinationRoom: null,
+    conflicts: [],
+    preview: []
+  });
+
   return {
     // UI state
     zoom, setZoom,
@@ -60,9 +85,13 @@ export function useRackState() {
     compact, setCompact,
     vivid, setVivid,
     
+    // Selection state
+    selectionMode, setSelectionMode,
+    
     // Dialog states
     detailSheet, setDetailSheet,
     conflictDialog, setConflictDialog,
     moveConfirmDialog, setMoveConfirmDialog,
+    manualRelodgeDialog, setManualRelodgeDialog,
   };
 }

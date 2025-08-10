@@ -14,9 +14,17 @@ type Props = {
   onContext: (room: UIRoom, dayISO: string, res?: UIReservation)=>void;
   onConflict: (opts: { draggedId: string; targetRoomId: string; conflicts: UIReservation[] }) => void;
   vivid?: boolean;
+  // Manual re-lodging props
+  selectionMode?: {
+    sourceRoom: UIRoom | null;
+    sourceReservation: UIReservation | null;
+    destinationRoom: UIRoom | null;
+  };
+  onLeftClick?: (room: UIRoom, reservation?: UIReservation) => void;
+  onRightClick?: (room: UIRoom) => void;
 };
 
-export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropReservation, onContext, onConflict, vivid }: Props) {
+export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropReservation, onContext, onConflict, vivid, selectionMode, onLeftClick, onRightClick }: Props) {
   const [over, setOver] = useState<"ok"|"bad"|"conflict"|null>(null);
   const resForCell = reservations.filter(r => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, dayISO));
   
@@ -40,6 +48,23 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
     onContext(room, dayISO, resForCell[0]);
   }
 
+  function handleLeftClick(e: React.MouseEvent) {
+    if (onLeftClick) {
+      e.preventDefault();
+      onLeftClick(room, resForCell[0]);
+    }
+  }
+
+  function handleRightClick(e: React.MouseEvent) {
+    if (onRightClick) {
+      e.preventDefault();
+      onRightClick(room);
+    } else {
+      e.preventDefault(); 
+      onContext(room, dayISO, resForCell[0]);
+    }
+  }
+
   // long-press tactile : ouvre menu
   const pressRef = useRef<number|undefined>(undefined);
   const startPress = () => { 
@@ -55,15 +80,25 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
   : over === "conflict" ? "drop-zone-conflict animate-scale-in"
                         : "";
 
+  // Selection styling
+  const isSourceSelected = selectionMode?.sourceRoom?.id === room.id;
+  const isDestinationSelected = selectionMode?.destinationRoom?.id === room.id;
+  
   const baseBg = hasConflict
     ? "bg-destructive/20 border-destructive/50" // Style spécial pour les conflits
     : vivid
       ? "bg-gradient-secondary/50 backdrop-blur-sm"
       : "bg-card/80 backdrop-blur-sm";
 
+  const selectionClasses = isSourceSelected
+    ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+    : isDestinationSelected
+      ? "ring-2 ring-dashed ring-secondary ring-offset-2 ring-offset-background"
+      : "";
+
   return (
     <div
-      className={`relative h-12 sm:h-16 rounded-lg border border-border/50 ${baseBg} ${dropClass} 
+      className={`relative h-12 sm:h-16 rounded-lg border border-border/50 ${baseBg} ${dropClass} ${selectionClasses}
         transition-all duration-300 hover:shadow-soft group touch-manipulation tap-target
         ${resForCell.length > 0 ? 'hover-lift active:scale-95' : 'hover:bg-card/90 active:bg-card'}
         ${hasConflict ? 'ring-2 ring-destructive/30 animate-pulse' : ''}`}
@@ -71,13 +106,18 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       onDoubleClick={handleDoubleClick}
-      onContextMenu={(e)=>{e.preventDefault(); onContext(room, dayISO, resForCell[0]);}}
+      onClick={handleLeftClick}
+      onContextMenu={handleRightClick}
       onTouchStart={startPress}
       onTouchEnd={endPress}
       role="gridcell"
       aria-disabled={room.status === "out_of_order" || room.status === "maintenance"}
       title={hasConflict 
         ? `⚠️ CONFLIT: ${resForCell.length} réservations simultanées dans cette chambre` 
+        : isSourceSelected
+          ? "🎯 Chambre source sélectionnée"
+        : isDestinationSelected
+          ? "📍 Chambre destination sélectionnée"
         : room.status === "out_of_order" || room.status === "maintenance" 
           ? "Chambre indisponible" 
           : ""}

@@ -9,6 +9,7 @@ import { RackGridTable } from "./components/RackGridTable";
 import RoomDetailSheet from "./components/RoomDetailSheet";
 import { NewConflictDialog } from "./components/NewConflictDialog";
 import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
+import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
 
@@ -21,9 +22,11 @@ export default function RackGrid() {
     statusFilter, setStatusFilter,
     compact, setCompact,
     vivid, setVivid,
+    selectionMode, setSelectionMode,
     detailSheet, setDetailSheet,
     conflictDialog, setConflictDialog,
     moveConfirmDialog, setMoveConfirmDialog,
+    manualRelodgeDialog, setManualRelodgeDialog,
   } = useRackState();
 
   const {
@@ -33,14 +36,18 @@ export default function RackGrid() {
     closeConflictDialog,
     doSwap,
     doAutoRelodge,
-    doConfirmRelodge
+    doConfirmRelodge,
+    handleManualRelodging,
+    closeManualRelodgeDialog,
+    confirmManualRelodge
   } = useRackActions({
     data,
     reload,
     conflictDialog,
     setConflictDialog,
     setDetailSheet,
-    setMoveConfirmDialog
+    setMoveConfirmDialog,
+    setManualRelodgeDialog
   });
 
   // expose read-only data for validation util (évite de propager 1000 props)
@@ -141,13 +148,40 @@ export default function RackGrid() {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      
       if (e.key === 'F1') { e.preventDefault(); toast({ title: "[F1] Check-in (Rack)", description: "Action de démonstration" }); }
       if (e.key === 'F2') { e.preventDefault(); toast({ title: "[F2] Assigner (Rack)", description: "Action de démonstration" }); }
       if (e.key === 'F5') { e.preventDefault(); toast({ title: "[F5] Note (Rack)", description: "Action de démonstration" }); }
+      
+      // NOUVEAU: Délogement manuel avec touche 'D'
+      if (e.key === 'D' || e.key === 'd') {
+        e.preventDefault();
+        if (selectionMode.sourceRoom && selectionMode.destinationRoom) {
+          handleManualRelodging(selectionMode.sourceRoom, selectionMode.destinationRoom);
+        } else {
+          toast({ 
+            title: "🎯 Délogement manuel", 
+            description: "Sélectionnez d'abord une chambre source (clic gauche) et une destination (clic droit)" 
+          });
+        }
+      }
+      
+      // Annuler la sélection avec Escape
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (selectionMode.sourceRoom || selectionMode.destinationRoom) {
+          setSelectionMode({
+            sourceRoom: null,
+            sourceReservation: null,
+            destinationRoom: null
+          });
+          toast({ title: "❌ Sélection annulée", description: "Mode de délogement manuel désactivé" });
+        }
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
+  }, [selectionMode, handleManualRelodging, setSelectionMode]);
 
   const filteredRooms = useMemo(() => {
     if (!data) return [];
@@ -189,6 +223,28 @@ export default function RackGrid() {
           onDropReservation={onDropReservation}
           onContext={onContext}
           onConflict={handleConflict}
+          selectionMode={selectionMode}
+          onLeftClick={(room, reservation) => {
+            setSelectionMode(prev => ({
+              ...prev,
+              sourceRoom: room,
+              sourceReservation: reservation || null
+            }));
+            toast({ 
+              title: "🎯 Chambre source sélectionnée", 
+              description: `Ch. ${room.number} - Clic droit sur destination puis [D]` 
+            });
+          }}
+          onRightClick={(room) => {
+            setSelectionMode(prev => ({
+              ...prev,
+              destinationRoom: room
+            }));
+            toast({ 
+              title: "📍 Chambre destination sélectionnée", 
+              description: `Ch. ${room.number} - Appuyez sur [D] pour déloger` 
+            });
+          }}
         />
 
         <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
@@ -225,6 +281,24 @@ export default function RackGrid() {
           targetRoom={moveConfirmDialog.targetRoom}
           onConfirm={handleMoveConfirm}
           onCancel={handleMoveCancel}
+        />
+
+        <ManualRelodgeDialog
+          open={manualRelodgeDialog.open}
+          sourceRoom={manualRelodgeDialog.sourceRoom}
+          destinationRoom={manualRelodgeDialog.destinationRoom}
+          conflicts={manualRelodgeDialog.conflicts}
+          preview={manualRelodgeDialog.preview}
+          onCancel={closeManualRelodgeDialog}
+          onConfirm={confirmManualRelodge}
+          onRestart={() => {
+            closeManualRelodgeDialog();
+            setSelectionMode({
+              sourceRoom: null,
+              sourceReservation: null,
+              destinationRoom: null
+            });
+          }}
         />
 
         <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">

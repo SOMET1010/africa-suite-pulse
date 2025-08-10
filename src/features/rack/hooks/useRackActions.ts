@@ -16,6 +16,7 @@ interface UseRackActionsProps {
   setConflictDialog: (state: any) => void;
   setDetailSheet: (state: any) => void;
   setMoveConfirmDialog: (state: any) => void;
+  setManualRelodgeDialog: (state: any) => void;
 }
 
 export function useRackActions({
@@ -24,7 +25,8 @@ export function useRackActions({
   conflictDialog,
   setConflictDialog,
   setDetailSheet,
-  setMoveConfirmDialog
+  setMoveConfirmDialog,
+  setManualRelodgeDialog
 }: UseRackActionsProps) {
   
   async function onDropReservation(resId: string, roomId: string) {
@@ -239,6 +241,77 @@ export function useRackActions({
     }
   }
 
+  // NOUVEAU: Actions pour le délogement manuel
+  function handleManualRelodging(sourceRoom: UIRoom, destinationRoom: UIRoom) {
+    if (!data) return;
+    
+    // Trouver les réservations dans la chambre destination qui causeraient des conflits
+    const destinationReservations = data.reservations.filter(r => r.roomId === destinationRoom.id);
+    
+    if (destinationReservations.length === 0) {
+      // Pas de conflit, on peut déplacer directement
+      toast({ 
+        title: "✅ Délogement sans conflit", 
+        description: `Ch. ${sourceRoom.number} → Ch. ${destinationRoom.number}` 
+      });
+      return;
+    }
+    
+    // Calculer les suggestions de re-lodging pour les conflits
+    const preview = findBestRelocationRooms(data, destinationReservations, {
+      excludeRoomIds: [sourceRoom.id] // Exclure la chambre source
+    });
+    
+    // Ouvrir le dialog de délogement manuel
+    setManualRelodgeDialog({
+      open: true,
+      sourceRoom,
+      destinationRoom,
+      conflicts: destinationReservations,
+      preview
+    });
+  }
+  
+  function closeManualRelodgeDialog() {
+    setManualRelodgeDialog({
+      open: false,
+      sourceRoom: null,
+      destinationRoom: null,
+      conflicts: [],
+      preview: []
+    });
+  }
+  
+  async function confirmManualRelodge(plan: Relocation[]) {
+    if (!data) return;
+    
+    try {
+      // Exécuter le plan de re-lodging
+      for (const relocation of plan) {
+        if (relocation.target) {
+          console.log(`🔄 Re-lodging ${relocation.conflict.guestName} to room ${relocation.target.number}`);
+          await reassignReservation(relocation.conflict.id, relocation.target.id);
+        }
+      }
+      
+      toast({ 
+        title: "✅ Délogement manuel réussi", 
+        description: `${plan.length} réservations re-logées` 
+      });
+      
+      closeManualRelodgeDialog();
+      await reload();
+      
+    } catch (error) {
+      console.error("❌ Error in manual re-lodging:", error);
+      toast({ 
+        title: "❌ Erreur de délogement", 
+        description: "Impossible de compléter le délogement",
+        variant: "destructive" 
+      });
+    }
+  }
+
   return {
     onDropReservation,
     handleConflict,
@@ -246,6 +319,10 @@ export function useRackActions({
     closeConflictDialog,
     doSwap,
     doAutoRelodge,
-    doConfirmRelodge
+    doConfirmRelodge,
+    // Nouvelles actions manuelles
+    handleManualRelodging,
+    closeManualRelodgeDialog,
+    confirmManualRelodge
   };
 }

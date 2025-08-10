@@ -15,6 +15,14 @@ interface RackGridRowProps {
   onDropReservation: (resId: string, roomId: string) => Promise<void> | void;
   onContext: (room: UIRoom, dayISO: string, res?: UIReservation) => void;
   onConflict: (opts: { draggedId: string; targetRoomId: string; conflicts: UIReservation[] }) => void;
+  // Manual re-lodging props
+  selectionMode?: {
+    sourceRoom: UIRoom | null;
+    sourceReservation: UIReservation | null;
+    destinationRoom: UIRoom | null;
+  };
+  onLeftClick?: (room: UIRoom, reservation?: UIReservation) => void;
+  onRightClick?: (room: UIRoom) => void;
 }
 
 export function RackGridRow({
@@ -28,7 +36,10 @@ export function RackGridRow({
   vivid,
   onDropReservation,
   onContext,
-  onConflict
+  onConflict,
+  selectionMode,
+  onLeftClick,
+  onRightClick
 }: RackGridRowProps) {
   return (
     <React.Fragment key={room.id}>
@@ -57,6 +68,9 @@ export function RackGridRow({
                onContext={onContext}
                onConflict={onConflict}
                vivid={vivid}
+               selectionMode={selectionMode}
+               onLeftClick={onLeftClick}
+               onRightClick={onRightClick}
              />
           </div>
         );

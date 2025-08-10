@@ -197,6 +197,8 @@ export function findBestRelocationRooms(
   return conflicts.map(conflict => {
     const candidates = data.rooms.filter(room => {
       if (exclude.has(room.id)) return false;
+      // CRITIQUE: Exclure la chambre source pour éviter re-lodger sur la même chambre
+      if (room.id === conflict.roomId) return false;
       if (isRoomBlocked(room.status)) return false;
       const busy = data.reservations.some(
         x => x.roomId === room.id && overlapsRange(x.start, x.end, conflict.start, conflict.end)
