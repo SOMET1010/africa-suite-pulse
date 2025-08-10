@@ -88,19 +88,19 @@ export class ServicesService {
   // Service Families
   static async getFamilies(orgId: string): Promise<ServiceFamily[]> {
     const { data, error } = await supabase
-      .from('service_families')
+      .from('service_families' as any)
       .select('*')
       .eq('org_id', orgId)
       .order('order_index');
 
     if (error) throw error;
-    return data || [];
+    return (data as any[]) || [];
   }
 
   static async saveFamily(orgId: string, family: Partial<ServiceFamily>): Promise<ServiceFamily> {
     if (family.id) {
       const { data, error } = await supabase
-        .from('service_families')
+        .from('service_families' as any)
         .update({
           code: family.code,
           label: family.label,
@@ -116,10 +116,10 @@ export class ServicesService {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as ServiceFamily;
     } else {
       const { data, error } = await supabase
-        .from('service_families')
+        .from('service_families' as any)
         .insert({
           org_id: orgId,
           code: family.code!,
@@ -134,13 +134,13 @@ export class ServicesService {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as ServiceFamily;
     }
   }
 
   static async deleteFamily(id: string): Promise<void> {
     const { error } = await supabase
-      .from('service_families')
+      .from('service_families' as any)
       .delete()
       .eq('id', id);
 
@@ -150,7 +150,7 @@ export class ServicesService {
   // Services
   static async getServices(orgId: string): Promise<Service[]> {
     const { data, error } = await supabase
-      .from('services')
+      .from('services' as any)
       .select(`
         *,
         family:service_families(*)
@@ -159,13 +159,13 @@ export class ServicesService {
       .order('family_id, code');
 
     if (error) throw error;
-    return data || [];
+    return (data as any[]) || [];
   }
 
   static async saveService(orgId: string, service: Partial<Service>): Promise<Service> {
     if (service.id) {
       const { data, error } = await supabase
-        .from('services')
+        .from('services' as any)
         .update({
           family_id: service.family_id,
           code: service.code,
@@ -191,10 +191,10 @@ export class ServicesService {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as Service;
     } else {
       const { data, error } = await supabase
-        .from('services')
+        .from('services' as any)
         .insert({
           org_id: orgId,
           family_id: service.family_id!,
@@ -219,13 +219,13 @@ export class ServicesService {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as Service;
     }
   }
 
   static async deleteService(id: string): Promise<void> {
     const { error } = await supabase
-      .from('services')
+      .from('services' as any)
       .delete()
       .eq('id', id);
 
@@ -235,7 +235,7 @@ export class ServicesService {
   // Arrangements
   static async getArrangements(orgId: string): Promise<Arrangement[]> {
     const { data, error } = await supabase
-      .from('arrangements')
+      .from('arrangements' as any)
       .select(`
         *,
         services:arrangement_services(
@@ -250,14 +250,14 @@ export class ServicesService {
       .order('code');
 
     if (error) throw error;
-    return data || [];
+    return (data as any[]) || [];
   }
 
   static async saveArrangement(orgId: string, arrangement: Partial<Arrangement>): Promise<Arrangement> {
     if (arrangement.id) {
       // Update arrangement
       const { data: updatedArrangement, error: updateError } = await supabase
-        .from('arrangements')
+        .from('arrangements' as any)
         .update({
           code: arrangement.code,
           label: arrangement.label,
@@ -278,14 +278,14 @@ export class ServicesService {
 
       // Delete existing arrangement services
       await supabase
-        .from('arrangement_services')
+        .from('arrangement_services' as any)
         .delete()
         .eq('arrangement_id', arrangement.id);
 
       // Insert new arrangement services
       if (arrangement.services && arrangement.services.length > 0) {
         const { error: servicesError } = await supabase
-          .from('arrangement_services')
+          .from('arrangement_services' as any)
           .insert(
             arrangement.services.map((svc, index) => ({
               arrangement_id: arrangement.id!,
@@ -295,7 +295,7 @@ export class ServicesService {
               is_included: svc.is_included,
               is_optional: svc.is_optional || false,
               order_index: index
-            }))
+            })) as any
           );
 
         if (servicesError) throw servicesError;
@@ -303,7 +303,7 @@ export class ServicesService {
 
       // Return full arrangement with services
       const { data, error } = await supabase
-        .from('arrangements')
+        .from('arrangements' as any)
         .select(`
           *,
           services:arrangement_services(
@@ -318,11 +318,11 @@ export class ServicesService {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as Arrangement;
     } else {
       // Create new arrangement
       const { data: newArrangement, error: insertError } = await supabase
-        .from('arrangements')
+        .from('arrangements' as any)
         .insert({
           org_id: orgId,
           code: arrangement.code!,
@@ -343,17 +343,17 @@ export class ServicesService {
       // Insert arrangement services
       if (arrangement.services && arrangement.services.length > 0) {
         const { error: servicesError } = await supabase
-          .from('arrangement_services')
+          .from('arrangement_services' as any)
           .insert(
             arrangement.services.map((svc, index) => ({
-              arrangement_id: newArrangement.id,
+              arrangement_id: (newArrangement as any).id,
               service_id: svc.service_id,
               quantity: svc.quantity,
               unit_price: svc.unit_price,
               is_included: svc.is_included,
               is_optional: svc.is_optional || false,
               order_index: index
-            }))
+            })) as any
           );
 
         if (servicesError) throw servicesError;
@@ -361,7 +361,7 @@ export class ServicesService {
 
       // Return full arrangement with services
       const { data, error } = await supabase
-        .from('arrangements')
+        .from('arrangements' as any)
         .select(`
           *,
           services:arrangement_services(
@@ -372,17 +372,17 @@ export class ServicesService {
             )
           )
         `)
-        .eq('id', newArrangement.id)
+        .eq('id', (newArrangement as any).id)
         .single();
 
       if (error) throw error;
-      return data;
+      return data as unknown as Arrangement;
     }
   }
 
   static async deleteArrangement(id: string): Promise<void> {
     const { error } = await supabase
-      .from('arrangements')
+      .from('arrangements' as any)
       .delete()
       .eq('id', id);
 
