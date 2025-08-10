@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { fetchArrivals, assignRoom, checkin } from "./arrivals.service";
 import type { ArrivalRow } from "./arrivals.types";
+import RoomAssignSheet from "./RoomAssignSheet";
 
 const statusToBadge = (s: ArrivalRow["status"]) =>
   s === "present" ? "present" : s === "confirmed" ? "confirmed" : s === "option" ? "option" : "cancelled" as const;
@@ -19,6 +20,9 @@ export default function CheckinExpressPage() {
   const [dateISO] = useState(() => new Date().toISOString().slice(0, 10));
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState<ArrivalRow[]>([]);
+  
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [targetResa, setTargetResa] = useState<string | undefined>();
 
   useEffect(() => {
     document.title = "Arrivées du jour - AfricaSuite";
@@ -52,6 +56,35 @@ export default function CheckinExpressPage() {
     }
   }
   useEffect(() => { load(); }, [dateISO]);
+
+  function askAssign(reservationId: string) {
+    setTargetResa(reservationId);
+    setAssignOpen(true);
+  }
+
+  async function handlePick(roomId: string) {
+    if (!targetResa) return;
+    try {
+      await assignRoom({ reservationId: targetResa, roomId });
+      toast({ title: "Chambre assignée", description: "✅ Assignation réussie" });
+      setAssignOpen(false);
+      setTargetResa(undefined);
+      await load();
+    } catch (e: any) {
+      toast({ title: "Erreur assignation", description: e.message });
+    }
+  }
+
+  async function onCheckin(reservationId: string) {
+    if (!confirm("Confirmer le check-in ?")) return;
+    try {
+      await checkin({ reservationId });
+      toast({ title: "Check-in effectué", description: "✅ Client présent" });
+      await load();
+    } catch (e: any) {
+      toast({ title: "Erreur check-in", description: e.message });
+    }
+  }
 
   const filtered = useMemo(() => {
     let list = rows.filter(r => {
@@ -128,15 +161,20 @@ export default function CheckinExpressPage() {
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <div className="text-muted-foreground">Chambre</div>
-                <div>{a.room_number ?? 'Non assignée'}</div>
+                <div className="flex items-center gap-2">
+                  {a.room_number ?? 'Non assignée'}
+                  {!a.room_id && <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800">Non assignée</span>}
+                </div>
                 <div className="text-muted-foreground">A/E</div>
                 <div>{(a.adults ?? 0)}A {(a.children ?? 0)}E</div>
                 <div className="text-muted-foreground">Total</div>
                 <div>{a.rate_total != null ? Intl.NumberFormat("fr-FR", { style: "currency", currency: "XOF" }).format(a.rate_total) : "—"}</div>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <TButton variant="primary" onClick={async ()=>{ try { await checkin({ reservationId: a.id }); toast({ title: "Check-in effectué" }); load(); } catch(e:any){ toast({ title: "Erreur check-in", description: e.message }); } }}>Check-in</TButton>
-                <TButton variant="default" onClick={async ()=>{ const roomId = prompt("ID de la chambre à assigner ?"); if (!roomId) return; try { await assignRoom({ reservationId: a.id, roomId }); toast({ title: "Chambre assignée" }); load(); } catch(e:any){ toast({ title: "Erreur assignation", description: e.message }); } }}>Assigner</TButton>
+                <TButton variant="primary" onClick={() => onCheckin(a.id)} disabled={a.status === 'present'}>
+                  {a.status === 'present' ? 'Présent' : 'Check-in'}
+                </TButton>
+                <TButton variant="default" onClick={() => askAssign(a.id)}>Assigner</TButton>
                 <TButton variant="ghost" onClick={()=>toast({ title: "Note", description: a.guest_name })}>Note</TButton>
                 <TButton variant="ghost" onClick={()=>toast({ title: "Détails", description: a.guest_name })}>Détails</TButton>
               </div>
@@ -167,6 +205,12 @@ export default function CheckinExpressPage() {
           </div>
         </div>
       </div>
+
+      <RoomAssignSheet
+        open={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        onPick={handlePick}
+      />
     </main>
   );
 }
