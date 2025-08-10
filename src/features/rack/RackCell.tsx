@@ -1,6 +1,7 @@
 import { Reservation, RoomStatus } from "./types";
 import { Badge } from "@/core/ui/Badge";
 import { toast } from "@/hooks/use-toast";
+import { reassignReservation } from "./rack.service";
 
 interface Props {
   date: string; // ISO
@@ -33,10 +34,17 @@ export function RackCell({ date, roomId, roomStatus, mode, reservations }: Props
         className="relative bg-background border-b border-l border-border px-3 py-2 cursor-pointer hover:bg-secondary/40"
         onClick={() => toast({ title: "Créer réservation", description: `Chambre ${roomId} - ${date}` })}
         onDragOver={(e)=>e.preventDefault()}
-        onDrop={(e)=>{
+        onDrop={async (e)=>{
+          e.preventDefault();
           const id = e.dataTransfer.getData('text/res-id');
-          console.log('Drop réservation', id, '→', roomId, date);
-          toast({ title: "Déplacement (mock)", description: `${id} → ${roomId} (${date})` });
+          if (!id) return;
+          try{
+            await reassignReservation(id, roomId);
+            toast({ title: "Réservation réassignée", description: `${id} → ${roomId}` });
+            window.dispatchEvent(new CustomEvent('rack-refresh'));
+          }catch(err:any){
+            toast({ title: "Erreur réassignation", description: err.message });
+          }
         }}
       >
         {stateDot}

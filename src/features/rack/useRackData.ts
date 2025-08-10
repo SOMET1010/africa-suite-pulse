@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import type { RackData, Room, Reservation, ReservationStatus, RoomStatus } from "./types";
+import type { RackData, Room as UIRoom, Reservation as UIReservation } from "./types";
+import { fetchRooms, fetchReservationsRange } from "./rack.service";
+import type { Room as SBRoom, Reservation as SBReservation } from "./rack.types";
 
 function generateDays(): string[] {
   const days: string[] = [];
@@ -12,59 +14,60 @@ function generateDays(): string[] {
   return days;
 }
 
-function sampleRooms(): Room[] {
-  return Array.from({ length: 12 }).map((_, i) => {
-    const statuses: RoomStatus[] = ["clean", "dirty", "maintenance", "out_of_order"];
-    return {
-      id: `room-${i+1}`,
-      number: `${101 + i}`,
-      type: ["STD", "DLX", "SUI"][i % 3],
-      floor: Math.floor(i / 3) + 1,
-      status: statuses[i % statuses.length],
-    };
-  });
+function toUIRoom(r: SBRoom): UIRoom {
+  return {
+    id: r.id,
+    number: r.number,
+    type: r.type,
+    floor: r.floor ? parseInt(r.floor, 10) || 0 : 0,
+    status: (r.status === 'inspected' ? 'clean' : r.status) as UIRoom["status"],
+  } as UIRoom;
 }
 
-function sampleReservations(days: string[], rooms: Room[]): Reservation[] {
-  const res: Reservation[] = [];
-  const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
-  const statuses: ReservationStatus[] = ["confirmed", "present", "option"];
-  for (let i = 0; i < 16; i++) {
-    const room = pick(rooms);
-    const startIndex = Math.floor(Math.random() * 5);
-    const nights = 1 + Math.floor(Math.random() * 3);
-    const start = days[startIndex];
-    const end = days[Math.min(startIndex + nights, days.length - 1)];
-    res.push({
-      id: `R-${1000 + i}`,
-      guestName: ["Diallo","Kouyaté","Mensah","Okonkwo","Tembo"][i % 5] + ` ${i+1}`,
-      status: statuses[i % statuses.length],
-      ae: i % 2 === 0 ? "A" : "E",
-      nights,
-      rate: 80 + (i % 3) * 20,
-      roomId: room.id,
-      start,
-      end,
-    });
-  }
-  return res;
+function diffDays(aISO: string, bISO: string) {
+  const a = new Date(aISO);
+  const b = new Date(bISO);
+  return Math.max(1, Math.round((new Date(b.toISOString().slice(0,10)).getTime() - new Date(a.toISOString().slice(0,10)).getTime()) / (1000*60*60*24)));
+}
+
+function toUIReservation(r: SBReservation): UIReservation {
+  return {
+    id: r.id,
+    guestName: r.reference ?? "Réservation",
+    status: (r.status === 'noshow' ? 'cancelled' : r.status) as UIReservation["status"],
+    ae: (r.adults ?? 0) > 0 ? 'A' : 'E',
+    nights: diffDays(r.date_arrival, r.date_departure),
+    rate: r.rate_total ?? 0,
+    roomId: r.room_id ?? "",
+    start: r.date_arrival,
+    end: r.date_departure,
+  } as UIReservation;
 }
 
 export function useRackData() {
   const [data, setData] = useState<RackData | null>(null);
+  const days = useMemo(() => generateDays(), []);
+
+  async function load() {
+    const [rooms, resas] = await Promise.all([fetchRooms(), fetchReservationsRange(days[0], days[days.length - 1])]);
+    const uiRooms: UIRoom[] = rooms.map(toUIRoom);
+    const uiResas: UIReservation[] = resas.map(toUIReservation);
+    setData({ days, rooms: uiRooms, reservations: uiResas });
+  }
+
+  useEffect(() => { load(); }, [/* days fixed */]);
 
   useEffect(() => {
-    const days = generateDays();
-    const rooms = sampleRooms();
-    const reservations = sampleReservations(days, rooms);
-    setData({ days, rooms, reservations });
-  }, []);
+    const handler = () => { load(); };
+    window.addEventListener('rack-refresh', handler as EventListener);
+    return () => window.removeEventListener('rack-refresh', handler as EventListener);
+  }, [days]);
 
   const kpis = useMemo(() => {
     if (!data) return { occ: 0, arrivals: 0, presents: 0, hs: 0 };
     const totalNights = data.rooms.length * data.days.length;
     const occupiedCells = data.reservations.reduce((acc, r) => acc + r.nights, 0);
-    const occ = Math.round((occupiedCells / totalNights) * 100);
+    const occ = totalNights ? Math.round((occupiedCells / totalNights) * 100) : 0;
     const arrivals = data.reservations.filter(r => r.start === data.days[0]).length;
     const presents = data.reservations.filter(r => r.status === 'present').length;
     const hs = data.rooms.filter(r => r.status === 'out_of_order').length;

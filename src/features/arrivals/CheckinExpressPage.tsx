@@ -3,44 +3,22 @@ import { TButton } from "@/core/ui/TButton";
 import { Badge } from "@/core/ui/Badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { fetchArrivals, assignRoom, checkin } from "./arrivals.service";
+import type { ArrivalRow } from "./arrivals.types";
 
-interface ArrivalItem {
-  id: string;
-  name: string;
-  reference: string;
-  room?: string;
-  status: "confirmed" | "checked_in" | "option" | "cancelled";
-  nights: number;
-  ae: string; // A/E
-  total: number;
-}
+const statusToBadge = (s: ArrivalRow["status"]) =>
+  s === "present" ? "present" : s === "confirmed" ? "confirmed" : s === "option" ? "option" : "cancelled" as const;
 
-const sampleArrivals: ArrivalItem[] = Array.from({ length: 14 }).map((_, i) => ({
-  id: `res-${i+1}`,
-  name: ["A. Diop","B. N'Diaye","C. Traoré","D. Abebe","E. Okoro","F. Mensah"][i % 6] + ` ${i+1}`,
-  reference: `AFS-${1000 + i}`,
-  room: i % 3 === 0 ? undefined : `${200 + i}`,
-  status: ((): ArrivalItem["status"] => {
-    const m = i % 5;
-    if (m === 0) return "checked_in";
-    if (m === 1) return "confirmed";
-    if (m === 2) return "option";
-    if (m === 3) return "cancelled";
-    return "confirmed";
-  })(),
-  nights: (i % 5) + 1,
-  ae: i % 2 === 0 ? "A" : "E",
-  total: 75 + (i % 5) * 20,
-}));
-
-const statusToBadge = (s: ArrivalItem["status"]) =>
-  s === "checked_in" ? "present" : s === "confirmed" ? "confirmed" : s === "option" ? "option" : "cancelled" as const;
 
 export default function CheckinExpressPage() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | "confirmed">("all");
   const [sort, setSort] = useState<"time" | "name" | "room">("time");
   const [mode, setMode] = useState<"express" | "detailed">("express");
+
+  const [dateISO] = useState(() => new Date().toISOString().slice(0, 10));
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState<ArrivalRow[]>([]);
 
   useEffect(() => {
     document.title = "Arrivées du jour - AfricaSuite";
@@ -62,25 +40,39 @@ export default function CheckinExpressPage() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  async function load() {
+    setLoading(true);
+    try {
+      const data = await fetchArrivals(dateISO);
+      setRows(data);
+    } catch (e: any) {
+      toast({ title: "Erreur chargement arrivées", description: e.message });
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => { load(); }, [dateISO]);
+
   const filtered = useMemo(() => {
-    let list = sampleArrivals.filter(a =>
-      [a.name, a.reference, a.room ?? "Non assignée"].join(" ").toLowerCase().includes(query.toLowerCase())
-    );
-    if (status === 'confirmed') list = list.filter(a => a.status === 'confirmed');
-    const sorter: Record<typeof sort, (a: ArrivalItem, b: ArrivalItem) => number> = {
-      time: (a,b) => a.id.localeCompare(b.id),
-      name: (a,b) => a.name.localeCompare(b.name),
-      room: (a,b) => (a.room ?? '').localeCompare(b.room ?? ''),
+    let list = rows.filter(r => {
+      const hay = `${r.guest_name} ${r.room_number ?? ""} ${r.reference ?? ""}`.toLowerCase();
+      return hay.includes(query.toLowerCase());
+    });
+    if (status === 'confirmed') list = list.filter(r => r.status === 'confirmed');
+    const sorter: Record<typeof sort, (a: ArrivalRow, b: ArrivalRow) => number> = {
+      time: (a, b) => (a.planned_time ?? '').localeCompare(b.planned_time ?? ''),
+      name: (a, b) => a.guest_name.localeCompare(b.guest_name),
+      room: (a, b) => (a.room_number ?? '').localeCompare(b.room_number ?? ''),
     };
     return list.sort(sorter[sort]);
-  }, [query, status, sort]);
+  }, [rows, query, status, sort]);
 
   const stats = useMemo(() => {
-    const confirmed = sampleArrivals.filter(a => a.status === 'confirmed').length;
-    const present = sampleArrivals.filter(a => a.status === 'checked_in').length;
-    const unassigned = sampleArrivals.filter(a => !a.room).length;
+    const confirmed = rows.filter(r => r.status === 'confirmed').length;
+    const present = rows.filter(r => r.status === 'present').length;
+    const unassigned = rows.filter(r => !r.room_id).length;
     return { confirmed, present, unassigned };
-  }, []);
+  }, [rows]);
 
   return (
     <main className="min-h-screen pb-24 px-4 sm:px-6 pt-6">
@@ -102,7 +94,7 @@ export default function CheckinExpressPage() {
         <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Confirmés</div><div className="text-2xl font-bold">{stats.confirmed}</div></CardContent></Card>
         <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Présents</div><div className="text-2xl font-bold">{stats.present}</div></CardContent></Card>
         <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Non assignés</div><div className="text-2xl font-bold">{stats.unassigned}</div></CardContent></Card>
-        <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Total</div><div className="text-2xl font-bold">{sampleArrivals.length}</div></CardContent></Card>
+        <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Total</div><div className="text-2xl font-bold">{rows.length}</div></CardContent></Card>
       </section>
 
       <section aria-label="Filtres" className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -129,26 +121,24 @@ export default function CheckinExpressPage() {
             <CardContent className="pt-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <div className="text-base font-semibold">{a.name}</div>
-                  <div className="text-sm text-muted-foreground">{a.reference}</div>
+                  <div className="text-base font-semibold">{a.guest_name}</div>
+                  <div className="text-sm text-muted-foreground">{a.reference ?? ""}</div>
                 </div>
-                <Badge variant={statusToBadge(a.status)}>{a.status === 'checked_in' ? 'Présent' : a.status === 'confirmed' ? 'Confirmé' : a.status === 'option' ? 'Option' : 'Annulé'}</Badge>
+                <Badge variant={statusToBadge(a.status)}>{a.status === 'present' ? 'Présent' : a.status === 'confirmed' ? 'Confirmé' : a.status === 'option' ? 'Option' : 'Annulé'}</Badge>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <div className="text-muted-foreground">Chambre</div>
-                <div>{a.room ?? 'Non assignée'}</div>
+                <div>{a.room_number ?? 'Non assignée'}</div>
                 <div className="text-muted-foreground">A/E</div>
-                <div>{a.ae}</div>
-                <div className="text-muted-foreground">Nuits</div>
-                <div>{a.nights}</div>
-                <div className="text-muted-foreground">Tarif total</div>
-                <div>{a.total.toFixed(2)} €</div>
+                <div>{(a.adults ?? 0)}A {(a.children ?? 0)}E</div>
+                <div className="text-muted-foreground">Total</div>
+                <div>{a.rate_total != null ? Intl.NumberFormat("fr-FR", { style: "currency", currency: "XOF" }).format(a.rate_total) : "—"}</div>
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <TButton variant="primary" onClick={()=>toast({ title: "Check-in", description: `${a.name}` })}>Check-in</TButton>
-                <TButton variant="default" onClick={()=>toast({ title: "Assigner chambre", description: `${a.name}` })}>Assigner</TButton>
-                <TButton variant="ghost" onClick={()=>toast({ title: "Note", description: `${a.name}` })}>Note</TButton>
-                <TButton variant="ghost" onClick={()=>toast({ title: "Détails", description: `${a.name}` })}>Détails</TButton>
+                <TButton variant="primary" onClick={async ()=>{ try { await checkin({ reservationId: a.id }); toast({ title: "Check-in effectué" }); load(); } catch(e:any){ toast({ title: "Erreur check-in", description: e.message }); } }}>Check-in</TButton>
+                <TButton variant="default" onClick={async ()=>{ const roomId = prompt("ID de la chambre à assigner ?"); if (!roomId) return; try { await assignRoom({ reservationId: a.id, roomId }); toast({ title: "Chambre assignée" }); load(); } catch(e:any){ toast({ title: "Erreur assignation", description: e.message }); } }}>Assigner</TButton>
+                <TButton variant="ghost" onClick={()=>toast({ title: "Note", description: a.guest_name })}>Note</TButton>
+                <TButton variant="ghost" onClick={()=>toast({ title: "Détails", description: a.guest_name })}>Détails</TButton>
               </div>
             </CardContent>
           </Card>
