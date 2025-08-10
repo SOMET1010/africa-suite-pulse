@@ -155,4 +155,17 @@
   .touch-pan-y {
     touch-action: pan-y;
   }
+
+  /* Drop zones */
+  .drop-zone-valid {
+    @apply bg-success/20 border-success shadow-success/30;
+  }
+
+  .drop-zone-invalid {
+    @apply bg-destructive/20 border-destructive shadow-destructive/30;
+  }
+
+  .drop-zone-conflict {
+    @apply bg-warning/20 border-warning shadow-warning/30;
+  }
 }

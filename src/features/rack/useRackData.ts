@@ -56,9 +56,8 @@ function toUIReservation(r: SBReservation): UIReservation {
 
 export function useRackData() {
   const orgId = useOrgId();
-  // Commencer 2 jours avant aujourd'hui pour voir les réservations en cours
-  const startISO = useMemo(() => addDays(toISODate(new Date()), -2), []);
-  const days = useMemo(() => daysRange(startISO, 9), [startISO]); // 9 jours au lieu de 7 (2 avant + 7 après)
+  const startISO = useMemo(() => toISODate(new Date()), []);
+  const days = useMemo(() => daysRange(startISO, 7), [startISO]);
   const endISO = days[days.length - 1];
 
   const [data, setData] = useState<RackData | null>(null);

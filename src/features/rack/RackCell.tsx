@@ -2,25 +2,26 @@ import React, { useRef, useState } from "react";
 import type { Room as UIRoom, Reservation as UIReservation } from "./types";
 import { DND_MIME, isBlockedRoom, getDragData } from "./rack.dnd";
 import { overlapsDay } from "./rack.adapters";
+import { detectConflicts } from "./conflictValidation";
 import BookingPill from "./components/BookingPill";
 
 type Props = {
   room: UIRoom;
   dayISO: string;
   reservations: UIReservation[];
+  allRooms: UIRoom[];
   mode: "compact" | "detailed";
-  onDropReservation: (reservationId: string, roomId: string) => Promise<void> | void;
+  onDropReservation: (reservationId: string, roomId: string, hasConflict: boolean) => Promise<void> | void;
   onContext: (room: UIRoom, dayISO: string, res?: UIReservation)=>void;
   vivid?: boolean;
 };
 
-export function RackCell({ room, dayISO, reservations, mode, onDropReservation, onContext, vivid }: Props) {
-  const [over, setOver] = useState<"ok"|"bad"|null>(null);
+export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropReservation, onContext, vivid }: Props) {
+  const [over, setOver] = useState<"ok"|"bad"|"conflict"|null>(null);
   const resForCell = reservations.filter(r => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, dayISO));
   
   // Log pour debug le re-render
   console.log(`🔍 RackCell ${room.number} day ${dayISO}: found ${resForCell.length} reservations for room ${room.id}`, resForCell.map(r => r.id));
-  console.log(`🔍 All reservations passed to cell:`, reservations.length, "total");
 
   function handleDoubleClick() {
     onContext(room, dayISO, resForCell[0]);
@@ -33,6 +34,19 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
       setOver("bad"); 
       return; 
     }
+    
+    // Vérifier les conflits potentiels
+    const resId = getDragData(e);
+    if (resId) {
+      const conflictInfo = detectConflicts(resId, room.id, reservations, allRooms);
+      if (conflictInfo.hasConflict) {
+        setOver("conflict");
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        return;
+      }
+    }
+    
     e.preventDefault(); 
     e.dataTransfer.dropEffect = "move"; 
     setOver("ok");
@@ -48,14 +62,11 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
     
     const resId = getDragData(e);
     console.log(`📍 Drop event on room ${room.id}: resId=${resId}`);
-    console.log(`📍 DataTransfer types:`, e.dataTransfer.types);
-    console.log(`📍 DataTransfer effectAllowed:`, e.dataTransfer.effectAllowed);
     
     setOver(null);
     
     if (!resId) {
       console.warn("❌ No reservation ID found in drop data");
-      console.warn("❌ Available data:", e.dataTransfer.getData("text/plain"));
       return;
     }
     
@@ -65,8 +76,12 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
       return; 
     }
     
-    console.log(`✅ Calling onDropReservation with resId=${resId}, roomId=${room.id}`);
-    await onDropReservation(resId, room.id);
+    // Détecter les conflits
+    const conflictInfo = detectConflicts(resId, room.id, reservations, allRooms);
+    console.log(`🔍 Conflict detection result:`, conflictInfo);
+    
+    console.log(`✅ Calling onDropReservation with resId=${resId}, roomId=${room.id}, hasConflict=${conflictInfo.hasConflict}`);
+    await onDropReservation(resId, room.id, conflictInfo.hasConflict);
   }
 
   // long-press tactile : ouvre menu
@@ -79,9 +94,10 @@ export function RackCell({ room, dayISO, reservations, mode, onDropReservation, 
   };
 
   const dropClass =
-    over === "ok"  ? "drop-zone-valid animate-scale-in"
-  : over === "bad" ? "drop-zone-invalid animate-scale-in"
-                   : "";
+    over === "ok"       ? "drop-zone-valid animate-scale-in"
+  : over === "bad"      ? "drop-zone-invalid animate-scale-in"  
+  : over === "conflict" ? "drop-zone-conflict animate-scale-in"
+                        : "";
 
   const baseBg = vivid
     ? "bg-gradient-secondary/50 backdrop-blur-sm"

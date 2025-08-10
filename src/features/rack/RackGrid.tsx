@@ -6,9 +6,12 @@ import RoomHeader from "./components/RoomHeader";
 import { RackCell } from "./RackCell";
 import { RackStatusBar } from "./RackStatusBar";
 import RoomDetailSheet from "./components/RoomDetailSheet";
+import { ConflictDialog } from "./components/ConflictDialog";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
+import { detectConflicts } from "./conflictValidation";
 import type { Room, Reservation } from "./types";
+import type { ConflictInfo } from "./conflictValidation";
 
 export default function RackGrid() {
   const { data, kpis, reload } = useRackData();
@@ -29,9 +32,37 @@ export default function RackGrid() {
     dayISO: "",
     reservation: undefined
   });
+  
+  const [conflictDialog, setConflictDialog] = useState<{
+    open: boolean;
+    conflictInfo: ConflictInfo | null;
+    pendingDrop: { resId: string; roomId: string } | null;
+  }>({
+    open: false,
+    conflictInfo: null,
+    pendingDrop: null
+  });
 
-  async function onDropReservation(resId: string, roomId: string) {
-    console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
+  async function onDropReservation(resId: string, roomId: string, hasConflict: boolean = false) {
+    console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}, hasConflict: ${hasConflict}`);
+    
+    if (hasConflict && data) {
+      // Afficher le dialog de conflit
+      const conflictInfo = detectConflicts(resId, roomId, data.reservations, data.rooms);
+      setConflictDialog({
+        open: true,
+        conflictInfo,
+        pendingDrop: { resId, roomId }
+      });
+      return;
+    }
+    
+    // Pas de conflit, procéder directement
+    await performDrop(resId, roomId);
+  }
+  
+  async function performDrop(resId: string, roomId: string) {
+    console.log(`🎯 Performing drop: reservation ${resId} to room ${roomId}`);
     try {
       const updatedReservation = await reassignReservation(resId, roomId);
       console.log(`✅ Reservation updated in DB:`, updatedReservation);
@@ -45,7 +76,7 @@ export default function RackGrid() {
       await reload();
       console.log(`✅ Reload completed`);
     } catch (error) {
-      console.error("❌ Error in onDropReservation:", error);
+      console.error("❌ Error in performDrop:", error);
       toast({ 
         title: "❌ Erreur", 
         description: "Impossible de réassigner la réservation",
@@ -61,6 +92,18 @@ export default function RackGrid() {
       dayISO,
       reservation: res
     });
+  }
+  
+  function handleConflictConfirm() {
+    const { pendingDrop } = conflictDialog;
+    if (pendingDrop) {
+      performDrop(pendingDrop.resId, pendingDrop.roomId);
+    }
+    setConflictDialog({ open: false, conflictInfo: null, pendingDrop: null });
+  }
+  
+  function handleConflictCancel() {
+    setConflictDialog({ open: false, conflictInfo: null, pendingDrop: null });
   }
 
   async function handleCheckin(reservationId: string) {
@@ -181,15 +224,16 @@ export default function RackGrid() {
                     <div key={`${room.id}-${day}`} 
                          className={`animate-fade-in`} 
                          style={{ animationDelay: `${(index * 50) + (dayIndex * 10)}ms` }}>
-                      <RackCell
-                        room={room}
-                        dayISO={day}
-                        reservations={data.reservations}
-                        mode={compact ? "compact" : mode}
-                        onDropReservation={onDropReservation}
-                        onContext={onContext}
-                        vivid={vivid}
-                      />
+                       <RackCell
+                         room={room}
+                         dayISO={day}
+                         reservations={data.reservations}
+                         allRooms={data.rooms}
+                         mode={compact ? "compact" : mode}
+                         onDropReservation={onDropReservation}
+                         onContext={onContext}
+                         vivid={vivid}
+                       />
                     </div>
                   ))}
                 </React.Fragment>
@@ -208,6 +252,14 @@ export default function RackGrid() {
           reservation={detailSheet.reservation}
           onCheckin={handleCheckin}
           onNewReservation={handleNewReservation}
+        />
+
+        <ConflictDialog
+          open={conflictDialog.open}
+          onOpenChange={(open) => !open && handleConflictCancel()}
+          conflictInfo={conflictDialog.conflictInfo}
+          onConfirm={handleConflictConfirm}
+          onCancel={handleConflictCancel}
         />
 
         <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
