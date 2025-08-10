@@ -16,16 +16,21 @@ import { reassignReservation } from "./rack.service";
 import { DragDropProvider, DragDropStyles } from "./hooks/useDragDrop";
 import { ModernRackGrid } from "./components/ModernRackGrid";
 
+// Types pour les données transformées
+interface DayData {
+  date: string;
+  dayName: string;
+  dayNumber: string;
+}
+
 export default function RackGrid() {
   const { data, kpis, reload } = useRackData();
   const {
     zoom, setZoom,
     query, setQuery,
-    mode, setMode,
     statusFilter, setStatusFilter,
     compact, setCompact,
     vivid, setVivid,
-    selectionMode, setSelectionMode,
     detailSheet, setDetailSheet,
     conflictDialog, setConflictDialog,
     moveConfirmDialog, setMoveConfirmDialog,
@@ -34,12 +39,10 @@ export default function RackGrid() {
 
   const {
     handleConflict,
-    onContext,
     closeConflictDialog,
     doSwap,
     doAutoRelodge,
     doConfirmRelodge,
-    handleManualRelodging,
     closeManualRelodgeDialog,
     confirmManualRelodge
   } = useRackActions({
@@ -156,143 +159,34 @@ export default function RackGrid() {
     }
   }
 
-  async function handleMoveConfirm() {
-    const { pendingDrop } = moveConfirmDialog;
-    if (pendingDrop) {
-      console.log("🔄 Starting move confirmation process...");
-      await performDrop(pendingDrop.resId, pendingDrop.roomId);
-      console.log("✅ Move confirmation completed, closing dialog");
-    }
-    setMoveConfirmDialog({ 
-      open: false, 
-      reservation: null, 
-      sourceRoom: null, 
-      targetRoom: null, 
-      pendingDrop: null 
-    });
-  }
-  
-  function handleMoveCancel() {
-    setMoveConfirmDialog({ 
-      open: false, 
-      reservation: null, 
-      sourceRoom: null, 
-      targetRoom: null, 
-      pendingDrop: null 
-    });
-  }
 
-  async function handleCheckin(reservationId: string) {
+  // Gestion des handlers manquants pour compatibilité
+  const handleCheckin = useCallback(async (reservationId: string) => {
     try {
-      console.log("🏨 Check-in reservation:", reservationId);
-      toast({ 
-        title: "✅ Check-in effectué", 
-        description: "Client enregistré avec succès" 
-      });
+      toast({ title: "✅ Check-in effectué", description: "Client enregistré avec succès" });
       setDetailSheet(prev => ({ ...prev, open: false }));
       await reload();
     } catch (error) {
-      console.error("❌ Error during checkin:", error);
-      toast({ 
-        title: "❌ Erreur", 
-        description: "Impossible d'effectuer le check-in",
-        variant: "destructive" 
-      });
+      toast({ title: "❌ Erreur", description: "Impossible d'effectuer le check-in", variant: "destructive" });
     }
-  }
+  }, [reload, setDetailSheet]);
 
-  function handleNewReservation(roomId: string, dayISO: string) {
-    console.log("📝 New reservation for room:", roomId, "on", dayISO);
-    toast({ 
-      title: "🆕 Nouvelle réservation", 
-      description: `Chambre ${roomId} - ${dayISO}` 
-    });
+  const handleNewReservation = useCallback((roomId: string, dayISO: string) => {
+    toast({ title: "🆕 Nouvelle réservation", description: `Chambre ${roomId} - ${dayISO}` });
     setDetailSheet(prev => ({ ...prev, open: false }));
-  }
+  }, [setDetailSheet]);
 
-  // 🆕 FONCTION AMÉLIORÉE : Validation pour délogement manuel
-  function handleManualRelodgingWithValidation(sourceRoom: any, destinationRoom: any) {
-    // Vérification : même chambre
-    if (sourceRoom?.id === destinationRoom?.id) {
-      toast({ 
-        title: "❌ Délogement impossible", 
-        description: "Vous ne pouvez pas déloger vers la même chambre",
-        variant: "destructive" 
-      });
-      
-      // Reset de la sélection
-      setSelectionMode({
-        sourceRoom: null,
-        sourceReservation: null,
-        destinationRoom: null
-      });
-      return;
+  const handleMoveConfirm = useCallback(async () => {
+    const { pendingDrop } = moveConfirmDialog;
+    if (pendingDrop) {
+      await handleReservationMove(pendingDrop.resId, pendingDrop.roomId, 'current');
     }
-
-    // Si validation OK, procéder avec la logique originale
-    handleManualRelodging(sourceRoom, destinationRoom);
-  }
-
-  useEffect(() => {
-    document.title = "Rack visuel - AfricaSuite";
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Rack visuel moderne: grille chambres x jours, réservations et états.");
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
-      
-      if (e.key === 'F1') { e.preventDefault(); toast({ title: "[F1] Check-in (Rack)", description: "Action de démonstration" }); }
-      if (e.key === 'F2') { e.preventDefault(); toast({ title: "[F2] Assigner (Rack)", description: "Action de démonstration" }); }
-      if (e.key === 'F5') { e.preventDefault(); toast({ title: "[F5] Note (Rack)", description: "Action de démonstration" }); }
-      
-      // 🆕 DÉLOGEMENT MANUEL AVEC VALIDATION
-      if (e.key === 'D' || e.key === 'd') {
-        e.preventDefault();
-        if (selectionMode.sourceRoom && selectionMode.destinationRoom) {
-          handleManualRelodgingWithValidation(selectionMode.sourceRoom, selectionMode.destinationRoom);
-        } else {
-          toast({ 
-            title: "🎯 Délogement manuel", 
-            description: "Sélectionnez d'abord une chambre source (clic gauche) et une destination (clic droit)" 
-          });
-        }
-      }
-      
-      // Annuler la sélection avec Escape
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        if (selectionMode.sourceRoom || selectionMode.destinationRoom) {
-          setSelectionMode({
-            sourceRoom: null,
-            sourceReservation: null,
-            destinationRoom: null
-          });
-          toast({ title: "❌ Sélection annulée", description: "Mode de délogement manuel désactivé" });
-        }
-      }
-      
-      // NOUVEAU: Clic droit pour changer la destination
-      if (e.key === 'c' || e.key === 'C') {
-        e.preventDefault();
-        if (selectionMode.sourceRoom) {
-          toast({ 
-            title: "🎯 Changement de destination", 
-            description: "Clic droit sur une nouvelle chambre pour changer la destination" 
-          });
-        } else {
-          toast({ 
-            title: "🎯 Mode délogement", 
-            description: "Sélectionnez d'abord une chambre source avec clic gauche" 
-          });
-        }
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [selectionMode, handleManualRelodging, setSelectionMode]);
+    setMoveConfirmDialog({ open: false, reservation: null, sourceRoom: null, targetRoom: null, pendingDrop: null });
+  }, [moveConfirmDialog, handleReservationMove, setMoveConfirmDialog]);
+  
+  const handleMoveCancel = useCallback(() => {
+    setMoveConfirmDialog({ open: false, reservation: null, sourceRoom: null, targetRoom: null, pendingDrop: null });
+  }, [setMoveConfirmDialog]);
 
   const filteredRooms = useMemo(() => {
     if (!data) return [];
@@ -323,120 +217,89 @@ export default function RackGrid() {
 
         <RackLegend />
 
-        <ModernRackGrid
-          days={data.days.map(dateISO => ({ date: dateISO, dayName: new Date(dateISO).toLocaleDateString('fr-FR', { weekday: 'short' }), dayNumber: new Date(dateISO).getDate().toString() }))}
-          filteredRooms={filteredRooms}
-          reservations={data.reservations}
-          compact={compact}
-          vivid={vivid}
-          zoom={zoom}
-          onReservationMove={handleReservationMove}
-          onCellClick={(room, day, reservation) => setDetailSheet({ open: true, room, dayISO: day, reservation: reservation || null })}
-          selectionMode={selectionMode}
-          onLeftClick={(room, reservation) => {
-            setSelectionMode(prev => ({
-              ...prev,
-              sourceRoom: room,
-              sourceReservation: reservation || null
-            }));
-            toast({ 
-              title: "🎯 Chambre source sélectionnée", 
-              description: `Ch. ${room.number} - Clic droit sur destination puis [D]` 
-            });
-          }}
-          onRightClick={(room) => {
-            // 🆕 VALIDATION LORS DE LA SÉLECTION DE DESTINATION
-            if (selectionMode.sourceRoom && selectionMode.sourceRoom.id === room.id) {
-              toast({ 
-                title: "⚠️ Même chambre", 
-                description: "Sélectionnez une chambre différente comme destination",
-                variant: "destructive" 
-              });
-              return;
-            }
-            
-            setSelectionMode(prev => ({
-              ...prev,
-              destinationRoom: room
-            }));
-            toast({ 
-              title: "📍 Chambre destination sélectionnée", 
-              description: `Ch. ${room.number} - Appuyez sur [D] pour déloger` 
-            });
-          }}
-        />
+          <ModernRackGrid
+            days={data.days.map(dateISO => ({ 
+              date: dateISO, 
+              dayName: new Date(dateISO).toLocaleDateString('fr-FR', { weekday: 'short' }), 
+              dayNumber: new Date(dateISO).getDate().toString() 
+            }))}
+            filteredRooms={filteredRooms}
+            reservations={data.reservations}
+            compact={compact}
+            vivid={vivid}
+            zoom={zoom}
+            onReservationMove={handleReservationMove}
+            onCellClick={(room, day, reservation) => setDetailSheet({ 
+              open: true, 
+              room, 
+              dayISO: day, 
+              reservation: reservation || null 
+            })}
+          />
 
-        <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
+          <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
 
-        <RoomDetailSheet
-          open={detailSheet.open}
-          onOpenChange={(open) => setDetailSheet(prev => ({ ...prev, open }))}
-          room={detailSheet.room}
-          dayISO={detailSheet.dayISO}
-          reservation={detailSheet.reservation}
-          onCheckin={handleCheckin}
-          onNewReservation={handleNewReservation}
-        />
+          <RoomDetailSheet
+            open={detailSheet.open}
+            onOpenChange={(open) => setDetailSheet(prev => ({ ...prev, open }))}
+            room={detailSheet.room}
+            dayISO={detailSheet.dayISO}
+            reservation={detailSheet.reservation}
+            onCheckin={handleCheckin}
+            onNewReservation={handleNewReservation}
+          />
 
-        <NewConflictDialog
-          open={conflictDialog.open}
-          dragged={conflictDialog.dragged}
-          targetRoom={data.rooms.find(r => r.id === conflictDialog.targetRoomId) || null}
-          conflicts={conflictDialog.conflicts}
-          preview={conflictDialog.preview}
-          conflictType={conflictDialog.conflictType}
-          allRooms={data.rooms}
-          onCancel={closeConflictDialog}
-          onSwap={doSwap}
-          onAutoRelodge={doAutoRelodge}
-          onConfirmRelodge={doConfirmRelodge}
-        />
+          <NewConflictDialog
+            open={conflictDialog.open}
+            dragged={conflictDialog.dragged}
+            targetRoom={data.rooms.find(r => r.id === conflictDialog.targetRoomId) || null}
+            conflicts={conflictDialog.conflicts}
+            preview={conflictDialog.preview}
+            conflictType={conflictDialog.conflictType}
+            allRooms={data.rooms}
+            onCancel={closeConflictDialog}
+            onSwap={doSwap}
+            onAutoRelodge={doAutoRelodge}
+            onConfirmRelodge={doConfirmRelodge}
+          />
 
-        <MoveConfirmationDialog
-          open={moveConfirmDialog.open}
-          onOpenChange={(open) => !open && handleMoveCancel()}
-          reservation={moveConfirmDialog.reservation}
-          sourceRoom={moveConfirmDialog.sourceRoom}
-          targetRoom={moveConfirmDialog.targetRoom}
-          onConfirm={handleMoveConfirm}
-          onCancel={handleMoveCancel}
-        />
+          <MoveConfirmationDialog
+            open={moveConfirmDialog.open}
+            onOpenChange={(open) => !open && handleMoveCancel()}
+            reservation={moveConfirmDialog.reservation}
+            sourceRoom={moveConfirmDialog.sourceRoom}
+            targetRoom={moveConfirmDialog.targetRoom}
+            onConfirm={handleMoveConfirm}
+            onCancel={handleMoveCancel}
+          />
 
-        <ManualRelodgeDialog
-          open={manualRelodgeDialog.open}
-          sourceRoom={manualRelodgeDialog.sourceRoom}
-          destinationRoom={manualRelodgeDialog.destinationRoom}
-          conflicts={manualRelodgeDialog.conflicts}
-          preview={manualRelodgeDialog.preview}
-          onCancel={closeManualRelodgeDialog}
-          onConfirm={confirmManualRelodge}
-          onRestart={() => {
-            closeManualRelodgeDialog();
-            setSelectionMode({
-              sourceRoom: null,
-              sourceReservation: null,
-              destinationRoom: null
-            });
-          }}
-        />
+          <ManualRelodgeDialog
+            open={manualRelodgeDialog.open}
+            sourceRoom={manualRelodgeDialog.sourceRoom}
+            destinationRoom={manualRelodgeDialog.destinationRoom}
+            conflicts={manualRelodgeDialog.conflicts}
+            preview={manualRelodgeDialog.preview}
+            onCancel={closeManualRelodgeDialog}
+            onConfirm={confirmManualRelodge}
+            onRestart={closeManualRelodgeDialog}
+          />
 
-        <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
-          <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
-            <div className="bg-card/95 backdrop-blur border-t border-border sm:rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
-              <div className="px-2 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
-                  <span className="whitespace-nowrap">[F1] Check-in</span>
-                  <span className="whitespace-nowrap">[F2] Assigner</span>
-                  <span className="whitespace-nowrap">[F5] Note</span>
-                  <span className="whitespace-nowrap">[D] Déloger</span>
-                  <span className="whitespace-nowrap">[Esc] Annuler</span>
-                </div>
-                <div className="text-xs text-muted-foreground/80 font-mono">
-                  {filteredRooms.length} chambres
+          <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
+            <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
+              <div className="bg-card/95 backdrop-blur border-t border-border sm:rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
+                <div className="px-2 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+                    <span className="whitespace-nowrap">🎯 Glisser-déposer</span>
+                    <span className="whitespace-nowrap">📱 Support tactile</span>
+                    <span className="whitespace-nowrap">✅ Validation auto</span>
+                    <span className="whitespace-nowrap">🔄 Annulation intelligente</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground/80 font-mono">
+                    {filteredRooms.length} chambres • {data.reservations.length} réservations
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </div>
         </main>
       </div>
