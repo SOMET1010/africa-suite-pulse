@@ -5,14 +5,24 @@ export function useOrgId(): string | null {
   const [orgId, setOrgId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Pour l'instant, on retourne un org_id fixe
-    // À adapter selon votre logique d'authentification
     const getCurrentOrgId = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        // Pour l'instant, on utilise l'organisation qui a le plus de chambres
-        // Dans un vrai système, cela viendrait d'une table de profils utilisateur
-        setOrgId('7e389008-3dd1-4f54-816d-4f1daff1f435');
+        // Get the user's organization from their profile
+        const { data: profile, error } = await (supabase as any)
+          .from('profiles')
+          .select('org_id')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          setOrgId(null);
+        } else {
+          setOrgId((profile as any)?.org_id || null);
+        }
+      } else {
+        setOrgId(null);
       }
     };
 
