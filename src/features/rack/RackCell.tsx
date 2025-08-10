@@ -53,10 +53,11 @@ export function RackCell({ date, roomId, roomStatus, mode, reservations }: Props
   }
 
   const badgeVariant = res.status === 'present' ? 'present' : res.status === 'confirmed' ? 'confirmed' : res.status === 'option' ? 'option' : 'cancelled';
+  const cellSoftClass = res.status === 'present' ? 'cell-soft--present' : res.status === 'confirmed' ? 'cell-soft--confirmed' : res.status === 'option' ? 'cell-soft--option' : 'cell-soft--cancelled';
 
   return (
     <div
-      className="relative bg-card border-b border-l border-border px-3 py-2 hover:bg-secondary/30 cursor-pointer"
+      className={`relative border-b border-l border-border px-3 py-2 cursor-pointer transition-smooth hover:opacity-95 ${cellSoftClass}`}
       onClick={() => toast({ title: "Détails réservation", description: `${res.guestName} (${res.id})` })}
       draggable
       onDragStart={(e)=>{

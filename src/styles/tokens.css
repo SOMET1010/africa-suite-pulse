@@ -138,4 +138,10 @@
   .badge-soft--present { background-color: hsl(var(--status-present) / var(--softness)); color: hsl(var(--status-present)); }
   .badge-soft--option { background-color: hsl(var(--status-option) / var(--softness)); color: hsl(var(--status-option)); }
   .badge-soft--cancelled { background-color: hsl(var(--status-cancelled) / var(--softness)); color: hsl(var(--status-cancelled)); }
+
+  /* Soft cell backgrounds for rack reservations */
+  .cell-soft--confirmed { background-color: hsl(var(--status-confirmed) / var(--softness)); }
+  .cell-soft--present { background-color: hsl(var(--status-present) / var(--softness)); }
+  .cell-soft--option { background-color: hsl(var(--status-option) / var(--softness)); }
+  .cell-soft--cancelled { background-color: hsl(var(--status-cancelled) / var(--softness)); }
 }
