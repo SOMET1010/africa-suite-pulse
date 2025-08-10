@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { useOrgId } from "@/hooks/useOrgId";
+import { useOrgId } from "@/core/auth/useOrg";
 import { listProfiles, updateProfile, createInvitation } from "./users.api";
 import { useToast } from "@/hooks/use-toast";
 

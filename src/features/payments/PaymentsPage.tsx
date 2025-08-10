@@ -3,7 +3,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { useOrgId } from "@/hooks/useOrgId";
+import { useOrgId } from "@/core/auth/useOrg";
 import {
   listPaymentMethods, upsertPaymentMethod, deletePaymentMethod,
   listTerminals, upsertTerminal, deleteTerminal,
