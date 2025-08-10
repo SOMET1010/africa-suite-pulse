@@ -1,9 +1,10 @@
-import { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { useRackData } from "./useRackData";
-import { RackToolbar } from "./RackToolbar";
-import { RackLegend } from "./RackLegend";
+import RackToolbar from "./components/RackToolbar";
+import RackLegend from "./components/RackLegend";
+import RoomHeader from "./components/RoomHeader";
+import { RackCell } from "./RackCell";
 import { RackStatusBar } from "./RackStatusBar";
-import { RackRow } from "./RackRow";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
 
@@ -12,12 +13,21 @@ export default function RackGrid() {
   const [zoom, setZoom] = useState(100);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<"compact" | "detailed">("compact");
-  const [highlight, setHighlight] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all"|"clean"|"inspected"|"dirty"|"maintenance"|"out_of_order">("all");
+  const [compact, setCompact] = useState(false);
+  const [vivid, setVivid] = useState(false);
 
   async function onDropReservation(resId: string, roomId: string) {
     await reassignReservation(resId, roomId);
     toast({ title: "✅ Réservation réassignée", description: "Nouvelle chambre assignée" });
     await reload();
+  }
+
+  function onContext(room: any, dayISO: string, res?: any) {
+    toast({ 
+      title: "Menu contextuel", 
+      description: `Chambre ${room.number} - ${dayISO}${res ? ` - ${res.guestName}` : ''}` 
+    });
   }
 
   useEffect(() => {
@@ -40,8 +50,10 @@ export default function RackGrid() {
 
   const filteredRooms = useMemo(() => {
     if (!data) return [];
-    return data.rooms.filter(r => `${r.number} ${r.type}`.toLowerCase().includes(query.toLowerCase()));
-  }, [data, query]);
+    return data.rooms
+      .filter(r => `${r.number} ${r.type}`.toLowerCase().includes(query.toLowerCase()))
+      .filter(r => statusFilter === "all" || r.status === statusFilter);
+  }, [data, query, statusFilter]);
 
   if (!data) return null;
 
@@ -50,21 +62,15 @@ export default function RackGrid() {
       <header className="mb-3 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold">Rack visuel</h1>
-          <p className="text-sm text-muted-foreground">Glissez-déposez les réservations pour les réassigner</p>
+          <p className="text-sm text-muted-foreground">Interface tactile améliorée avec long-press et couleurs vives</p>
         </div>
       </header>
 
       <RackToolbar
-        zoom={zoom}
-        setZoom={setZoom}
-        query={query}
-        setQuery={setQuery}
-        mode={mode}
-        setMode={setMode}
-        onFullscreen={() => {
-          const el = document.documentElement;
-          el.requestFullscreen?.();
-        }}
+        onFilterStatus={setStatusFilter}
+        onToggleCompact={setCompact}
+        onZoom={setZoom}
+        onVivid={setVivid}
       />
 
       <RackLegend />
@@ -74,21 +80,35 @@ export default function RackGrid() {
           <div className="grid" style={{ gridTemplateColumns: `240px repeat(${data.days.length}, 1fr)` }}>
             {/* Header row */}
             <div className="sticky left-0 z-10 bg-card border-b border-border px-3 py-2 font-medium">Chambre</div>
-            {data.days.map(d => (
-              <div key={d} className="bg-card border-b border-l border-border px-3 py-2 text-center">{new Date(d).toLocaleDateString(undefined,{weekday:'short', day:'2-digit'})}</div>
-            ))}
+            {data.days.map(d=>{
+              const dt = new Date(d);
+              const isToday = d === new Date().toISOString().slice(0,10);
+              const isWE = [0,6].includes(dt.getDay());
+              return (
+                <div key={d}
+                  className={`px-2 py-2 text-xs text-center border-b border-l border-border
+                    ${isToday ? "bg-blue-100" : isWE ? "bg-secondary/30" : "bg-card"}`}>
+                  {dt.toLocaleDateString("fr-FR",{weekday:"short", day:"2-digit", month:"2-digit"})}
+                </div>
+              );
+            })}
             {/* Rows */}
             {filteredRooms.map((room) => (
-              <RackRow 
-                key={room.id} 
-                room={room} 
-                days={data.days} 
-                reservations={data.reservations} 
-                mode={mode} 
-                highlight={highlight === room.id} 
-                onHighlight={() => setHighlight(room.id)}
-                onDropReservation={onDropReservation}
-              />
+              <React.Fragment key={room.id}>
+                <RoomHeader room={room} />
+                {data.days.map((day) => (
+                  <RackCell
+                    key={`${room.id}-${day}`}
+                    room={room}
+                    dayISO={day}
+                    reservations={data.reservations}
+                    mode={compact ? "compact" : mode}
+                    onDropReservation={onDropReservation}
+                    onContext={onContext}
+                    vivid={vivid}
+                  />
+                ))}
+              </React.Fragment>
             ))}
           </div>
         </div>
