@@ -1,6 +1,42 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+async function createProfileForUser(userId: string, email?: string) {
+  // D'abord, s'assurer qu'il y a au moins une organisation
+  const { data: orgs } = await (supabase as any)
+    .from("hotel_settings")
+    .select("org_id")
+    .limit(1);
+  
+  let orgId: string;
+  
+  if (!orgs || orgs.length === 0) {
+    // Créer une organisation par défaut
+    const { data: newOrg } = await (supabase as any)
+      .from("hotel_settings")
+      .insert({
+        name: "Mon Hôtel",
+        org_id: crypto.randomUUID()
+      })
+      .select("org_id")
+      .single();
+    
+    orgId = newOrg.org_id;
+  } else {
+    orgId = orgs[0].org_id;
+  }
+  
+  // Créer le profil utilisateur
+  await (supabase as any)
+    .from("profiles")
+    .insert({
+      user_id: userId,
+      org_id: orgId,
+      email: email,
+      role: "admin"
+    });
+}
+
 type ProfileRow = {
   user_id: string;
   org_id: string | null;
@@ -50,9 +86,31 @@ export function useOrgId(): UseOrgIdResult {
         .select("org_id")
         .eq("user_id", user.id)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (dbErr) throw dbErr;
+      
+      // Si aucun profil n'existe, en créer un
+      if (!data) {
+        await createProfileForUser(user.id, user.email);
+        // Retry after creating profile
+        const { data: retryData, error: retryErr } = await (supabase as any)
+          .from("profiles")
+          .select("org_id")
+          .eq("user_id", user.id)
+          .limit(1)
+          .maybeSingle();
+        
+        if (retryErr) throw retryErr;
+        const org = retryData?.org_id ?? null;
+        if (!alive.current) return;
+        setOrgId(org);
+        try {
+          if (org) sessionStorage.setItem(CACHE_KEY, org);
+          else sessionStorage.removeItem(CACHE_KEY);
+        } catch {}
+        return;
+      }
 
       const org = data?.org_id ?? null;
       if (!alive.current) return;
