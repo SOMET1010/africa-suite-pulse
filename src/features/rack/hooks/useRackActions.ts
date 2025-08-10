@@ -41,6 +41,12 @@ export function useRackActions({
       return;
     }
     
+    // CRITIQUE : Vérifier si c'est la même chambre
+    if (reservation.roomId === roomId) {
+      console.log(`🔄 Same room drop detected: ${reservation.guestName} already in room ${targetRoom.number}, ignoring`);
+      return; // Ne rien faire silencieusement
+    }
+    
     // Afficher le dialog de confirmation (pas de conflit car déjà validé)
     setMoveConfirmDialog({
       open: true,

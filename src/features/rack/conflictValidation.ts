@@ -55,8 +55,8 @@ export function validateDrop(
 
   // CRITIQUE : Empêcher le drop sur la même chambre
   if (dragged.roomId === targetRoomId) {
-    console.log(`🚫 Cannot drop reservation on its own room: ${dragged.guestName} already in room ${room.number}`);
-    return { ok: true }; // Pas d'erreur, mais pas d'action non plus
+    console.log(`🔄 Same room drop detected: ${dragged.guestName} already in target room`);
+    return { ok: false, reason: "BLOCKED" }; // Bloquer complètement le drop
   }
 
   const conflicts = data.reservations.filter(r =>
