@@ -44,8 +44,8 @@ export function useRackActions({
     
     console.log(`🔍 Checking same room: reservation.roomId=${reservation.roomId}, targetRoomId=${roomId}`);
     
-    // CRITIQUE : Vérifier si c'est la même chambre
-    if (reservation.roomId === roomId) {
+    // CRITIQUE : Vérifier si c'est la même chambre (en gérant les null)
+    if (reservation.roomId && reservation.roomId === roomId) {
       console.log(`🔄 Same room drop detected: ${reservation.guestName} already in room ${targetRoom.number}, ignoring completely`);
       return; // Ne rien faire silencieusement
     }

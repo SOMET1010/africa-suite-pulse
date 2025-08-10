@@ -42,7 +42,7 @@ export interface UIReservation {
   ae: "A" | "E";
   nights: number;
   rate: number;
-  roomId: string;
+  roomId: string | null;
   start: string; // ISO date
   end: string; // ISO date (exclusive)
 }

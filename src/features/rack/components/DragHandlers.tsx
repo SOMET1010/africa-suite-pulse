@@ -24,8 +24,8 @@ export function useDragHandlers(
     if (resId) {
       const dragged = reservations.find(r => r.id === resId);
       if (dragged) {
-        // CRITIQUE : Empêcher le drag sur la même chambre
-        if (dragged.roomId === room.id) {
+        // CRITIQUE : Empêcher le drag sur la même chambre (en gérant les null)
+        if (dragged.roomId && dragged.roomId === room.id) {
           console.log(`🔄 Same room drag detected for ${room.number}, ignoring`);
           setOver(null);
           return;
@@ -85,8 +85,8 @@ export function useDragHandlers(
       return;
     }
 
-    // CRITIQUE : Empêcher le drop sur la même chambre
-    if (dragged.roomId === room.id) {
+    // CRITIQUE : Empêcher le drop sur la même chambre (en gérant les null)
+    if (dragged.roomId && dragged.roomId === room.id) {
       console.log(`🔄 Cannot drop reservation on its own room ${room.number}, ignoring`);
       return;
     }

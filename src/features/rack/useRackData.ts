@@ -48,7 +48,7 @@ function toUIReservation(r: SBReservation): UIReservation {
     ae: (r.children ?? 0) > 0 ? "E" : "A",
     nights: diffNights(r.date_arrival, r.date_departure),
     rate: r.rate_total ?? 0,
-    roomId: r.room_id || "",
+    roomId: r.room_id, // Garder null si pas assigné
     start: r.date_arrival,
     end: r.date_departure,
   };
