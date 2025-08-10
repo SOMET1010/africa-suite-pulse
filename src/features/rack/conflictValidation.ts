@@ -16,21 +16,38 @@ export function isRoomBlocked(status: UIRoom["status"]) {
   return status === "out_of_order" || status === "maintenance";
 }
 
+export type ConflictType = "CURRENT" | "FUTURE";
+
 export type DropValidationResult =
   | { ok: true }
   | {
       ok: false;
-      reason: "BLOCKED" | "CONFLICT";
+      reason: "BLOCKED" | "CONFLICT" | "FUTURE_CONFLICT";
       conflicts?: UIReservation[];
+      conflictType?: ConflictType;
     };
+
+/** Détermine si un conflit concerne un séjour en cours ou futur */
+export function getConflictType(conflict: UIReservation, today: string): ConflictType {
+  // Si la réservation a déjà commencé (start <= today), c'est un séjour en cours
+  return conflict.start <= today ? "CURRENT" : "FUTURE";
+}
+
+/** Vérifie si le délogement est autorisé selon les règles TopRésa */
+export function isRelodgingAllowed(conflicts: UIReservation[], today: string): boolean {
+  // Autoriser uniquement si tous les conflits concernent des séjours en cours
+  return conflicts.every(conflict => getConflictType(conflict, today) === "CURRENT");
+}
 
 /**
  * Valide un drop : vérifie blocage de chambre + conflits de dates sur la room cible
+ * Applique les règles TopRésa pour les délogements
  */
 export function validateDrop(
   data: RackData,
   dragged: UIReservation,
-  targetRoomId: string
+  targetRoomId: string,
+  today?: string
 ): DropValidationResult {
   const room = data.rooms.find(r => r.id === targetRoomId);
   if (!room) return { ok: false, reason: "CONFLICT", conflicts: [] };
@@ -42,8 +59,31 @@ export function validateDrop(
     overlapsRange(r.start, r.end, dragged.start, dragged.end)
   );
 
-  if (conflicts.length > 0) return { ok: false, reason: "CONFLICT", conflicts };
-  return { ok: true };
+  if (conflicts.length === 0) return { ok: true };
+
+  // Appliquer les règles TopRésa si date du jour fournie
+  if (today) {
+    const conflictTypes = conflicts.map(c => getConflictType(c, today));
+    const hasFutureConflicts = conflictTypes.some(type => type === "FUTURE");
+    
+    if (hasFutureConflicts) {
+      return { 
+        ok: false, 
+        reason: "FUTURE_CONFLICT", 
+        conflicts,
+        conflictType: "FUTURE"
+      };
+    }
+    
+    return { 
+      ok: false, 
+      reason: "CONFLICT", 
+      conflicts,
+      conflictType: "CURRENT"
+    };
+  }
+
+  return { ok: false, reason: "CONFLICT", conflicts };
 }
 
 /**
@@ -121,7 +161,12 @@ function scorePriceFit(targetRoom: UIRoom, conflict: UIReservation, allReservati
   }
 }
 
-export type Relocation = { conflict: UIReservation; target: UIRoom | null; score: number };
+export type Relocation = { 
+  conflict: UIReservation; 
+  target: UIRoom | null; 
+  score: number;
+  conflictType?: ConflictType;
+};
 
 /**
  * Trouve la *meilleure* chambre libre pour chaque conflit, avec un score.
@@ -132,7 +177,7 @@ export type Relocation = { conflict: UIReservation; target: UIRoom | null; score
 export function findBestRelocationRooms(
   data: RackData,
   conflicts: UIReservation[],
-  opts?: { excludeRoomIds?: string[] }
+  opts?: { excludeRoomIds?: string[]; today?: string }
 ): Relocation[] {
   const exclude = new Set(opts?.excludeRoomIds ?? []);
   return conflicts.map(conflict => {
@@ -160,7 +205,10 @@ export function findBestRelocationRooms(
     
     const best = candidatesWithScore.sort((a, b) => b.score - a.score)[0];
 
-    return best ? { conflict, target: best.room, score: best.score } : { conflict, target: null, score: -1 };
+    const conflictType = opts?.today ? getConflictType(conflict, opts.today) : undefined;
+    return best ? 
+      { conflict, target: best.room, score: best.score, conflictType } : 
+      { conflict, target: null, score: -1, conflictType };
   });
 }
 

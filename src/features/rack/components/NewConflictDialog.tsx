@@ -1,6 +1,6 @@
 import React from "react";
 import type { UIReservation, UIRoom } from "../rack.types";
-import type { Relocation } from "../conflictValidation";
+import type { Relocation, ConflictType } from "../conflictValidation";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -17,6 +17,7 @@ type Props = {
   conflicts: UIReservation[];
   targetRoom: UIRoom | null;
   preview: Relocation[];
+  conflictType: ConflictType | null;
   onCancel: () => void;
   onSwap: () => void;
   onAutoRelodge: () => void;
@@ -24,7 +25,7 @@ type Props = {
 };
 
 export function NewConflictDialog({
-  open, dragged, conflicts, targetRoom, preview, onCancel, onSwap, onAutoRelodge, onConfirmRelodge
+  open, dragged, conflicts, targetRoom, preview, conflictType, onCancel, onSwap, onAutoRelodge, onConfirmRelodge
 }: Props) {
   if (!open || !dragged || !targetRoom) return null;
 
@@ -35,19 +36,28 @@ export function NewConflictDialog({
       <AlertDialogContent className="sm:max-w-[700px]">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-destructive flex items-center gap-2">
-            ⚠️ Conflit de réservation détecté
+            ⚠️ {conflictType === "FUTURE" ? "Conflit avec séjour futur" : "Conflit de délogement"}
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-4">
-              <ConflictDescription 
-                dragged={dragged}
-                targetRoom={targetRoom}
-                conflicts={conflicts}
-              />
-              
-              {/* Prévisualisation du plan de délogement */}
-              <div className="rounded-lg border bg-muted/50 p-4">
-                <div className="text-sm font-medium mb-3">Plan de délogement proposé :</div>
+              {conflictType === "FUTURE" ? (
+                <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
+                  <p className="text-sm text-warning-foreground">
+                    Impossible de déloger vers la chambre {targetRoom.number} : conflit avec un séjour futur. 
+                    Utilisez TopRésa pour déplacer manuellement la réservation.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <ConflictDescription 
+                    dragged={dragged}
+                    targetRoom={targetRoom}
+                    conflicts={conflicts}
+                  />
+                  
+                  {/* Prévisualisation du plan de délogement */}
+                  <div className="rounded-lg border bg-muted/50 p-4">
+                    <div className="text-sm font-medium mb-3">Plan de délogement proposé :</div>
                 <div className="max-h-60 overflow-auto">
                   <table className="w-full text-sm">
                     <thead>
@@ -95,22 +105,27 @@ export function NewConflictDialog({
                 {missing.length > 0 && (
                   <div className="mt-3 p-3 rounded-md bg-warning/10 text-warning-foreground text-xs border border-warning/20">
                     ⚠️ {missing.length} réservation{missing.length>1?'s':''} sans solution disponible. Ajustez manuellement.
-                  </div>
-                )}
-              </div>
+                    </div>
+                  )}
+                </div>
+              </>
+              )}
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         
-        <ConflictActions
-          conflicts={conflicts}
-          dragged={dragged}
-          preview={preview}
-          onCancel={onCancel}
-          onSwap={onSwap}
-          onAutoRelodge={onAutoRelodge}
-          onConfirmRelodge={onConfirmRelodge}
-        />
+        {conflictType !== "FUTURE" && (
+          <ConflictActions
+            conflicts={conflicts}
+            dragged={dragged}
+            preview={preview}
+            conflictType={conflictType}
+            onCancel={onCancel}
+            onSwap={onSwap}
+            onAutoRelodge={onAutoRelodge}
+            onConfirmRelodge={onConfirmRelodge}
+          />
+        )}
       </AlertDialogContent>
     </AlertDialog>
   );

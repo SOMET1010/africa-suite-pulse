@@ -209,6 +209,7 @@ export default function RackGrid() {
           targetRoom={data.rooms.find(r => r.id === conflictDialog.targetRoomId) || null}
           conflicts={conflictDialog.conflicts}
           preview={conflictDialog.preview}
+          conflictType={conflictDialog.conflictType}
           onCancel={closeConflictDialog}
           onSwap={doSwap}
           onAutoRelodge={doAutoRelodge}
