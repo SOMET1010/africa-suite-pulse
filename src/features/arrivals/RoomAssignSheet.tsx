@@ -19,7 +19,7 @@ export default function RoomAssignSheet({ open, onClose, onPick }: Props) {
   }, [open]);
 
   const filtered = q ? rows.filter(r =>
-    `${r.number} ${r.type} ${r.floor ?? ""}`.toLowerCase().includes(q.toLowerCase())
+    `${r.number} ${r.type} ${r.room_type?.label ?? ""} ${r.floor ?? ""}`.toLowerCase().includes(q.toLowerCase())
   ) : rows;
 
   if (!open) return null;
@@ -54,7 +54,8 @@ export default function RoomAssignSheet({ open, onClose, onPick }: Props) {
                   </span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
-                  {r.type} • Étage {r.floor ?? "—"}
+                  {r.room_type ? `${r.room_type.label} (${r.type})` : r.type} • Étage {r.floor ?? "—"}
+                  {r.room_type && <span className="text-xs ml-2">• {r.room_type.capacity} pers.</span>}
                 </div>
               </button>
             ))}

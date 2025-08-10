@@ -279,7 +279,7 @@ export class RoomsCatalogService {
     }
 
     if (!room.type?.trim()) {
-      errors.type = 'Type obligatoire';
+      errors.type = 'Type de chambre obligatoire';
     }
 
     if (!room.status) {
@@ -287,5 +287,20 @@ export class RoomsCatalogService {
     }
 
     return errors;
+  }
+
+  static async validateRoomType(orgId: string, typeCode: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase
+        .from('room_types')
+        .select('id')
+        .eq('code', typeCode)
+        .eq('org_id', orgId)
+        .single();
+      
+      return !error && !!data;
+    } catch {
+      return false;
+    }
   }
 }

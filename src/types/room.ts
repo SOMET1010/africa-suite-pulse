@@ -73,6 +73,11 @@ export type PickableRoom = {
   type: string;
   floor: string | null;
   status: RoomStatus;
+  room_type?: {
+    code: string;
+    label: string;
+    capacity: number;
+  };
 };
 
 // For rack module - UI adapted room

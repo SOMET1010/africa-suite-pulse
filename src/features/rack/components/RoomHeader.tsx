@@ -1,4 +1,5 @@
 import type { UIRoom } from "../rack.types";
+import { RoomTypeIndicator } from "./RoomTypeIndicator";
 
 function roomDotClass(status: UIRoom["status"]) {
   switch (status) {
@@ -18,9 +19,9 @@ export default function RoomHeader({ room }:{room: UIRoom}){
         <span className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${roomDotClass(room.status)} animate-scale-in shadow-sm flex-shrink-0`} />
         <div className="font-display font-semibold text-foreground text-sm sm:text-base truncate">Ch. {room.number}</div>
       </div>
-      <div className="text-xs font-medium text-muted-foreground mt-0.5 sm:mt-1 truncate">
-        <span className="hidden sm:inline">{room.type} • </span>
-        <span className="text-primary font-semibold">Ét. {room.floor ?? 0}</span>
+      <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
+        <RoomTypeIndicator typeCode={room.type} compact />
+        <span className="text-xs text-primary font-semibold">Ét. {room.floor ?? 0}</span>
       </div>
     </div>
   );

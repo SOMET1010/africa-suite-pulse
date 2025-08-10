@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useRoomTypes } from '../useRoomTypes';
 import { RoomTypeStats } from './RoomTypeStats';
 import { RoomTypeRow } from './RoomTypeRow';
+import { RoomTypeAuditWidget } from './RoomTypeAuditWidget';
 import { RoomTypesService } from '../roomTypesService';
 import { useOrgId } from '@/core/auth/useOrg';
 import type { RoomTypeWithStock } from '@/types/roomType';
@@ -124,6 +125,9 @@ export default function RoomTypesTab() {
 
   return (
     <div className="space-y-6">
+      {/* Audit */}
+      <RoomTypeAuditWidget />
+      
       {/* Stats */}
       <RoomTypeStats 
         totalTypes={stats.total}

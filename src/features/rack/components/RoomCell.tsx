@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { DraggableReservation, DropZoneRoom, useDragDrop } from '../hooks/useDragDrop';
 import { ReservationCard } from './ReservationCard';
+import { RoomTypeIndicator } from './RoomTypeIndicator';
 import type { UIRoom, UIReservation } from '../rack.types';
 
 interface RoomCellProps {
@@ -163,15 +164,16 @@ export function RoomCell({
               transition-all duration-200 hover:border-muted/50 hover:bg-muted/10
               ${isDraggedOver ? 'border-primary/50 bg-primary/5' : ''}
             `}>
-              <div className="flex flex-col items-center gap-1 opacity-60">
-                <span className="text-lg">{getRoomStatusIcon()}</span>
-                <span className="text-xs">
-                  {room.status === 'out_of_order' || room.status === 'maintenance' 
-                    ? 'Indisponible' 
-                    : 'Libre'
-                  }
-                </span>
-              </div>
+            <div className="flex flex-col items-center gap-1 opacity-60">
+              <span className="text-lg">{getRoomStatusIcon()}</span>
+              <span className="text-xs">
+                {room.status === 'out_of_order' || room.status === 'maintenance' 
+                  ? 'Indisponible' 
+                  : 'Libre'
+                }
+              </span>
+              <RoomTypeIndicator typeCode={room.type} compact />
+            </div>
             </div>
           )}
         </div>
