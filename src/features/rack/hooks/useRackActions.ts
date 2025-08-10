@@ -56,6 +56,8 @@ export function useRackActions({
     targetRoomId: string; 
     conflicts: UIReservation[] 
   }) {
+    console.log("🔥 handleConflict called:", { draggedId, targetRoomId, conflicts: conflicts.length });
+    
     const dragged = data?.reservations.find(r => r.id === draggedId) || null;
     
     // Déterminer le type de conflit (aujourd'hui pour l'exemple)
@@ -63,12 +65,16 @@ export function useRackActions({
     const conflictType = conflicts.length > 0 ? 
       (conflicts.some(c => c.start > today) ? "FUTURE" : "CURRENT") : null;
 
+    console.log("📊 Conflict analysis:", { conflictType, today, conflictDates: conflicts.map(c => c.start) });
+
     // Calculer la preview seulement pour les conflits actuels
     const preview = conflictType === "CURRENT" && data ? 
       findBestRelocationRooms(data, conflicts, { 
         excludeRoomIds: [targetRoomId],
         today 
       }) : [];
+      
+    console.log("📋 Preview calculation:", { preview: preview.length, conflictType });
     
     setConflictDialog({ 
       open: true, 

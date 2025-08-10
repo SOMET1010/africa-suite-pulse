@@ -18,6 +18,7 @@ type Props = {
   targetRoom: UIRoom | null;
   preview: Relocation[];
   conflictType: ConflictType | null;
+  allRooms: UIRoom[]; // Add this to get room numbers
   onCancel: () => void;
   onSwap: () => void;
   onAutoRelodge: () => void;
@@ -25,9 +26,14 @@ type Props = {
 };
 
 export function NewConflictDialog({
-  open, dragged, conflicts, targetRoom, preview, conflictType, onCancel, onSwap, onAutoRelodge, onConfirmRelodge
+  open, dragged, conflicts, targetRoom, preview, conflictType, allRooms, onCancel, onSwap, onAutoRelodge, onConfirmRelodge
 }: Props) {
-  if (!open || !dragged || !targetRoom) return null;
+  console.log("🏨 NewConflictDialog render:", { open, dragged: dragged?.guestName, conflicts: conflicts.length, conflictType, preview: preview.length });
+  
+  if (!open || !dragged || !targetRoom) {
+    console.log("🚫 NewConflictDialog early return:", { open, hasDragged: !!dragged, hasTargetRoom: !!targetRoom });
+    return null;
+  }
 
   const missing = preview.filter(p => !p.target);
 
@@ -76,7 +82,7 @@ export function NewConflictDialog({
                           <td className="py-2 pr-3 font-medium">{p.conflict.guestName}</td>
                           <td className="py-2 pr-3 text-xs font-mono">{p.conflict.rate}€</td>
                           <td className="py-2 pr-3 text-xs">{p.conflict.start} → {p.conflict.end}</td>
-                          <td className="py-2 pr-3">Ch. {p.conflict.roomId || "?"}</td>
+                          <td className="py-2 pr-3">Ch. {allRooms.find(r => r.id === p.conflict.roomId)?.number || "?"}</td>
                           <td className="py-2 pr-3">
                             {p.target ? (
                               <span className="text-sm">

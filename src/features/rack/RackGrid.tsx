@@ -210,6 +210,7 @@ export default function RackGrid() {
           conflicts={conflictDialog.conflicts}
           preview={conflictDialog.preview}
           conflictType={conflictDialog.conflictType}
+          allRooms={data.rooms}
           onCancel={closeConflictDialog}
           onSwap={doSwap}
           onAutoRelodge={doAutoRelodge}
