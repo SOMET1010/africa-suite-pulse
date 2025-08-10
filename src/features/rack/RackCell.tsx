@@ -91,9 +91,9 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
       : "bg-card/80 backdrop-blur-sm";
 
   const selectionClasses = isSourceSelected
-    ? "ring-2 ring-primary ring-offset-2 ring-offset-background"
+    ? "ring-2 ring-primary ring-offset-2 ring-offset-background bg-primary/5 animate-pulse"
     : isDestinationSelected
-      ? "ring-2 ring-dashed ring-secondary ring-offset-2 ring-offset-background"
+      ? "border-2 border-dashed border-secondary ring-offset-2 ring-offset-background bg-secondary/5 animate-pulse"
       : "";
 
   return (
@@ -122,6 +122,18 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
           ? "Chambre indisponible" 
           : ""}
     >
+      {/* Selection badges */}
+      {isSourceSelected && (
+        <div className="absolute -top-1 -left-1 bg-primary text-primary-foreground px-1 py-0.5 rounded text-xs font-bold animate-bounce">
+          SOURCE
+        </div>
+      )}
+      {isDestinationSelected && (
+        <div className="absolute -top-1 -right-1 bg-secondary text-secondary-foreground px-1 py-0.5 rounded text-xs font-bold animate-bounce">
+          DEST
+        </div>
+      )}
+      
       <div className="absolute inset-0.5 sm:inset-1 flex gap-0.5 sm:gap-1 overflow-hidden">
         {resForCell.length === 0 && (
           <div className="flex items-center justify-center w-full h-full text-muted-foreground/50 group-hover:text-muted-foreground transition-colors">
