@@ -7,6 +7,7 @@ import { RackCell } from "./RackCell";
 import { RackStatusBar } from "./RackStatusBar";
 import RoomDetailSheet from "./components/RoomDetailSheet";
 import { ConflictDialog } from "./components/ConflictDialog";
+import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { toast } from "@/hooks/use-toast";
 import { reassignReservation } from "./rack.service";
 import { detectConflicts } from "./conflictValidation";
@@ -43,10 +44,35 @@ export default function RackGrid() {
     pendingDrop: null
   });
 
+  const [moveConfirmDialog, setMoveConfirmDialog] = useState<{
+    open: boolean;
+    reservation: Reservation | null;
+    sourceRoom: Room | null;
+    targetRoom: Room | null;
+    pendingDrop: { resId: string; roomId: string } | null;
+  }>({
+    open: false,
+    reservation: null,
+    sourceRoom: null,
+    targetRoom: null,
+    pendingDrop: null
+  });
+
   async function onDropReservation(resId: string, roomId: string, hasConflict: boolean = false) {
     console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}, hasConflict: ${hasConflict}`);
     
-    if (hasConflict && data) {
+    if (!data) return;
+    
+    const reservation = data.reservations.find(r => r.id === resId);
+    const targetRoom = data.rooms.find(r => r.id === roomId);
+    const sourceRoom = reservation ? data.rooms.find(r => r.id === reservation.roomId) : null;
+    
+    if (!reservation || !targetRoom) {
+      console.error("❌ Reservation or room not found");
+      return;
+    }
+    
+    if (hasConflict) {
       // Afficher le dialog de conflit
       const conflictInfo = detectConflicts(resId, roomId, data.reservations, data.rooms);
       setConflictDialog({
@@ -57,8 +83,14 @@ export default function RackGrid() {
       return;
     }
     
-    // Pas de conflit, procéder directement
-    await performDrop(resId, roomId);
+    // Pas de conflit, afficher le dialog de confirmation
+    setMoveConfirmDialog({
+      open: true,
+      reservation,
+      sourceRoom,
+      targetRoom,
+      pendingDrop: { resId, roomId }
+    });
   }
   
   async function performDrop(resId: string, roomId: string) {
@@ -104,6 +136,30 @@ export default function RackGrid() {
   
   function handleConflictCancel() {
     setConflictDialog({ open: false, conflictInfo: null, pendingDrop: null });
+  }
+
+  function handleMoveConfirm() {
+    const { pendingDrop } = moveConfirmDialog;
+    if (pendingDrop) {
+      performDrop(pendingDrop.resId, pendingDrop.roomId);
+    }
+    setMoveConfirmDialog({ 
+      open: false, 
+      reservation: null, 
+      sourceRoom: null, 
+      targetRoom: null, 
+      pendingDrop: null 
+    });
+  }
+  
+  function handleMoveCancel() {
+    setMoveConfirmDialog({ 
+      open: false, 
+      reservation: null, 
+      sourceRoom: null, 
+      targetRoom: null, 
+      pendingDrop: null 
+    });
   }
 
   async function handleCheckin(reservationId: string) {
@@ -260,6 +316,16 @@ export default function RackGrid() {
           conflictInfo={conflictDialog.conflictInfo}
           onConfirm={handleConflictConfirm}
           onCancel={handleConflictCancel}
+        />
+
+        <MoveConfirmationDialog
+          open={moveConfirmDialog.open}
+          onOpenChange={(open) => !open && handleMoveCancel()}
+          reservation={moveConfirmDialog.reservation}
+          sourceRoom={moveConfirmDialog.sourceRoom}
+          targetRoom={moveConfirmDialog.targetRoom}
+          onConfirm={handleMoveConfirm}
+          onCancel={handleMoveCancel}
         />
 
         <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
