@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import type { RackData, Room as UIRoom, Reservation as UIReservation } from "./types";
 import { fetchRooms, fetchReservationsRange } from "./rack.service";
 import type { Room as SBRoom, Reservation as SBReservation } from "./rack.types";
@@ -48,20 +48,29 @@ export function useRackData() {
   const [data, setData] = useState<RackData | null>(null);
   const days = useMemo(() => generateDays(), []);
 
-  async function load() {
-    const [rooms, resas] = await Promise.all([fetchRooms(), fetchReservationsRange(days[0], days[days.length - 1])]);
-    const uiRooms: UIRoom[] = rooms.map(toUIRoom);
-    const uiResas: UIReservation[] = resas.map(toUIReservation);
-    setData({ days, rooms: uiRooms, reservations: uiResas });
-  }
+  const load = useCallback(async () => {
+    console.log('🔄 Rechargement des données Rack...');
+    try {
+      const [rooms, resas] = await Promise.all([fetchRooms(), fetchReservationsRange(days[0], days[days.length - 1])]);
+      const uiRooms: UIRoom[] = rooms.map(toUIRoom);
+      const uiResas: UIReservation[] = resas.map(toUIReservation);
+      console.log('✅ Données Rack rechargées:', { rooms: uiRooms.length, reservations: uiResas.length });
+      setData({ days, rooms: uiRooms, reservations: uiResas });
+    } catch (error) {
+      console.error('❌ Erreur rechargement Rack:', error);
+    }
+  }, [days]);
 
-  useEffect(() => { load(); }, [/* days fixed */]);
+  useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    const handler = () => { load(); };
+    const handler = () => { 
+      console.log('🎯 Événement rack-refresh reçu');
+      load(); 
+    };
     window.addEventListener('rack-refresh', handler as EventListener);
     return () => window.removeEventListener('rack-refresh', handler as EventListener);
-  }, [days]);
+  }, [load]); // Maintenant load est stable grâce à useCallback
 
   const kpis = useMemo(() => {
     if (!data) return { occ: 0, arrivals: 0, presents: 0, hs: 0 };

@@ -41,7 +41,9 @@ export function RackCell({ date, roomId, roomStatus, mode, reservations }: Props
           const id = e.dataTransfer.getData('text/res-id');
           if (!id) return;
           try{
+            console.log('🎯 Début réassignation:', { reservationId: id, roomId });
             await reassignReservation(id, roomId);
+            console.log('✅ Réassignation réussie, envoi de rack-refresh');
             toast({ title: "✅ Réservation réassignée", description: `Nouvelle chambre assignée` });
             window.dispatchEvent(new CustomEvent('rack-refresh'));
           }catch(err:any){
