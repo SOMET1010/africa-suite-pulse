@@ -8,9 +8,10 @@ interface Props {
   mode: "compact" | "detailed";
   highlight?: boolean;
   onHighlight?: () => void;
+  onDropReservation: (reservationId: string, roomId: string) => Promise<void> | void;
 }
 
-export function RackRow({ room, days, reservations, mode, highlight, onHighlight }: Props) {
+export function RackRow({ room, days, reservations, mode, highlight, onHighlight, onDropReservation }: Props) {
   const resForRoom = reservations.filter(r => r.roomId === room.id);
   console.log(`🏠 Chambre ${room.number} (${room.id}):`, resForRoom.length, 'réservations');
 
@@ -24,7 +25,14 @@ export function RackRow({ room, days, reservations, mode, highlight, onHighlight
         <div className="text-xs text-muted-foreground">Étage {room.floor}</div>
       </div>
       {days.map((d) => (
-        <RackCell key={room.id + d} date={d} roomId={room.id} roomStatus={room.status} mode={mode} reservations={resForRoom} />
+        <RackCell 
+          key={room.id + d} 
+          room={room}
+          dayISO={d} 
+          reservations={reservations}
+          mode={mode} 
+          onDropReservation={onDropReservation}
+        />
       ))}
     </>
   );

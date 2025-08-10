@@ -5,13 +5,20 @@ import { RackLegend } from "./RackLegend";
 import { RackStatusBar } from "./RackStatusBar";
 import { RackRow } from "./RackRow";
 import { toast } from "@/hooks/use-toast";
+import { reassignReservation } from "./rack.service";
 
 export default function RackGrid() {
-  const { data, kpis } = useRackData();
+  const { data, kpis, reload } = useRackData();
   const [zoom, setZoom] = useState(100);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<"compact" | "detailed">("compact");
   const [highlight, setHighlight] = useState<string | null>(null);
+
+  async function onDropReservation(resId: string, roomId: string) {
+    await reassignReservation(resId, roomId);
+    toast({ title: "✅ Réservation réassignée", description: "Nouvelle chambre assignée" });
+    await reload();
+  }
 
   useEffect(() => {
     document.title = "Rack visuel - AfricaSuite";
@@ -72,7 +79,16 @@ export default function RackGrid() {
             ))}
             {/* Rows */}
             {filteredRooms.map((room) => (
-              <RackRow key={room.id} room={room} days={data.days} reservations={data.reservations} mode={mode} highlight={highlight === room.id} onHighlight={() => setHighlight(room.id)} />
+              <RackRow 
+                key={room.id} 
+                room={room} 
+                days={data.days} 
+                reservations={data.reservations} 
+                mode={mode} 
+                highlight={highlight === room.id} 
+                onHighlight={() => setHighlight(room.id)}
+                onDropReservation={onDropReservation}
+              />
             ))}
           </div>
         </div>
