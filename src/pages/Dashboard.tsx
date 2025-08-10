@@ -6,6 +6,7 @@ import { useEffect } from "react";
 const tiles = [
   { title: "Rack Hôtel", to: "/reservations/rack" },
   { title: "Arrivées", to: "/arrivals" },
+  { title: "Paramètres", to: "/settings" },
   { title: "Clients", to: "/" },
   { title: "Facturation", to: "/" },
   { title: "Rapports", to: "/" },

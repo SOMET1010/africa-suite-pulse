@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import AuthPage from "@/pages/AuthPage";
 import RequireAuth from "@/core/auth/RequireAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { SettingsHome, HotelSettingsForm } from "@/features/settings";
 
 function Layout() {
   return (
@@ -17,6 +18,7 @@ function Layout() {
           <div className="ml-auto flex items-center gap-2">
             <Link to="/arrivals" className="text-sm text-muted-foreground hover:underline">Arrivées</Link>
             <Link to="/reservations/rack" className="text-sm text-muted-foreground hover:underline">Rack</Link>
+            <Link to="/settings" className="text-sm text-muted-foreground hover:underline">Paramètres</Link>
             <button onClick={() => supabase.auth.signOut()} className="text-sm text-muted-foreground hover:underline">Logout</button>
           </div>
         </div>
@@ -34,6 +36,8 @@ export function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
         <Route path="reservations/rack" element={<RackGrid />} />
+        <Route path="settings" element={<SettingsHome />} />
+        <Route path="settings/hotel" element={<HotelSettingsForm />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
