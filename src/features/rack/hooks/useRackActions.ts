@@ -36,7 +36,6 @@ export function useRackActions({
     
     const reservation = data.reservations.find(r => r.id === resId);
     const targetRoom = data.rooms.find(r => r.id === roomId);
-    const sourceRoom = reservation ? data.rooms.find(r => r.id === reservation.roomId) : null;
     
     if (!reservation || !targetRoom) {
       console.error("❌ Reservation or room not found");
@@ -48,6 +47,17 @@ export function useRackActions({
       console.log(`🔄 Same room drop detected: ${reservation.guestName} already in room ${targetRoom.number}, ignoring`);
       return; // Ne rien faire silencieusement
     }
+    
+    // CORRECTION : Trouver la vraie chambre source basée sur la réservation
+    const sourceRoom = reservation.roomId ? data.rooms.find(r => r.id === reservation.roomId) : null;
+    
+    console.log(`🔍 Move confirmation details:`, {
+      reservation: reservation.guestName,
+      sourceRoom: sourceRoom ? `${sourceRoom.number} (${sourceRoom.type})` : 'Unassigned',
+      targetRoom: `${targetRoom.number} (${targetRoom.type})`,
+      sourceRoomId: reservation.roomId,
+      targetRoomId: roomId
+    });
     
     // Afficher le dialog de confirmation (pas de conflit car déjà validé)
     setMoveConfirmDialog({
