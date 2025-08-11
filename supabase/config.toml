@@ -37,3 +37,9 @@ verify_jwt = true
 
 [functions.report-scheduler]
 verify_jwt = true
+
+[functions.advanced-analytics]
+verify_jwt = true
+
+[functions.generate-insights]
+verify_jwt = true

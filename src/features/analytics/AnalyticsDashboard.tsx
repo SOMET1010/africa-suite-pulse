@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnalyticsKPIs } from "./components/AnalyticsKPIs";
 import { OccupancyChart } from "./components/OccupancyChart";
@@ -8,7 +9,8 @@ import { ReservationSourceChart } from "./components/ReservationSourceChart";
 import { FilterControls } from "./components/FilterControls";
 import { useAnalyticsData } from "./hooks/useAnalyticsData";
 import { AnalyticsFilters } from "./types";
-import { BarChart3, TrendingUp, Users, Calendar } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Calendar, Brain } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AnalyticsDashboard() {
   const [filters, setFilters] = useState<AnalyticsFilters>({
@@ -42,6 +44,12 @@ export default function AnalyticsDashboard() {
             Tableaux de bord et métriques de performance en temps réel
           </p>
         </div>
+        <Link to="/analytics/advanced">
+          <Button className="gap-2">
+            <Brain className="h-4 w-4" />
+            Analytics Avancés
+          </Button>
+        </Link>
       </div>
 
       <FilterControls 
