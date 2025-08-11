@@ -15,7 +15,7 @@ export interface Guest {
   nationality?: string;
   
   // Identity Documents
-  document_type?: 'passport' | 'id_card' | 'driving_license';
+  document_type?: string;
   document_number?: string;
   document_expiry?: string;
   document_issuing_country?: string;
@@ -34,17 +34,17 @@ export interface Guest {
   tax_id?: string;
   
   // Preferences and Notes
-  preferences?: Record<string, any>;
+  preferences?: any;
   special_requests?: string;
   notes?: string;
   
   // Classification
-  guest_type: 'individual' | 'corporate' | 'group';
+  guest_type: string;
   vip_status: boolean;
   
   // Contact Preferences
   marketing_consent: boolean;
-  preferred_communication: 'email' | 'phone' | 'sms';
+  preferred_communication: string;
   
   // System Fields
   created_at: string;

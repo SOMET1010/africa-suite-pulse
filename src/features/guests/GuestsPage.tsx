@@ -13,7 +13,7 @@ import { GuestFiltersSheet } from "./components/GuestFiltersSheet";
 import type { GuestFilters } from "@/types/guest";
 
 export default function GuestsPage() {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<GuestFilters>({});
   const [showCreateDialog, setShowCreateDialog] = useState(false);

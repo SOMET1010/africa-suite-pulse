@@ -38,7 +38,7 @@ const guestSchema = z.object({
   nationality: z.string().optional(),
   
   // Documents
-  document_type: z.enum(["passport", "id_card", "driving_license"]).optional(),
+  document_type: z.string().optional(),
   document_number: z.string().optional(),
   document_expiry: z.string().optional(),
   document_issuing_country: z.string().optional(),
@@ -57,9 +57,9 @@ const guestSchema = z.object({
   tax_id: z.string().optional(),
   
   // Autres
-  guest_type: z.enum(["individual", "corporate", "group"]),
+  guest_type: z.string(),
   vip_status: z.boolean(),
-  preferred_communication: z.enum(["email", "phone", "sms"]),
+  preferred_communication: z.string(),
   marketing_consent: z.boolean(),
   special_requests: z.string().optional(),
   notes: z.string().optional(),
@@ -73,7 +73,7 @@ interface CreateGuestDialogProps {
 }
 
 export function CreateGuestDialog({ open, onOpenChange }: CreateGuestDialogProps) {
-  const orgId = useOrgId();
+  const { orgId } = useOrgId();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -107,9 +107,32 @@ export function CreateGuestDialog({ open, onOpenChange }: CreateGuestDialogProps
     setIsSubmitting(true);
     
     const guestData: GuestInsert = {
-      ...data,
       org_id: orgId,
+      first_name: data.first_name,
+      last_name: data.last_name,
       email: data.email || undefined,
+      phone: data.phone,
+      date_of_birth: data.date_of_birth,
+      nationality: data.nationality,
+      document_type: data.document_type,
+      document_number: data.document_number,
+      document_expiry: data.document_expiry,
+      document_issuing_country: data.document_issuing_country,
+      address_line1: data.address_line1,
+      address_line2: data.address_line2,
+      city: data.city,
+      state_province: data.state_province,
+      postal_code: data.postal_code,
+      country: data.country,
+      company_name: data.company_name,
+      company_address: data.company_address,
+      tax_id: data.tax_id,
+      guest_type: data.guest_type,
+      vip_status: data.vip_status,
+      preferred_communication: data.preferred_communication,
+      marketing_consent: data.marketing_consent,
+      special_requests: data.special_requests,
+      notes: data.notes,
       preferences: {},
     };
     

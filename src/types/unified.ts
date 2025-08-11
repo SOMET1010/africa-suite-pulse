@@ -92,7 +92,7 @@ export type RackData = {
 export type Reservation = {
   id: string;
   org_id: string;
-  client_id: string;
+  guest_id?: string;
   room_id: string | null;
   status: ReservationStatus;
   date_arrival: string;   // ISO

@@ -37,7 +37,7 @@ const guestSchema = z.object({
   nationality: z.string().optional(),
   
   // Documents
-  document_type: z.enum(["passport", "id_card", "driving_license"]).optional(),
+  document_type: z.string().optional(),
   document_number: z.string().optional(),
   document_expiry: z.string().optional(),
   document_issuing_country: z.string().optional(),
@@ -56,9 +56,9 @@ const guestSchema = z.object({
   tax_id: z.string().optional(),
   
   // Autres
-  guest_type: z.enum(["individual", "corporate", "group"]),
+  guest_type: z.string(),
   vip_status: z.boolean(),
-  preferred_communication: z.enum(["email", "phone", "sms"]),
+  preferred_communication: z.string(),
   marketing_consent: z.boolean(),
   special_requests: z.string().optional(),
   notes: z.string().optional(),
