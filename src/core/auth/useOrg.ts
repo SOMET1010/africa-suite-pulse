@@ -28,7 +28,7 @@ async function createProfileForUser(userId: string, email?: string) {
   
   // Créer le profil utilisateur
   await (supabase as any)
-    .from("profiles")
+    .from("profiles_backup")
     .insert({
       user_id: userId,
       org_id: orgId,
@@ -82,7 +82,7 @@ export function useOrgId(): UseOrgIdResult {
       }
 
       const { data, error: dbErr } = await (supabase as any)
-        .from("profiles")
+        .from("profiles_backup")
         .select("org_id")
         .eq("user_id", user.id)
         .limit(1)
@@ -95,7 +95,7 @@ export function useOrgId(): UseOrgIdResult {
         await createProfileForUser(user.id, user.email);
         // Retry after creating profile
         const { data: retryData, error: retryErr } = await (supabase as any)
-          .from("profiles")
+          .from("profiles_backup")
           .select("org_id")
           .eq("user_id", user.id)
           .limit(1)

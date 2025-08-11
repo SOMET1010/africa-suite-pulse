@@ -44,7 +44,7 @@ export const updateProfilePermissions = async (profileId: string, permissionIds:
 };
 
 export const listUsers = (orgId: string) =>
-  supabase.from("profiles")
+  (supabase as any).from("profiles_backup")
   .select("*")
   .eq("org_id", orgId)
   .order("full_name", { ascending: true });
