@@ -6,12 +6,11 @@ import { Crown, Hotel, Users, CreditCard, FileText, Clock } from "lucide-react";
 
 const tiles = [
   { title: "Rack Hôtel", to: "/reservations/rack", icon: Hotel, description: "Gestion visuelle des chambres et réservations" },
+  { title: "Réservations", to: "/reservations", icon: FileText, description: "Gestion des réservations et planning" },
   { title: "Arrivées", to: "/arrivals", icon: Users, description: "Check-in express et gestion des arrivées" },
-  { title: "Paramètres", to: "/settings", icon: Crown, description: "Configuration et administration" },
-  { title: "Clients", to: "/", icon: Users, description: "Base de données clients et profils" },
+  { title: "Clients", to: "/guests", icon: Users, description: "Base de données clients et profils" },
   { title: "Facturation", to: "/billing", icon: CreditCard, description: "Gestion des factures et paiements" },
-  { title: "Rapports", to: "/", icon: FileText, description: "Analytics et rapports détaillés" },
-  { title: "Main courante", to: "/", icon: Clock, description: "Journal des événements et activités" },
+  { title: "Paramètres", to: "/settings", icon: Crown, description: "Configuration et administration" },
 ];
 
 export default function Dashboard() {

@@ -882,6 +882,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_reservations_guest_id"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "fk_reservations_guest_id"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "reservations_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
@@ -1316,7 +1337,15 @@ export type Database = {
           room_type_code: string | null
           status: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reservations_view_arrivals: {
         Row: {
@@ -1333,7 +1362,15 @@ export type Database = {
           room_number: string | null
           status: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services_with_family: {
         Row: {
