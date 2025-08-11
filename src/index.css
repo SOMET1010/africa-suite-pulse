@@ -1,11 +1,11 @@
-/* Système de couleurs et animations modernes */
+/* Système de couleurs et animations modernes - AfricaSuite PMS */
+
+@import "./styles/tokens.css";
+@import "./styles/animations.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "./styles/tokens.css";
-@import "./styles/animations.css";
 
 /* Unification du design system - AfricaSuite PMS */
 

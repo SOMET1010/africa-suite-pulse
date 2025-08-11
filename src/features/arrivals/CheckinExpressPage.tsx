@@ -157,7 +157,7 @@ export default function CheckinExpressPage() {
                 <div className="text-muted-foreground">Chambre</div>
                 <div className="flex items-center gap-2">
                   {a.room_number ?? 'Non assignée'}
-                  {!a.room_id && <span className="text-xs px-2 py-1 rounded-full bg-orange-100 text-orange-800">Non assignée</span>}
+                  {!a.room_id && <span className="text-xs px-2 py-1 rounded-full badge-soft--option">Non assignée</span>}
                 </div>
                 <div className="text-muted-foreground">A/E</div>
                 <div>{(a.adults ?? 0)}A {(a.children ?? 0)}E</div>
