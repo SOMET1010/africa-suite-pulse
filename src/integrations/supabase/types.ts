@@ -807,45 +807,78 @@ export type Database = {
       reservations: {
         Row: {
           adults: number | null
+          checked_in_at: string | null
+          checked_out_at: string | null
           children: number | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string | null
+          created_by: string | null
           date_arrival: string
           date_departure: string | null
           guest_id: string | null
           id: string
+          notes: string | null
           org_id: string
           planned_time: string | null
           rate_total: number | null
           reference: string | null
           room_id: string | null
+          source: string | null
+          source_reference: string | null
+          special_requests: string | null
           status: string
+          updated_at: string | null
         }
         Insert: {
           adults?: number | null
+          checked_in_at?: string | null
+          checked_out_at?: string | null
           children?: number | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
           date_arrival: string
           date_departure?: string | null
           guest_id?: string | null
           id?: string
+          notes?: string | null
           org_id: string
           planned_time?: string | null
           rate_total?: number | null
           reference?: string | null
           room_id?: string | null
+          source?: string | null
+          source_reference?: string | null
+          special_requests?: string | null
           status: string
+          updated_at?: string | null
         }
         Update: {
           adults?: number | null
+          checked_in_at?: string | null
+          checked_out_at?: string | null
           children?: number | null
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
           date_arrival?: string
           date_departure?: string | null
           guest_id?: string | null
           id?: string
+          notes?: string | null
           org_id?: string
           planned_time?: string | null
           rate_total?: number | null
           reference?: string | null
           room_id?: string | null
+          source?: string | null
+          source_reference?: string | null
+          special_requests?: string | null
           status?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -1377,17 +1410,28 @@ export type Database = {
         Args: { p_res: string; p_room: string }
         Returns: {
           adults: number | null
+          checked_in_at: string | null
+          checked_out_at: string | null
           children: number | null
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string | null
+          created_by: string | null
           date_arrival: string
           date_departure: string | null
           guest_id: string | null
           id: string
+          notes: string | null
           org_id: string
           planned_time: string | null
           rate_total: number | null
           reference: string | null
           room_id: string | null
+          source: string | null
+          source_reference: string | null
+          special_requests: string | null
           status: string
+          updated_at: string | null
         }
       }
       pms_search_free_rooms: {

@@ -15,11 +15,7 @@ export const reservationsApi = {
   async list(orgId: string, params: ReservationSearchParams = {}) {
     let query = supabase
       .from('reservations')
-      .select(`
-        *,
-        guests(first_name, last_name, email, phone),
-        rooms(number, type, floor)
-      `)
+      .select('*')
       .eq('org_id', orgId)
       .order('date_arrival', { ascending: false });
 
@@ -37,13 +33,7 @@ export const reservationsApi = {
     }
 
     if (params.search) {
-      query = query.or(`
-        reference.ilike.%${params.search}%,
-        guests.first_name.ilike.%${params.search}%,
-        guests.last_name.ilike.%${params.search}%,
-        guests.email.ilike.%${params.search}%,
-        rooms.number.ilike.%${params.search}%
-      `);
+      query = query.or(`reference.ilike.%${params.search}%`);
     }
 
     // Pagination
@@ -78,11 +68,7 @@ export const reservationsApi = {
   async get(id: string) {
     const { data, error } = await supabase
       .from('reservations')
-      .select(`
-        *,
-        guests(*),
-        rooms(*)
-      `)
+      .select('*')
       .eq('id', id)
       .maybeSingle();
 
