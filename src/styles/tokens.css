@@ -163,9 +163,12 @@
   /* Copper accents */
   .accent-copper { color: hsl(var(--brand-copper)); }
   .bg-accent-copper { background-color: hsl(var(--brand-copper)); }
+  .border-accent-copper { border-color: hsl(var(--brand-copper)); }
   
   /* Pearl backgrounds */
   .bg-pearl { background-color: hsl(var(--pearl)); }
+  .bg-platinum { background-color: hsl(var(--platinum)); }
+  .text-charcoal { color: hsl(var(--charcoal)); }
   
   /* Vibrant background utilities */
   .bg-success { background-color: hsl(var(--success)); }

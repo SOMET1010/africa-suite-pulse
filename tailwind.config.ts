@@ -81,6 +81,13 @@ export default {
 				'soft-warning': 'hsl(var(--soft-warning))',
 				'soft-danger': 'hsl(var(--soft-danger))',
 				
+				// Luxury brand colors
+				'brand-accent': 'hsl(var(--brand-accent))',
+				'brand-copper': 'hsl(var(--brand-copper))',
+				'pearl': 'hsl(var(--pearl))',
+				'charcoal': 'hsl(var(--charcoal))',
+				'platinum': 'hsl(var(--platinum))',
+				
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
