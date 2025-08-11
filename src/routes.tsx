@@ -17,6 +17,7 @@ import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
 import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
 import AnalyticsDashboard from "@/features/analytics/AnalyticsDashboard";
+import ReportsManagement from "@/features/reports/ReportsManagement";
 import SecurityPage from "@/features/settings/security/SecurityPage";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
@@ -53,6 +54,7 @@ export function AppRoutes() {
         <Route path="settings/templates" element={<TemplatesPage />} />
         <Route path="settings/analytics" element={<AnalyticsPage />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
+        <Route path="reports" element={<ReportsManagement />} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3 } from "lucide-react";
+import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText } from "lucide-react";
 import { RealtimeClock } from "./RealtimeClock";
 import { UserMenu } from "./UserMenu";
 import { NotificationCenter } from "./NotificationCenter";
@@ -26,6 +26,7 @@ export function ProfessionalHeader({
     { to: "/guests", label: "Clients", icon: Users },
     { to: "/reservations/rack", label: "Rack", icon: User },
     { to: "/analytics", label: "Analytics", icon: BarChart3 },
+    { to: "/reports", label: "Rapports", icon: FileText },
     { to: "/settings", label: "Paramètres", icon: Settings },
   ];
 
