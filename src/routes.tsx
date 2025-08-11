@@ -3,10 +3,8 @@ import Dashboard from "@/pages/Dashboard";
 import CheckinExpressPage from "@/features/arrivals/CheckinExpressPage";
 import RackGrid from "@/features/rack/RackGrid";
 import NotFound from "@/pages/NotFound";
-import { Link } from "react-router-dom";
 import AuthPage from "@/pages/AuthPage";
 import RequireAuth from "@/core/auth/RequireAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { SettingsHome, HotelSettingsForm } from "@/features/settings";
 import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
@@ -16,21 +14,12 @@ import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
 import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
 import SecurityPage from "@/features/settings/security/SecurityPage";
+import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
 function Layout() {
   return (
-    <div className="min-h-screen">
-      <nav className="sticky top-0 z-50 bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border-b border-border">
-        <div className="mx-auto max-w-screen-2xl px-4 py-2 flex items-center gap-3">
-          <Link to="/" className="text-sm font-semibold">AfricaSuite PMS</Link>
-          <div className="ml-auto flex items-center gap-2">
-            <Link to="/arrivals" className="text-sm text-muted-foreground hover:underline">Arrivées</Link>
-            <Link to="/reservations/rack" className="text-sm text-muted-foreground hover:underline">Rack</Link>
-            <Link to="/settings" className="text-sm text-muted-foreground hover:underline">Paramètres</Link>
-            <button onClick={() => supabase.auth.signOut()} className="text-sm text-muted-foreground hover:underline">Logout</button>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-pearl">
+      <ProfessionalHeader />
       <Outlet />
     </div>
   );
