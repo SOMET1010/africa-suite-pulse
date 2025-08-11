@@ -12,6 +12,10 @@ import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
 import UsersPage from "@/features/users/UsersPage";
+import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
+import TemplatesPage from "@/features/settings/templates/TemplatesPage";
+import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
+import SecurityPage from "@/features/settings/security/SecurityPage";
 
 function Layout() {
   return (
@@ -49,6 +53,10 @@ export function AppRoutes() {
         <Route path="settings/services" element={<ServicesPage />} />
         <Route path="settings/payments" element={<PaymentsPage />} />
         <Route path="settings/users" element={<UsersPage />} />
+        <Route path="settings/system" element={<SystemSettingsPage />} />
+        <Route path="settings/templates" element={<TemplatesPage />} />
+        <Route path="settings/analytics" element={<AnalyticsPage />} />
+        <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
