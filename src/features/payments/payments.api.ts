@@ -1,58 +1,52 @@
 import { supabase } from "@/integrations/supabase/client";
+import type {
+  PaymentMethod,
+  PaymentMethodInsert,
+  PaymentMethodUpdate,
+  PaymentTerminal,
+  PaymentTerminalInsert,
+  PaymentTerminalUpdate,
+  Currency,
+  CurrencyInsert,
+  CurrencyUpdate,
+  PaymentTransaction,
+  PaymentTransactionInsert,
+  PaymentTransactionWithMethod,
+  CreateTransactionInput,
+  PaymentSummary,
+  SupabaseResponse,
+  SupabaseMultiResponse
+} from "@/types/payments";
 
 export const listPaymentMethods = (orgId: string) =>
-  (supabase as any).from("payment_methods").select("*").eq("org_id", orgId).order("label");
+  supabase.from("payment_methods").select("*").eq("org_id", orgId).order("label");
 
 export const upsertPaymentMethod = (payload: any) =>
-  (supabase as any).from("payment_methods").upsert(payload).select();
+  supabase.from("payment_methods").upsert(payload).select();
 
 export const deletePaymentMethod = (id: string) =>
-  (supabase as any).from("payment_methods").delete().eq("id", id);
+  supabase.from("payment_methods").delete().eq("id", id);
 
 export const listTerminals = (orgId: string) =>
-  (supabase as any).from("payment_terminals").select("*").eq("org_id", orgId).order("name");
+  supabase.from("payment_terminals").select("*").eq("org_id", orgId).order("name");
 
 export const upsertTerminal = (payload: any) =>
-  (supabase as any).from("payment_terminals").upsert(payload).select();
+  supabase.from("payment_terminals").upsert(payload).select();
 
 export const deleteTerminal = (id: string) =>
-  (supabase as any).from("payment_terminals").delete().eq("id", id);
+  supabase.from("payment_terminals").delete().eq("id", id);
 
 export const listCurrencies = (orgId: string) =>
-  (supabase as any).from("currencies").select("*").eq("org_id", orgId).order("is_base", { ascending: false }).order("code");
+  supabase.from("currencies").select("*").eq("org_id", orgId).order("is_base", { ascending: false }).order("code");
 
 export const upsertCurrency = (payload: any) =>
-  (supabase as any).from("currencies").upsert(payload).select();
+  supabase.from("currencies").upsert(payload).select();
 
 export const deleteCurrency = (id: string) =>
-  (supabase as any).from("currencies").delete().eq("id", id);
+  supabase.from("currencies").delete().eq("id", id);
 
 // Payment transactions
-export type CreateTransactionInput = {
-  org_id: string;
-  invoice_id: string;          // folio ou facture
-  method_id: string;           // id de payment_methods
-  amount: number;              // en devise base (ex: XOF)
-  currency_code?: string;      // si différent de la devise base
-  reference?: string;          // n° transaction MM / 4 derniers CB / chèque
-  metadata?: Record<string, any>;
-};
-
-export type PaymentTransaction = {
-  id: string;
-  org_id: string;
-  invoice_id: string;
-  method_id: string;
-  amount: number;
-  currency_code: string | null;
-  status: string;
-  reference: string | null;
-  metadata: Record<string, any>;
-  created_at: string;
-  updated_at: string;
-};
-
-export async function createPaymentTransaction(input: CreateTransactionInput) {
+export async function createPaymentTransaction(input: CreateTransactionInput): Promise<PaymentTransaction> {
   const { data, error } = await (supabase as any)
     .from('payment_transactions')
     .insert({
@@ -72,7 +66,7 @@ export async function createPaymentTransaction(input: CreateTransactionInput) {
   return data;
 }
 
-export async function listInvoiceTransactions(invoiceId: string): Promise<PaymentTransaction[]> {
+export async function listInvoiceTransactions(invoiceId: string): Promise<PaymentTransactionWithMethod[]> {
   const { data, error } = await (supabase as any)
     .from('payment_transactions')
     .select(`
@@ -89,7 +83,7 @@ export async function listInvoiceTransactions(invoiceId: string): Promise<Paymen
   return data || [];
 }
 
-export async function getInvoicePaymentSummary(invoiceId: string) {
+export async function getInvoicePaymentSummary(invoiceId: string): Promise<PaymentSummary> {
   const { data, error } = await (supabase as any)
     .from('payment_transactions')
     .select('amount')
@@ -98,6 +92,7 @@ export async function getInvoicePaymentSummary(invoiceId: string) {
 
   if (error) throw error;
   
-  const totalPaid = (data || []).reduce((sum: number, t: any) => sum + Number(t.amount), 0);
+  const totalPaid = (data || []).reduce((sum: number, transaction: any) => 
+    sum + Number(transaction.amount), 0);
   return { totalPaid, transactionCount: data?.length || 0 };
 }

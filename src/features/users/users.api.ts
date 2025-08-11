@@ -1,4 +1,21 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+import type {
+  Profile,
+  ProfileInsert,
+  ProfileUpdate,
+  Permission,
+  ProfilePermission,
+  ProfilePermissionInsert,
+  AppUser,
+  AppUserInsert,
+  AppUserUpdate,
+  StaffInvitationInsert,
+  InvitationPayload,
+  HasPermissionResponse,
+  SupabaseResponse,
+  SupabaseMultiResponse
+} from "@/types/database";
 
 export const listProfiles = (orgId: string) =>
   supabase.from("profiles").select("*").eq("org_id", orgId).order("label");
@@ -19,19 +36,19 @@ export const upsertProfilePermissions = (rows: any[]) =>
   supabase.from("profile_permissions").upsert(rows).select();
 
 export const listAppUsers = (orgId: string) =>
-  (supabase as any).from("app_users").select(`
-    id, user_id, org_id, login, full_name, profile_id, password_expires_on, active,
+  (supabase as any).from("profiles_backup").select(`
+    id, user_id, org_id, login_code as login, full_name, profile_id, expires_at as password_expires_on, active,
     profiles:profile_id (id, code, label, access_level)
   `).eq("org_id", orgId).order("full_name");
 
 export const upsertAppUser = (payload: any) =>
-  (supabase as any).from("app_users").upsert(payload).select();
+  (supabase as any).from("profiles_backup").upsert(payload).select();
 
 export const deleteAppUser = (id: string) =>
-  (supabase as any).from("app_users").delete().eq("id", id);
+  (supabase as any).from("profiles_backup").delete().eq("id", id);
 
 /** Helper RPC */
-export const hasPermission = async (key: string) => {
+export const hasPermission = async (key: string): Promise<boolean> => {
   const { data, error } = await (supabase as any).rpc("has_permission", { p_permission: key });
   if (error) throw error;
   return !!data;

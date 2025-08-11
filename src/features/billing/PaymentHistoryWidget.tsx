@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { listInvoiceTransactions, type PaymentTransaction } from "@/features/payments/payments.api";
+import { listInvoiceTransactions } from "@/features/payments/payments.api";
+import type { PaymentTransaction } from "@/types/payments";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Clock } from "lucide-react";
