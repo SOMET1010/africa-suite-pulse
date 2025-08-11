@@ -9,9 +9,11 @@ interface RoomsListProps {
   rooms: Room[];
   selectedRooms: Set<string>;
   onToggleSelect: (roomId: string) => void;
+  onEdit?: (room: Room) => void;
+  onDelete?: (roomId: string) => void;
 }
 
-export function RoomsList({ rooms, selectedRooms, onToggleSelect }: RoomsListProps) {
+export function RoomsList({ rooms, selectedRooms, onToggleSelect, onEdit, onDelete }: RoomsListProps) {
   const getStatusVariant = (status: string): "default" | "destructive" | "secondary" | "outline" => {
     const variants: Record<string, "default" | "destructive" | "secondary" | "outline"> = {
       clean: 'default',
@@ -103,10 +105,10 @@ export function RoomsList({ rooms, selectedRooms, onToggleSelect }: RoomsListPro
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center justify-center gap-1">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => onEdit?.(room)}>
                     <Edit3 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" onClick={() => onDelete?.(room.id!)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

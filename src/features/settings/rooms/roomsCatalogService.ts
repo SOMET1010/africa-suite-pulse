@@ -251,12 +251,7 @@ export class RoomsCatalogService {
       features: data.features || {},
       created_at: data.created_at,
       updated_at: data.updated_at,
-      room_type: data.room_types ? {
-        id: data.room_types.id,
-        code: data.room_types.code,
-        label: data.room_types.label,
-        capacity: data.room_types.capacity
-      } : undefined
+      room_type: undefined
     };
   }
 

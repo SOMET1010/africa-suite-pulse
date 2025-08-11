@@ -18,6 +18,7 @@ import { RoomCard } from './RoomCard';
 import { RoomsList } from './RoomsList';
 import { CreateSeriesModal } from './CreateSeriesModal';
 import { BulkActionsMenu } from './BulkActionsMenu';
+import EditRoomModal from './EditRoomModal';
 
 export default function RoomsCatalogTab() {
   const { orgId } = useOrgId();
@@ -28,6 +29,8 @@ export default function RoomsCatalogTab() {
     selectedRooms,
     filters,
     createSeries,
+    updateRoom,
+    deleteRoom,
     bulkUpdate,
     bulkDelete,
     exportToCSV,
@@ -44,6 +47,7 @@ export default function RoomsCatalogTab() {
   const [showFilters, setShowFilters] = useState(false);
   const [showCreateSeries, setShowCreateSeries] = useState(false);
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [editRoom, setEditRoom] = useState<Room | null>(null);
 
   if (loading) {
     return (
@@ -320,6 +324,8 @@ export default function RoomsCatalogTab() {
               room={room}
               selected={selectedRooms.has(room.id!)}
               onToggleSelect={() => toggleSelection(room.id!)}
+              onEdit={(r) => setEditRoom(r)}
+              onDelete={(id) => deleteRoom(id)}
             />
           ))}
         </div>
@@ -328,6 +334,8 @@ export default function RoomsCatalogTab() {
           rooms={rooms}
           selectedRooms={selectedRooms}
           onToggleSelect={toggleSelection}
+          onEdit={(r) => setEditRoom(r)}
+          onDelete={(id) => deleteRoom(id)}
         />
       )}
 
@@ -337,6 +345,15 @@ export default function RoomsCatalogTab() {
           roomTypes={roomTypes}
           onClose={() => setShowCreateSeries(false)}
           onConfirm={createSeries}
+        />
+      )}
+
+      {editRoom && (
+        <EditRoomModal
+          room={editRoom}
+          roomTypes={roomTypes}
+          onClose={() => setEditRoom(null)}
+          onSave={async (id, updates) => { await updateRoom(id, updates); }}
         />
       )}
     </div>
