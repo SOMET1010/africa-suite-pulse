@@ -4,6 +4,7 @@ import type { Room } from '@/types/room';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RoomStatusBadge } from '@/features/rack/components/RoomBadges';
 
 interface RoomsListProps {
   rooms: Room[];
@@ -14,28 +15,6 @@ interface RoomsListProps {
 }
 
 export function RoomsList({ rooms, selectedRooms, onToggleSelect, onEdit, onDelete }: RoomsListProps) {
-  const getStatusVariant = (status: string): "default" | "destructive" | "secondary" | "outline" => {
-    const variants: Record<string, "default" | "destructive" | "secondary" | "outline"> = {
-      clean: 'default',
-      inspected: 'secondary',
-      dirty: 'destructive',
-      out_of_order: 'destructive',
-      maintenance: 'outline'
-    };
-    return variants[status] || 'default';
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels = {
-      clean: 'Propre',
-      inspected: 'Inspectée',
-      dirty: 'Sale',
-      out_of_order: 'Hors service',
-      maintenance: 'Maintenance'
-    };
-    return labels[status as keyof typeof labels] || status;
-  };
-
   const getFeatureIcon = (feature: string) => {
     const icons = {
       wifi: Wifi,
@@ -77,9 +56,7 @@ export function RoomsList({ rooms, selectedRooms, onToggleSelect, onEdit, onDele
               </td>
               <td className="px-4 py-3 text-muted-foreground">Étage {room.floor}</td>
               <td className="px-4 py-3">
-                <Badge variant={getStatusVariant(room.status)}>
-                  {getStatusLabel(room.status)}
-                </Badge>
+                <RoomStatusBadge status={room.status} />
               </td>
               <td className="px-4 py-3">
                 {room.is_fictive ? (
