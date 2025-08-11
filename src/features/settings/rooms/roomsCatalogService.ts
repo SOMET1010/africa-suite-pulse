@@ -5,10 +5,7 @@ export class RoomsCatalogService {
   static async getAll(orgId: string): Promise<Room[]> {
     const { data, error } = await supabase
       .from('rooms')
-      .select(`
-        *,
-        room_types!inner(id, code, label, capacity)
-      `)
+      .select('*')
       .eq('org_id', orgId)
       .order('number');
 
@@ -20,10 +17,7 @@ export class RoomsCatalogService {
   static async getById(id: string): Promise<Room | null> {
     const { data, error } = await supabase
       .from('rooms')
-      .select(`
-        *,
-        room_types!inner(id, code, label, capacity)
-      `)
+      .select('*')
       .eq('id', id)
       .single();
 
@@ -127,10 +121,7 @@ export class RoomsCatalogService {
     const { data: created, error } = await supabase
       .from('rooms')
       .insert(newRooms)
-      .select(`
-        *,
-        room_types!inner(id, code, label, capacity)
-      `);
+      .select('*');
 
     if (error) throw error;
     
