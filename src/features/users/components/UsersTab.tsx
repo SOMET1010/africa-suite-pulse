@@ -8,28 +8,30 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { listUsers, updateUser, listUserProfiles, createInvitation, updateProfile } from "../profiles.api";
+import { listAppUsers, upsertAppUser, listProfiles, createInvitation } from "../users.api";
 import { CalendarIcon, Pencil, Save } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface User {
+  id: string;
   user_id: string;
-  full_name?: string;
-  email?: string;
-  role: string;
-  active: boolean;
-  last_login_at?: string;
+  org_id: string;
+  login: string;
+  full_name: string;
   profile_id?: string;
-  login_code?: string;
-  expires_at?: string;
+  password_expires_on?: string;
+  active: boolean;
+  created_at: string;
+  last_login_at?: string;
+  profiles?: UserProfile;
 }
 
 interface UserProfile {
   id: string;
-  name: string;
+  code: string;
+  label: string;
   access_level: string;
-  is_active: boolean;
 }
 
 interface UsersTabProps {
@@ -49,7 +51,7 @@ export default function UsersTab({ orgId }: UsersTabProps) {
   }, [orgId]);
 
   const loadUsers = async () => {
-    const { data, error } = await listUsers(orgId);
+    const { data, error } = await listAppUsers(orgId);
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
       return;
@@ -58,16 +60,23 @@ export default function UsersTab({ orgId }: UsersTabProps) {
   };
 
   const loadProfiles = async () => {
-    const { data, error } = await listUserProfiles(orgId);
+    const { data, error } = await listProfiles(orgId);
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
       return;
     }
-    setProfiles(data || []);
+    // Map the data to the expected UserProfile structure
+    const mappedProfiles = (data || []).map((item: any) => ({
+      id: item.id,
+      code: item.code || item.label?.toLowerCase() || 'unknown',
+      label: item.label || item.name || 'Unknown Profile',
+      access_level: item.access_level || 'basic'
+    }));
+    setProfiles(mappedProfiles);
   };
 
   const handleUserUpdate = async (userId: string, updates: Partial<User>) => {
-    const { error } = await updateProfile(userId, updates);
+    const { error } = await upsertAppUser({ id: userId, ...updates });
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
       return;
@@ -101,14 +110,14 @@ export default function UsersTab({ orgId }: UsersTabProps) {
 
   const patch = (userId: string, updates: Partial<User>) => {
     setUsers(prev => prev.map(user => 
-      user.user_id === userId ? { ...user, ...updates } : user
+      user.id === userId ? { ...user, ...updates } : user
     ));
   };
 
   const getProfileName = (profileId?: string) => {
     if (!profileId) return "Aucun profil";
     const profile = profiles.find(p => p.id === profileId);
-    return profile?.name || "Profil inconnu";
+    return profile?.label || "Profil inconnu";
   };
 
   const isExpired = (expiresAt?: string) => {
@@ -144,13 +153,13 @@ export default function UsersTab({ orgId }: UsersTabProps) {
 
       <div className="space-y-4">
         {users.map((user) => (
-          <Card key={user.user_id}>
+          <Card key={user.id}>
             <CardContent className="pt-6">
-              {editingUser === user.user_id ? (
+              {editingUser === user.id ? (
                 <EditUserForm 
                   user={user}
                   profiles={profiles}
-                  onSave={(updates) => handleUserUpdate(user.user_id, updates)}
+                  onSave={(updates) => handleUserUpdate(user.id, updates)}
                   onCancel={() => setEditingUser(null)}
                 />
               ) : (
@@ -158,18 +167,15 @@ export default function UsersTab({ orgId }: UsersTabProps) {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <h4 className="font-semibold">{user.full_name || "—"}</h4>
-                      {user.login_code && (
-                        <Badge variant="outline">Code: {user.login_code}</Badge>
-                      )}
+                      <Badge variant="outline">Login: {user.login}</Badge>
                       {!user.active && <Badge variant="destructive">Inactif</Badge>}
-                      {isExpired(user.expires_at) && <Badge variant="destructive">Expiré</Badge>}
+                      {isExpired(user.password_expires_on) && <Badge variant="destructive">Expiré</Badge>}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      <p>{user.email || "—"}</p>
-                      <p>Rôle: {user.role}</p>
+                      <p>Profil: {getProfileName(user.profile_id)}</p>
                       <p>Dernière connexion: {user.last_login_at ? new Date(user.last_login_at).toLocaleString() : "—"}</p>
-                      {user.expires_at && (
-                        <p>Expire le: {format(new Date(user.expires_at), "dd/MM/yyyy", { locale: fr })}</p>
+                      {user.password_expires_on && (
+                        <p>Expire le: {format(new Date(user.password_expires_on), "dd/MM/yyyy", { locale: fr })}</p>
                       )}
                     </div>
                   </div>
@@ -178,23 +184,23 @@ export default function UsersTab({ orgId }: UsersTabProps) {
                       <span className="text-sm">Actif</span>
                       <Switch 
                         checked={!!user.active} 
-                        onCheckedChange={v => patch(user.user_id, { active: v })}
+                        onCheckedChange={v => patch(user.id, { active: v })}
                       />
                     </div>
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      onClick={() => setEditingUser(user.user_id)}
+                      onClick={() => setEditingUser(user.id)}
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
                     <Button 
                       size="sm" 
-                      onClick={() => handleUserUpdate(user.user_id, { 
+                      onClick={() => handleUserUpdate(user.id, { 
                         active: user.active,
                         profile_id: user.profile_id,
-                        login_code: user.login_code,
-                        expires_at: user.expires_at
+                        login: user.login,
+                        password_expires_on: user.password_expires_on
                       })}
                     >
                       <Save className="w-4 h-4" />
@@ -220,9 +226,9 @@ interface EditUserFormProps {
 function EditUserForm({ user, profiles, onSave, onCancel }: EditUserFormProps) {
   const [formData, setFormData] = useState({
     full_name: user.full_name || "",
-    login_code: user.login_code || "",
+    login: user.login || "",
     profile_id: user.profile_id || "",
-    expires_at: user.expires_at || ""
+    password_expires_on: user.password_expires_on || ""
   });
   const [showCalendar, setShowCalendar] = useState(false);
 
@@ -243,8 +249,8 @@ function EditUserForm({ user, profiles, onSave, onCancel }: EditUserFormProps) {
         <div>
           <label className="text-sm font-medium">Code de connexion</label>
           <Input
-            value={formData.login_code}
-            onChange={e => setFormData(prev => ({ ...prev, login_code: e.target.value }))}
+            value={formData.login}
+            onChange={e => setFormData(prev => ({ ...prev, login: e.target.value }))}
             placeholder="Code court unique"
           />
         </div>
@@ -261,9 +267,9 @@ function EditUserForm({ user, profiles, onSave, onCancel }: EditUserFormProps) {
               <SelectValue placeholder="Sélectionner un profil" />
             </SelectTrigger>
             <SelectContent>
-              {profiles.filter(p => p.is_active).map(profile => (
+              {profiles.map(profile => (
                 <SelectItem key={profile.id} value={profile.id}>
-                  {profile.name} ({profile.access_level})
+                  {profile.label} ({profile.access_level})
                 </SelectItem>
               ))}
             </SelectContent>
@@ -275,8 +281,8 @@ function EditUserForm({ user, profiles, onSave, onCancel }: EditUserFormProps) {
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full justify-start">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {formData.expires_at 
-                  ? format(new Date(formData.expires_at), "dd/MM/yyyy", { locale: fr })
+                {formData.password_expires_on 
+                  ? format(new Date(formData.password_expires_on), "dd/MM/yyyy", { locale: fr })
                   : "Pas de limite"
                 }
               </Button>
@@ -284,11 +290,11 @@ function EditUserForm({ user, profiles, onSave, onCancel }: EditUserFormProps) {
             <PopoverContent className="w-auto p-0">
               <Calendar
                 mode="single"
-                selected={formData.expires_at ? new Date(formData.expires_at) : undefined}
+                selected={formData.password_expires_on ? new Date(formData.password_expires_on) : undefined}
                 onSelect={(date) => {
                   setFormData(prev => ({ 
                     ...prev, 
-                    expires_at: date ? date.toISOString().split('T')[0] : ""
+                    password_expires_on: date ? date.toISOString().split('T')[0] : ""
                   }));
                   setShowCalendar(false);
                 }}
