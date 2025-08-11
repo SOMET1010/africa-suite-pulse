@@ -26,3 +26,34 @@ export const upsertCurrency = (payload: any) =>
 
 export const deleteCurrency = (id: string) =>
   (supabase as any).from("currencies").delete().eq("id", id);
+
+// Payment transactions
+export type CreateTransactionInput = {
+  org_id: string;
+  invoice_id: string;          // folio ou facture
+  method_id: string;           // id de payment_methods
+  amount: number;              // en devise base (ex: XOF)
+  currency_code?: string;      // si différent de la devise base
+  reference?: string;          // n° transaction MM / 4 derniers CB / chèque
+  metadata?: Record<string, any>;
+};
+
+export async function createPaymentTransaction(input: CreateTransactionInput) {
+  const { data, error } = await supabase
+    .from('payment_transactions')
+    .insert({
+      org_id: input.org_id,
+      invoice_id: input.invoice_id,
+      method_id: input.method_id,
+      amount: input.amount,
+      currency_code: input.currency_code ?? null,
+      status: 'captured',
+      reference: input.reference ?? null,
+      metadata: input.metadata ?? {},
+    })
+    .select('*')
+    .single();
+
+  if (error) throw error;
+  return data;
+}
