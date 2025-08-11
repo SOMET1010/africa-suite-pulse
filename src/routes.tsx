@@ -11,6 +11,8 @@ import ServicesPage from "@/features/settings/services/ServicesPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
 import BillingPage from "@/features/billing/BillingPage";
 import UsersPage from "@/features/users/UsersPage";
+import ReservationsPage from "@/features/reservations/ReservationsPage";
+import GuestsPage from "@/features/guests/GuestsPage";
 import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
 import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
@@ -33,7 +35,9 @@ export function AppRoutes() {
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
+        <Route path="reservations" element={<ReservationsPage />} />
         <Route path="reservations/rack" element={<RackGrid />} />
+        <Route path="guests" element={<GuestsPage />} />
         <Route path="settings" element={<SettingsHome />} />
         <Route path="settings/hotel" element={<HotelSettingsForm />} />
         <Route path="settings/rooms" element={<RoomsPage />} />
