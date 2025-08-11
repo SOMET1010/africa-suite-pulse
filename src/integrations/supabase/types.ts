@@ -943,6 +943,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rack_reservations_enriched: {
+        Row: {
+          adults: number | null
+          children: number | null
+          date_arrival: string | null
+          date_departure: string | null
+          id: string | null
+          org_id: string | null
+          rate_total: number | null
+          reference: string | null
+          room_floor: string | null
+          room_id: string | null
+          room_number: string | null
+          room_type_code: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
       reservations_view_arrivals: {
         Row: {
           adults: number | null
@@ -1015,6 +1033,44 @@ export type Database = {
       pms_checkin: {
         Args: { p_res: string }
         Returns: undefined
+      }
+      pms_move_reservation: {
+        Args: { p_res: string; p_room: string }
+        Returns: {
+          adults: number | null
+          children: number | null
+          date_arrival: string
+          date_departure: string | null
+          id: string
+          org_id: string
+          planned_time: string | null
+          rate_total: number | null
+          reference: string | null
+          room_id: string | null
+          status: string
+        }
+      }
+      pms_search_free_rooms: {
+        Args: {
+          p_org: string
+          p_start: string
+          p_end: string
+          p_exclude_room_ids?: string[]
+        }
+        Returns: {
+          id: string
+          number: string
+          type: string
+          floor: string
+          status: string
+        }[]
+      }
+      pms_validate_move: {
+        Args: { p_res: string; p_room: string }
+        Returns: {
+          ok: boolean
+          reason: string
+        }[]
       }
     }
     Enums: {
