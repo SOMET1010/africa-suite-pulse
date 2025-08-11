@@ -81,7 +81,7 @@
   }
 
   .room-dot-maintenance {
-    @apply bg-orange-500;
+    @apply bg-purple-500;
   }
 
   .room-dot-out_of_order {

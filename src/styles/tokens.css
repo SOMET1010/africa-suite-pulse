@@ -58,9 +58,13 @@
 
     /* Success, Info, Warning, Danger mappings */
     --success: var(--status-confirmed);
+    --success-foreground: 210 40% 98%;
     --info: var(--status-present);
+    --info-foreground: 210 40% 98%;
     --warning: var(--status-option);
+    --warning-foreground: 222 84% 5%;
     --danger: var(--status-cancelled);
+    --danger-foreground: 210 40% 98%;
 
     /* Light mode softness (decimal for alpha, not percentage) */
     --softness: 0.12;
