@@ -64,7 +64,7 @@ export function ServicesTab({ services, families, searchQuery, onExport, onSaveS
     }
 
     try {
-      await saveService(editingService);
+      await onSaveService(editingService);
       setEditingService(null);
       setIsCreating(false);
     } catch (error) {
@@ -74,7 +74,7 @@ export function ServicesTab({ services, families, searchQuery, onExport, onSaveS
 
   const handleDeleteService = async (id: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) {
-      await deleteService(id);
+      await onDeleteService(id);
     }
   };
 

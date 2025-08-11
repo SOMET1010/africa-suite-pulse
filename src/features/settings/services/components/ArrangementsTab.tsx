@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Plus, Download, Edit3, Trash2, Star, Save, X, DollarSign } from 'lucide-react';
 import { ServicesService } from '../servicesService';
 import type { Arrangement, Service } from '@/types/database';
-import { useServices } from '../useServices';
-import { useOrgId } from '@/core/auth/useOrg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,11 +15,11 @@ interface ArrangementsTabProps {
   services: Service[];
   searchQuery: string;
   onExport: () => void;
+  onSaveArrangement: (arrangement: Partial<Arrangement>) => Promise<Arrangement> | Promise<void>;
+  onDeleteArrangement: (id: string) => Promise<void>;
 }
 
-export function ArrangementsTab({ arrangements, services, searchQuery, onExport }: ArrangementsTabProps) {
-  const { orgId } = useOrgId();
-  const { saveArrangement, deleteArrangement } = useServices(orgId);
+export function ArrangementsTab({ arrangements, services, searchQuery, onExport, onSaveArrangement, onDeleteArrangement }: ArrangementsTabProps) {
   const [editingArrangement, setEditingArrangement] = useState<Partial<Arrangement> | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -56,7 +54,7 @@ export function ArrangementsTab({ arrangements, services, searchQuery, onExport 
     }
 
     try {
-      await saveArrangement(editingArrangement);
+      await onSaveArrangement(editingArrangement);
       setEditingArrangement(null);
       setIsCreating(false);
     } catch (error) {
@@ -66,7 +64,7 @@ export function ArrangementsTab({ arrangements, services, searchQuery, onExport 
 
   const handleDeleteArrangement = async (id: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cet arrangement ?')) {
-      await deleteArrangement(id);
+      await onDeleteArrangement(id);
     }
   };
 

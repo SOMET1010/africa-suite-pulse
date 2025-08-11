@@ -24,6 +24,12 @@ export default function ServicesPage() {
     stats,
     loading,
     saving,
+    saveFamily,
+    deleteFamily,
+    saveService,
+    deleteService,
+    saveArrangement,
+    deleteArrangement,
     exportFamilies,
     exportServices,
     exportArrangements
@@ -256,6 +262,8 @@ export default function ServicesPage() {
                   families={families}
                   searchQuery={searchQuery}
                   onExport={exportFamilies}
+                  onSaveFamily={saveFamily}
+                  onDeleteFamily={deleteFamily}
                 />
               </TabsContent>
 
@@ -265,6 +273,8 @@ export default function ServicesPage() {
                   families={families}
                   searchQuery={searchQuery}
                   onExport={exportServices}
+                  onSaveService={saveService}
+                  onDeleteService={deleteService}
                 />
               </TabsContent>
 
@@ -274,6 +284,8 @@ export default function ServicesPage() {
                   services={services}
                   searchQuery={searchQuery}
                   onExport={exportArrangements}
+                  onSaveArrangement={saveArrangement}
+                  onDeleteArrangement={deleteArrangement}
                 />
               </TabsContent>
             </Tabs>
