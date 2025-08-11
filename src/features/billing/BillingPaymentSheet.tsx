@@ -36,7 +36,7 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
           setMethodId(activeMethods[0].id);
         }
       } catch (error) {
-        console.error('Error loading payment methods:', error);
+        // Error loading payment methods
       }
     })();
   }, [orgId]);

@@ -24,7 +24,7 @@ export function useUserRole() {
         const { data, error } = await (supabase as any).rpc("get_current_user_role");
         
         if (error) {
-          console.error("Error fetching user role:", error);
+          // Silently handle error - user role fetch failed
           setError(error.message);
           setRole(null);
           return;
@@ -32,7 +32,7 @@ export function useUserRole() {
 
         setRole(data as UserRole);
       } catch (err: any) {
-        console.error("Error in getCurrentUserRole:", err);
+        // Silently handle error - getCurrentUserRole failed
         setError(err.message || "Unknown error");
         setRole(null);
       } finally {
@@ -72,13 +72,13 @@ export function useUserRole() {
       });
       
       if (error) {
-        console.error("Permission check error:", error);
+        // Silently handle error - permission check failed
         return false;
       }
       
       return !!data;
     } catch (err) {
-      console.error("Permission check failed:", err);
+      // Silently handle error - permission check failed
       return false;
     }
   };

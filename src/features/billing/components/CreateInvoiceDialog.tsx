@@ -220,7 +220,7 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
       setItems([{ id: "1", description: "", quantity: 1, unit_price: 0, tax_rate: 18 }]);
       onOpenChange(false);
     } catch (error) {
-      console.error('Error creating invoice:', error);
+      // Error creating invoice
       toast({
         title: "Erreur",
         description: "Impossible de créer la facture",

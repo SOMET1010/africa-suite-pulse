@@ -97,7 +97,7 @@ export function CreateGuestDialog({ open, onOpenChange }: CreateGuestDialogProps
     },
     onError: (error: any) => {
       toast.error("Erreur lors de la création du client");
-      console.error("Error creating guest:", error);
+      // Error creating guest
     },
   });
 

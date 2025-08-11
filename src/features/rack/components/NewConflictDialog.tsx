@@ -28,10 +28,10 @@ type Props = {
 export function NewConflictDialog({
   open, dragged, conflicts, targetRoom, preview, conflictType, allRooms, onCancel, onSwap, onAutoRelodge, onConfirmRelodge
 }: Props) {
-  console.log("🏨 NewConflictDialog render:", { open, dragged: dragged?.guestName, conflicts: conflicts.length, conflictType, preview: preview.length });
-  
+  // NewConflictDialog render check
+
   if (!open || !dragged || !targetRoom) {
-    console.log("🚫 NewConflictDialog early return:", { open, hasDragged: !!dragged, hasTargetRoom: !!targetRoom });
+    // Early return - missing required data
     return null;
   }
 

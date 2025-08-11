@@ -23,7 +23,9 @@ export function PaymentHistoryWidget({ invoiceId, totalPaid, transactionCount }:
     setLoading(true);
     listInvoiceTransactions(invoiceId)
       .then((data) => setTransactions(data as any))
-      .catch(console.error)
+      .catch(() => {
+        // Error loading payment history
+      })
       .finally(() => setLoading(false));
   }, [invoiceId]);
 

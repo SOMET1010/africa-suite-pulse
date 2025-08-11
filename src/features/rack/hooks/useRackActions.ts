@@ -30,7 +30,7 @@ export function useRackActions({
   const reassignMutation = useReassignReservation();
   
   async function onDropReservation(resId: string, roomId: string) {
-    console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
+    // Dropping reservation onto room
     
     if (!data) return;
     
@@ -38,7 +38,7 @@ export function useRackActions({
     const targetRoom = data.rooms.find(r => r.id === roomId);
     
     if (!reservation || !targetRoom) {
-      console.error("❌ Reservation or room not found");
+      // Reservation or room not found
       return;
     }
     
@@ -60,7 +60,7 @@ export function useRackActions({
     targetRoomId: string; 
     conflicts: UIReservation[] 
   }) {
-    console.log("🔥 handleConflict called:", { draggedId, targetRoomId, conflicts: conflicts.length });
+    // handleConflict called
     
     const dragged = data?.reservations.find(r => r.id === draggedId) || null;
     
