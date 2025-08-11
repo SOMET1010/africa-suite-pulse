@@ -3,10 +3,8 @@ type Cfg = { url: string; anon: string };
 export function getSupabaseConfig(): Cfg {
   const host = typeof window !== "undefined" ? window.location.hostname : "";
   if (host.includes("prod-ton-domaine.com")) {
-    return {
-      url: "https://YOUR_PROD_PROJECT.supabase.co",
-      anon: "YOUR_PROD_ANON_KEY",
-    };
+    // SECURITY: Replace with actual production values when deploying
+    throw new Error("Production configuration not set. Please configure production Supabase credentials.");
   }
   // Staging (default)
   return {

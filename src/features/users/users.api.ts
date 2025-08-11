@@ -46,7 +46,7 @@ export const upsertAppUser = (payload: any) =>
 export const deleteAppUser = (id: string) =>
   (supabase as any).from("app_users").delete().eq("id", id);
 
-/** Helper RPC */
+/** Helper RPC - SECURITY: Updated to use new has_permission function */
 export const hasPermission = async (key: string): Promise<boolean> => {
   const { data, error } = await (supabase as any).rpc("has_permission", { p_permission: key });
   if (error) throw error;

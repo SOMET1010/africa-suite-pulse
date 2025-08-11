@@ -26,14 +26,14 @@ async function createProfileForUser(userId: string, email?: string) {
     orgId = orgs[0].org_id;
   }
   
-  // Créer le profil utilisateur
+  // Créer le profil utilisateur - SECURITY: Role assignment moved to database trigger
   await (supabase as any)
     .from("app_users")
     .insert({
       user_id: userId,
       org_id: orgId,
-      email: email,
-      role: "admin"
+      email: email
+      // Role assignment now handled by handle_new_user trigger in database
     });
 }
 
