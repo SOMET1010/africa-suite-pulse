@@ -1,5 +1,6 @@
 import React, { useMemo, useEffect, useCallback } from "react";
-import { useRackData } from "./useRackData";
+import { useRackDataModern } from "./useRackDataModern";
+import { useReassignReservation } from "@/queries/rack.queries";
 import { useRackState } from "./hooks/useRackState";
 import { useRackActions } from "./hooks/useRackActions";
 import RackToolbar from "./components/RackToolbar";
@@ -10,7 +11,6 @@ import { NewConflictDialog } from "./components/NewConflictDialog";
 import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { toast } from "@/hooks/use-toast";
-import { reassignReservation } from "./rack.service";
 
 // Import du nouveau système drag & drop
 import { DragDropProvider, DragDropStyles } from "./hooks/useDragDrop";
@@ -24,7 +24,9 @@ interface DayData {
 }
 
 export default function RackGrid() {
-  const { data, kpis, reload } = useRackData();
+  // 🆕 UTILISATION DU NOUVEAU HOOK AVEC REACT QUERY
+  const { data, kpis, loading, error, refetch, isRefetching } = useRackDataModern();
+  const reassignMutation = useReassignReservation();
   const {
     zoom, setZoom,
     query, setQuery,
@@ -47,7 +49,7 @@ export default function RackGrid() {
     confirmManualRelodge
   } = useRackActions({
     data,
-    reload,
+    reload: () => refetch().then(() => {}), // 🆕 WRAPPER POUR COMPATIBILITY
     conflictDialog,
     setConflictDialog,
     setDetailSheet,
@@ -55,16 +57,22 @@ export default function RackGrid() {
     setManualRelodgeDialog
   });
 
-  // Gestion du déplacement de réservation
+  // 🆕 GESTION MODERNISÉE DU DÉPLACEMENT AVEC REACT QUERY
   const handleReservationMove = useCallback(async (reservationId: string, targetRoomId: string, targetDay: string) => {
     try {
-      await reassignReservation(reservationId, targetRoomId);
-      await reload();
-      toast({ title: "✅ Réservation déplacée", description: `Chambre ${targetRoomId}` });
-    } catch (error) {
-      toast({ title: "❌ Erreur", description: "Impossible de déplacer la réservation", variant: "destructive" });
+      await reassignMutation.mutateAsync({ reservationId, roomId: targetRoomId });
+      toast({ 
+        title: "✅ Réservation déplacée", 
+        description: `Chambre ${targetRoomId}`,
+      });
+    } catch (error: any) {
+      toast({ 
+        title: "❌ Erreur", 
+        description: error.message || "Impossible de déplacer la réservation", 
+        variant: "destructive" 
+      });
     }
-  }, [reload]);
+  }, [reassignMutation]);
 
   // Injection des styles CSS
   useEffect(() => {
@@ -115,10 +123,10 @@ export default function RackGrid() {
     return { isValid: true };
   }
 
+  // 🆕 FONCTION DE VALIDATION MODERNISÉE
   async function performDrop(resId: string, roomId: string) {
-    console.log(`🎯 Performing drop: reservation ${resId} to room ${roomId}`);
+    console.log(`🎯 Modern drop: reservation ${resId} to room ${roomId}`);
     
-    // 🆕 VALIDATION AVANT EXÉCUTION
     const reservation = data?.reservations.find(r => r.id === resId);
     const validation = validateMove(reservation, roomId);
     
@@ -133,43 +141,36 @@ export default function RackGrid() {
     }
 
     try {
-      console.log(`📡 Calling reassignReservation API...`);
-      const updatedReservation = await reassignReservation(resId, roomId);
-      console.log(`✅ Reservation updated in DB:`, updatedReservation);
+      console.log(`📡 Using React Query mutation...`);
+      await reassignMutation.mutateAsync({ reservationId: resId, roomId });
+      console.log(`✅ React Query mutation completed`);
       
       toast({ 
         title: "✅ Réservation réassignée", 
         description: `Déplacée vers la chambre ${roomId}` 
       });
       
-      console.log(`🔄 Calling reload() to refresh UI...`);
-      await reload();
-      console.log(`✅ Reload completed`);
-      
-      // Force un re-render en déclenchant un event custom
-      window.dispatchEvent(new CustomEvent('rack-updated'));
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error("❌ Error in performDrop:", error);
       toast({ 
         title: "❌ Erreur", 
-        description: "Impossible de réassigner la réservation",
+        description: error.message || "Impossible de réassigner la réservation",
         variant: "destructive" 
       });
     }
   }
 
 
-  // Gestion des handlers manquants pour compatibilité
+  // Gestion des handlers avec React Query
   const handleCheckin = useCallback(async (reservationId: string) => {
     try {
       toast({ title: "✅ Check-in effectué", description: "Client enregistré avec succès" });
       setDetailSheet(prev => ({ ...prev, open: false }));
-      await reload();
+      // React Query invalidera automatiquement le cache
     } catch (error) {
       toast({ title: "❌ Erreur", description: "Impossible d'effectuer le check-in", variant: "destructive" });
     }
-  }, [reload, setDetailSheet]);
+  }, [setDetailSheet]);
 
   const handleNewReservation = useCallback((roomId: string, dayISO: string) => {
     toast({ title: "🆕 Nouvelle réservation", description: `Chambre ${roomId} - ${dayISO}` });
@@ -195,6 +196,9 @@ export default function RackGrid() {
       .filter(r => statusFilter === "all" || r.status === statusFilter);
   }, [data, query, statusFilter]);
 
+  // 🆕 ÉTAT DE CHARGEMENT REACT QUERY
+  if (loading) return <div className="p-8 text-center">Chargement du rack...</div>;
+  if (error) return <div className="p-8 text-center text-destructive">Erreur: {error.message}</div>;
   if (!data) return null;
 
   return (

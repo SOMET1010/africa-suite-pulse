@@ -3,7 +3,8 @@ import { TButton } from "@/core/ui/TButton";
 import { Badge } from "@/core/ui/Badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { fetchArrivals, assignRoom, checkin } from "./arrivals.service";
+import { useArrivals, useAssignRoomToReservation, useCheckinReservation } from "@/queries/arrivals.queries";
+import { useOrgId } from "@/core/auth/useOrg";
 import type { ArrivalRow } from "./arrivals.types";
 import RoomAssignSheet from "./RoomAssignSheet";
 
@@ -12,17 +13,23 @@ const statusToBadge = (s: ArrivalRow["status"]) =>
 
 
 export default function CheckinExpressPage() {
+  const { orgId } = useOrgId();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | "confirmed">("all");
   const [sort, setSort] = useState<"time" | "name" | "room">("time");
   const [mode, setMode] = useState<"express" | "detailed">("express");
 
   const [dateISO] = useState(() => new Date().toISOString().slice(0, 10));
-  const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState<ArrivalRow[]>([]);
+  
+  // 🆕 REACT QUERY HOOKS
+  const arrivalsQuery = useArrivals(orgId!, dateISO);
+  const assignRoomMutation = useAssignRoomToReservation();
+  const checkinMutation = useCheckinReservation();
   
   const [assignOpen, setAssignOpen] = useState(false);
   const [targetResa, setTargetResa] = useState<string | undefined>();
+
+  const rows = arrivalsQuery.data || [];
 
   useEffect(() => {
     document.title = "Arrivées du jour - AfricaSuite";
@@ -30,6 +37,7 @@ export default function CheckinExpressPage() {
     if (meta) meta.setAttribute("content", "Arrivées du jour: check-in express, filtres, et actions rapides.");
   }, []);
 
+  // 🆕 SUPPRESSION DES EVENT LISTENERS MANUELS
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -44,32 +52,19 @@ export default function CheckinExpressPage() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  async function load() {
-    setLoading(true);
-    try {
-      const data = await fetchArrivals(dateISO);
-      setRows(data);
-    } catch (e: any) {
-      toast({ title: "Erreur chargement arrivées", description: e.message });
-    } finally {
-      setLoading(false);
-    }
-  }
-  useEffect(() => { load(); }, [dateISO]);
-
   function askAssign(reservationId: string) {
     setTargetResa(reservationId);
     setAssignOpen(true);
   }
 
+  // 🆕 HANDLERS AVEC REACT QUERY MUTATIONS
   async function handlePick(roomId: string) {
     if (!targetResa) return;
     try {
-      await assignRoom({ reservationId: targetResa, roomId });
+      await assignRoomMutation.mutateAsync({ reservationId: targetResa, roomId });
       toast({ title: "Chambre assignée", description: "✅ Assignation réussie" });
       setAssignOpen(false);
       setTargetResa(undefined);
-      await load();
     } catch (e: any) {
       toast({ title: "Erreur assignation", description: e.message });
     }
@@ -78,9 +73,8 @@ export default function CheckinExpressPage() {
   async function onCheckin(reservationId: string) {
     if (!confirm("Confirmer le check-in ?")) return;
     try {
-      await checkin({ reservationId });
+      await checkinMutation.mutateAsync({ reservationId });
       toast({ title: "Check-in effectué", description: "✅ Client présent" });
-      await load();
     } catch (e: any) {
       toast({ title: "Erreur check-in", description: e.message });
     }

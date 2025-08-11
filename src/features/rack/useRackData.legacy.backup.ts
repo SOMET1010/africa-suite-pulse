@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import type { RackData, UIRoom, UIReservation } from "./rack.types";
-import { fetchRooms, fetchReservationsRange } from "./rack.service";
+import { rackService } from "@/services/rack.service";
 import type { Room as SBRoom, Reservation as SBReservation } from "./rack.types";
 import { useOrgId } from "@/core/auth/useOrg";
 import { overlapsDay } from "./rack.adapters";
@@ -70,8 +70,8 @@ export function useRackData() {
     console.log("🔄 Rack reload… org:", orgId, "range:", startISO, "→", endISO);
     try {
       const [rooms, resas] = await Promise.all([
-        fetchRooms(orgId),
-        fetchReservationsRange(orgId, startISO, endISO),
+        rackService.getRooms(orgId),
+        rackService.getReservations(orgId, startISO, endISO),
       ]);
 
       // logs de diag par chambre

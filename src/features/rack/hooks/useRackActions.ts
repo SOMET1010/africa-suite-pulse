@@ -1,5 +1,6 @@
 import { toast } from "@/hooks/use-toast";
-import { reassignReservation } from "../rack.service";
+// Service moderne importé via queries
+import { rackService } from "@/services/rack.service";
 import { canSwap, findFirstFreeRoom, findBestRelocationRooms, type Relocation } from "../conflictValidation";
 import type { UIRoom, UIReservation, RackData } from "../rack.types";
 
@@ -143,8 +144,8 @@ export function useRackActions({
         return;
       }
       
-      await reassignReservation(other.id, dragged.roomId);
-      await reassignReservation(dragged.id, targetRoomId);
+      await rackService.moveReservation(other.id, dragged.roomId);
+      await rackService.moveReservation(dragged.id, targetRoomId);
 
       toast({ 
         title: "✅ Échange effectué", 
@@ -178,9 +179,9 @@ export function useRackActions({
           });
           return;
         }
-        await reassignReservation(c.id, free.id);
+        await rackService.moveReservation(c.id, free.id);
       }
-      await reassignReservation(dragged.id, targetRoomId);
+      await rackService.moveReservation(dragged.id, targetRoomId);
 
       toast({ 
         title: "✅ Délogement effectué", 
@@ -215,10 +216,10 @@ export function useRackActions({
           });
           return;
         }
-        await reassignReservation(p.conflict.id, p.target.id);
+        await rackService.moveReservation(p.conflict.id, p.target.id);
       }
       // 2) déplacer la réservation d'origine vers la cible
-      await reassignReservation(dragged.id, targetRoomId);
+      await rackService.moveReservation(dragged.id, targetRoomId);
 
       toast({ 
         title: "✅ Plan de délogement exécuté", 
@@ -286,7 +287,7 @@ export function useRackActions({
       for (const relocation of plan) {
         if (relocation.target) {
           console.log(`🔄 Re-lodging ${relocation.conflict.guestName} to room ${relocation.target.number}`);
-          await reassignReservation(relocation.conflict.id, relocation.target.id);
+          await rackService.moveReservation(relocation.conflict.id, relocation.target.id);
         }
       }
       
