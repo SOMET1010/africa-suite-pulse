@@ -1,15 +1,16 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, Euro, User } from "lucide-react";
+import { CalendarDays, Clock, Euro, User, CreditCard } from "lucide-react";
 import { ReservationStatusBadge } from "./RoomBadges";
 import type { UIReservation } from "../rack.types";
 
 interface ReservationInfoProps {
   reservation: UIReservation;
   onCheckin?: (reservationId: string) => void;
+  onPayment?: (reservationId: string) => void;
 }
 
-export function ReservationInfo({ reservation, onCheckin }: ReservationInfoProps) {
+export function ReservationInfo({ reservation, onCheckin, onPayment }: ReservationInfoProps) {
   const canCheckin = reservation.status === "confirmed";
 
   return (
@@ -44,16 +45,30 @@ export function ReservationInfo({ reservation, onCheckin }: ReservationInfoProps
         )}
       </div>
 
-      {canCheckin && onCheckin && (
-        <Button 
-          onClick={() => onCheckin(reservation.id)}
-          className="w-full"
-          size="sm"
-        >
-          <Clock className="w-4 h-4 mr-2" />
-          Effectuer le check-in
-        </Button>
-      )}
+      <div className="space-y-2">
+        {canCheckin && onCheckin && (
+          <Button 
+            onClick={() => onCheckin(reservation.id)}
+            className="w-full"
+            size="sm"
+          >
+            <Clock className="w-4 h-4 mr-2" />
+            Effectuer le check-in
+          </Button>
+        )}
+        
+        {onPayment && (
+          <Button 
+            onClick={() => onPayment(reservation.id)}
+            className="w-full"
+            size="sm"
+            variant="outline"
+          >
+            <CreditCard className="w-4 h-4 mr-2" />
+            Encaisser
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

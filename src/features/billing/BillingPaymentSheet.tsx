@@ -12,13 +12,14 @@ interface BillingPaymentSheetProps {
   invoiceId: string;
   totalDue: number;
   onPaid?: () => void;
+  defaultAmount?: number;
 }
 
-export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid }: BillingPaymentSheetProps) {
+export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defaultAmount }: BillingPaymentSheetProps) {
   const { orgId } = useOrgId();
   const [methods, setMethods] = useState<any[]>([]);
   const [methodId, setMethodId] = useState<string>("");
-  const [amount, setAmount] = useState<number>(totalDue);
+  const [amount, setAmount] = useState<number>(defaultAmount ?? totalDue);
   const [reference, setReference] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -129,9 +130,10 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid }: Bil
             value={amount}
             onChange={e => setAmount(Number(e.target.value || 0))}
           />
-          <p className="text-sm text-muted-foreground">
-            À payer: {totalDue.toLocaleString()}
-          </p>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Reste à payer:</span>
+            <span className="font-medium">{totalDue.toLocaleString()}</span>
+          </div>
         </div>
 
         {needsReference && (
