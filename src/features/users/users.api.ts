@@ -18,13 +18,13 @@ import type {
 } from "@/types/database";
 
 export const listProfiles = (orgId: string) =>
-  supabase.from("profiles").select("*").eq("org_id", orgId).order("label");
+  supabase.from("user_profiles").select("*").eq("org_id", orgId).order("name");
 
 export const upsertProfile = (payload: any) =>
-  supabase.from("profiles").upsert(payload).select();
+  supabase.from("user_profiles").upsert(payload).select();
 
 export const deleteProfile = (id: string) =>
-  supabase.from("profiles").delete().eq("id", id);
+  supabase.from("user_profiles").delete().eq("id", id);
 
 export const listPermissions = () =>
   supabase.from("permissions").select("*").order("category").order("label");
@@ -37,8 +37,7 @@ export const upsertProfilePermissions = (rows: any[]) =>
 
 export const listAppUsers = (orgId: string) =>
   (supabase as any).from("app_users").select(`
-    id, user_id, org_id, login_code as login, full_name, profile_id, expires_at as password_expires_on, active,
-    user_roles:profile_id (id, name as label, access_level)
+    id, user_id, org_id, login_code as login, full_name, profile_id, password_expires_on, active, created_at, last_login_at
   `).eq("org_id", orgId).order("full_name");
 
 export const upsertAppUser = (payload: any) =>

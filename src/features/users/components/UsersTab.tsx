@@ -29,8 +29,7 @@ interface User {
 
 interface UserProfile {
   id: string;
-  code: string;
-  label: string;
+  name: string;
   access_level: string;
 }
 
@@ -59,21 +58,20 @@ export default function UsersTab({ orgId }: UsersTabProps) {
     setUsers(data || []);
   };
 
-  const loadProfiles = async () => {
-    const { data, error } = await listProfiles(orgId);
-    if (error) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
-      return;
-    }
-    // Map the data to the expected UserProfile structure
-    const mappedProfiles = (data || []).map((item: any) => ({
-      id: item.id,
-      code: item.code || item.label?.toLowerCase() || 'unknown',
-      label: item.label || item.name || 'Unknown Profile',
-      access_level: item.access_level || 'basic'
-    }));
-    setProfiles(mappedProfiles);
-  };
+const loadProfiles = async () => {
+  const { data, error } = await listProfiles(orgId);
+  if (error) {
+    toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    return;
+  }
+  // Map the data to the expected UserProfile structure
+  const mappedProfiles = (data || []).map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    access_level: item.access_level || 'basic'
+  }));
+  setProfiles(mappedProfiles);
+};
 
   const handleUserUpdate = async (userId: string, updates: Partial<User>) => {
     const { error } = await upsertAppUser({ id: userId, ...updates });
@@ -114,11 +112,11 @@ export default function UsersTab({ orgId }: UsersTabProps) {
     ));
   };
 
-  const getProfileName = (profileId?: string) => {
-    if (!profileId) return "Aucun profil";
-    const profile = profiles.find(p => p.id === profileId);
-    return profile?.label || "Profil inconnu";
-  };
+const getProfileName = (profileId?: string) => {
+  if (!profileId) return "Aucun profil";
+  const profile = profiles.find(p => p.id === profileId);
+  return profile?.name || "Profil inconnu";
+};
 
   const isExpired = (expiresAt?: string) => {
     if (!expiresAt) return false;
@@ -267,11 +265,11 @@ function EditUserForm({ user, profiles, onSave, onCancel }: EditUserFormProps) {
               <SelectValue placeholder="Sélectionner un profil" />
             </SelectTrigger>
             <SelectContent>
-              {profiles.map(profile => (
-                <SelectItem key={profile.id} value={profile.id}>
-                  {profile.label} ({profile.access_level})
-                </SelectItem>
-              ))}
+{profiles.map(profile => (
+  <SelectItem key={profile.id} value={profile.id}>
+    {profile.name} ({profile.access_level})
+  </SelectItem>
+))}
             </SelectContent>
           </Select>
         </div>

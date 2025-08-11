@@ -26,15 +26,16 @@ export const listPermissions = () =>
   .order("category", { ascending: true })
   .order("label", { ascending: true });
 
-export const updateProfilePermissions = async (profileId: string, permissionIds: string[]) => {
+export const updateProfilePermissions = async (profileId: string, permissionKeys: string[]) => {
   // Delete existing permissions
   await (supabase as any).from("profile_permissions").delete().eq("profile_id", profileId);
   
   // Insert new permissions
-  if (permissionIds.length > 0) {
-    const permissions = permissionIds.map(permissionId => ({
+  if (permissionKeys.length > 0) {
+    const permissions = permissionKeys.map(permissionKey => ({
       profile_id: profileId,
-      permission_id: permissionId
+      permission_key: permissionKey,
+      allowed: true
     }));
     
     return (supabase as any).from("profile_permissions").insert(permissions);
@@ -45,10 +46,7 @@ export const updateProfilePermissions = async (profileId: string, permissionIds:
 
 export const listUsers = (orgId: string) =>
   (supabase as any).from("app_users")
-  .select(`
-    *, 
-    user_roles:profile_id (id, name, access_level)
-  `)
+  .select("*")
   .eq("org_id", orgId)
   .order("full_name", { ascending: true });
 

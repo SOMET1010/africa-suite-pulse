@@ -5,9 +5,9 @@ import type { Database } from '@/integrations/supabase/types';
 export type { Database } from '@/integrations/supabase/types';
 
 // Table row types
-export type Profile = Database['public']['Tables']['profiles']['Row'];
-export type ProfileInsert = Database['public']['Tables']['profiles']['Insert'];
-export type ProfileUpdate = Database['public']['Tables']['profiles']['Update'];
+export type Profile = Database['public']['Tables']['user_profiles']['Row'];
+export type ProfileInsert = Database['public']['Tables']['user_profiles']['Insert'];
+export type ProfileUpdate = Database['public']['Tables']['user_profiles']['Update'];
 
 export type Permission = Database['public']['Tables']['permissions']['Row'];
 export type ProfilePermission = Database['public']['Tables']['profile_permissions']['Row'];
