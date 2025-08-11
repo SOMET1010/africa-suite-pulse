@@ -1,129 +1,141 @@
 import { Link } from 'react-router-dom';
 import { 
-  Building2, 
-  Bed, 
-  Package, 
+  Hotel, 
+  BedDouble, 
+  Gift, 
   CreditCard, 
-  Users, 
-  Settings, 
+  UserCheck, 
+  Settings2, 
   FileText,
-  BarChart3,
-  Shield,
-  CheckCircle,
-  AlertCircle,
-  Clock
+  TrendingUp,
+  ShieldCheck,
+  CheckCircle2,
+  AlertTriangle,
+  Clock4,
+  Crown,
+  Star,
+  Sparkles
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 const settingsTiles = [
   {
-    title: 'Paramètres Hôtel',
-    description: 'Configuration générale de votre établissement',
+    title: 'Configuration Hôtel',
+    description: 'Paramètres généraux de votre établissement de prestige',
     to: '/settings/hotel',
-    icon: Building2,
-    color: 'bg-soft-primary text-primary',
+    icon: Hotel,
+    color: 'glass-card border-accent-gold',
     status: 'configured',
     priority: 'high',
     lastModified: '2 jours',
+    category: 'Établissement',
   },
   {
-    title: 'Gestion des Chambres',
-    description: 'Catalogue et types de chambres',
+    title: 'Suites & Chambres',
+    description: 'Gestion du patrimoine hôtelier et classifications',
     to: '/settings/rooms',
-    icon: Bed,
-    color: 'bg-soft-success text-success',
+    icon: BedDouble,
+    color: 'glass-card border-success/30',
     status: 'configured',
     priority: 'high',
     lastModified: '1 semaine',
+    category: 'Hébergement',
   },
   {
-    title: 'Catalogue Prestations',
-    description: 'Services et prestations disponibles',
+    title: 'Services de Prestige',
+    description: 'Conciergerie, spa, restauration et services exclusifs',
     to: '/settings/services',
-    icon: Package,
-    color: 'bg-soft-accent text-accent',
+    icon: Gift,
+    color: 'glass-card border-accent-copper',
     status: 'configured',
     priority: 'medium',
     lastModified: '3 jours',
+    category: 'Services',
   },
   {
-    title: 'Moyens de Paiement',
-    description: 'Configuration des méthodes de paiement',
+    title: 'Paiements & Facturation',
+    description: 'Solutions de paiement premium et facturation',
     to: '/settings/payments',
     icon: CreditCard,
-    color: 'bg-soft-warning text-warning',
+    color: 'glass-card border-warning/30',
     status: 'partial',
     priority: 'high',
     lastModified: '5 jours',
+    category: 'Finance',
   },
   {
-    title: 'Gestion Utilisateurs',
-    description: 'Droits et accès du personnel',
+    title: 'Équipe & Permissions',
+    description: 'Gestion du personnel et hiérarchie des accès',
     to: '/settings/users',
-    icon: Users,
-    color: 'bg-soft-info text-info',
+    icon: UserCheck,
+    color: 'glass-card border-info/30',
     status: 'configured',
     priority: 'medium',
     lastModified: '1 jour',
+    category: 'Personnel',
   },
   {
-    title: 'Paramètres Système',
-    description: 'Configuration technique avancée',
+    title: 'Architecture Système',
+    description: 'Configuration technique et infrastructure',
     to: '/settings/system',
-    icon: Settings,
-    color: 'bg-muted text-muted-foreground',
+    icon: Settings2,
+    color: 'glass-card border-muted/30',
     status: 'pending',
     priority: 'low',
     lastModified: 'Jamais',
+    category: 'Technique',
   },
   {
-    title: 'Modèles Documents',
-    description: 'Factures, confirmations, rapports',
+    title: 'Documents Personnalisés',
+    description: 'Templates de facturation et correspondance premium',
     to: '/settings/templates',
     icon: FileText,
-    color: 'bg-soft-primary text-primary',
+    color: 'glass-card border-primary/30',
     status: 'pending',
     priority: 'medium',
     lastModified: 'Jamais',
+    category: 'Communication',
   },
   {
-    title: 'Analytics & Rapports',
-    description: 'Configuration des indicateurs',
+    title: 'Analytics Business',
+    description: 'Tableaux de bord et indicateurs de performance',
     to: '/settings/analytics',
-    icon: BarChart3,
-    color: 'bg-soft-danger text-danger',
+    icon: TrendingUp,
+    color: 'glass-card border-danger/30',
     status: 'pending',
     priority: 'low',
     lastModified: 'Jamais',
+    category: 'Performance',
   },
   {
-    title: 'Sécurité & Audit',
-    description: 'Logs, sauvegardes, sécurité',
+    title: 'Sécurité & Conformité',
+    description: 'Audit, sauvegarde et protection des données',
     to: '/settings/security',
-    icon: Shield,
-    color: 'bg-soft-warning text-warning',
+    icon: ShieldCheck,
+    color: 'glass-card border-warning/30',
     status: 'partial',
     priority: 'high',
     lastModified: '1 semaine',
+    category: 'Sécurité',
   },
 ];
 
 const getStatusIcon = (status: string) => {
   switch (status) {
-    case 'configured': return CheckCircle;
-    case 'partial': return AlertCircle;
-    case 'pending': return Clock;
-    default: return Clock;
+    case 'configured': return CheckCircle2;
+    case 'partial': return AlertTriangle;
+    case 'pending': return Clock4;
+    default: return Clock4;
   }
 };
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'configured': return 'bg-soft-success text-success border-success/20';
-    case 'partial': return 'bg-soft-warning text-warning border-warning/20';
-    case 'pending': return 'bg-muted text-muted-foreground border-border';
-    default: return 'bg-muted text-muted-foreground border-border';
+    case 'configured': return 'glass-card border-success/40 bg-success/5 text-success';
+    case 'partial': return 'glass-card border-warning/40 bg-warning/5 text-warning';
+    case 'pending': return 'glass-card border-muted/40 bg-muted/5 text-muted-foreground';
+    default: return 'glass-card border-muted/40 bg-muted/5 text-muted-foreground';
   }
 };
 
@@ -142,42 +154,76 @@ export default function SettingsHome() {
   const pendingCount = settingsTiles.filter(tile => tile.status === 'pending').length;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header with breadcrumb */}
-        <div className="mb-8">
-          <nav className="text-sm text-muted-foreground mb-4" aria-label="Breadcrumb">
-            <span>Accueil</span> <span className="mx-2">/</span> <span className="text-foreground">Paramètres</span>
+    <div className="min-h-screen bg-pearl">
+      {/* Luxury gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-pearl via-background to-platinum/50" />
+      
+      <div className="relative container mx-auto px-6 py-12">
+        {/* Luxury Header */}
+        <div className="mb-12">
+          <nav className="text-sm text-muted-foreground mb-6 font-premium" aria-label="Breadcrumb">
+            <span>Accueil</span> 
+            <Crown className="inline mx-2 h-3 w-3 accent-gold" />
+            <span className="accent-gold font-medium">Centre de Configuration</span>
           </nav>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                Paramètres & Configuration
-              </h1>
-              <p className="text-muted-foreground">
-                Configurez votre hôtel et personnalisez votre système de gestion
+          
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 glass-card border-accent-gold shadow-luxury rounded-xl">
+                  <Settings2 className="h-8 w-8 accent-gold" />
+                </div>
+                <div>
+                  <h1 className="text-4xl lg:text-5xl font-luxury font-bold text-charcoal leading-tight">
+                    Centre de Configuration
+                  </h1>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Star className="h-4 w-4 accent-gold" />
+                    <span className="text-lg text-muted-foreground font-premium">
+                      Gestion hôtelière de prestige
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-muted-foreground font-premium text-lg max-w-2xl leading-relaxed">
+                Orchestrez l'excellence de votre établissement grâce à notre suite de configuration avancée
               </p>
             </div>
-            <div className="flex gap-2">
-              <Badge variant="secondary" className="bg-soft-success text-success border-success/20">
-                {configuredCount} configurés
-              </Badge>
+            <div className="flex flex-wrap gap-3">
+              <div className="glass-card border-success/40 px-4 py-2 rounded-full shadow-soft">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-success" />
+                  <span className="font-premium font-medium text-success">
+                    {configuredCount} Configurés
+                  </span>
+                </div>
+              </div>
               {partialCount > 0 && (
-                <Badge variant="secondary" className="bg-soft-warning text-warning border-warning/20">
-                  {partialCount} partiels
-                </Badge>
+                <div className="glass-card border-warning/40 px-4 py-2 rounded-full shadow-soft">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-warning" />
+                    <span className="font-premium font-medium text-warning">
+                      {partialCount} En cours
+                    </span>
+                  </div>
+                </div>
               )}
               {pendingCount > 0 && (
-                <Badge variant="outline" className="border-muted-foreground/30">
-                  {pendingCount} à faire
-                </Badge>
+                <div className="glass-card border-muted/40 px-4 py-2 rounded-full shadow-soft">
+                  <div className="flex items-center gap-2">
+                    <Clock4 className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-premium font-medium text-muted-foreground">
+                      {pendingCount} À configurer
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Settings Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Luxury Settings Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
           {settingsTiles.map((tile, index) => {
             const Icon = tile.icon;
             const StatusIcon = getStatusIcon(tile.status);
@@ -186,41 +232,65 @@ export default function SettingsHome() {
                 key={tile.to} 
                 to={tile.to} 
                 className="group block"
-                style={{ animationDelay: `${index * 50}ms` }}
+                style={{ animationDelay: `${index * 80}ms` }}
               >
-                <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-border group-hover:border-primary/20 animate-fade-in">
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`
-                        p-3 rounded-lg ${tile.color} 
-                        shadow-soft group-hover:shadow-elevate transition-all duration-300
-                        group-hover:scale-110
-                      `}>
-                        <Icon className="h-6 w-6" />
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <Badge 
-                          variant="outline" 
-                          className={`text-xs px-2 py-1 ${getStatusColor(tile.status)}`}
-                        >
-                          <StatusIcon className="h-3 w-3 mr-1" />
-                          {getStatusLabel(tile.status)}
-                        </Badge>
+                <Card className={`
+                  h-full transition-elegant hover:shadow-luxury hover:scale-[1.03] 
+                  ${tile.color} backdrop-blur-md
+                  group-hover:border-accent-gold/50 animate-fade-in
+                  relative overflow-hidden
+                `}>
+                  {/* Luxury shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-accent-gold/5 to-transparent opacity-0 group-hover:opacity-100 group-hover:translate-x-full transition-all duration-1000 transform -translate-x-full" />
+                  
+                  <CardContent className="p-8 relative">
+                    <div className="flex items-start justify-between mb-6">
+                      <div className="relative">
+                        <div className={`
+                          p-4 rounded-xl ${tile.color} 
+                          shadow-luxury group-hover:shadow-elevate transition-elegant
+                          group-hover:scale-110 group-hover:rotate-3
+                          border border-accent-gold/20
+                        `}>
+                          <Icon className="h-7 w-7 accent-gold" />
+                        </div>
                         {tile.priority === 'high' && (
-                          <div className="w-2 h-2 bg-danger rounded-full animate-pulse" title="Priorité élevée" />
+                          <div className="absolute -top-1 -right-1">
+                            <Sparkles className="h-4 w-4 accent-gold animate-pulse" />
+                          </div>
                         )}
+                      </div>
+                      
+                      <div className="flex flex-col items-end gap-3">
+                        <div className={`
+                          text-xs px-3 py-1.5 rounded-full ${getStatusColor(tile.status)}
+                          backdrop-blur-sm font-premium font-medium
+                        `}>
+                          <div className="flex items-center gap-1.5">
+                            <StatusIcon className="h-3 w-3" />
+                            {getStatusLabel(tile.status)}
+                          </div>
+                        </div>
+                        <div className="text-xs font-premium text-muted-foreground bg-background/50 px-2 py-1 rounded-md">
+                          {tile.category}
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-lg">
+                    <div className="space-y-4">
+                      <h3 className="font-luxury font-semibold text-charcoal group-hover:accent-gold transition-colors text-xl leading-tight">
                         {tile.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed font-premium">
                         {tile.description}
                       </p>
-                      <div className="text-xs text-muted-foreground pt-2 border-t border-border/50">
-                        <span>Modifié: {tile.lastModified}</span>
+                      <div className="flex items-center justify-between pt-4 border-t border-accent-gold/10">
+                        <span className="text-xs text-muted-foreground font-premium">
+                          Modifié il y a {tile.lastModified}
+                        </span>
+                        <div className="w-6 h-6 rounded-full glass-card border-accent-gold/30 flex items-center justify-center group-hover:bg-accent-gold/10 transition-colors">
+                          <span className="text-xs accent-gold">→</span>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -230,59 +300,85 @@ export default function SettingsHome() {
           })}
         </div>
 
-        {/* Enhanced Quick Stats */}
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="group hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              <div className="text-3xl font-bold text-success mb-1 group-hover:scale-110 transition-transform">
-                {configuredCount}
-              </div>
-              <div className="text-sm text-muted-foreground">Modules Configurés</div>
-              <div className="w-full bg-muted rounded-full h-2 mt-3">
-                <div 
-                  className="bg-success h-2 rounded-full transition-all duration-500" 
-                  style={{ width: `${(configuredCount / settingsTiles.length) * 100}%` }}
-                />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Luxury Analytics Dashboard */}
+        <div className="mt-16 space-y-8">
+          <div className="text-center">
+            <h2 className="font-luxury text-3xl font-bold text-charcoal mb-2">
+              Tableau de Bord Exécutif
+            </h2>
+            <p className="text-muted-foreground font-premium">
+              Vision d'ensemble de l'état de votre système
+            </p>
+          </div>
           
-          <Card className="group hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              <div className="flex items-center justify-center mb-2">
-                <div className="w-3 h-3 bg-success rounded-full animate-pulse mr-2" />
-                <div className="text-2xl font-bold text-success group-hover:scale-110 transition-transform">
-                  Active
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="glass-card border-success/30 group hover:shadow-luxury transition-elegant overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-success/20 to-transparent rounded-bl-full" />
+              <CardContent className="p-8 text-center relative">
+                <div className="text-4xl font-luxury font-bold text-success mb-2 group-hover:scale-110 transition-elegant">
+                  {configuredCount}
                 </div>
-              </div>
-              <div className="text-sm text-muted-foreground">État du Système</div>
-              <div className="text-xs text-success mt-2">Tous services opérationnels</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="group hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-primary mb-1 group-hover:scale-110 transition-transform">
-                v2.1.0
-              </div>
-              <div className="text-sm text-muted-foreground">Version PMS</div>
-              <div className="text-xs text-primary mt-2">Dernière mise à jour</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="group hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-warning mb-1 group-hover:scale-110 transition-transform">
-                {pendingCount}
-              </div>
-              <div className="text-sm text-muted-foreground">Actions Requises</div>
-              {pendingCount > 0 ? (
-                <div className="text-xs text-warning mt-2">Configuration incomplète</div>
-              ) : (
-                <div className="text-xs text-success mt-2">Tout est configuré</div>
-              )}
-            </CardContent>
-          </Card>
+                <div className="text-sm text-muted-foreground font-premium mb-4">Modules Configurés</div>
+                <div className="w-full bg-success/10 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-success to-success/80 h-3 rounded-full transition-all duration-1000" 
+                    style={{ width: `${(configuredCount / settingsTiles.length) * 100}%` }}
+                  />
+                </div>
+                <div className="text-xs text-success mt-2 font-premium">
+                  {Math.round((configuredCount / settingsTiles.length) * 100)}% complété
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card border-accent-gold/30 group hover:shadow-luxury transition-elegant overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-accent-gold/20 to-transparent rounded-bl-full" />
+              <CardContent className="p-8 text-center relative">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-4 h-4 bg-accent-gold rounded-full animate-pulse mr-3" />
+                  <div className="text-3xl font-luxury font-bold accent-gold group-hover:scale-110 transition-elegant">
+                    Premium
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground font-premium mb-2">État du Système</div>
+                <div className="text-xs accent-gold font-premium bg-accent-gold/10 px-3 py-1 rounded-full">
+                  Tous services opérationnels
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card border-primary/30 group hover:shadow-luxury transition-elegant overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full" />
+              <CardContent className="p-8 text-center relative">
+                <div className="text-3xl font-luxury font-bold text-primary mb-2 group-hover:scale-110 transition-elegant">
+                  v2.1.0
+                </div>
+                <div className="text-sm text-muted-foreground font-premium mb-2">Version PMS</div>
+                <div className="text-xs text-primary font-premium bg-primary/10 px-3 py-1 rounded-full">
+                  Dernière mise à jour
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="glass-card border-warning/30 group hover:shadow-luxury transition-elegant overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-warning/20 to-transparent rounded-bl-full" />
+              <CardContent className="p-8 text-center relative">
+                <div className="text-3xl font-luxury font-bold text-warning mb-2 group-hover:scale-110 transition-elegant">
+                  {pendingCount}
+                </div>
+                <div className="text-sm text-muted-foreground font-premium mb-2">Actions Requises</div>
+                {pendingCount > 0 ? (
+                  <div className="text-xs text-warning font-premium bg-warning/10 px-3 py-1 rounded-full">
+                    Configuration à finaliser
+                  </div>
+                ) : (
+                  <div className="text-xs text-success font-premium bg-success/10 px-3 py-1 rounded-full">
+                    Tout est configuré
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

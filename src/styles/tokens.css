@@ -6,15 +6,21 @@
 
 @layer base {
   :root {
-    /* Brand palette */
-    --brand-primary: 226 64% 33%;            /* #1E3A8A */
-    --brand-primary-hover: 226 64% 29%;      /* #193273 approx */
-    --brand-accent: 42 94% 50%;              /* #F59E0B */
-    --brand-accent-hover: 41 93% 40%;        /* #C47D08 approx */
+    /* Luxury Hotel Brand Palette */
+    --brand-primary: 226 64% 33%;            /* Deep hotel blue */
+    --brand-primary-hover: 226 64% 29%;      /* Darker blue hover */
+    --brand-accent: 45 100% 42%;             /* Champagne gold #D4AF37 */
+    --brand-accent-hover: 45 100% 35%;       /* Darker gold hover */
+    --brand-copper: 25 45% 47%;              /* Copper accents #B87333 */
 
-    --brand-success: 142 72% 38%;            /* #16A34A */
-    --brand-danger: 0 72% 52%;               /* #DC2626 */
-    --brand-info: 199 98% 39%;               /* #0284C7 */
+    --brand-success: 142 72% 38%;            /* Emerald green */
+    --brand-danger: 0 72% 52%;               /* Cardinal red */
+    --brand-info: 199 98% 39%;               /* Sapphire blue */
+    
+    /* Luxury neutrals */
+    --pearl: 210 20% 97%;                    /* Pearl white */
+    --charcoal: 225 39% 13%;                 /* Charcoal */
+    --platinum: 210 6% 93%;                  /* Platinum */
 
     /* Base surfaces and text taken from shadcn defaults but can be overridden */
     --background: 0 0% 100%;
@@ -73,10 +79,17 @@
     --soft-warning: var(--status-option) / 0.12;
     --soft-danger: var(--status-cancelled) / 0.12;
 
-    /* Shadows and motion */
-    --shadow-soft: 0 8px 24px hsl(var(--brand-primary) / 0.08), 0 2px 8px hsl(var(--brand-primary) / 0.06);
-    --shadow-elevate: 0 12px 32px hsl(var(--brand-primary) / 0.12);
-    --transition-smooth: 180ms cubic-bezier(0.22, 1, 0.36, 1);
+    /* Luxury shadows and motion */
+    --shadow-soft: 0 8px 32px hsl(var(--brand-primary) / 0.08), 0 2px 12px hsl(var(--brand-accent) / 0.04);
+    --shadow-elevate: 0 20px 40px hsl(var(--brand-primary) / 0.12), 0 8px 16px hsl(var(--brand-accent) / 0.08);
+    --shadow-luxury: 0 25px 50px hsl(var(--brand-primary) / 0.15), 0 10px 20px hsl(var(--brand-accent) / 0.1);
+    --transition-smooth: 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-elegant: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* Glassmorphism */
+    --glass-bg: hsl(var(--background) / 0.8);
+    --glass-border: hsl(var(--brand-accent) / 0.2);
+    --blur-amount: 12px;
 
     /* Touch-first sizing */
     --tap-target: 44px;
@@ -123,11 +136,36 @@
     }
   }
 
-  /* Utilities tied to tokens */
+  /* Luxury utility classes */
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-elevate { box-shadow: var(--shadow-elevate); }
+  .shadow-luxury { box-shadow: var(--shadow-luxury); }
   .transition-smooth { transition: var(--transition-smooth); }
+  .transition-elegant { transition: var(--transition-elegant); }
   .tap-target { min-height: var(--tap-target); }
+  
+  /* Glassmorphism effects */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
+  }
+  
+  /* Luxury typography */
+  .font-luxury { font-family: 'Playfair Display', serif; }
+  .font-premium { font-family: 'Inter', sans-serif; }
+  
+  /* Gold accents */
+  .accent-gold { color: hsl(var(--brand-accent)); }
+  .bg-accent-gold { background-color: hsl(var(--brand-accent)); }
+  .border-accent-gold { border-color: hsl(var(--brand-accent)); }
+  
+  /* Copper accents */
+  .accent-copper { color: hsl(var(--brand-copper)); }
+  .bg-accent-copper { background-color: hsl(var(--brand-copper)); }
+  
+  /* Pearl backgrounds */
+  .bg-pearl { background-color: hsl(var(--pearl)); }
   
   /* Vibrant background utilities */
   .bg-success { background-color: hsl(var(--success)); }
