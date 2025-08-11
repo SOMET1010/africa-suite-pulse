@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Plus, Download, Edit3, Trash2, Tags, Save, X, DollarSign } from 'lucide-react';
 import { ServicesService } from '../servicesService';
 import type { Service, ServiceFamily } from '@/types/database';
-import { useServices } from '../useServices';
-import { useOrgId } from '@/core/auth/useOrg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,11 +15,11 @@ interface ServicesTabProps {
   families: ServiceFamily[];
   searchQuery: string;
   onExport: () => void;
+  onSaveService: (service: Partial<Service>) => Promise<Service> | Promise<void>;
+  onDeleteService: (id: string) => Promise<void>;
 }
 
-export function ServicesTab({ services, families, searchQuery, onExport }: ServicesTabProps) {
-  const { orgId } = useOrgId();
-  const { saveService, deleteService } = useServices(orgId);
+export function ServicesTab({ services, families, searchQuery, onExport, onSaveService, onDeleteService }: ServicesTabProps) {
   const [editingService, setEditingService] = useState<Partial<Service> | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 

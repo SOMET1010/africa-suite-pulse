@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Plus, Download, Edit3, Trash2, Package, Save, X } from 'lucide-react';
 import { ServicesService } from '../servicesService';
 import type { ServiceFamily } from '@/types/database';
-import { useServices } from '../useServices';
-import { useOrgId } from '@/core/auth/useOrg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,11 +14,11 @@ interface FamiliesTabProps {
   families: ServiceFamily[];
   searchQuery: string;
   onExport: () => void;
+  onSaveFamily: (family: Partial<ServiceFamily>) => Promise<ServiceFamily> | Promise<void>;
+  onDeleteFamily: (id: string) => Promise<void>;
 }
 
-export function FamiliesTab({ families, searchQuery, onExport }: FamiliesTabProps) {
-  const { orgId } = useOrgId();
-  const { saveFamily, deleteFamily } = useServices(orgId);
+export function FamiliesTab({ families, searchQuery, onExport, onSaveFamily, onDeleteFamily }: FamiliesTabProps) {
   const [editingFamily, setEditingFamily] = useState<Partial<ServiceFamily> | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -73,7 +71,7 @@ export function FamiliesTab({ families, searchQuery, onExport }: FamiliesTabProp
     }
 
     try {
-      await saveFamily(editingFamily);
+      await onSaveFamily(editingFamily);
       setEditingFamily(null);
       setIsCreating(false);
     } catch (error) {
@@ -83,7 +81,7 @@ export function FamiliesTab({ families, searchQuery, onExport }: FamiliesTabProp
 
   const handleDeleteFamily = async (id: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette famille ?')) {
-      await deleteFamily(id);
+      await onDeleteFamily(id);
     }
   };
 

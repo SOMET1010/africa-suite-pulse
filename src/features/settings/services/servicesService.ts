@@ -84,22 +84,57 @@ export class ServicesService {
 
   // Services
   static async getServices(orgId: string): Promise<Service[]> {
+    // Use the pre-joined view to avoid PostgREST embed ambiguity
     const { data, error } = await supabase
-      .from('services' as any)
-      .select(`
-        *,
-        family:service_families(*)
-      `)
+      .from('services_with_family' as any)
+      .select('*')
       .eq('org_id', orgId)
       .order('family_id, code');
 
     if (error) throw error;
-    return (data as any[]) || [];
+
+    // Map view rows to Service shape with nested family object
+    const rows = (data as any[]) || [];
+    return rows.map((row: any) => ({
+      id: row.id,
+      org_id: row.org_id,
+      family_id: row.family_id,
+      code: row.code,
+      label: row.label,
+      description: row.description,
+      unit: row.unit,
+      price: Number(row.price ?? 0),
+      vat_rate: Number(row.vat_rate ?? 0),
+      is_active: !!row.is_active,
+      is_free_price: !!row.is_free_price,
+      cost_price: row.cost_price !== null && row.cost_price !== undefined ? Number(row.cost_price) : undefined,
+      profit_margin: row.profit_margin !== null && row.profit_margin !== undefined ? Number(row.profit_margin) : undefined,
+      min_quantity: row.min_quantity !== null && row.min_quantity !== undefined ? Number(row.min_quantity) : undefined,
+      max_quantity: row.max_quantity !== null && row.max_quantity !== undefined ? Number(row.max_quantity) : undefined,
+      tags: row.tags || null,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      family: row.family_id
+        ? {
+            id: row.family_id,
+            code: row.family_code,
+            label: row.family_label,
+            color: row.family_color,
+            icon: row.family_icon,
+            org_id: row.org_id,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+            is_active: row.is_active,
+            order_index: 0,
+            description: row.description,
+          } as any
+        : undefined,
+    })) as unknown as Service[];
   }
 
   static async saveService(orgId: string, service: Partial<Service>): Promise<Service> {
     if (service.id) {
-      const { data, error } = await supabase
+      const { data: updated, error: updateError } = await supabase
         .from('services' as any)
         .update({
           family_id: service.family_id,
@@ -119,16 +154,21 @@ export class ServicesService {
         })
         .eq('id', service.id)
         .eq('org_id', orgId)
-        .select(`
-          *,
-          family:service_families(*)
-        `)
+        .select('id')
         .single();
 
-      if (error) throw error;
-      return data as unknown as Service;
-    } else {
+      if (updateError) throw updateError;
+
       const { data, error } = await supabase
+        .from('services_with_family' as any)
+        .select('*')
+        .eq('id', (updated as any).id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return (await this.getServices(orgId)).find(s => s.id === (updated as any).id)!;
+    } else {
+      const { data: inserted, error: insertError } = await supabase
         .from('services' as any)
         .insert({
           org_id: orgId,
@@ -147,14 +187,12 @@ export class ServicesService {
           max_quantity: service.max_quantity,
           tags: service.tags
         })
-        .select(`
-          *,
-          family:service_families(*)
-        `)
+        .select('id')
         .single();
 
-      if (error) throw error;
-      return data as unknown as Service;
+      if (insertError) throw insertError;
+
+      return (await this.getServices(orgId)).find(s => s.id === (inserted as any).id)!;
     }
   }
 
@@ -169,23 +207,30 @@ export class ServicesService {
 
   // Arrangements
   static async getArrangements(orgId: string): Promise<Arrangement[]> {
-    const { data, error } = await supabase
+    const { data: arrangements, error } = await supabase
       .from('arrangements' as any)
-      .select(`
-        *,
-        services:arrangement_services(
-          *,
-          service:services(
-            *,
-            family:service_families(*)
-          )
-        )
-      `)
+      .select('*')
       .eq('org_id', orgId)
       .order('code');
 
     if (error) throw error;
-    return (data as any[]) || [];
+    const arrs = (arrangements as any[]) || [];
+    if (arrs.length === 0) return [] as unknown as Arrangement[];
+
+    const ids = arrs.map(a => a.id);
+    const { data: arrServices, error: svcError } = await supabase
+      .from('arrangement_services' as any)
+      .select('*')
+      .in('arrangement_id', ids)
+      .order('order_index');
+
+    if (svcError) throw svcError;
+    const byArrangement = (arrServices as any[] | null) || [];
+
+    return arrs.map(a => ({
+      ...a,
+      services: byArrangement.filter(s => s.arrangement_id === a.id)
+    })) as unknown as Arrangement[];
   }
 
   static async saveArrangement(orgId: string, arrangement: Partial<Arrangement>): Promise<Arrangement> {
@@ -236,24 +281,22 @@ export class ServicesService {
         if (servicesError) throw servicesError;
       }
 
-      // Return full arrangement with services
-      const { data, error } = await supabase
+      // Return arrangement with services (no embeds)
+      const { data: arr, error: fetchErr } = await supabase
         .from('arrangements' as any)
-        .select(`
-          *,
-          services:arrangement_services(
-            *,
-            service:services(
-              *,
-              family:service_families(*)
-            )
-          )
-        `)
+        .select('*')
         .eq('id', arrangement.id)
         .single();
+      if (fetchErr) throw fetchErr;
 
-      if (error) throw error;
-      return data as unknown as Arrangement;
+      const { data: svc, error: svcFetchErr } = await supabase
+        .from('arrangement_services' as any)
+        .select('*')
+        .eq('arrangement_id', arrangement.id)
+        .order('order_index');
+      if (svcFetchErr) throw svcFetchErr;
+
+      return { ...(arr as any), services: (svc as any[]) || [] } as unknown as Arrangement;
     } else {
       // Create new arrangement
       const { data: newArrangement, error: insertError } = await supabase
@@ -294,24 +337,22 @@ export class ServicesService {
         if (servicesError) throw servicesError;
       }
 
-      // Return full arrangement with services
-      const { data, error } = await supabase
+      // Return arrangement with services (no embeds)
+      const { data: arr, error: fetchErr } = await supabase
         .from('arrangements' as any)
-        .select(`
-          *,
-          services:arrangement_services(
-            *,
-            service:services(
-              *,
-              family:service_families(*)
-            )
-          )
-        `)
+        .select('*')
         .eq('id', (newArrangement as any).id)
         .single();
+      if (fetchErr) throw fetchErr;
 
-      if (error) throw error;
-      return data as unknown as Arrangement;
+      const { data: svc, error: svcFetchErr } = await supabase
+        .from('arrangement_services' as any)
+        .select('*')
+        .eq('arrangement_id', (newArrangement as any).id)
+        .order('order_index');
+      if (svcFetchErr) throw svcFetchErr;
+
+      return { ...(arr as any), services: (svc as any[]) || [] } as unknown as Arrangement;
     }
   }
 
