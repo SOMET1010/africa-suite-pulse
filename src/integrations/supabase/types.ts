@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_users: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          last_login_at: string | null
+          login: string
+          login_code: string | null
+          org_id: string
+          password_expires_on: string | null
+          profile_id: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          last_login_at?: string | null
+          login: string
+          login_code?: string | null
+          org_id: string
+          password_expires_on?: string | null
+          profile_id?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          last_login_at?: string | null
+          login?: string
+          login_code?: string | null
+          org_id?: string
+          password_expires_on?: string | null
+          profile_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_app_users_org_id"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "hotel_settings"
+            referencedColumns: ["org_id"]
+          },
+        ]
+      }
       arrangement_services: {
         Row: {
           arrangement_id: string
@@ -72,6 +125,34 @@ export type Database = {
           },
           {
             foreignKeyName: "arrangement_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services_with_family"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_arrangement_services_arrangement_id"
+            columns: ["arrangement_id"]
+            isOneToOne: false
+            referencedRelation: "arrangements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_arrangement_services_arrangement_id"
+            columns: ["arrangement_id"]
+            isOneToOne: false
+            referencedRelation: "arrangements_with_calculated_price"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_arrangement_services_service_id"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_arrangement_services_service_id"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services_with_family"
@@ -223,6 +304,56 @@ export type Database = {
         }
         Relationships: []
       }
+      mobile_money_accounts: {
+        Row: {
+          active: boolean | null
+          api_provider: string | null
+          created_at: string | null
+          default_method_id: string | null
+          display_name: string
+          id: string
+          merchant_id: string | null
+          org_id: string
+          provider: string
+          settlement_account: string | null
+          wallet_msisdn: string
+        }
+        Insert: {
+          active?: boolean | null
+          api_provider?: string | null
+          created_at?: string | null
+          default_method_id?: string | null
+          display_name: string
+          id?: string
+          merchant_id?: string | null
+          org_id: string
+          provider: string
+          settlement_account?: string | null
+          wallet_msisdn: string
+        }
+        Update: {
+          active?: boolean | null
+          api_provider?: string | null
+          created_at?: string | null
+          default_method_id?: string | null
+          display_name?: string
+          id?: string
+          merchant_id?: string | null
+          org_id?: string
+          provider?: string
+          settlement_account?: string | null
+          wallet_msisdn?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mobile_money_accounts_default_method_id_fkey"
+            columns: ["default_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string | null
@@ -250,35 +381,47 @@ export type Database = {
       payment_methods: {
         Row: {
           active: boolean | null
+          capture_mode: string
           code: string
           commission_percent: number | null
           created_at: string | null
+          expense_service_code: string | null
           id: string
           kind: string
           label: string
+          metadata: Json | null
           org_id: string
+          settlement_delay_days: number | null
           updated_at: string | null
         }
         Insert: {
           active?: boolean | null
+          capture_mode?: string
           code: string
           commission_percent?: number | null
           created_at?: string | null
+          expense_service_code?: string | null
           id?: string
           kind: string
           label: string
+          metadata?: Json | null
           org_id: string
+          settlement_delay_days?: number | null
           updated_at?: string | null
         }
         Update: {
           active?: boolean | null
+          capture_mode?: string
           code?: string
           commission_percent?: number | null
           created_at?: string | null
+          expense_service_code?: string | null
           id?: string
           kind?: string
           label?: string
+          metadata?: Json | null
           org_id?: string
+          settlement_delay_days?: number | null
           updated_at?: string | null
         }
         Relationships: []
@@ -319,122 +462,89 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency_code: string | null
+          id: string
+          invoice_id: string
+          metadata: Json | null
+          method_id: string
+          org_id: string
+          reference: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency_code?: string | null
+          id?: string
+          invoice_id: string
+          metadata?: Json | null
+          method_id: string
+          org_id: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency_code?: string | null
+          id?: string
+          invoice_id?: string
+          metadata?: Json | null
+          method_id?: string
+          org_id?: string
+          reference?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           category: string
-          code: string
-          created_at: string | null
-          description: string | null
-          id: string
+          key: string
           label: string
         }
         Insert: {
-          category?: string
-          code: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
+          category: string
+          key: string
           label: string
         }
         Update: {
           category?: string
-          code?: string
-          created_at?: string | null
-          description?: string | null
-          id?: string
+          key?: string
           label?: string
         }
         Relationships: []
       }
       profile_permissions: {
         Row: {
-          created_at: string | null
-          id: string
-          permission_id: string
+          allowed: boolean
+          permission_key: string
           profile_id: string
         }
         Insert: {
-          created_at?: string | null
-          id?: string
-          permission_id: string
+          allowed?: boolean
+          permission_key: string
           profile_id: string
         }
         Update: {
-          created_at?: string | null
-          id?: string
-          permission_id?: string
+          allowed?: boolean
+          permission_key?: string
           profile_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "profile_permissions_permission_id_fkey"
-            columns: ["permission_id"]
+            foreignKeyName: "profile_permissions_permission_key_fkey"
+            columns: ["permission_key"]
             isOneToOne: false
             referencedRelation: "permissions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "profile_permissions_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          active: boolean | null
-          created_at: string
-          email: string | null
-          expires_at: string | null
-          full_name: string | null
-          id: string
-          last_login_at: string | null
-          login_code: string | null
-          org_id: string
-          profile_id: string | null
-          role: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          active?: boolean | null
-          created_at?: string
-          email?: string | null
-          expires_at?: string | null
-          full_name?: string | null
-          id?: string
-          last_login_at?: string | null
-          login_code?: string | null
-          org_id: string
-          profile_id?: string | null
-          role?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          active?: boolean | null
-          created_at?: string
-          email?: string | null
-          expires_at?: string | null
-          full_name?: string | null
-          id?: string
-          last_login_at?: string | null
-          login_code?: string | null
-          org_id?: string
-          profile_id?: string | null
-          role?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "user_profiles"
-            referencedColumns: ["id"]
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -558,6 +668,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_rooms_room_type_id"
+            columns: ["room_type_id"]
+            isOneToOne: false
+            referencedRelation: "room_types"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "rooms_room_type_id_fkey"
             columns: ["room_type_id"]
             isOneToOne: false
@@ -671,6 +788,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_services_family_id"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "service_families"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "services_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
@@ -712,6 +836,21 @@ export type Database = {
           status?: string
           token?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_organizations: {
+        Row: {
+          org_id: string
+          user_id: string
+        }
+        Insert: {
+          org_id: string
+          user_id: string
+        }
+        Update: {
+          org_id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -848,6 +987,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_services_family_id"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "service_families"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "services_family_id_fkey"
             columns: ["family_id"]
             isOneToOne: false
@@ -858,6 +1004,10 @@ export type Database = {
       }
     }
     Functions: {
+      get_current_user_org_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       pms_assign_room: {
         Args: { p_res: string; p_room: string }
         Returns: undefined
