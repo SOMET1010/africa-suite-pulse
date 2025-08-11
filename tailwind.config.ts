@@ -67,11 +67,12 @@ export default {
 				info: 'hsl(var(--info))',
 				danger: 'hsl(var(--danger))',
 				
-				// Status sémantiques
+				// Status sémantiques complets
 				'status-confirmed': 'hsl(var(--status-confirmed))',
 				'status-present': 'hsl(var(--status-present))', 
 				'status-option': 'hsl(var(--status-option))',
 				'status-cancelled': 'hsl(var(--status-cancelled))',
+				'status-maintenance': 'hsl(var(--status-maintenance))',
 				
 				// Surfaces pastel
 				'soft-primary': 'hsl(var(--soft-primary))',

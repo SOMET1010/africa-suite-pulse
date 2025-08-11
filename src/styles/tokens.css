@@ -13,9 +13,12 @@
     --brand-accent-hover: 45 100% 35%;       /* Darker gold hover */
     --brand-copper: 25 45% 47%;              /* Copper accents #B87333 */
 
-    --brand-success: 142 72% 38%;            /* Emerald green */
-    --brand-danger: 0 72% 52%;               /* Cardinal red */
-    --brand-info: 199 98% 39%;               /* Sapphire blue */
+    /* Status colors (semantic) - Enhanced vibrancy */
+    --status-confirmed: 142 76% 36%;     /* vibrant green #16A249 */
+    --status-present: 199 100% 43%;      /* vibrant blue #0096DB */
+    --status-option: 38 92% 50%;         /* vibrant orange #F59F0A */
+    --status-cancelled: 0 84% 60%;       /* vibrant red #EF4343 */
+    --status-maintenance: 271 81% 56%;   /* vibrant purple */
     
     /* Luxury neutrals */
     --pearl: 210 20% 97%;                    /* Pearl white */
@@ -44,7 +47,7 @@
     --accent: var(--brand-accent);
     --accent-foreground: 222 47% 11%;
 
-    --destructive: var(--brand-danger);
+    --destructive: var(--status-cancelled);
     --destructive-foreground: 210 40% 98%;
 
     --border: 214 32% 91%;
@@ -53,31 +56,22 @@
 
     --radius: 0.875rem; /* rounded-xl default */
 
-    /* Status colors (semantic) - Enhanced vibrancy */
-    --status-confirmed: 142 76% 36%;     /* vibrant green */
-    --status-present: 199 100% 43%;      /* vibrant blue */
-    --status-option: 38 92% 50%;         /* vibrant orange */
-    --status-cancelled: 0 84% 60%;       /* vibrant red */
-    
     /* Success, Info, Warning, Danger mappings */
     --success: var(--status-confirmed);
     --info: var(--status-present);
     --warning: var(--status-option);
     --danger: var(--status-cancelled);
 
-    /* Pastel soft-surfaces computed via color-mix (oklab) against background */
-    /* We use CSS color() with oklab via color-mix, but Tailwind consumes hsl() in theme.
-       For soft usage, we expose ready-to-use HSL tokens approximated to ensure compatibility. */
-    /* Light mode softness at ~12% over background */
-    --softness: 12%;
+    /* Light mode softness (decimal for alpha, not percentage) */
+    --softness: 0.12;
 
-    /* Generated soft surfaces (approx using alpha blending on HSL) */
-    --soft-primary: var(--brand-primary) / 0.12;
-    --soft-accent: var(--brand-accent) / 0.12;
-    --soft-success: var(--status-confirmed) / 0.12;
-    --soft-info: var(--status-present) / 0.12;
-    --soft-warning: var(--status-option) / 0.12;
-    --soft-danger: var(--status-cancelled) / 0.12;
+    /* Soft surfaces with corrected syntax - HSL color space + alpha */
+    --soft-primary: 226 64% 33% / var(--softness);
+    --soft-accent: 45 100% 42% / var(--softness);
+    --soft-success: 142 76% 36% / var(--softness);
+    --soft-info: 199 100% 43% / var(--softness);
+    --soft-warning: 38 92% 50% / var(--softness);
+    --soft-danger: 0 84% 60% / var(--softness);
 
     /* Luxury shadows and motion */
     --shadow-soft: 0 8px 32px hsl(var(--brand-primary) / 0.08), 0 2px 12px hsl(var(--brand-accent) / 0.04);
@@ -126,13 +120,13 @@
       --ring: 212 92% 59%;
 
       /* Dark mode soft surfaces slightly stronger (16%) */
-      --softness: 16%;
-      --soft-primary: var(--brand-primary) / 0.16;
-      --soft-accent: var(--brand-accent) / 0.16;
-      --soft-success: var(--status-confirmed) / 0.16;
-      --soft-info: var(--status-present) / 0.16;
-      --soft-warning: var(--status-option) / 0.16;
-      --soft-danger: var(--status-cancelled) / 0.16;
+      --softness: 0.16;
+      --soft-primary: 226 64% 33% / var(--softness);
+      --soft-accent: 45 100% 42% / var(--softness);
+      --soft-success: 142 76% 36% / var(--softness);
+      --soft-info: 199 100% 43% / var(--softness);
+      --soft-warning: 38 92% 50% / var(--softness);
+      --soft-danger: 0 84% 60% / var(--softness);
     }
   }
 
@@ -176,32 +170,54 @@
   .bg-warning { background-color: hsl(var(--warning)); }
   .bg-danger { background-color: hsl(var(--danger)); }
   
-  /* Room status dots - vibrant colors */
-  .room-dot-clean { background-color: hsl(142 76% 36%); }
-  .room-dot-inspected { background-color: hsl(199 100% 43%); }
-  .room-dot-dirty { background-color: hsl(38 92% 50%); }
-  .room-dot-maintenance { background-color: hsl(271 81% 56%); }
-  .room-dot-out_of_order { background-color: hsl(0 84% 60%); }
+  /* Room status dots using semantic tokens */
+  .room-dot-clean { background-color: hsl(var(--status-confirmed)); }
+  .room-dot-inspected { background-color: hsl(var(--status-present)); }
+  .room-dot-dirty { background-color: hsl(var(--status-option)); }
+  .room-dot-maintenance { background-color: hsl(var(--status-maintenance)); }
+  .room-dot-out_of_order { background-color: hsl(var(--status-cancelled)); }
 
   /* Hover helpers for brand exact hover shades */
   .bg-primary-hover { background-color: hsl(var(--brand-primary-hover)); }
   .bg-accent-hover { background-color: hsl(var(--brand-accent-hover)); }
 
   /* Status text helpers */
+  .text-success { color: hsl(var(--success)); }
+  .text-info { color: hsl(var(--info)); }
+  .text-warning { color: hsl(var(--warning)); }
+  .text-danger { color: hsl(var(--danger)); }
   .text-status-confirmed { color: hsl(var(--status-confirmed)); }
   .text-status-present { color: hsl(var(--status-present)); }
   .text-status-option { color: hsl(var(--status-option)); }
   .text-status-cancelled { color: hsl(var(--status-cancelled)); }
 
-  /* Soft badge backgrounds */
-  .badge-soft--confirmed { background-color: hsl(var(--status-confirmed) / var(--softness)); color: hsl(var(--status-confirmed)); }
-  .badge-soft--present { background-color: hsl(var(--status-present) / var(--softness)); color: hsl(var(--status-present)); }
-  .badge-soft--option { background-color: hsl(var(--status-option) / var(--softness)); color: hsl(var(--status-option)); }
-  .badge-soft--cancelled { background-color: hsl(var(--status-cancelled) / var(--softness)); color: hsl(var(--status-cancelled)); }
+  /* Border utilities for status colors */
+  .border-success { border-color: hsl(var(--success)); }
+  .border-info { border-color: hsl(var(--info)); }
+  .border-warning { border-color: hsl(var(--warning)); }
+  .border-danger { border-color: hsl(var(--danger)); }
+
+  /* Soft badge backgrounds with corrected syntax */
+  .badge-soft--confirmed { 
+    background-color: hsl(var(--soft-success)); 
+    color: hsl(var(--status-confirmed)); 
+  }
+  .badge-soft--present { 
+    background-color: hsl(var(--soft-info)); 
+    color: hsl(var(--status-present)); 
+  }
+  .badge-soft--option { 
+    background-color: hsl(var(--soft-warning)); 
+    color: hsl(var(--status-option)); 
+  }
+  .badge-soft--cancelled { 
+    background-color: hsl(var(--soft-danger)); 
+    color: hsl(var(--status-cancelled)); 
+  }
 
   /* Soft cell backgrounds for rack reservations */
-  .cell-soft--confirmed { background-color: hsl(var(--status-confirmed) / var(--softness)); }
-  .cell-soft--present { background-color: hsl(var(--status-present) / var(--softness)); }
-  .cell-soft--option { background-color: hsl(var(--status-option) / var(--softness)); }
-  .cell-soft--cancelled { background-color: hsl(var(--status-cancelled) / var(--softness)); }
+  .cell-soft--confirmed { background-color: hsl(var(--soft-success)); }
+  .cell-soft--present { background-color: hsl(var(--soft-info)); }
+  .cell-soft--option { background-color: hsl(var(--soft-warning)); }
+  .cell-soft--cancelled { background-color: hsl(var(--soft-danger)); }
 }
