@@ -9,7 +9,7 @@ const tiles = [
   { title: "Arrivées", to: "/arrivals", icon: Users, description: "Check-in express et gestion des arrivées" },
   { title: "Paramètres", to: "/settings", icon: Crown, description: "Configuration et administration" },
   { title: "Clients", to: "/", icon: Users, description: "Base de données clients et profils" },
-  { title: "Facturation", to: "/", icon: CreditCard, description: "Gestion des factures et paiements" },
+  { title: "Facturation", to: "/billing", icon: CreditCard, description: "Gestion des factures et paiements" },
   { title: "Rapports", to: "/", icon: FileText, description: "Analytics et rapports détaillés" },
   { title: "Main courante", to: "/", icon: Clock, description: "Journal des événements et activités" },
 ];

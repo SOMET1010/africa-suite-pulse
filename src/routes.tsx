@@ -9,6 +9,7 @@ import { SettingsHome, HotelSettingsForm } from "@/features/settings";
 import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
+import BillingPage from "@/features/billing/BillingPage";
 import UsersPage from "@/features/users/UsersPage";
 import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
@@ -41,6 +42,7 @@ export function AppRoutes() {
         <Route path="settings/rooms-catalog" element={<RoomsPage />} />
         <Route path="settings/services" element={<ServicesPage />} />
         <Route path="settings/payments" element={<PaymentsPage />} />
+        <Route path="billing" element={<BillingPage />} />
         <Route path="settings/users" element={<UsersPage />} />
         <Route path="settings/system" element={<SystemSettingsPage />} />
         <Route path="settings/templates" element={<TemplatesPage />} />
