@@ -97,6 +97,7 @@ export default {
 				// Luxury brand colors
 				'brand-accent': 'hsl(var(--brand-accent))',
 				'brand-copper': 'hsl(var(--brand-copper))',
+				'primary-glow': 'hsl(var(--brand-primary-glow))',
 				'pearl': 'hsl(var(--pearl))',
 				'charcoal': 'hsl(var(--charcoal))',
 				'platinum': 'hsl(var(--platinum))',

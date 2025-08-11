@@ -9,6 +9,7 @@
     /* Luxury Hotel Brand Palette */
     --brand-primary: 226 64% 33%;            /* Deep hotel blue */
     --brand-primary-hover: 226 64% 29%;      /* Darker blue hover */
+    --brand-primary-glow: 226 64% 45%;       /* Lighter blue for gradients */
     --brand-accent: 45 100% 42%;             /* Champagne gold #D4AF37 */
     --brand-accent-hover: 45 100% 35%;       /* Darker gold hover */
     --brand-copper: 25 45% 47%;              /* Copper accents #B87333 */
