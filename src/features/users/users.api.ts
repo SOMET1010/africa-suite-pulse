@@ -36,3 +36,10 @@ export const hasPermission = async (key: string) => {
   if (error) throw error;
   return !!data;
 };
+
+export const createInvitation = (payload: {org_id: string; email: string; role: string;}) =>
+  (supabase as any).from("staff_invitations").insert({
+    ...payload,
+    token: crypto.randomUUID(),
+    status: "pending"
+  }).select();
