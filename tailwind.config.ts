@@ -62,10 +62,22 @@ export default {
 				},
 				
 				// Statuts métier unifiés - Enhanced vibrancy
-				success: 'hsl(var(--success))',
-				warning: 'hsl(var(--warning))', 
-				info: 'hsl(var(--info))',
-				danger: 'hsl(var(--danger))',
+				success: {
+					DEFAULT: 'hsl(var(--success))',
+					foreground: 'hsl(var(--success-foreground))'
+				},
+				warning: {
+					DEFAULT: 'hsl(var(--warning))',
+					foreground: 'hsl(var(--warning-foreground))'
+				},
+				info: {
+					DEFAULT: 'hsl(var(--info))',
+					foreground: 'hsl(var(--info-foreground))'
+				},
+				danger: {
+					DEFAULT: 'hsl(var(--danger))',
+					foreground: 'hsl(var(--danger-foreground))'
+				},
 				
 				// Status sémantiques complets
 				'status-confirmed': 'hsl(var(--status-confirmed))',

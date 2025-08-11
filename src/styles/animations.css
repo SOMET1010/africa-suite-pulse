@@ -81,7 +81,7 @@
   }
 
   .room-dot-maintenance {
-    @apply bg-purple-500;
+    background-color: hsl(var(--status-maintenance));
   }
 
   .room-dot-out_of_order {
