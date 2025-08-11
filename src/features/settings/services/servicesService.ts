@@ -1,87 +1,22 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { 
+  ServiceFamily, 
+  Service, 
+  Arrangement, 
+  ArrangementService, 
+  ServiceStats,
+  ServiceFamilyInsert,
+  ServiceInsert,
+  ArrangementInsert
+} from '@/types/database';
 
-// Types
-export interface ServiceFamily {
-  id?: string;
-  org_id: string;
-  code: string;
-  label: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-  order_index: number;
-  is_active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface Service {
-  id?: string;
-  org_id: string;
-  family_id: string;
-  family?: ServiceFamily;
-  code: string;
-  label: string;
-  description?: string;
-  price: number;
-  vat_rate: number;
-  unit?: string;
-  is_active: boolean;
-  is_free_price: boolean;
-  cost_price?: number;
-  profit_margin?: number;
-  min_quantity?: number;
-  max_quantity?: number;
-  tags?: string[];
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface Arrangement {
-  id?: string;
-  org_id: string;
-  code: string;
-  label: string;
-  description?: string;
-  services: ArrangementService[];
-  base_price?: number;
-  is_active: boolean;
-  valid_from?: string;
-  valid_until?: string;
-  min_nights?: number;
-  max_nights?: number;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ArrangementService {
-  id?: string;
-  service_id: string;
-  service?: Service;
-  quantity: number;
-  unit_price?: number;
-  is_included: boolean;
-  is_optional: boolean;
-  order_index: number;
-}
-
+// Service-specific types
 export interface ServiceFilters {
   search?: string;
   family_id?: string | 'all';
   is_active?: boolean | 'all';
   price_range?: [number, number];
   has_free_price?: boolean | 'all';
-}
-
-export interface ServiceStats {
-  totalFamilies: number;
-  totalServices: number;
-  totalArrangements: number;
-  activeServices: number;
-  averagePrice: number;
-  byFamily: Record<string, number>;
-  totalRevenuePotential: number;
-  profitMargin: number;
 }
 
 export class ServicesService {
@@ -413,9 +348,14 @@ export class ServicesService {
 
     return {
       totalFamilies: families.filter(f => f.is_active).length,
+      activeFamilies: families.filter(f => f.is_active).length,
       totalServices: services.length,
-      totalArrangements: arrangements.filter(a => a.is_active).length,
       activeServices: activeServices.length,
+      totalArrangements: arrangements.filter(a => a.is_active).length,
+      activeArrangements: arrangements.filter(a => a.is_active).length,
+      averageServicePrice: averagePrice,
+      totalServiceValue: totalRevenuePotential,
+      // Legacy properties for compatibility
       averagePrice,
       byFamily,
       totalRevenuePotential,

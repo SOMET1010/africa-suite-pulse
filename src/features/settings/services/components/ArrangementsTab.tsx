@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Download, Edit3, Trash2, Star, Save, X, DollarSign } from 'lucide-react';
-import { Arrangement, Service, ServicesService } from '../servicesService';
+import { ServicesService } from '../servicesService';
+import type { Arrangement, Service } from '@/types/database';
 import { useServices } from '../useServices';
 import { useOrgId } from '@/core/auth/useOrg';
 import { Button } from '@/components/ui/button';

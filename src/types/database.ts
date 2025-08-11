@@ -118,6 +118,177 @@ export type InvitationPayload = {
   role: 'admin' | 'staff' | 'manager';
 };
 
+// Service management types
+export type ServiceFamily = {
+  id: string;
+  org_id: string;
+  code: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  order_index: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ServiceFamilyInsert = {
+  org_id: string;
+  code: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  order_index?: number;
+  is_active?: boolean;
+};
+
+export type ServiceFamilyUpdate = {
+  code?: string;
+  label?: string;
+  description?: string;
+  icon?: string;
+  color?: string;
+  order_index?: number;
+  is_active?: boolean;
+};
+
+export type Service = {
+  id: string;
+  org_id: string;
+  family_id: string;
+  code: string;
+  label: string;
+  description?: string;
+  price: number;
+  cost_price?: number;
+  profit_margin?: number;
+  vat_rate: number;
+  unit?: string;
+  min_quantity?: number;
+  max_quantity?: number;
+  tags?: string[];
+  is_active: boolean;
+  is_free_price: boolean;
+  created_at: string;
+  updated_at: string;
+  family?: {
+    id: string;
+    code: string;
+    label: string;
+    color?: string;
+    icon?: string;
+  };
+};
+
+export type ServiceInsert = {
+  org_id: string;
+  family_id: string;
+  code: string;
+  label: string;
+  description?: string;
+  price?: number;
+  cost_price?: number;
+  profit_margin?: number;
+  vat_rate?: number;
+  unit?: string;
+  min_quantity?: number;
+  max_quantity?: number;
+  tags?: string[];
+  is_active?: boolean;
+  is_free_price?: boolean;
+};
+
+export type ServiceUpdate = {
+  family_id?: string;
+  code?: string;
+  label?: string;
+  description?: string;
+  price?: number;
+  cost_price?: number;
+  profit_margin?: number;
+  vat_rate?: number;
+  unit?: string;
+  min_quantity?: number;
+  max_quantity?: number;
+  tags?: string[];
+  is_active?: boolean;
+  is_free_price?: boolean;
+};
+
+export type ArrangementService = {
+  id?: string;
+  arrangement_id?: string;
+  service_id: string;
+  quantity: number;
+  unit_price?: number;
+  is_included: boolean;
+  is_optional: boolean;
+  order_index: number;
+  created_at?: string;
+  // For joined data
+  service?: Service;
+};
+
+export type Arrangement = {
+  id: string;
+  org_id: string;
+  code: string;
+  label: string;
+  description?: string;
+  base_price?: number;
+  min_nights?: number;
+  max_nights?: number;
+  valid_from?: string;
+  valid_until?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  services: ArrangementService[];
+};
+
+export type ArrangementInsert = {
+  org_id: string;
+  code: string;
+  label: string;
+  description?: string;
+  base_price?: number;
+  min_nights?: number;
+  max_nights?: number;
+  valid_from?: string;
+  valid_until?: string;
+  is_active?: boolean;
+};
+
+export type ArrangementUpdate = {
+  code?: string;
+  label?: string;
+  description?: string;
+  base_price?: number;
+  min_nights?: number;
+  max_nights?: number;
+  valid_from?: string;
+  valid_until?: string;
+  is_active?: boolean;
+};
+
+export type ServiceStats = {
+  totalFamilies: number;
+  activeFamilies: number;
+  totalServices: number;
+  activeServices: number;
+  totalArrangements: number;
+  activeArrangements: number;
+  averageServicePrice: number;
+  totalServiceValue: number;
+  // Legacy properties for compatibility
+  averagePrice: number;
+  byFamily: Record<string, number>;
+  totalRevenuePotential: number;
+  profitMargin: number;
+};
+
 // RPC function response types
 export type HasPermissionResponse = boolean;
 

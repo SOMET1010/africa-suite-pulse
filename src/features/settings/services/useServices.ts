@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ServicesService, ServiceFamily, Service, Arrangement, ServiceStats } from './servicesService';
+import { ServicesService } from './servicesService';
+import type { ServiceFamily, Service, Arrangement, ServiceStats } from '@/types/database';
 import { useToast } from '@/hooks/use-toast';
 
 export function useServices(orgId: string) {
