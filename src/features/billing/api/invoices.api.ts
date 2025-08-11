@@ -4,6 +4,16 @@ export interface CreateInvoiceInput {
   org_id: string;
   guest_name: string;
   guest_email?: string;
+  guest_phone?: string;
+  guest_address?: string;
+  reservation_id?: string;
+  room_number?: string;
+  room_type?: string;
+  check_in_date?: string;
+  check_out_date?: string;
+  nights_count?: number;
+  adults_count?: number;
+  children_count?: number;
   reference?: string;
   due_date?: string;
   notes?: string;
@@ -26,6 +36,16 @@ export interface InvoiceWithItems {
   total_amount: number;
   guest_name?: string;
   guest_email?: string;
+  guest_phone?: string;
+  guest_address?: string;
+  reservation_id?: string;
+  room_number?: string;
+  room_type?: string;
+  check_in_date?: string;
+  check_out_date?: string;
+  nights_count?: number;
+  adults_count?: number;
+  children_count?: number;
   reference?: string;
   notes?: string;
   items: Array<{
@@ -59,6 +79,16 @@ export async function createInvoice(input: CreateInvoiceInput) {
       number: invoiceNumber,
       guest_name: input.guest_name,
       guest_email: input.guest_email || null,
+      guest_phone: input.guest_phone || null,
+      guest_address: input.guest_address || null,
+      reservation_id: input.reservation_id || null,
+      room_number: input.room_number || null,
+      room_type: input.room_type || null,
+      check_in_date: input.check_in_date || null,
+      check_out_date: input.check_out_date || null,
+      nights_count: input.nights_count || null,
+      adults_count: input.adults_count || null,
+      children_count: input.children_count || null,
       reference: input.reference || null,
       due_date: input.due_date || null,
       notes: input.notes || null,

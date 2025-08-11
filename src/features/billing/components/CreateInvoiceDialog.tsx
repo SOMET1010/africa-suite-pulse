@@ -28,8 +28,21 @@ interface CreateInvoiceDialogProps {
 
 export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogProps) {
   const { orgId } = useOrgId();
-  const [guestName, setGuestName] = useState("");
-  const [guestEmail, setGuestEmail] = useState("");
+  const [guestInfo, setGuestInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: ""
+  });
+  const [stayInfo, setStayInfo] = useState({
+    reservationId: "",
+    roomNumber: "",
+    roomType: "",
+    checkInDate: "",
+    checkOutDate: "",
+    adultsCount: 1,
+    childrenCount: 0
+  });
   const [reference, setReference] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [notes, setNotes] = useState("");
@@ -75,8 +88,18 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
     return calculateSubtotal() + calculateTax();
   };
 
+  const calculateNights = () => {
+    if (stayInfo.checkInDate && stayInfo.checkOutDate) {
+      const checkIn = new Date(stayInfo.checkInDate);
+      const checkOut = new Date(stayInfo.checkOutDate);
+      const diffTime = checkOut.getTime() - checkIn.getTime();
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+    return 0;
+  };
+
   const handleCreate = async () => {
-    if (!guestName.trim() || items.some(item => !item.description.trim())) {
+    if (!guestInfo.name.trim() || items.some(item => !item.description.trim())) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -96,8 +119,18 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
         .insert({
           org_id: orgId,
           number: invoiceNumber,
-          guest_name: guestName,
-          guest_email: guestEmail || null,
+          guest_name: guestInfo.name,
+          guest_email: guestInfo.email || null,
+          guest_phone: guestInfo.phone || null,
+          guest_address: guestInfo.address || null,
+          reservation_id: stayInfo.reservationId || null,
+          room_number: stayInfo.roomNumber || null,
+          room_type: stayInfo.roomType || null,
+          check_in_date: stayInfo.checkInDate || null,
+          check_out_date: stayInfo.checkOutDate || null,
+          nights_count: calculateNights(),
+          adults_count: stayInfo.adultsCount,
+          children_count: stayInfo.childrenCount,
           reference: reference || null,
           due_date: dueDate || null,
           notes: notes || null,
@@ -133,8 +166,16 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
       });
 
       // Reset form
-      setGuestName("");
-      setGuestEmail("");
+      setGuestInfo({ name: "", email: "", phone: "", address: "" });
+      setStayInfo({
+        reservationId: "",
+        roomNumber: "",
+        roomType: "",
+        checkInDate: "",
+        checkOutDate: "",
+        adultsCount: 1,
+        childrenCount: 0
+      });
       setReference("");
       setDueDate("");
       setNotes("");
@@ -171,8 +212,8 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
                   <Label htmlFor="guestName">Nom du client *</Label>
                   <Input
                     id="guestName"
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
+                    value={guestInfo.name}
+                    onChange={(e) => setGuestInfo(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="Nom complet du client"
                   />
                 </div>
@@ -181,29 +222,138 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
                   <Input
                     id="guestEmail"
                     type="email"
-                    value={guestEmail}
-                    onChange={(e) => setGuestEmail(e.target.value)}
+                    value={guestInfo.email}
+                    onChange={(e) => setGuestInfo(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="email@exemple.com"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="reference">Référence</Label>
+                  <Label htmlFor="guestPhone">Téléphone</Label>
+                  <Input
+                    id="guestPhone"
+                    value={guestInfo.phone}
+                    onChange={(e) => setGuestInfo(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="+225 XX XX XX XX"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="guestAddress">Adresse</Label>
+                  <Input
+                    id="guestAddress"
+                    value={guestInfo.address}
+                    onChange={(e) => setGuestInfo(prev => ({ ...prev, address: e.target.value }))}
+                    placeholder="Adresse complète"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Stay Information */}
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="text-lg font-luxury">Informations du séjour</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="roomNumber">Numéro de chambre</Label>
+                  <Input
+                    id="roomNumber"
+                    value={stayInfo.roomNumber}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, roomNumber: e.target.value }))}
+                    placeholder="101"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="roomType">Type de chambre</Label>
+                  <Input
+                    id="roomType"
+                    value={stayInfo.roomType}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, roomType: e.target.value }))}
+                    placeholder="Standard"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="checkInDate">Date d'arrivée</Label>
+                  <Input
+                    id="checkInDate"
+                    type="date"
+                    value={stayInfo.checkInDate}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, checkInDate: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="checkOutDate">Date de départ</Label>
+                  <Input
+                    id="checkOutDate"
+                    type="date"
+                    value={stayInfo.checkOutDate}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, checkOutDate: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="adultsCount">Adultes</Label>
+                  <Input
+                    id="adultsCount"
+                    type="number"
+                    min="1"
+                    value={stayInfo.adultsCount}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, adultsCount: parseInt(e.target.value) || 1 }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="childrenCount">Enfants</Label>
+                  <Input
+                    id="childrenCount"
+                    type="number"
+                    min="0"
+                    value={stayInfo.childrenCount}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, childrenCount: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="nights">Nuits calculées</Label>
+                  <Input
+                    id="nights"
+                    value={calculateNights()}
+                    disabled
+                    className="bg-charcoal/5"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="reservationId">Référence réservation</Label>
+                  <Input
+                    id="reservationId"
+                    value={stayInfo.reservationId}
+                    onChange={(e) => setStayInfo(prev => ({ ...prev, reservationId: e.target.value }))}
+                    placeholder="RES-2024-001"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="reference">Référence facture</Label>
                   <Input
                     id="reference"
                     value={reference}
                     onChange={(e) => setReference(e.target.value)}
-                    placeholder="Numéro de réservation, etc."
+                    placeholder="REF-001"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="dueDate">Date d'échéance</Label>
-                  <Input
-                    id="dueDate"
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                  />
-                </div>
+              </div>
+              <div>
+                <Label htmlFor="dueDate">Date d'échéance</Label>
+                <Input
+                  id="dueDate"
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                />
               </div>
             </CardContent>
           </Card>

@@ -29,6 +29,16 @@ interface InvoiceData {
   total_amount: number;
   guest_name?: string;
   guest_email?: string;
+  guest_phone?: string;
+  guest_address?: string;
+  reservation_id?: string;
+  room_number?: string;
+  room_type?: string;
+  check_in_date?: string;
+  check_out_date?: string;
+  nights_count?: number;
+  adults_count?: number;
+  children_count?: number;
   reference?: string;
   notes?: string;
   items: InvoiceItem[];
@@ -160,39 +170,125 @@ export function InvoiceDetails({ invoiceId }: InvoiceDetailsProps) {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Client Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <h3 className="font-luxury font-semibold text-charcoal">Informations client</h3>
-              {invoice.guest_name && (
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-charcoal/50" />
-                  <span className="font-premium">{invoice.guest_name}</span>
+          {/* Information Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Client Information */}
+            <Card className="glass-card">
+              <CardContent className="p-4">
+                <h3 className="font-luxury font-semibold text-charcoal mb-3">Client</h3>
+                <div className="space-y-2">
+                  {invoice.guest_name && (
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-charcoal/50" />
+                      <span className="font-premium text-sm">{invoice.guest_name}</span>
+                    </div>
+                  )}
+                  {invoice.guest_email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-charcoal/50" />
+                      <span className="font-premium text-sm">{invoice.guest_email}</span>
+                    </div>
+                  )}
+                  {invoice.guest_phone && (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 text-charcoal/50">📞</span>
+                      <span className="font-premium text-sm">{invoice.guest_phone}</span>
+                    </div>
+                  )}
+                  {invoice.guest_address && (
+                    <div className="flex items-start gap-2">
+                      <span className="h-4 w-4 text-charcoal/50 mt-0.5">📍</span>
+                      <span className="font-premium text-sm">{invoice.guest_address}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              {invoice.guest_email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-charcoal/50" />
-                  <span className="font-premium">{invoice.guest_email}</span>
+              </CardContent>
+            </Card>
+
+            {/* Stay Information */}
+            <Card className="glass-card">
+              <CardContent className="p-4">
+                <h3 className="font-luxury font-semibold text-charcoal mb-3">Séjour</h3>
+                <div className="space-y-2">
+                  {invoice.room_number && (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 text-charcoal/50">🏠</span>
+                      <span className="font-premium text-sm">
+                        Ch. {invoice.room_number} {invoice.room_type && `(${invoice.room_type})`}
+                      </span>
+                    </div>
+                  )}
+                  {invoice.check_in_date && (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 text-charcoal/50">📅</span>
+                      <span className="font-premium text-sm">
+                        Arrivée: {new Date(invoice.check_in_date).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  )}
+                  {invoice.check_out_date && (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 text-charcoal/50">📅</span>
+                      <span className="font-premium text-sm">
+                        Départ: {new Date(invoice.check_out_date).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  )}
+                  {invoice.nights_count && (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 text-charcoal/50">🌙</span>
+                      <span className="font-premium text-sm">
+                        {invoice.nights_count} nuit{invoice.nights_count > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {(invoice.adults_count || invoice.children_count) && (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 text-charcoal/50">👥</span>
+                      <span className="font-premium text-sm">
+                        {invoice.adults_count} adulte{invoice.adults_count > 1 ? 's' : ''}
+                        {invoice.children_count > 0 && `, ${invoice.children_count} enfant${invoice.children_count > 1 ? 's' : ''}`}
+                      </span>
+                    </div>
+                  )}
+                  {invoice.reservation_id && (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-charcoal/50" />
+                      <span className="font-premium text-sm">Rés: {invoice.reservation_id}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-              {invoice.reference && (
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-charcoal/50" />
-                  <span className="font-premium">Réf: {invoice.reference}</span>
-                </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
             
-            <div className="space-y-3">
-              <h3 className="font-luxury font-semibold text-charcoal">Échéances</h3>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-charcoal/50" />
-                <span className="font-premium">
-                  Échéance: {new Date(invoice.due_date).toLocaleDateString('fr-FR')}
-                </span>
-              </div>
-            </div>
+            {/* Invoice Information */}
+            <Card className="glass-card">
+              <CardContent className="p-4">
+                <h3 className="font-luxury font-semibold text-charcoal mb-3">Facture</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-charcoal/50" />
+                    <span className="font-premium text-sm">
+                      Émise: {new Date(invoice.issue_date).toLocaleDateString('fr-FR')}
+                    </span>
+                  </div>
+                  {invoice.due_date && (
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-charcoal/50" />
+                      <span className="font-premium text-sm">
+                        Échéance: {new Date(invoice.due_date).toLocaleDateString('fr-FR')}
+                      </span>
+                    </div>
+                  )}
+                  {invoice.reference && (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-charcoal/50" />
+                      <span className="font-premium text-sm">Réf: {invoice.reference}</span>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <Separator />
