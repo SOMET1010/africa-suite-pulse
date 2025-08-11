@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TButton } from "@/core/ui/TButton";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, Calendar, Users } from "lucide-react";
 import { useOrgId } from "@/core/auth/useOrg";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { useReservationsForBilling, useReservationById } from "../hooks/useReservations";
+import { format } from "date-fns";
 
 interface InvoiceItem {
   id: string;
@@ -28,6 +30,12 @@ interface CreateInvoiceDialogProps {
 
 export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogProps) {
   const { orgId } = useOrgId();
+  
+  // Hooks for reservations
+  const { data: reservations = [] } = useReservationsForBilling(orgId);
+  const [selectedReservationId, setSelectedReservationId] = useState<string>("");
+  const { data: selectedReservation } = useReservationById(selectedReservationId || null);
+  
   const [guestInfo, setGuestInfo] = useState({
     name: "",
     email: "",
@@ -50,6 +58,35 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
     { id: "1", description: "", quantity: 1, unit_price: 0, tax_rate: 18 }
   ]);
   const [isCreating, setIsCreating] = useState(false);
+
+  // Auto-fill from selected reservation
+  useEffect(() => {
+    if (selectedReservation) {
+      setGuestInfo(prev => ({ ...prev, name: selectedReservation.guest_name }));
+      setStayInfo(prev => ({
+        ...prev,
+        reservationId: selectedReservation.reference || "",
+        roomNumber: selectedReservation.room_number || "",
+        roomType: selectedReservation.room_type || "",
+        checkInDate: selectedReservation.date_arrival,
+        checkOutDate: selectedReservation.date_departure,
+        adultsCount: selectedReservation.adults,
+        childrenCount: selectedReservation.children
+      }));
+      
+      // Auto-add accommodation item if rate is available
+      if (selectedReservation.rate_total) {
+        const nights = Math.max(1, Math.ceil((new Date(selectedReservation.date_departure).getTime() - new Date(selectedReservation.date_arrival).getTime()) / (1000 * 60 * 60 * 24)));
+        setItems([{
+          id: "1",
+          description: `Hébergement ${nights} nuit${nights > 1 ? 's' : ''} - Chambre ${selectedReservation.room_number}`,
+          quantity: nights,
+          unit_price: selectedReservation.rate_total / nights,
+          tax_rate: 18
+        }]);
+      }
+    }
+  }, [selectedReservation]);
 
   const addItem = () => {
     setItems([...items, {
@@ -166,6 +203,7 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
       });
 
       // Reset form
+      setSelectedReservationId("");
       setGuestInfo({ name: "", email: "", phone: "", address: "" });
       setStayInfo({
         reservationId: "",
@@ -201,10 +239,41 @@ export function CreateInvoiceDialog({ open, onOpenChange }: CreateInvoiceDialogP
         </DialogHeader>
 
         <div className="space-y-6">
+          {/* Reservation Selection */}
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="text-lg font-luxury flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Réservation existante (optionnel)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <Label htmlFor="reservation">Choisir une réservation</Label>
+                <Select value={selectedReservationId} onValueChange={setSelectedReservationId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une réservation..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Nouvelle facture manuelle</SelectItem>
+                    {reservations.map((res) => (
+                      <SelectItem key={res.id} value={res.id}>
+                        {res.reference} - {res.guest_name} - Ch.{res.room_number} ({format(new Date(res.date_arrival), 'dd/MM/yyyy')})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Client Information */}
           <Card className="glass-card">
             <CardHeader>
-              <CardTitle className="text-lg font-luxury">Informations client</CardTitle>
+              <CardTitle className="text-lg font-luxury flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Informations client
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
