@@ -24,14 +24,16 @@ interface AppUser {
   active: boolean;
   profiles?: {
     id: string;
-    name: string;
+    code: string;
+    label: string;
     access_level: string;
   };
 }
 
 interface Profile {
   id: string;
-  name: string;
+  code: string;
+  label: string;
   access_level: string;
 }
 
@@ -79,7 +81,8 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
       // Map the data to match our Profile interface
       const mappedProfiles = (data || []).map((item: any) => ({
         id: item.id,
-        name: item.name || item.full_name || "Sans nom",
+        code: item.code || "",
+        label: item.label || "Sans nom",
         access_level: item.access_level || "C"
       }));
       setProfiles(mappedProfiles);
@@ -214,7 +217,7 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
                   
                    {user.profiles && (
                      <div className="flex items-center gap-2">
-                       <span className="text-sm font-medium">{user.profiles.name}</span>
+                       <span className="text-sm font-medium">{user.profiles.label}</span>
                        <span className={`text-xs px-2 py-1 rounded ${
                          getAccessLevelVariant(user.profiles.access_level) === 'default' ? 'bg-primary text-primary-foreground' :
                          getAccessLevelVariant(user.profiles.access_level) === 'secondary' ? 'bg-secondary text-secondary-foreground' :
@@ -300,7 +303,7 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
                   <SelectContent>
                      {profiles.map((profile) => (
                        <SelectItem key={profile.id} value={profile.id}>
-                         {profile.name} ({getAccessLevelLabel(profile.access_level)})
+                         {profile.label} ({getAccessLevelLabel(profile.access_level)})
                        </SelectItem>
                      ))}
                   </SelectContent>

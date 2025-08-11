@@ -13,18 +13,15 @@ import { Pencil, Trash2, Plus } from "lucide-react";
 
 interface Profile {
   id: string;
-  name: string;
-  description?: string;
+  code: string;
+  label: string;
   access_level: string;
-  is_active: boolean;
 }
 
 interface Permission {
-  id: string;
-  code: string;
+  key: string;
   label: string;
   category: string;
-  description?: string;
 }
 
 interface ProfilesTabProps {
@@ -37,8 +34,8 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
+    code: "",
+    label: "",
     access_level: "C"
   });
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
@@ -57,10 +54,9 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
       // Map the data to match our Profile interface
       const mappedProfiles = (data || []).map((item: any) => ({
         id: item.id,
-        name: item.name || item.full_name || "Sans nom",
-        description: item.description || "",
-        access_level: item.access_level || "C",
-        is_active: item.is_active !== false
+        code: item.code || "",
+        label: item.label || "Sans nom",
+        access_level: item.access_level || "C"
       }));
       setProfiles(mappedProfiles);
     } catch (error: any) {
@@ -74,15 +70,21 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
     try {
       const { data, error } = await listPermissions();
       if (error) throw error;
-      setPermissions(data || []);
+      // Map the data to match our Permission interface
+      const mappedPermissions = (data || []).map((item: any) => ({
+        key: item.key,
+        label: item.label,
+        category: item.category
+      }));
+      setPermissions(mappedPermissions);
     } catch (error: any) {
       toast.error("Erreur lors du chargement des permissions");
     }
   };
 
   const handleSubmit = async () => {
-    if (!formData.name) {
-      toast.error("Nom requis");
+    if (!formData.code || !formData.label) {
+      toast.error("Code et libellé requis");
       return;
     }
 
@@ -90,10 +92,9 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
       const profileData = {
         id: editingProfile?.id,
         org_id: orgId,
-        name: formData.name,
-        description: formData.description,
-        access_level: formData.access_level,
-        is_active: true
+        code: formData.code,
+        label: formData.label,
+        access_level: formData.access_level
       };
 
       const { data, error } = await upsertProfile(profileData);
@@ -103,9 +104,10 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
 
       // Update permissions
       await upsertProfilePermissions(
-        selectedPermissions.map(permissionId => ({
+        selectedPermissions.map(permissionKey => ({
           profile_id: profileId,
-          permission_id: permissionId
+          permission_key: permissionKey,
+          allowed: true
         }))
       );
       
@@ -120,8 +122,8 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const handleEdit = (profile: Profile) => {
     setEditingProfile(profile);
     setFormData({
-      name: profile.name,
-      description: profile.description || "",
+      code: profile.code,
+      label: profile.label,
       access_level: profile.access_level
     });
     setSelectedPermissions([]);
@@ -129,7 +131,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   };
 
   const handleDelete = async (profile: Profile) => {
-    if (!confirm(`Supprimer le profil "${profile.name}" ?`)) return;
+    if (!confirm(`Supprimer le profil "${profile.label}" ?`)) return;
     
     try {
       const { error } = await deleteProfile(profile.id);
@@ -145,7 +147,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const resetForm = () => {
     setEditingProfile(null);
     setShowForm(false);
-    setFormData({ name: "", description: "", access_level: "C" });
+    setFormData({ code: "", label: "", access_level: "C" });
     setSelectedPermissions([]);
   };
 
@@ -193,35 +195,35 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Nom du profil</label>
+                <label className="text-sm font-medium">Code du profil</label>
                 <Input
-                  value={formData.name}
-                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Ex: Réception de jour"
+                  value={formData.code}
+                  onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                  placeholder="Ex: RECEPTION"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Niveau d'accès</label>
-                <Select value={formData.access_level} onValueChange={level => setFormData(prev => ({ ...prev, access_level: level }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="T">T - Tous les accès</SelectItem>
-                    <SelectItem value="H">H - Hors facturation</SelectItem>
-                    <SelectItem value="C">C - Consultation uniquement</SelectItem>
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium">Libellé du profil</label>
+                <Input
+                  value={formData.label}
+                  onChange={e => setFormData(prev => ({ ...prev, label: e.target.value }))}
+                  placeholder="Ex: Réception de jour"
+                />
               </div>
             </div>
             
             <div>
-              <label className="text-sm font-medium">Description</label>
-              <Textarea
-                value={formData.description}
-                onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Description du profil..."
-              />
+              <label className="text-sm font-medium">Niveau d'accès</label>
+              <Select value={formData.access_level} onValueChange={level => setFormData(prev => ({ ...prev, access_level: level }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="T">T - Tous les accès</SelectItem>
+                  <SelectItem value="H">H - Hors facturation</SelectItem>
+                  <SelectItem value="C">C - Consultation uniquement</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
@@ -232,19 +234,19 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
                     <h4 className="font-medium text-sm text-muted-foreground uppercase">{category}</h4>
                     <div className="grid grid-cols-2 gap-2">
                       {categoryPermissions.map(permission => (
-                        <div key={permission.id} className="flex items-center space-x-2">
+                        <div key={permission.key} className="flex items-center space-x-2">
                           <Checkbox
-                            id={permission.id}
-                            checked={selectedPermissions.includes(permission.id)}
+                            id={permission.key}
+                            checked={selectedPermissions.includes(permission.key)}
                             onCheckedChange={(checked) => {
                               if (checked) {
-                                setSelectedPermissions(prev => [...prev, permission.id]);
+                                setSelectedPermissions(prev => [...prev, permission.key]);
                               } else {
-                                setSelectedPermissions(prev => prev.filter(id => id !== permission.id));
+                                setSelectedPermissions(prev => prev.filter(key => key !== permission.key));
                               }
                             }}
                           />
-                          <label htmlFor={permission.id} className="text-sm">{permission.label}</label>
+                          <label htmlFor={permission.key} className="text-sm">{permission.label}</label>
                         </div>
                       ))}
                     </div>
@@ -272,17 +274,13 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold">{profile.name}</h4>
+                    <h4 className="font-semibold">{profile.label}</h4>
                     <Badge variant={getAccessLevelVariant(profile.access_level)}>
                       {getAccessLevelLabel(profile.access_level)}
                     </Badge>
-                    {!profile.is_active && <Badge variant="destructive">Inactif</Badge>}
                   </div>
-                  {profile.description && (
-                    <p className="text-sm text-muted-foreground">{profile.description}</p>
-                  )}
                   <div className="text-xs text-muted-foreground">
-                    Profil configuré
+                    Code: {profile.code}
                   </div>
                 </div>
                 <div className="flex gap-2">

@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const listProfiles = (orgId: string) =>
-  supabase.from("profiles").select("*").eq("org_id", orgId).order("name");
+  supabase.from("profiles").select("*").eq("org_id", orgId).order("label");
 
 export const upsertProfile = (payload: any) =>
   supabase.from("profiles").upsert(payload).select();
@@ -21,7 +21,7 @@ export const upsertProfilePermissions = (rows: any[]) =>
 export const listAppUsers = (orgId: string) =>
   (supabase as any).from("app_users").select(`
     id, user_id, org_id, login, full_name, profile_id, password_expires_on, active,
-    profiles:profile_id (id, name, access_level)
+    profiles:profile_id (id, code, label, access_level)
   `).eq("org_id", orgId).order("full_name");
 
 export const upsertAppUser = (payload: any) =>
@@ -38,7 +38,7 @@ export const hasPermission = async (key: string) => {
 };
 
 export const createInvitation = (payload: {org_id: string; email: string; role: string;}) =>
-  (supabase as any).from("staff_invitations").insert({
+  supabase.from("staff_invitations").insert({
     ...payload,
     token: crypto.randomUUID(),
     status: "pending"
