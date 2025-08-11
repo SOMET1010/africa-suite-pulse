@@ -102,6 +102,9 @@ export type Reservation = {
   children: number | null;
   rate_total: number | null;
   reference: string | null;
+  // Champs système (optionnels selon contexte)
+  created_at?: string;
+  updated_at?: string;
 };
 
 // === TYPES API ===

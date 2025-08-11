@@ -22,6 +22,7 @@ export function ProfessionalHeader({
   const navigationItems = [
     { to: "/", label: "Tableau de bord", icon: Crown },
     { to: "/arrivals", label: "Arrivées", icon: Calendar },
+    { to: "/reservations", label: "Réservations", icon: Calendar },
     { to: "/reservations/rack", label: "Rack", icon: User },
     { to: "/settings", label: "Paramètres", icon: Settings },
   ];
