@@ -61,11 +61,11 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				
-				// Statuts métier unifiés
-				success: 'hsl(var(--brand-success))',
-				warning: 'hsl(var(--status-option))', 
-				info: 'hsl(var(--status-present))',
-				danger: 'hsl(var(--brand-danger))',
+				// Statuts métier unifiés - Enhanced vibrancy
+				success: 'hsl(var(--success))',
+				warning: 'hsl(var(--warning))', 
+				info: 'hsl(var(--info))',
+				danger: 'hsl(var(--danger))',
 				
 				// Status sémantiques
 				'status-confirmed': 'hsl(var(--status-confirmed))',

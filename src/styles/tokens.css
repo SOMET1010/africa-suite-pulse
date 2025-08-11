@@ -47,11 +47,17 @@
 
     --radius: 0.875rem; /* rounded-xl default */
 
-    /* Status colors (semantic) */
-    --status-confirmed: 142 72% 38%;     /* success */
-    --status-present: 199 98% 39%;       /* info */
-    --status-option: 42 94% 50%;         /* accent */
-    --status-cancelled: 0 72% 52%;       /* danger */
+    /* Status colors (semantic) - Enhanced vibrancy */
+    --status-confirmed: 142 76% 36%;     /* vibrant green */
+    --status-present: 199 100% 43%;      /* vibrant blue */
+    --status-option: 38 92% 50%;         /* vibrant orange */
+    --status-cancelled: 0 84% 60%;       /* vibrant red */
+    
+    /* Success, Info, Warning, Danger mappings */
+    --success: var(--status-confirmed);
+    --info: var(--status-present);
+    --warning: var(--status-option);
+    --danger: var(--status-cancelled);
 
     /* Pastel soft-surfaces computed via color-mix (oklab) against background */
     /* We use CSS color() with oklab via color-mix, but Tailwind consumes hsl() in theme.
@@ -122,6 +128,19 @@
   .shadow-elevate { box-shadow: var(--shadow-elevate); }
   .transition-smooth { transition: var(--transition-smooth); }
   .tap-target { min-height: var(--tap-target); }
+  
+  /* Vibrant background utilities */
+  .bg-success { background-color: hsl(var(--success)); }
+  .bg-info { background-color: hsl(var(--info)); }
+  .bg-warning { background-color: hsl(var(--warning)); }
+  .bg-danger { background-color: hsl(var(--danger)); }
+  
+  /* Room status dots - vibrant colors */
+  .room-dot-clean { background-color: hsl(142 76% 36%); }
+  .room-dot-inspected { background-color: hsl(199 100% 43%); }
+  .room-dot-dirty { background-color: hsl(38 92% 50%); }
+  .room-dot-maintenance { background-color: hsl(271 81% 56%); }
+  .room-dot-out_of_order { background-color: hsl(0 84% 60%); }
 
   /* Hover helpers for brand exact hover shades */
   .bg-primary-hover { background-color: hsl(var(--brand-primary-hover)); }

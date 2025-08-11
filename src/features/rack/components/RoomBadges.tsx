@@ -8,11 +8,11 @@ interface RoomBadgesProps {
 
 export function RoomStatusBadge({ status }: RoomBadgesProps) {
   const variants = {
-    clean: "bg-emerald-500/20 text-emerald-700 border-emerald-500/30",
-    inspected: "bg-blue-500/20 text-blue-700 border-blue-500/30", 
-    dirty: "bg-amber-500/20 text-amber-700 border-amber-500/30",
-    maintenance: "bg-purple-500/20 text-purple-700 border-purple-500/30",
-    out_of_order: "bg-destructive/20 text-destructive border-destructive/30"
+    clean: "bg-green-500/25 text-green-800 border-green-500/50",
+    inspected: "bg-blue-500/25 text-blue-800 border-blue-500/50", 
+    dirty: "bg-orange-500/25 text-orange-800 border-orange-500/50",
+    maintenance: "bg-purple-500/25 text-purple-800 border-purple-500/50",
+    out_of_order: "bg-red-500/25 text-red-800 border-red-500/50"
   };
   
   const labels = {
@@ -36,11 +36,11 @@ interface ReservationBadgesProps {
 
 export function ReservationStatusBadge({ status }: ReservationBadgesProps) {
   const variants = {
-    confirmed: "bg-primary/20 text-primary border-primary/30",
-    present: "bg-emerald-500/20 text-emerald-700 border-emerald-500/30",
-    option: "bg-amber-500/20 text-amber-700 border-amber-500/30",
-    cancelled: "bg-destructive/20 text-destructive border-destructive/30",
-    noshow: "bg-destructive/20 text-destructive border-destructive/30"
+    confirmed: "bg-blue-600/25 text-blue-800 border-blue-600/50",
+    present: "bg-green-500/25 text-green-800 border-green-500/50",
+    option: "bg-orange-500/25 text-orange-800 border-orange-500/50",
+    cancelled: "bg-red-500/25 text-red-800 border-red-500/50",
+    noshow: "bg-red-500/25 text-red-800 border-red-500/50"
   };
   
   const labels = {

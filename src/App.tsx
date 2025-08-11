@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AppRoutes } from "./routes";
 import { queryClient } from "@/lib/queryClient";
 import { setupRealtimeListeners, cleanupRealtimeListeners } from "@/lib/realtime";
+import { ColorTest } from "@/components/ColorTest";
 
 const App = () => {
   // Configuration du temps réel pour synchronisation automatique
@@ -28,6 +29,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AppRoutes />
+          <ColorTest />
         </BrowserRouter>
         <ReactQueryDevtools initialIsOpen={false} />
       </TooltipProvider>

@@ -24,9 +24,9 @@ export function RoomTypeIndicator({ typeCode, typeName, compact = false }: RoomT
     
     const hue = Math.abs(hash) % 360;
     return {
-      bg: `hsl(${hue} 45% 95%)`,
-      border: `hsl(${hue} 45% 70%)`,
-      text: `hsl(${hue} 45% 30%)`
+      bg: `hsl(${hue} 65% 92%)`,
+      border: `hsl(${hue} 65% 60%)`,
+      text: `hsl(${hue} 65% 25%)`
     };
   };
 
