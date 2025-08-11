@@ -1,6 +1,11 @@
 export { default as ReservationsPage } from "./ReservationsPage";
+export { default as QuickReservationPage } from "./QuickReservationPage";
+export { default as AdvancedReservationPage } from "./AdvancedReservationPage";
+export { default as GroupsManagementPage } from "./GroupsManagementPage";
+export { default as AllotmentsPage } from "./AllotmentsPage";
 export { ReservationCard } from "./components/ReservationCard";
 export { CreateReservationDialog } from "./components/CreateReservationDialog";
 export { EditReservationDialog } from "./components/EditReservationDialog";
+export { DuplicateReservationDialog } from "./components/DuplicateReservationDialog";
 export { ReservationDetailsSheet } from "./components/ReservationDetailsSheet";
 export { ReservationFiltersSheet } from "./components/ReservationFiltersSheet";

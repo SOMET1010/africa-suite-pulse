@@ -37,6 +37,7 @@ interface DuplicateReservationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   reservation: any;
+  onSuccess?: () => void;
 }
 
 interface ReservationAction {
@@ -50,7 +51,8 @@ interface ReservationAction {
 export function DuplicateReservationDialog({ 
   open, 
   onOpenChange, 
-  reservation 
+  reservation,
+  onSuccess
 }: DuplicateReservationDialogProps) {
   const { orgId } = useOrgId();
   const { toast } = useToast();
@@ -121,6 +123,7 @@ export function DuplicateReservationDialog({
       });
       
       queryClient.invalidateQueries({ queryKey: ["reservations-management", orgId] });
+      onSuccess?.();
       onOpenChange(false);
     },
     onError: (error) => {

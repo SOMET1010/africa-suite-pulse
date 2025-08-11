@@ -43,3 +43,15 @@ verify_jwt = true
 
 [functions.generate-insights]
 verify_jwt = true
+
+[functions.send-reservation-email]
+verify_jwt = true
+
+[functions.generate-reservation-pdf]
+verify_jwt = true
+
+[functions.duplicate-reservation]
+verify_jwt = true
+
+[functions.calculate-tariff]
+verify_jwt = true

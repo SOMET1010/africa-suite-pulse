@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, Filter, Calendar, Users, Crown, Building2, MapPin } from "lucide-react";
+import { Plus, Search, Filter, Calendar, Users, Crown, Building2, MapPin, Copy, Eye, Pencil, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useOrgId } from "@/core/auth/useOrg";
 import { ReservationCard } from "./components/ReservationCard";
 import { CreateReservationDialog } from "./components/CreateReservationDialog";
+import { DuplicateReservationDialog } from "./components/DuplicateReservationDialog";
 import { ReservationFiltersSheet } from "./components/ReservationFiltersSheet";
 import { reservationsApi } from "@/services/reservations.api";
 import type { ReservationFilters } from "@/types/reservation";
@@ -20,6 +21,8 @@ export default function ReservationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<ReservationFilters>({});
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<any>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
 
@@ -213,6 +216,16 @@ export default function ReservationsPage() {
       <CreateReservationDialog
         open={showCreateDialog}
         onOpenChange={setShowCreateDialog}
+      />
+
+      <DuplicateReservationDialog
+        open={showDuplicateDialog}
+        onOpenChange={setShowDuplicateDialog}
+        reservation={selectedReservation}
+        onSuccess={() => {
+          setShowDuplicateDialog(false);
+          setSelectedReservation(null);
+        }}
       />
       
       <ReservationFiltersSheet
