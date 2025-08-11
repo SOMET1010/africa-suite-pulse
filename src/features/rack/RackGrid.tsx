@@ -49,7 +49,6 @@ export default function RackGrid() {
     confirmManualRelodge
   } = useRackActions({
     data,
-    reload: () => refetch().then(() => {}), // 🆕 WRAPPER POUR COMPATIBILITY
     conflictDialog,
     setConflictDialog,
     setDetailSheet,

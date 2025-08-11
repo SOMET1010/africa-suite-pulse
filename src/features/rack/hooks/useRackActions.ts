@@ -1,12 +1,10 @@
 import { toast } from "@/hooks/use-toast";
-// Service moderne importé via queries
-import { rackService } from "@/services/rack.service";
+import { useReassignReservation } from "@/queries/rack.queries";
 import { canSwap, findFirstFreeRoom, findBestRelocationRooms, type Relocation } from "../conflictValidation";
 import type { UIRoom, UIReservation, RackData } from "../rack.types";
 
 interface UseRackActionsProps {
   data: RackData | null;
-  reload: () => Promise<void>;
   conflictDialog: {
     open: boolean;
     dragged: UIReservation | null;
@@ -22,13 +20,14 @@ interface UseRackActionsProps {
 
 export function useRackActions({
   data,
-  reload,
   conflictDialog,
   setConflictDialog,
   setDetailSheet,
   setMoveConfirmDialog,
   setManualRelodgeDialog
 }: UseRackActionsProps) {
+  
+  const reassignMutation = useReassignReservation();
   
   async function onDropReservation(resId: string, roomId: string) {
     console.log(`🎯 Dropping reservation ${resId} onto room ${roomId}`);
@@ -144,8 +143,8 @@ export function useRackActions({
         return;
       }
       
-      await rackService.moveReservation(other.id, dragged.roomId);
-      await rackService.moveReservation(dragged.id, targetRoomId);
+      await reassignMutation.mutateAsync({ reservationId: other.id, roomId: dragged.roomId });
+      await reassignMutation.mutateAsync({ reservationId: dragged.id, roomId: targetRoomId });
 
       toast({ 
         title: "✅ Échange effectué", 
@@ -153,7 +152,6 @@ export function useRackActions({
       });
       
       closeConflictDialog();
-      await reload();
     } catch (error) {
       console.error("❌ Error during swap:", error);
       toast({ 
@@ -179,9 +177,9 @@ export function useRackActions({
           });
           return;
         }
-        await rackService.moveReservation(c.id, free.id);
+        await reassignMutation.mutateAsync({ reservationId: c.id, roomId: free.id });
       }
-      await rackService.moveReservation(dragged.id, targetRoomId);
+      await reassignMutation.mutateAsync({ reservationId: dragged.id, roomId: targetRoomId });
 
       toast({ 
         title: "✅ Délogement effectué", 
@@ -189,7 +187,6 @@ export function useRackActions({
       });
 
       closeConflictDialog();
-      await reload();
     } catch (error) {
       console.error("❌ Error during auto relodge:", error);
       toast({ 
@@ -216,10 +213,10 @@ export function useRackActions({
           });
           return;
         }
-        await rackService.moveReservation(p.conflict.id, p.target.id);
+        await reassignMutation.mutateAsync({ reservationId: p.conflict.id, roomId: p.target.id });
       }
       // 2) déplacer la réservation d'origine vers la cible
-      await rackService.moveReservation(dragged.id, targetRoomId);
+      await reassignMutation.mutateAsync({ reservationId: dragged.id, roomId: targetRoomId });
 
       toast({ 
         title: "✅ Plan de délogement exécuté", 
@@ -227,7 +224,6 @@ export function useRackActions({
       });
 
       closeConflictDialog();
-      await reload();
     } catch (error) {
       console.error("❌ Error during plan execution:", error);
       toast({ 
@@ -287,7 +283,7 @@ export function useRackActions({
       for (const relocation of plan) {
         if (relocation.target) {
           console.log(`🔄 Re-lodging ${relocation.conflict.guestName} to room ${relocation.target.number}`);
-          await rackService.moveReservation(relocation.conflict.id, relocation.target.id);
+          await reassignMutation.mutateAsync({ reservationId: relocation.conflict.id, roomId: relocation.target.id });
         }
       }
       
@@ -297,7 +293,6 @@ export function useRackActions({
       });
       
       closeManualRelodgeDialog();
-      await reload();
       
     } catch (error) {
       console.error("❌ Error in manual re-lodging:", error);

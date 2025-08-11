@@ -1,7 +1,12 @@
-// Unified database types for the application
-import type { Database } from '@/integrations/supabase/types';
+/**
+ * 🔄 DEPRECATED - Use @/types/unified instead
+ * 
+ * This file is kept for backwards compatibility only.
+ * New code should import from @/types/unified.ts
+ */
 
 // Re-export main Database type
+import type { Database } from '@/integrations/supabase/types';
 export type { Database } from '@/integrations/supabase/types';
 
 // Table row types
