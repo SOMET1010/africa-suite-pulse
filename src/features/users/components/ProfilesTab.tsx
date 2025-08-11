@@ -7,8 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { createUserProfile, updateUserProfile, deleteUserProfile } from "../profiles.api";
-import { supabase } from "@/integrations/supabase/client";
+import { listProfiles, upsertProfile, deleteProfile, listPermissions, listProfilePermissions, upsertProfilePermissions } from "../users.api";
+import { toast } from "sonner";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
 interface Profile {
@@ -42,7 +42,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
     access_level: "C"
   });
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadProfiles();
@@ -51,53 +51,69 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
 
   const loadProfiles = async () => {
     try {
-      const { data, error } = await (supabase as any).from("user_profiles")
-        .select("*")
-        .eq("org_id", orgId)
-        .order("name", { ascending: true });
-      
+      setLoading(true);
+      const { data, error } = await listProfiles(orgId);
       if (error) throw error;
-      setProfiles(data || []);
+      // Map the data to match our Profile interface
+      const mappedProfiles = (data || []).map((item: any) => ({
+        id: item.id,
+        name: item.name || item.full_name || "Sans nom",
+        description: item.description || "",
+        access_level: item.access_level || "C",
+        is_active: item.is_active !== false
+      }));
+      setProfiles(mappedProfiles);
     } catch (error: any) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      toast.error("Erreur lors du chargement des profils");
+    } finally {
+      setLoading(false);
     }
   };
 
   const loadPermissions = async () => {
     try {
-      const { data, error } = await (supabase as any).from("permissions")
-        .select("*")
-        .order("category", { ascending: true })
-        .order("label", { ascending: true });
-      
+      const { data, error } = await listPermissions();
       if (error) throw error;
       setPermissions(data || []);
     } catch (error: any) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      toast.error("Erreur lors du chargement des permissions");
     }
   };
 
   const handleSubmit = async () => {
     if (!formData.name) {
-      toast({ title: "Nom requis", variant: "destructive" });
+      toast.error("Nom requis");
       return;
     }
 
     try {
-      if (editingProfile) {
-        await updateUserProfile(editingProfile.id, formData);
-      } else {
-        await createUserProfile({
-          ...formData,
-          org_id: orgId
-        });
-      }
+      const profileData = {
+        id: editingProfile?.id,
+        org_id: orgId,
+        name: formData.name,
+        description: formData.description,
+        access_level: formData.access_level,
+        is_active: true
+      };
+
+      const { data, error } = await upsertProfile(profileData);
+      if (error) throw error;
+
+      const profileId = data[0].id;
+
+      // Update permissions
+      await upsertProfilePermissions(
+        selectedPermissions.map(permissionId => ({
+          profile_id: profileId,
+          permission_id: permissionId
+        }))
+      );
       
-      toast({ title: editingProfile ? "Profil modifié" : "Profil créé" });
+      toast.success(editingProfile ? "Profil modifié" : "Profil créé");
       resetForm();
       loadProfiles();
     } catch (error: any) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      toast.error("Erreur lors de la sauvegarde");
     }
   };
 
@@ -115,14 +131,15 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const handleDelete = async (profile: Profile) => {
     if (!confirm(`Supprimer le profil "${profile.name}" ?`)) return;
     
-    const { error } = await deleteUserProfile(profile.id);
-    if (error) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
-      return;
+    try {
+      const { error } = await deleteProfile(profile.id);
+      if (error) throw error;
+      
+      toast.success("Profil supprimé");
+      loadProfiles();
+    } catch (error: any) {
+      toast.error("Erreur lors de la suppression");
     }
-    
-    toast({ title: "Profil supprimé" });
-    loadProfiles();
   };
 
   const resetForm = () => {
