@@ -13,8 +13,6 @@ import { ColorTest } from "@/components/ColorTest";
 const App = () => {
   // Configuration du temps réel pour synchronisation automatique
   useEffect(() => {
-    console.log("🚀 AfricaSuite PMS - Initializing with React Query + Realtime");
-    
     const channels = setupRealtimeListeners();
     
     return () => {
