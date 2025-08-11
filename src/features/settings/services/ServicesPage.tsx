@@ -29,6 +29,9 @@ export default function ServicesPage() {
     exportArrangements
   } = useServices(orgId || ''); // Passer une chaîne vide si orgId est null
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+
   // Gestion des états de chargement et d'erreur
   if (orgLoading) {
     return (
@@ -54,8 +57,6 @@ export default function ServicesPage() {
     );
   }
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showFilters, setShowFilters] = useState(false);
 
   if (loading) {
     return (
