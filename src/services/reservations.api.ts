@@ -67,8 +67,9 @@ export const reservationsApi = {
       guest_phone: (reservation as any).guests?.phone,
       room_number: (reservation as any).rooms?.number,
       room_type: (reservation as any).rooms?.type,
-      created_at: reservation.created_at || new Date().toISOString(),
-      updated_at: reservation.updated_at || new Date().toISOString(),
+      // Ajouter des timestamps par défaut car la table n'a pas ces colonnes
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }));
 
     return { data: enrichedData, error: null };
@@ -98,8 +99,9 @@ export const reservationsApi = {
         guest_phone: (data as any).guests?.phone,
         room_number: (data as any).rooms?.number,
         room_type: (data as any).rooms?.type,
-        created_at: data.created_at || new Date().toISOString(),
-        updated_at: data.updated_at || new Date().toISOString(),
+        // Ajouter des timestamps par défaut car la table n'a pas ces colonnes
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       };
       return { data: enrichedData, error: null };
     }
