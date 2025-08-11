@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,8 @@ import { Download, Edit, CreditCard, Mail, Printer, Calendar, User, FileText } f
 import { useOrgId } from "@/core/auth/useOrg";
 import { supabase } from "@/integrations/supabase/client";
 import { PaymentDialog } from "../PaymentDialog";
+import { InvoicePrint } from "./InvoicePrint";
+import { useReactToPrint } from "react-to-print";
 
 interface InvoiceItem {
   id: string;
@@ -53,6 +55,11 @@ export function InvoiceDetails({ invoiceId }: InvoiceDetailsProps) {
   const [invoice, setInvoice] = useState<InvoiceData | null>(null);
   const [loading, setLoading] = useState(true);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+  });
 
   useEffect(() => {
     if (!invoiceId || !orgId) return;
@@ -157,7 +164,7 @@ export function InvoiceDetails({ invoiceId }: InvoiceDetailsProps) {
                 <Edit className="h-4 w-4" />
                 Modifier
               </Button>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2" onClick={handlePrint}>
                 <Printer className="h-4 w-4" />
                 Imprimer
               </Button>
@@ -373,6 +380,11 @@ export function InvoiceDetails({ invoiceId }: InvoiceDetailsProps) {
         totalDue={invoice.total_amount}
         guestName={invoice.guest_name}
       />
+
+      {/* Hidden Print Component */}
+      <div style={{ display: 'none' }}>
+        {invoice && <InvoicePrint ref={printRef} invoice={invoice} />}
+      </div>
     </>
   );
 }
