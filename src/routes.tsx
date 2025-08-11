@@ -12,6 +12,10 @@ import PaymentsPage from "@/features/payments/PaymentsPage";
 import BillingPage from "@/features/billing/BillingPage";
 import UsersPage from "@/features/users/UsersPage";
 import ReservationsPage from "@/features/reservations/ReservationsPage";
+import QuickReservationPage from "@/features/reservations/QuickReservationPage";
+import AdvancedReservationPage from "@/features/reservations/AdvancedReservationPage";
+import GroupsManagementPage from "@/features/reservations/GroupsManagementPage";
+import AllotmentsPage from "@/features/reservations/AllotmentsPage";
 import GuestsPage from "@/features/guests/GuestsPage";
 import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
@@ -39,6 +43,10 @@ export function AppRoutes() {
         <Route index element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
         <Route path="reservations" element={<ReservationsPage />} />
+        <Route path="reservations/new/quick" element={<QuickReservationPage />} />
+        <Route path="reservations/new/advanced" element={<AdvancedReservationPage />} />
+        <Route path="reservations/groups" element={<GroupsManagementPage />} />
+        <Route path="reservations/allotments" element={<AllotmentsPage />} />
         <Route path="reservations/rack" element={<RackGrid />} />
         <Route path="guests" element={<GuestsPage />} />
         <Route path="settings" element={<SettingsHome />} />

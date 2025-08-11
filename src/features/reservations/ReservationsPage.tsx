@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Plus, Search, Filter, Calendar, Users, Crown, Building2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { reservationsApi } from "@/services/reservations.api";
 import type { ReservationFilters } from "@/types/reservation";
 
 export default function ReservationsPage() {
+  const navigate = useNavigate();
   const { orgId } = useOrgId();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState<ReservationFilters>({});
@@ -64,10 +66,19 @@ export default function ReservationsPage() {
             Gérez toutes vos réservations et suivez leur statut
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nouvelle Réservation
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Nouvelle Réservation
+          </Button>
+          <Button 
+            variant="outline"
+            onClick={() => navigate("/reservations/new/quick")}
+            className="gap-2"
+          >
+            ⚡ Express
+          </Button>
+        </div>
       </div>
 
       {/* Statistiques */}
