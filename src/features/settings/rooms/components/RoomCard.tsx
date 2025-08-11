@@ -7,6 +7,7 @@ import type { Room } from '@/types/room';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { RoomStatusBadge } from '@/features/rack/components/RoomBadges';
 
 interface RoomCardProps {
   room: Room;
@@ -62,13 +63,13 @@ export function RoomCard({ room, selected, onToggleSelect, onEdit, onDelete }: R
     <Card className={`relative transition-all duration-200 cursor-pointer hover:shadow-lg ${
       selected ? 'ring-2 ring-primary bg-primary/5' : ''
     }`}>
-      <CardContent className="p-4">
+      <CardContent onClick={() => onEdit?.(room)} className="p-4">
         {/* Selection Checkbox */}
         <div className="absolute top-3 right-3">
           <Button
             variant="ghost"
             size="sm"
-            onClick={onToggleSelect}
+            onClick={(e) => { e.stopPropagation(); onToggleSelect(); }}
             className={`w-6 h-6 p-0 rounded-lg border-2 ${
               selected ? 'bg-primary border-primary' : 'border-muted-foreground/30'
             }`}
@@ -96,9 +97,7 @@ export function RoomCard({ room, selected, onToggleSelect, onEdit, onDelete }: R
 
         {/* Status */}
         <div className="mb-3">
-          <Badge variant={getStatusVariant(room.status)}>
-            {getStatusLabel(room.status)}
-          </Badge>
+          <RoomStatusBadge status={room.status} />
         </div>
 
         {/* Features */}
@@ -125,15 +124,15 @@ export function RoomCard({ room, selected, onToggleSelect, onEdit, onDelete }: R
         {/* Actions */}
         <div className="flex items-center justify-between pt-3 border-t">
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => onEdit?.(room)}>
+            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onEdit?.(room); }}>
               <Edit3 className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => onDelete?.(room.id!)}>
+            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onDelete?.(room.id!); }}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </div>
