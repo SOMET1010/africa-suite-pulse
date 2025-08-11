@@ -37,7 +37,7 @@ export const upsertProfilePermissions = (rows: any[]) =>
 
 export const listAppUsers = (orgId: string) =>
   (supabase as any).from("app_users").select(`
-    id, user_id, org_id, login_code as login, full_name, profile_id, password_expires_on, active, created_at, last_login_at
+    id, user_id, org_id, login, full_name, profile_id, password_expires_on, active, created_at, last_login_at
   `).eq("org_id", orgId).order("full_name");
 
 export const upsertAppUser = (payload: any) =>
