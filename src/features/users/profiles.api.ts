@@ -1,8 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const listUserProfiles = (orgId: string) =>
-  (supabase as any).from("user_roles")
-  .select("*, profile_permissions(*, permissions(*))")
+  (supabase as any).from("user_profiles")
+  .select("*")
   .eq("org_id", orgId)
   .order("name", { ascending: true });
 
@@ -12,13 +12,13 @@ export const createUserProfile = (payload: {
   description?: string;
   access_level: string;
 }) =>
-  (supabase as any).from("user_roles").insert(payload).select().single();
+  (supabase as any).from("user_profiles").insert(payload).select().single();
 
 export const updateUserProfile = (id: string, patch: any) =>
-  (supabase as any).from("user_roles").update(patch).eq("id", id);
+  (supabase as any).from("user_profiles").update(patch).eq("id", id);
 
 export const deleteUserProfile = (id: string) =>
-  (supabase as any).from("user_roles").delete().eq("id", id);
+  (supabase as any).from("user_profiles").delete().eq("id", id);
 
 export const listPermissions = () =>
   (supabase as any).from("permissions")
@@ -45,7 +45,10 @@ export const updateProfilePermissions = async (profileId: string, permissionIds:
 
 export const listUsers = (orgId: string) =>
   (supabase as any).from("app_users")
-  .select("*")
+  .select(`
+    *, 
+    user_roles:profile_id (id, name, access_level)
+  `)
   .eq("org_id", orgId)
   .order("full_name", { ascending: true });
 

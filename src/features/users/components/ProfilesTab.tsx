@@ -7,14 +7,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { listProfiles, upsertProfile, deleteProfile, listPermissions, listProfilePermissions, upsertProfilePermissions } from "../users.api";
+import { listUserProfiles, createUserProfile, updateUserProfile, deleteUserProfile, listPermissions, updateProfilePermissions } from "../profiles.api";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
 interface Profile {
   id: string;
   code: string;
-  label: string;
+  name: string;
   access_level: string;
 }
 
@@ -35,8 +35,8 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     code: "",
-    label: "",
-    access_level: "C"
+    name: "",
+    access_level: "basic"
   });
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,16 +49,9 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const loadProfiles = async () => {
     try {
       setLoading(true);
-      const { data, error } = await listProfiles(orgId);
+      const { data, error } = await listUserProfiles(orgId);
       if (error) throw error;
-      // Map the data to match our Profile interface
-      const mappedProfiles = (data || []).map((item: any) => ({
-        id: item.id,
-        code: item.code || "",
-        label: item.label || "Sans nom",
-        access_level: item.access_level || "C"
-      }));
-      setProfiles(mappedProfiles);
+      setProfiles(data || []);
     } catch (error: any) {
       toast.error("Erreur lors du chargement des profils");
     } finally {
@@ -83,33 +76,26 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   };
 
   const handleSubmit = async () => {
-    if (!formData.code || !formData.label) {
-      toast.error("Code et libellé requis");
+    if (!formData.name) {
+      toast.error("Nom requis");
       return;
     }
 
     try {
-      const profileData = {
-        id: editingProfile?.id,
-        org_id: orgId,
-        code: formData.code,
-        label: formData.label,
-        access_level: formData.access_level
-      };
-
-      const { data, error } = await upsertProfile(profileData);
-      if (error) throw error;
-
-      const profileId = data[0].id;
-
-      // Update permissions
-      await upsertProfilePermissions(
-        selectedPermissions.map(permissionKey => ({
-          profile_id: profileId,
-          permission_key: permissionKey,
-          allowed: true
-        }))
-      );
+      if (editingProfile) {
+        const { error } = await updateUserProfile(editingProfile.id, {
+          name: formData.name,
+          access_level: formData.access_level
+        });
+        if (error) throw error;
+      } else {
+        const { data, error } = await createUserProfile({
+          org_id: orgId,
+          name: formData.name,
+          access_level: formData.access_level
+        });
+        if (error) throw error;
+      }
       
       toast.success(editingProfile ? "Profil modifié" : "Profil créé");
       resetForm();
@@ -123,7 +109,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
     setEditingProfile(profile);
     setFormData({
       code: profile.code,
-      label: profile.label,
+      name: profile.name,
       access_level: profile.access_level
     });
     setSelectedPermissions([]);
@@ -131,10 +117,10 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   };
 
   const handleDelete = async (profile: Profile) => {
-    if (!confirm(`Supprimer le profil "${profile.label}" ?`)) return;
+    if (!confirm(`Supprimer le profil "${profile.name}" ?`)) return;
     
     try {
-      const { error } = await deleteProfile(profile.id);
+      const { error } = await deleteUserProfile(profile.id);
       if (error) throw error;
       
       toast.success("Profil supprimé");
@@ -147,24 +133,24 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
   const resetForm = () => {
     setEditingProfile(null);
     setShowForm(false);
-    setFormData({ code: "", label: "", access_level: "C" });
+    setFormData({ code: "", name: "", access_level: "basic" });
     setSelectedPermissions([]);
   };
 
   const getAccessLevelLabel = (level: string) => {
     switch (level) {
-      case "T": return "Tous les accès";
-      case "H": return "Hors facturation";
-      case "C": return "Consultation";
+      case "admin": return "Administrateur";
+      case "manager": return "Manager";
+      case "basic": return "Basique";
       default: return level;
     }
   };
 
   const getAccessLevelVariant = (level: string) => {
     switch (level) {
-      case "T": return "default";
-      case "H": return "secondary";
-      case "C": return "outline";
+      case "admin": return "default";
+      case "manager": return "secondary";
+      case "basic": return "outline";
       default: return "outline";
     }
   };
@@ -193,23 +179,13 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
             <CardTitle>{editingProfile ? "Modifier le profil" : "Nouveau profil"}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Code du profil</label>
-                <Input
-                  value={formData.code}
-                  onChange={e => setFormData(prev => ({ ...prev, code: e.target.value }))}
-                  placeholder="Ex: RECEPTION"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Libellé du profil</label>
-                <Input
-                  value={formData.label}
-                  onChange={e => setFormData(prev => ({ ...prev, label: e.target.value }))}
-                  placeholder="Ex: Réception de jour"
-                />
-              </div>
+            <div>
+              <label className="text-sm font-medium">Nom du profil</label>
+              <Input
+                value={formData.name}
+                onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Ex: Réception de jour"
+              />
             </div>
             
             <div>
@@ -218,11 +194,11 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="T">T - Tous les accès</SelectItem>
-                  <SelectItem value="H">H - Hors facturation</SelectItem>
-                  <SelectItem value="C">C - Consultation uniquement</SelectItem>
-                </SelectContent>
+                 <SelectContent>
+                   <SelectItem value="admin">Administrateur</SelectItem>
+                   <SelectItem value="manager">Manager</SelectItem>
+                   <SelectItem value="basic">Basique</SelectItem>
+                 </SelectContent>
               </Select>
             </div>
 
@@ -274,7 +250,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold">{profile.label}</h4>
+                    <h4 className="font-semibold">{profile.name}</h4>
                     <Badge variant={getAccessLevelVariant(profile.access_level)}>
                       {getAccessLevelLabel(profile.access_level)}
                     </Badge>

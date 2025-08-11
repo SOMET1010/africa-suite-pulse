@@ -11,7 +11,8 @@ import { CalendarIcon, Plus, Edit2, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
-import { listAppUsers, listProfiles, upsertAppUser, deleteAppUser } from "../users.api";
+import { listUsers, updateUser } from "../profiles.api";
+import { listUserProfiles, deleteUserProfile } from "../profiles.api";
 
 interface AppUser {
   id: string;
@@ -22,18 +23,16 @@ interface AppUser {
   profile_id: string | null;
   password_expires_on: string | null;
   active: boolean;
-  profiles?: {
+  user_roles?: {
     id: string;
-    code: string;
-    label: string;
+    name: string;
     access_level: string;
   };
 }
 
 interface Profile {
   id: string;
-  code: string;
-  label: string;
+  name: string;
   access_level: string;
 }
 
@@ -61,7 +60,7 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
 
   const loadUsers = async () => {
     try {
-      const { data, error } = await listAppUsers(orgId);
+      const { data, error } = await listUsers(orgId);
       if (error) throw error;
       setUsers(data || []);
     } catch (error) {
@@ -76,16 +75,9 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
 
   const loadProfiles = async () => {
     try {
-      const { data, error } = await listProfiles(orgId);
+      const { data, error } = await listUserProfiles(orgId);
       if (error) throw error;
-      // Map the data to match our Profile interface
-      const mappedProfiles = (data || []).map((item: any) => ({
-        id: item.id,
-        code: item.code || "",
-        label: item.label || "Sans nom",
-        access_level: item.access_level || "C"
-      }));
-      setProfiles(mappedProfiles);
+      setProfiles(data || []);
     } catch (error) {
       console.error("Erreur lors du chargement des profils:", error);
     }
@@ -105,7 +97,7 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
         active: formData.active
       };
 
-      const { error } = await upsertAppUser(payload);
+      const { error } = await updateUser(payload.user_id, payload);
       if (error) throw error;
 
       toast({
@@ -141,7 +133,7 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
     if (!confirm(`Supprimer l'utilisateur ${user.full_name} ?`)) return;
     
     try {
-      const { error } = await deleteAppUser(user.id);
+      const { error } = await updateUser(user.user_id, { active: false });
       if (error) throw error;
 
       toast({
@@ -174,18 +166,18 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
 
   const getAccessLevelLabel = (level: string) => {
     switch (level) {
-      case 'T': return 'Tous droits';
-      case 'H': return 'Hors facturation';
-      case 'C': return 'Consultation';
+      case 'admin': return 'Administrateur';
+      case 'manager': return 'Manager';
+      case 'basic': return 'Basique';
       default: return level;
     }
   };
 
   const getAccessLevelVariant = (level: string) => {
     switch (level) {
-      case 'T': return 'default';
-      case 'H': return 'secondary';
-      case 'C': return 'outline';
+      case 'admin': return 'default';
+      case 'manager': return 'secondary';
+      case 'basic': return 'outline';
       default: return 'outline';
     }
   };
@@ -215,15 +207,15 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
                     )}
                   </div>
                   
-                   {user.profiles && (
+                   {user.user_roles && (
                      <div className="flex items-center gap-2">
-                       <span className="text-sm font-medium">{user.profiles.label}</span>
+                       <span className="text-sm font-medium">{user.user_roles.name}</span>
                        <span className={`text-xs px-2 py-1 rounded ${
-                         getAccessLevelVariant(user.profiles.access_level) === 'default' ? 'bg-primary text-primary-foreground' :
-                         getAccessLevelVariant(user.profiles.access_level) === 'secondary' ? 'bg-secondary text-secondary-foreground' :
+                         getAccessLevelVariant(user.user_roles.access_level) === 'default' ? 'bg-primary text-primary-foreground' :
+                         getAccessLevelVariant(user.user_roles.access_level) === 'secondary' ? 'bg-secondary text-secondary-foreground' :
                          'bg-muted text-muted-foreground'
                        }`}>
-                         {getAccessLevelLabel(user.profiles.access_level)}
+                         {getAccessLevelLabel(user.user_roles.access_level)}
                        </span>
                      </div>
                    )}
@@ -301,9 +293,9 @@ export default function AppUsersTab({ orgId }: AppUsersTabProps) {
                     <SelectValue placeholder="Sélectionner un profil" />
                   </SelectTrigger>
                   <SelectContent>
-                     {profiles.map((profile) => (
+                      {profiles.map((profile) => (
                        <SelectItem key={profile.id} value={profile.id}>
-                         {profile.label} ({getAccessLevelLabel(profile.access_level)})
+                         {profile.name} ({getAccessLevelLabel(profile.access_level)})
                        </SelectItem>
                      ))}
                   </SelectContent>
