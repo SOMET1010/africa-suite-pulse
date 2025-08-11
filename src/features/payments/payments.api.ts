@@ -39,7 +39,7 @@ export type CreateTransactionInput = {
 };
 
 export async function createPaymentTransaction(input: CreateTransactionInput) {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('payment_transactions')
     .insert({
       org_id: input.org_id,
