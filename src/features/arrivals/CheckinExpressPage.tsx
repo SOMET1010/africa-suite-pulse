@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { useArrivals, useAssignRoomToReservation, useCheckinReservation } from "@/queries/arrivals.queries";
 import { useOrgId } from "@/core/auth/useOrg";
+import { Crown } from "lucide-react";
 import type { ArrivalRow } from "./arrivals.types";
 import RoomAssignSheet from "./RoomAssignSheet";
 
@@ -102,80 +103,158 @@ export default function CheckinExpressPage() {
   }, [rows]);
 
   return (
-    <main className="min-h-screen pb-24 px-4 sm:px-6 pt-6">
-      <header className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Arrivées du jour</h1>
-          <p className="text-muted-foreground text-sm">{new Date().toLocaleDateString()}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Mode</span>
-          <div className="inline-flex rounded-xl border border-border overflow-hidden">
-            <button onClick={()=>setMode('express')} className={"px-3 h-10 " + (mode==='express'?"bg-secondary":"bg-background")}>Express</button>
-            <button onClick={()=>setMode('detailed')} className={"px-3 h-10 " + (mode==='detailed'?"bg-secondary":"bg-background")}>Détaillé</button>
+    <main className="min-h-screen bg-pearl pb-24 px-4 sm:px-6 pt-8 animate-fade-in">
+      <div className="container mx-auto">
+        <header className="mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <Crown className="h-6 w-6 text-brand-accent" />
+              <h1 className="text-3xl font-luxury font-bold text-gradient">Arrivées du Jour</h1>
+            </div>
+            <p className="text-lg text-charcoal/80 font-premium">{new Date().toLocaleDateString('fr-FR', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</p>
           </div>
-        </div>
-      </header>
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-sm font-premium text-charcoal/70">Mode d'affichage</span>
+            <div className="inline-flex rounded-xl border border-accent-gold/30 bg-glass-card shadow-soft overflow-hidden">
+              <button 
+                onClick={()=>setMode('express')} 
+                className={`px-4 h-10 font-premium transition-elegant ${mode==='express'?"bg-brand-accent text-white":"bg-transparent text-charcoal hover:bg-brand-accent/10"}`}
+              >
+                Express
+              </button>
+              <button 
+                onClick={()=>setMode('detailed')} 
+                className={`px-4 h-10 font-premium transition-elegant ${mode==='detailed'?"bg-brand-accent text-white":"bg-transparent text-charcoal hover:bg-brand-accent/10"}`}
+              >
+                Détaillé
+              </button>
+            </div>
+          </div>
+        </header>
 
-      <section className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
-        <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Confirmés</div><div className="text-2xl font-bold">{stats.confirmed}</div></CardContent></Card>
-        <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Présents</div><div className="text-2xl font-bold">{stats.present}</div></CardContent></Card>
-        <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Non assignés</div><div className="text-2xl font-bold">{stats.unassigned}</div></CardContent></Card>
-        <Card><CardContent className="pt-4"><div className="text-sm text-muted-foreground">Total</div><div className="text-2xl font-bold">{rows.length}</div></CardContent></Card>
-      </section>
+        <section className="mb-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {label:"Confirmés",value:stats.confirmed,color:"text-info"},
+              {label:"Présents",value:stats.present,color:"text-success"},
+              {label:"Non assignés",value:stats.unassigned,color:"text-warning"},
+              {label:"Total",value:rows.length,color:"text-brand-accent"}
+            ].map((stat, index) => (
+              <Card key={stat.label} className="glass-card shadow-luxury hover-glow transition-elegant" style={{ animationDelay: `${0.3 + index * 0.1}s` }}>
+                <CardContent className="pt-6">
+                  <div className="text-sm font-premium text-charcoal/70 uppercase tracking-wide mb-2">{stat.label}</div>
+                  <div className={`text-3xl font-luxury font-bold ${stat.color}`}>{stat.value}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
 
-      <section aria-label="Filtres" className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <input
-          placeholder="Rechercher nom / réf / chambre"
-          className="w-full rounded-xl border border-border bg-background px-4 h-12 shadow-soft focus:outline-none focus:ring-2 focus:ring-ring"
-          value={query}
-          onChange={(e)=>setQuery(e.target.value)}
-        />
-        <select className="rounded-xl border border-border bg-background px-3 h-12" value={status} onChange={(e)=>setStatus(e.target.value as any)}>
-          <option value="all">Tous statuts</option>
-          <option value="confirmed">Confirmés</option>
-        </select>
-        <select className="rounded-xl border border-border bg-background px-3 h-12" value={sort} onChange={(e)=>setSort(e.target.value as any)}>
-          <option value="time">Tri par heure</option>
-          <option value="name">Tri par nom</option>
-          <option value="room">Tri par chambre</option>
-        </select>
-      </section>
+        <section aria-label="Filtres" className="mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input
+              placeholder="Rechercher nom, référence, chambre..."
+              className="w-full rounded-xl border border-accent-gold/20 bg-glass-card px-6 h-12 shadow-luxury focus:outline-none focus:ring-2 focus:ring-brand-accent focus:border-brand-accent backdrop-blur text-charcoal placeholder:text-charcoal/60 transition-elegant"
+              value={query}
+              onChange={(e)=>setQuery(e.target.value)}
+            />
+            <select 
+              className="rounded-xl border border-accent-gold/20 bg-glass-card px-4 h-12 shadow-luxury text-charcoal font-premium transition-elegant focus:outline-none focus:ring-2 focus:ring-brand-accent" 
+              value={status} 
+              onChange={(e)=>setStatus(e.target.value as any)}
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="confirmed">Confirmés uniquement</option>
+            </select>
+            <select 
+              className="rounded-xl border border-accent-gold/20 bg-glass-card px-4 h-12 shadow-luxury text-charcoal font-premium transition-elegant focus:outline-none focus:ring-2 focus:ring-brand-accent" 
+              value={sort} 
+              onChange={(e)=>setSort(e.target.value as any)}
+            >
+              <option value="time">Tri par heure d'arrivée</option>
+              <option value="name">Tri par nom client</option>
+              <option value="room">Tri par numéro chambre</option>
+            </select>
+          </div>
+        </section>
 
-      <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filtered.map((a) => (
-          <Card key={a.id} className="shadow-soft">
-            <CardContent className="pt-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-base font-semibold">{a.guest_name}</div>
-                  <div className="text-sm text-muted-foreground">{a.reference ?? ""}</div>
-                </div>
-                <Badge variant={statusToBadge(a.status)}>{a.status === 'present' ? 'Présent' : a.status === 'confirmed' ? 'Confirmé' : a.status === 'option' ? 'Option' : 'Annulé'}</Badge>
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                <div className="text-muted-foreground">Chambre</div>
-                <div className="flex items-center gap-2">
-                  {a.room_number ?? 'Non assignée'}
-                  {!a.room_id && <span className="text-xs px-2 py-1 rounded-full badge-soft--option">Non assignée</span>}
-                </div>
-                <div className="text-muted-foreground">A/E</div>
-                <div>{(a.adults ?? 0)}A {(a.children ?? 0)}E</div>
-                <div className="text-muted-foreground">Total</div>
-                <div>{a.rate_total != null ? Intl.NumberFormat("fr-FR", { style: "currency", currency: "XOF" }).format(a.rate_total) : "—"}</div>
-              </div>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <TButton variant="primary" onClick={() => onCheckin(a.id)} disabled={a.status === 'present'}>
-                  {a.status === 'present' ? 'Présent' : 'Check-in'}
-                </TButton>
-                <TButton variant="default" onClick={() => askAssign(a.id)}>Assigner</TButton>
-                <TButton variant="ghost" onClick={()=>toast({ title: "Note", description: a.guest_name })}>Note</TButton>
-                <TButton variant="ghost" onClick={()=>toast({ title: "Détails", description: a.guest_name })}>Détails</TButton>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
+        <section className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((a, index) => (
+              <Card key={a.id} className="glass-card shadow-luxury hover-lift transition-elegant group" style={{ animationDelay: `${0.6 + index * 0.05}s` }}>
+                <CardContent className="pt-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="text-lg font-luxury font-semibold text-charcoal">{a.guest_name}</div>
+                      <div className="text-sm text-charcoal/60 font-premium">{a.reference ?? "Aucune référence"}</div>
+                    </div>
+                    <Badge variant={statusToBadge(a.status)} className="shimmer">
+                      {a.status === 'present' ? 'Présent' : a.status === 'confirmed' ? 'Confirmé' : a.status === 'option' ? 'Option' : 'Annulé'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-premium text-charcoal/70">Chambre</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-luxury font-medium text-charcoal">{a.room_number ?? 'Non assignée'}</span>
+                        {!a.room_id && <span className="text-xs px-2 py-1 rounded-full badge-soft--option">À assigner</span>}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-premium text-charcoal/70">Occupants</span>
+                      <span className="font-luxury font-medium text-charcoal">{(a.adults ?? 0)} Adulte{(a.adults ?? 0) > 1 ? 's' : ''} • {(a.children ?? 0)} Enfant{(a.children ?? 0) > 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-premium text-charcoal/70">Montant</span>
+                      <span className="font-luxury font-bold text-brand-accent">
+                        {a.rate_total != null ? Intl.NumberFormat("fr-FR", { style: "currency", currency: "XOF" }).format(a.rate_total) : "—"}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <TButton 
+                      variant="primary" 
+                      onClick={() => onCheckin(a.id)} 
+                      disabled={a.status === 'present'}
+                      className="group-hover:scale-[1.02] transition-elegant"
+                    >
+                      {a.status === 'present' ? 'Présent ✓' : 'Check-in'}
+                    </TButton>
+                    <TButton 
+                      variant="default" 
+                      onClick={() => askAssign(a.id)}
+                      className="group-hover:scale-[1.02] transition-elegant"
+                    >
+                      Assigner
+                    </TButton>
+                    <TButton 
+                      variant="ghost" 
+                      onClick={()=>toast({ title: "Note ajoutée", description: `Note pour ${a.guest_name}` })}
+                      className="group-hover:scale-[1.02] transition-elegant"
+                    >
+                      Note
+                    </TButton>
+                    <TButton 
+                      variant="ghost" 
+                      onClick={()=>toast({ title: "Détails", description: `Détails de ${a.guest_name}` })}
+                      className="group-hover:scale-[1.02] transition-elegant"
+                    >
+                      Détails
+                    </TButton>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      </div>
 
       <div className="h-24" />
 

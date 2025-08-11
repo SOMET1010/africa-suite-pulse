@@ -11,6 +11,7 @@ import { NewConflictDialog } from "./components/NewConflictDialog";
 import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { toast } from "@/hooks/use-toast";
+import { Crown } from "lucide-react";
 
 // Import du nouveau système drag & drop
 import { DragDropProvider, DragDropStyles } from "./hooks/useDragDrop";
@@ -203,12 +204,14 @@ export default function RackGrid() {
   return (
     <DragDropProvider onReservationMove={handleReservationMove}>
       <div className="page-enter">
-        <main className="min-h-screen px-2 sm:px-4 lg:px-6 pt-4 sm:pt-6 pb-20 sm:pb-12 space-y-4 sm:space-y-6">
-        <header className="animate-fade-in">
-          <div className="text-center space-y-1 sm:space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-display font-bold text-gradient">Rack Visuel</h1>
-            <p className="text-sm sm:text-base text-muted-foreground font-medium">Interface tactile moderne avec animations fluides</p>
+        <main className="min-h-screen bg-pearl px-2 sm:px-4 lg:px-6 pt-8 sm:pt-12 pb-20 sm:pb-12 space-y-6 sm:space-y-8 animate-fade-in">
+          <div className="container mx-auto">
+        <header className="text-center mb-8 animate-fade-in">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Crown className="h-8 w-8 text-brand-accent" />
+            <h1 className="text-4xl font-luxury font-bold text-gradient">Rack Hôtel</h1>
           </div>
+          <p className="text-lg text-charcoal/80 font-premium">Gestion visuelle • Interface de prestige</p>
         </header>
 
         <RackToolbar
@@ -303,6 +306,7 @@ export default function RackGrid() {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </main>
       </div>
