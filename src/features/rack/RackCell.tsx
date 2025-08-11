@@ -28,15 +28,8 @@ export function RackCell({ room, dayISO, reservations, allRooms, mode, onDropRes
   const [over, setOver] = useState<"ok"|"bad"|"conflict"|null>(null);
   const resForCell = reservations.filter(r => r.roomId === room.id && overlapsDay({ date_arrival: r.start, date_departure: r.end }, dayISO));
   
-  // Log pour debug le re-render
-  console.log(`🔍 RackCell ${room.number} day ${dayISO}: found ${resForCell.length} reservations for room ${room.id}`, resForCell.map(r => r.id));
-  
   // CRITIQUE : Détecter et signaler les conflits existants dans les données
   const hasConflict = resForCell.length > 1;
-  if (hasConflict) {
-    console.warn(`⚠️ CONFLIT DÉTECTÉ: Chambre ${room.number} le ${dayISO} a ${resForCell.length} réservations simultanées:`, 
-      resForCell.map(r => ({ id: r.id, guest: r.guestName, dates: `${r.start} → ${r.end}` })));
-  }
 
   const {
     handleDragOver,

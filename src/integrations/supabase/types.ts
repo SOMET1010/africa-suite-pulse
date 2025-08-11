@@ -1241,40 +1241,6 @@ export type Database = {
           valid_from: string | null
           valid_until: string | null
         }
-        Insert: {
-          base_price?: number | null
-          calculated_price?: never
-          code?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          label?: string | null
-          max_nights?: number | null
-          min_nights?: number | null
-          org_id?: string | null
-          services_count?: never
-          updated_at?: string | null
-          valid_from?: string | null
-          valid_until?: string | null
-        }
-        Update: {
-          base_price?: number | null
-          calculated_price?: never
-          code?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          label?: string | null
-          max_nights?: number | null
-          min_nights?: number | null
-          org_id?: string | null
-          services_count?: never
-          updated_at?: string | null
-          valid_from?: string | null
-          valid_until?: string | null
-        }
         Relationships: []
       }
       guest_stay_history: {

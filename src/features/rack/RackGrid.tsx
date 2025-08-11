@@ -125,13 +125,11 @@ export default function RackGrid() {
 
   // 🆕 FONCTION DE VALIDATION MODERNISÉE
   async function performDrop(resId: string, roomId: string) {
-    console.log(`🎯 Modern drop: reservation ${resId} to room ${roomId}`);
     
     const reservation = data?.reservations.find(r => r.id === resId);
     const validation = validateMove(reservation, roomId);
     
     if (!validation.isValid) {
-      console.log(`❌ Invalid move: ${validation.reason}`);
       toast({ 
         title: "❌ Déplacement impossible", 
         description: validation.reason,
@@ -141,9 +139,7 @@ export default function RackGrid() {
     }
 
     try {
-      console.log(`📡 Using React Query mutation...`);
       await reassignMutation.mutateAsync({ reservationId: resId, roomId });
-      console.log(`✅ React Query mutation completed`);
       
       toast({ 
         title: "✅ Réservation réassignée", 
@@ -151,7 +147,6 @@ export default function RackGrid() {
       });
       
     } catch (error: any) {
-      console.error("❌ Error in performDrop:", error);
       toast({ 
         title: "❌ Erreur", 
         description: error.message || "Impossible de réassigner la réservation",
