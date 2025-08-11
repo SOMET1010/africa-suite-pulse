@@ -15,7 +15,7 @@ export default function RoomsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Header */}
-      <div className="bg-card/80 backdrop-blur border-b border-border sticky top-0 z-50">
+      <div className="bg-card border-b border-border sticky top-0 z-50">
         <div className="max-w-screen-2xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
             <Link to="/settings">

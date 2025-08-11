@@ -50,7 +50,7 @@ export function RoomsList({ rooms, selectedRooms, onToggleSelect, onEdit, onDele
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
-        <thead className="bg-muted/50 border-b">
+        <thead className="bg-muted border-b">
           <tr>
             <th className="px-4 py-3 text-left text-sm font-semibold w-12"></th>
             <th className="px-4 py-3 text-left text-sm font-semibold">Numéro</th>
