@@ -14,6 +14,11 @@ export function useServices(orgId: string) {
 
   // Load all data
   const loadData = useCallback(async () => {
+    if (!orgId) {
+      console.warn('No orgId provided to useServices');
+      return;
+    }
+
     try {
       setLoading(true);
       const [familiesData, servicesData, arrangementsData, statsData] = await Promise.all([
@@ -201,6 +206,8 @@ export function useServices(orgId: string) {
 
   // Refresh stats
   const refreshStats = useCallback(async () => {
+    if (!orgId) return;
+    
     try {
       const statsData = await ServicesService.getStats(orgId);
       setStats(statsData);
@@ -211,15 +218,17 @@ export function useServices(orgId: string) {
 
   // Load data on mount
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (orgId) {
+      loadData();
+    }
+  }, [loadData, orgId]);
 
   // Refresh stats when data changes
   useEffect(() => {
-    if (!loading) {
+    if (!loading && orgId) {
       refreshStats();
     }
-  }, [families, services, arrangements, loading, refreshStats]);
+  }, [families, services, arrangements, loading, refreshStats, orgId]);
 
   return {
     // Data

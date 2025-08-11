@@ -16,7 +16,7 @@ import { ServicesTab } from './components/ServicesTab';
 import { ArrangementsTab } from './components/ArrangementsTab';
 
 export default function ServicesPage() {
-  const { orgId } = useOrgId();
+  const { orgId, loading: orgLoading, error: orgError } = useOrgId();
   const {
     families,
     services,
@@ -27,7 +27,32 @@ export default function ServicesPage() {
     exportFamilies,
     exportServices,
     exportArrangements
-  } = useServices(orgId);
+  } = useServices(orgId || ''); // Passer une chaîne vide si orgId est null
+
+  // Gestion des états de chargement et d'erreur
+  if (orgLoading) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-b-2 border-primary mx-auto mb-2" />
+          <p>Chargement de l'organisation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (orgError || !orgId) {
+    return (
+      <div className="p-6 flex items-center justify-center">
+        <div className="text-center text-destructive">
+          <p>Erreur: Impossible de charger l'organisation</p>
+          <p className="text-sm text-muted-foreground mt-2">
+            {orgError || 'Organisation non trouvée'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
