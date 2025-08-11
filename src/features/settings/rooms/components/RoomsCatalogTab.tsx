@@ -19,6 +19,7 @@ import { RoomsList } from './RoomsList';
 import { CreateSeriesModal } from './CreateSeriesModal';
 import { BulkActionsMenu } from './BulkActionsMenu';
 import EditRoomModal from './EditRoomModal';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 export default function RoomsCatalogTab() {
   const { orgId } = useOrgId();
@@ -48,6 +49,7 @@ export default function RoomsCatalogTab() {
   const [showCreateSeries, setShowCreateSeries] = useState(false);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [editRoom, setEditRoom] = useState<Room | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Room | null>(null);
 
   if (loading) {
     return (
@@ -216,6 +218,45 @@ export default function RoomsCatalogTab() {
         </div>
       </div>
 
+      {/* Active Filters Chips */}
+      {(filters.search || filters.floor !== 'all' || filters.type !== 'all' || filters.status !== 'all' || filters.fictive !== 'all' || (filters.features?.length ?? 0) > 0) && (
+        <div className="flex flex-wrap items-center gap-2">
+          {filters.search && (
+            <Button variant="outline" size="sm" className="gap-1" onClick={() => updateFilters({ search: '' })}>
+              Recherche: "{filters.search}" <X className="h-3 w-3" />
+            </Button>
+          )}
+          {filters.floor !== 'all' && (
+            <Button variant="outline" size="sm" className="gap-1" onClick={() => updateFilters({ floor: 'all' })}>
+              Étage {filters.floor} <X className="h-3 w-3" />
+            </Button>
+          )}
+          {filters.type !== 'all' && (
+            <Button variant="outline" size="sm" className="gap-1" onClick={() => updateFilters({ type: 'all' })}>
+              Type: {filters.type} <X className="h-3 w-3" />
+            </Button>
+          )}
+          {filters.status !== 'all' && (
+            <Button variant="outline" size="sm" className="gap-1" onClick={() => updateFilters({ status: 'all' })}>
+              Statut: {filters.status} <X className="h-3 w-3" />
+            </Button>
+          )}
+          {filters.fictive !== 'all' && (
+            <Button variant="outline" size="sm" className="gap-1" onClick={() => updateFilters({ fictive: 'all' })}>
+              Nature: {filters.fictive === 'real' ? 'Réelle' : 'Fictive'} <X className="h-3 w-3" />
+            </Button>
+          )}
+          {(filters.features?.length ?? 0) > 0 && (
+            <Button variant="outline" size="sm" className="gap-1" onClick={() => updateFilters({ features: [] })}>
+              Caractéristiques: {filters.features.length} <X className="h-3 w-3" />
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" className="ml-auto" onClick={resetFilters}>
+            Tout effacer
+          </Button>
+        </div>
+      )}
+
       {/* Filters Panel */}
       {showFilters && (
         <Card>
@@ -325,7 +366,7 @@ export default function RoomsCatalogTab() {
               selected={selectedRooms.has(room.id!)}
               onToggleSelect={() => toggleSelection(room.id!)}
               onEdit={(r) => setEditRoom(r)}
-              onDelete={(id) => deleteRoom(id)}
+              onDelete={(id) => setDeleteTarget(rooms.find(rr => rr.id === id) ?? null)}
             />
           ))}
         </div>
@@ -335,7 +376,7 @@ export default function RoomsCatalogTab() {
           selectedRooms={selectedRooms}
           onToggleSelect={toggleSelection}
           onEdit={(r) => setEditRoom(r)}
-          onDelete={(id) => deleteRoom(id)}
+          onDelete={(id) => setDeleteTarget(rooms.find(rr => rr.id === id) ?? null)}
         />
       )}
 

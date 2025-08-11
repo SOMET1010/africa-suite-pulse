@@ -3,6 +3,8 @@ import { RoomsCatalogService } from './roomsCatalogService';
 import type { Room, RoomFilters, RoomStats, CreateSeriesData } from '@/types/room';
 import { useToast } from '@/hooks/use-toast';
 
+const LS_KEY = 'roomsCatalog.filters.v1';
+
 export function useRoomsCatalog(orgId: string) {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +19,29 @@ export function useRoomsCatalog(orgId: string) {
     features: []
   });
   const { toast } = useToast();
+
+  // Load filters from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setFilters(prev => ({ ...prev, ...parsed }));
+      }
+    } catch (e) {
+      console.warn('Failed to read filters from localStorage', e);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist filters to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(filters));
+    } catch (e) {
+      console.warn('Failed to save filters to localStorage', e);
+    }
+  }, [filters]);
 
   const loadRooms = useCallback(async () => {
     try {
