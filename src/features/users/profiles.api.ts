@@ -50,7 +50,10 @@ export const listUsers = (orgId: string) =>
   .order("full_name", { ascending: true });
 
 export const updateUser = (userId: string, patch: any) =>
-  supabase.from("profiles").update(patch).eq("user_id", userId);
+  (supabase as any).from("profiles_backup").update(patch).eq("user_id", userId);
+
+export const updateProfile = (userId: string, patch: any) =>
+  (supabase as any).from("profiles_backup").update(patch).eq("user_id", userId);
 
 export const createInvitation = (payload: {org_id: string; email: string; role: string;}) =>
   (supabase as any).from("staff_invitations").insert({
