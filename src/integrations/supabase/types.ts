@@ -244,6 +244,108 @@ export type Database = {
         }
         Relationships: []
       }
+      guests: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          company_address: string | null
+          company_name: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          date_of_birth: string | null
+          document_expiry: string | null
+          document_issuing_country: string | null
+          document_number: string | null
+          document_type: string | null
+          email: string | null
+          first_name: string
+          guest_type: string | null
+          id: string
+          last_name: string
+          marketing_consent: boolean | null
+          nationality: string | null
+          notes: string | null
+          org_id: string
+          phone: string | null
+          postal_code: string | null
+          preferences: Json | null
+          preferred_communication: string | null
+          special_requests: string | null
+          state_province: string | null
+          tax_id: string | null
+          updated_at: string
+          vip_status: boolean | null
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          company_address?: string | null
+          company_name?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_of_birth?: string | null
+          document_expiry?: string | null
+          document_issuing_country?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          email?: string | null
+          first_name: string
+          guest_type?: string | null
+          id?: string
+          last_name: string
+          marketing_consent?: boolean | null
+          nationality?: string | null
+          notes?: string | null
+          org_id: string
+          phone?: string | null
+          postal_code?: string | null
+          preferences?: Json | null
+          preferred_communication?: string | null
+          special_requests?: string | null
+          state_province?: string | null
+          tax_id?: string | null
+          updated_at?: string
+          vip_status?: boolean | null
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          company_address?: string | null
+          company_name?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          date_of_birth?: string | null
+          document_expiry?: string | null
+          document_issuing_country?: string | null
+          document_number?: string | null
+          document_type?: string | null
+          email?: string | null
+          first_name?: string
+          guest_type?: string | null
+          id?: string
+          last_name?: string
+          marketing_consent?: boolean | null
+          nationality?: string | null
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          postal_code?: string | null
+          preferences?: Json | null
+          preferred_communication?: string | null
+          special_requests?: string | null
+          state_province?: string | null
+          tax_id?: string | null
+          updated_at?: string
+          vip_status?: boolean | null
+        }
+        Relationships: []
+      }
       hotel_settings: {
         Row: {
           activation_code: string | null
@@ -315,6 +417,7 @@ export type Database = {
           due_date: string | null
           guest_address: string | null
           guest_email: string | null
+          guest_id: string | null
           guest_name: string | null
           guest_phone: string | null
           id: number
@@ -343,6 +446,7 @@ export type Database = {
           due_date?: string | null
           guest_address?: string | null
           guest_email?: string | null
+          guest_id?: string | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: never
@@ -371,6 +475,7 @@ export type Database = {
           due_date?: string | null
           guest_address?: string | null
           guest_email?: string | null
+          guest_id?: string | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: never
@@ -390,6 +495,27 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "invoices_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["reservation_id"]
+          },
           {
             foreignKeyName: "invoices_reservation_id_fkey"
             columns: ["reservation_id"]
@@ -684,6 +810,7 @@ export type Database = {
           children: number | null
           date_arrival: string
           date_departure: string | null
+          guest_id: string | null
           id: string
           org_id: string
           planned_time: string | null
@@ -697,6 +824,7 @@ export type Database = {
           children?: number | null
           date_arrival: string
           date_departure?: string | null
+          guest_id?: string | null
           id?: string
           org_id: string
           planned_time?: string | null
@@ -710,6 +838,7 @@ export type Database = {
           children?: number | null
           date_arrival?: string
           date_departure?: string | null
+          guest_id?: string | null
           id?: string
           org_id?: string
           planned_time?: string | null
@@ -718,7 +847,22 @@ export type Database = {
           room_id?: string | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       room_types: {
         Row: {
@@ -1100,6 +1244,29 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_stay_history: {
+        Row: {
+          adults: number | null
+          children: number | null
+          date_arrival: string | null
+          date_departure: string | null
+          email: string | null
+          first_name: string | null
+          guest_id: string | null
+          invoice_number: string | null
+          invoice_total: number | null
+          last_name: string | null
+          nights_count: number | null
+          phone: string | null
+          rate_total: number | null
+          reservation_id: string | null
+          reservation_reference: string | null
+          reservation_status: string | null
+          room_number: string | null
+          room_type: string | null
+        }
+        Relationships: []
+      }
       rack_reservations_enriched: {
         Row: {
           adults: number | null
@@ -1213,6 +1380,7 @@ export type Database = {
           children: number | null
           date_arrival: string
           date_departure: string | null
+          guest_id: string | null
           id: string
           org_id: string
           planned_time: string | null
