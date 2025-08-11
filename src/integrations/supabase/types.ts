@@ -304,6 +304,115 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          adults_count: number | null
+          check_in_date: string | null
+          check_out_date: string | null
+          children_count: number | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          guest_address: string | null
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: number
+          issue_date: string | null
+          nights_count: number | null
+          notes: string | null
+          number: string | null
+          org_id: string
+          reference: string | null
+          reservation_id: string | null
+          room_number: string | null
+          room_type: string | null
+          status: string | null
+          subtotal: number | null
+          tax_amount: number | null
+          total_amount: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          adults_count?: number | null
+          check_in_date?: string | null
+          check_out_date?: string | null
+          children_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          guest_address?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: never
+          issue_date?: string | null
+          nights_count?: number | null
+          notes?: string | null
+          number?: string | null
+          org_id: string
+          reference?: string | null
+          reservation_id?: string | null
+          room_number?: string | null
+          room_type?: string | null
+          status?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          adults_count?: number | null
+          check_in_date?: string | null
+          check_out_date?: string | null
+          children_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          guest_address?: string | null
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: never
+          issue_date?: string | null
+          nights_count?: number | null
+          notes?: string | null
+          number?: string | null
+          org_id?: string
+          reference?: string | null
+          reservation_id?: string | null
+          room_number?: string | null
+          room_type?: string | null
+          status?: string | null
+          subtotal?: number | null
+          tax_amount?: number | null
+          total_amount?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "rack_reservations_enriched"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations_view_arrivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mobile_money_accounts: {
         Row: {
           active: boolean | null
@@ -547,6 +656,27 @@ export type Database = {
             referencedColumns: ["key"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          org_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          org_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          org_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       reservations: {
         Row: {
