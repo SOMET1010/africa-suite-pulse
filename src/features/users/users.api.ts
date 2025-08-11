@@ -36,16 +36,16 @@ export const upsertProfilePermissions = (rows: any[]) =>
   supabase.from("profile_permissions").upsert(rows).select();
 
 export const listAppUsers = (orgId: string) =>
-  (supabase as any).from("profiles_backup").select(`
+  (supabase as any).from("app_users").select(`
     id, user_id, org_id, login_code as login, full_name, profile_id, expires_at as password_expires_on, active,
-    profiles:profile_id (id, code, label, access_level)
+    user_roles:profile_id (id, name as label, access_level)
   `).eq("org_id", orgId).order("full_name");
 
 export const upsertAppUser = (payload: any) =>
-  (supabase as any).from("profiles_backup").upsert(payload).select();
+  (supabase as any).from("app_users").upsert(payload).select();
 
 export const deleteAppUser = (id: string) =>
-  (supabase as any).from("profiles_backup").delete().eq("id", id);
+  (supabase as any).from("app_users").delete().eq("id", id);
 
 /** Helper RPC */
 export const hasPermission = async (key: string): Promise<boolean> => {
