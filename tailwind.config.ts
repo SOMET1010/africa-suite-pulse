@@ -28,10 +28,12 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				
+				// Système unifié depuis tokens.css
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
+					DEFAULT: 'hsl(var(--brand-primary))',
 					foreground: 'hsl(var(--primary-foreground))',
-					glow: 'hsl(var(--primary-glow))',
+					hover: 'hsl(var(--brand-primary-hover))',
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -46,8 +48,9 @@ export default {
 					foreground: 'hsl(var(--muted-foreground))'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: 'hsl(var(--brand-accent))',
+					foreground: 'hsl(var(--accent-foreground))',
+					hover: 'hsl(var(--brand-accent-hover))',
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -57,14 +60,27 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Statuts métier
-				success: 'hsl(var(--success))',
-				warning: 'hsl(var(--warning))',
-				info: 'hsl(var(--info))',
-				danger: 'hsl(var(--danger))',
-				// Gradients
-				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-secondary': 'var(--gradient-secondary)',
+				
+				// Statuts métier unifiés
+				success: 'hsl(var(--brand-success))',
+				warning: 'hsl(var(--status-option))', 
+				info: 'hsl(var(--status-present))',
+				danger: 'hsl(var(--brand-danger))',
+				
+				// Status sémantiques
+				'status-confirmed': 'hsl(var(--status-confirmed))',
+				'status-present': 'hsl(var(--status-present))', 
+				'status-option': 'hsl(var(--status-option))',
+				'status-cancelled': 'hsl(var(--status-cancelled))',
+				
+				// Surfaces pastel
+				'soft-primary': 'hsl(var(--soft-primary))',
+				'soft-accent': 'hsl(var(--soft-accent))',
+				'soft-success': 'hsl(var(--soft-success))',
+				'soft-info': 'hsl(var(--soft-info))',
+				'soft-warning': 'hsl(var(--soft-warning))',
+				'soft-danger': 'hsl(var(--soft-danger))',
+				
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

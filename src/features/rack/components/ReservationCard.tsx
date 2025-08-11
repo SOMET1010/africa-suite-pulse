@@ -10,11 +10,11 @@ interface ReservationCardProps {
 export function ReservationCard({ reservation, compact = false, vivid = false }: ReservationCardProps) {
   const getStatusColor = (status: UIReservation["status"]) => {
     const colors = {
-      'confirmed': vivid ? 'bg-success text-white border-success' : 'bg-success/10 text-success border-success/20',
-      'present': vivid ? 'bg-info text-white border-info' : 'bg-info/10 text-info border-info/20',
-      'cancelled': vivid ? 'bg-destructive text-white border-destructive' : 'bg-destructive/10 text-destructive border-destructive/20',
-      'option': vivid ? 'bg-warning text-white border-warning' : 'bg-warning/10 text-warning border-warning/20',
-      'noshow': vivid ? 'bg-muted text-white border-muted' : 'bg-muted/10 text-muted-foreground border-muted/20',
+      'confirmed': vivid ? 'badge-soft--confirmed' : 'cell-soft--confirmed text-status-confirmed',
+      'present': vivid ? 'badge-soft--present' : 'cell-soft--present text-status-present',
+      'cancelled': vivid ? 'badge-soft--cancelled' : 'cell-soft--cancelled text-status-cancelled',
+      'option': vivid ? 'badge-soft--option' : 'cell-soft--option text-status-option',
+      'noshow': vivid ? 'bg-muted text-primary-foreground border-muted' : 'bg-muted/10 text-muted-foreground border-muted/20',
     };
     return colors[status] || colors.option;
   };

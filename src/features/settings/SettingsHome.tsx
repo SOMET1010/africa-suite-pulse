@@ -18,63 +18,63 @@ const settingsTiles = [
     description: 'Configuration générale de votre établissement',
     to: '/settings/hotel',
     icon: Building2,
-    color: 'from-blue-500 to-blue-600',
+    color: 'bg-soft-primary text-primary',
   },
   {
     title: 'Gestion des Chambres',
     description: 'Catalogue et types de chambres',
     to: '/settings/rooms',
     icon: Bed,
-    color: 'from-emerald-500 to-emerald-600',
+    color: 'bg-soft-success text-success',
   },
   {
     title: 'Catalogue Prestations',
     description: 'Services et prestations disponibles',
     to: '/settings/services',
     icon: Package,
-    color: 'from-purple-500 to-purple-600',
+    color: 'bg-soft-accent text-accent',
   },
   {
     title: 'Moyens de Paiement',
     description: 'Configuration des méthodes de paiement',
     to: '/settings/payments',
     icon: CreditCard,
-    color: 'from-orange-500 to-orange-600',
+    color: 'bg-soft-warning text-warning',
   },
   {
     title: 'Gestion Utilisateurs',
     description: 'Droits et accès du personnel',
     to: '/settings/users',
     icon: Users,
-    color: 'from-teal-500 to-teal-600',
+    color: 'bg-soft-info text-info',
   },
   {
     title: 'Paramètres Système',
     description: 'Configuration technique avancée',
     to: '/settings/system',
     icon: Settings,
-    color: 'from-gray-500 to-gray-600',
+    color: 'bg-muted text-muted-foreground',
   },
   {
     title: 'Modèles Documents',
     description: 'Factures, confirmations, rapports',
     to: '/settings/templates',
     icon: FileText,
-    color: 'from-indigo-500 to-indigo-600',
+    color: 'bg-soft-primary text-primary',
   },
   {
     title: 'Analytics & Rapports',
     description: 'Configuration des indicateurs',
     to: '/settings/analytics',
     icon: BarChart3,
-    color: 'from-red-500 to-red-600',
+    color: 'bg-soft-danger text-danger',
   },
   {
     title: 'Sécurité & Audit',
     description: 'Logs, sauvegardes, sécurité',
     to: '/settings/security',
     icon: Shield,
-    color: 'from-yellow-500 to-yellow-600',
+    color: 'bg-soft-warning text-warning',
   },
 ];
 
@@ -101,11 +101,11 @@ export default function SettingsHome() {
                 <Card className="h-full transition-all duration-200 hover:shadow-lg hover:scale-105 border-border">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-4">
-                      <div className={`
-                        p-3 rounded-lg bg-gradient-to-br ${tile.color} 
-                        shadow-sm group-hover:shadow-md transition-shadow
+                     <div className={`
+                        p-3 rounded-lg ${tile.color} 
+                        shadow-soft group-hover:shadow-elevate transition-smooth
                       `}>
-                        <Icon className="h-6 w-6 text-white" />
+                        <Icon className="h-6 w-6" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
@@ -133,13 +133,13 @@ export default function SettingsHome() {
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-green-600">Active</div>
+              <div className="text-2xl font-bold text-success">Active</div>
               <div className="text-sm text-muted-foreground">État du Système</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-6 text-center">
-              <div className="text-2xl font-bold text-blue-600">v2.1.0</div>
+              <div className="text-2xl font-bold text-primary">v2.1.0</div>
               <div className="text-sm text-muted-foreground">Version PMS</div>
             </CardContent>
           </Card>
