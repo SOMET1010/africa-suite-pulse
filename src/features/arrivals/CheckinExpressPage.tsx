@@ -10,6 +10,7 @@ import { Crown, FileText, MoreVertical } from "lucide-react";
 import type { ArrivalRow } from "./arrivals.types";
 import RoomAssignSheet from "./RoomAssignSheet";
 import { DocumentActionsMenu } from "./components/DocumentActionsMenu";
+import ArrivalServicesControl from "./components/ArrivalServicesControl";
 
 const statusToBadge = (s: ArrivalRow["status"]) =>
   s === "present" ? "present" : s === "confirmed" ? "confirmed" : s === "option" ? "option" : "cancelled" as const;

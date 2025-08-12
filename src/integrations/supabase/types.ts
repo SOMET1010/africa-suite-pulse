@@ -592,6 +592,57 @@ export type Database = {
         }
         Relationships: []
       }
+      invoice_items: {
+        Row: {
+          billing_condition: string | null
+          created_at: string
+          description: string
+          folio_number: number
+          id: string
+          invoice_id: number
+          org_id: string
+          quantity: number
+          service_code: string
+          total_price: number
+          unit_price: number
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          billing_condition?: string | null
+          created_at?: string
+          description: string
+          folio_number?: number
+          id?: string
+          invoice_id: number
+          org_id?: string
+          quantity?: number
+          service_code: string
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          billing_condition?: string | null
+          created_at?: string
+          description?: string
+          folio_number?: number
+          id?: string
+          invoice_id?: number
+          org_id?: string
+          quantity?: number
+          service_code?: string
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           adults_count: number | null
@@ -601,6 +652,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           due_date: string | null
+          folio_number: number | null
+          group_billing_mode: string | null
           guest_address: string | null
           guest_email: string | null
           guest_id: string | null
@@ -630,6 +683,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           due_date?: string | null
+          folio_number?: number | null
+          group_billing_mode?: string | null
           guest_address?: string | null
           guest_email?: string | null
           guest_id?: string | null
@@ -659,6 +714,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           due_date?: string | null
+          folio_number?: number | null
+          group_billing_mode?: string | null
           guest_address?: string | null
           guest_email?: string | null
           guest_id?: string | null
@@ -1240,6 +1297,60 @@ export type Database = {
         }
         Relationships: []
       }
+      reservation_services: {
+        Row: {
+          arrangement_id: string | null
+          billing_condition: string
+          created_at: string
+          folio_number: number
+          id: string
+          is_applied: boolean
+          org_id: string
+          quantity: number
+          reservation_id: string
+          service_id: string
+          total_price: number
+          unit_price: number
+          updated_at: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          arrangement_id?: string | null
+          billing_condition?: string
+          created_at?: string
+          folio_number?: number
+          id?: string
+          is_applied?: boolean
+          org_id?: string
+          quantity?: number
+          reservation_id: string
+          service_id: string
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          valid_from: string
+          valid_until: string
+        }
+        Update: {
+          arrangement_id?: string | null
+          billing_condition?: string
+          created_at?: string
+          folio_number?: number
+          id?: string
+          is_applied?: boolean
+          org_id?: string
+          quantity?: number
+          reservation_id?: string
+          service_id?: string
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
       reservations: {
         Row: {
           adults: number | null
@@ -1255,6 +1366,7 @@ export type Database = {
           date_arrival: string
           date_departure: string | null
           discount_amount: number | null
+          group_billing_mode: string | null
           group_id: string | null
           guest_id: string | null
           id: string
@@ -1288,6 +1400,7 @@ export type Database = {
           date_arrival: string
           date_departure?: string | null
           discount_amount?: number | null
+          group_billing_mode?: string | null
           group_id?: string | null
           guest_id?: string | null
           id?: string
@@ -1321,6 +1434,7 @@ export type Database = {
           date_arrival?: string
           date_departure?: string | null
           discount_amount?: number | null
+          group_billing_mode?: string | null
           group_id?: string | null
           guest_id?: string | null
           id?: string
@@ -2076,6 +2190,7 @@ export type Database = {
           date_arrival: string
           date_departure: string | null
           discount_amount: number | null
+          group_billing_mode: string | null
           group_id: string | null
           guest_id: string | null
           id: string

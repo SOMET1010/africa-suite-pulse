@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import type { Reservation } from "@/types/reservation";
+import ReservationServicesManager from "@/features/billing/components/ReservationServicesManager";
 
 interface ReservationDetailsSheetProps {
   open: boolean;
@@ -331,6 +332,14 @@ export function ReservationDetailsSheet({ open, onOpenChange, reservation }: Res
               )}
             </CardContent>
           </Card>
+
+          {/* Prestations à facturer */}
+          <ReservationServicesManager
+            reservationId={reservation.id}
+            dateArrival={reservation.date_arrival}
+            dateDeparture={reservation.date_departure}
+            orgId={reservation.org_id}
+          />
 
           {/* Actions */}
           <div className="space-y-2">
