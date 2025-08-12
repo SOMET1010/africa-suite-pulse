@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -28,12 +29,15 @@ import {
   Timer,
   Shirt,
   Package,
-  RotateCcw
+  RotateCcw,
+  UserPlus,
+  Eye
 } from "lucide-react";
 import { useMockHousekeepingTasks, useMockHousekeepingStaff, useMockRoomStatuses } from "./hooks/useMockHousekeeping";
 import { useRecoucheWorkflow } from "./hooks/useRecoucheWorkflow";
 import { LinenManagement } from "./components/LinenManagement";
 import { RecoucheBoard } from "./components/RecoucheBoard";
+import { HousekeepingTask } from "./types";
 import { cn } from "@/lib/utils";
 
 interface ScheduledTask {
@@ -55,6 +59,9 @@ export default function HousekeepingPage() {
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
+  const [selectedTask, setSelectedTask] = useState<HousekeepingTask | null>(null);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   // Utiliser les hooks mock pour les données
   const { tasks, loading: tasksLoading, updateTaskStatus, assignTask } = useMockHousekeepingTasks();
@@ -236,6 +243,21 @@ export default function HousekeepingPage() {
     updateRoomStatus(roomId, 'clean');
   };
 
+  // Handler pour assigner une tâche
+  const handleAssignTask = (staffId: string) => {
+    if (selectedTask) {
+      assignTask(selectedTask.id, staffId);
+      setIsAssignDialogOpen(false);
+      setSelectedTask(null);
+    }
+  };
+
+  // Handler pour voir les détails d'une tâche
+  const handleViewTaskDetails = (task: HousekeepingTask) => {
+    setSelectedTask(task);
+    setIsDetailsDialogOpen(true);
+  };
+
   return (
     <PageLayout title="Gouvernante - Housekeeping">
       <div className="space-y-6">
@@ -403,9 +425,29 @@ export default function HousekeepingPage() {
                           </Badge>
                           
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleViewTaskDetails(task)}
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
                               Détails
                             </Button>
+                            
+                            {!task.assigned_to && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedTask(task);
+                                  setIsAssignDialogOpen(true);
+                                }}
+                              >
+                                <UserPlus className="h-3 w-3 mr-1" />
+                                Assigner
+                              </Button>
+                            )}
+                            
                             {task.status === 'pending' && (
                               <Button 
                                 size="sm"
@@ -842,6 +884,172 @@ export default function HousekeepingPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Dialog pour assigner une tâche */}
+      <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Assigner la tâche - Chambre {selectedTask?.room_number}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-medium mb-2">Type de tâche:</h4>
+              <div className="flex items-center gap-2">
+                {selectedTask && getTaskTypeIcon(selectedTask.task_type)}
+                <span className="capitalize">
+                  {selectedTask?.task_type === 'cleaning' && 'Nettoyage'}
+                  {selectedTask?.task_type === 'maintenance' && 'Maintenance'}
+                  {selectedTask?.task_type === 'inspection' && 'Inspection'}
+                  {selectedTask?.task_type === 'linen_change' && 'Changement de linge'}
+                  {selectedTask?.task_type === 'recouche' && 'Recouche'}
+                </span>
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium mb-2">Personnel disponible:</h4>
+              <div className="space-y-2">
+                {staff
+                  .filter(s => s.status === 'available')
+                  .map((member) => (
+                    <Button
+                      key={member.id}
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => handleAssignTask(member.id)}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div>
+                          <span className="font-medium">{member.name}</span>
+                          <span className="text-sm text-muted-foreground ml-2">
+                            ({member.role})
+                          </span>
+                        </div>
+                        <Badge variant="secondary">Disponible</Badge>
+                      </div>
+                    </Button>
+                  ))}
+                
+                {staff.filter(s => s.status === 'available').length === 0 && (
+                  <p className="text-muted-foreground text-center py-4">
+                    Aucun personnel disponible actuellement
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog pour les détails d'une tâche */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Détails de la tâche - Chambre {selectedTask?.room_number}</DialogTitle>
+          </DialogHeader>
+          {selectedTask && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-medium">Type de tâche</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    {getTaskTypeIcon(selectedTask.task_type)}
+                    <span className="capitalize">
+                      {selectedTask.task_type === 'cleaning' && 'Nettoyage'}
+                      {selectedTask.task_type === 'maintenance' && 'Maintenance'}
+                      {selectedTask.task_type === 'inspection' && 'Inspection'}
+                      {selectedTask.task_type === 'linen_change' && 'Changement de linge'}
+                      {selectedTask.task_type === 'recouche' && 'Recouche'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium">Statut</h4>
+                  <Badge className={cn(getStatusColor(selectedTask.status), "mt-1")}>
+                    {selectedTask.status === 'pending' && 'En attente'}
+                    {selectedTask.status === 'in_progress' && 'En cours'}
+                    {selectedTask.status === 'completed' && 'Terminé'}
+                    {selectedTask.status === 'verified' && 'Vérifié'}
+                  </Badge>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium">Priorité</h4>
+                  <Badge className={cn(getPriorityColor(selectedTask.priority), "mt-1")}>
+                    {selectedTask.priority}
+                  </Badge>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium">Personnel assigné</h4>
+                  <p className="mt-1">{selectedTask.staff_name || 'Non assigné'}</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium">Durée estimée</h4>
+                  <p className="mt-1">{selectedTask.estimated_duration} minutes</p>
+                </div>
+                
+                {selectedTask.actual_duration && (
+                  <div>
+                    <h4 className="font-medium">Durée réelle</h4>
+                    <p className="mt-1">{selectedTask.actual_duration} minutes</p>
+                  </div>
+                )}
+              </div>
+              
+              {selectedTask.notes && (
+                <div>
+                  <h4 className="font-medium">Notes</h4>
+                  <p className="mt-1 text-sm">{selectedTask.notes}</p>
+                </div>
+              )}
+              
+              {selectedTask.checklist_items.length > 0 && (
+                <div>
+                  <h4 className="font-medium">Liste de contrôle</h4>
+                  <div className="mt-2 space-y-2">
+                    {selectedTask.checklist_items.map((item) => (
+                      <div key={item.id} className="flex items-center gap-2">
+                        <CheckCircle2 
+                          className={cn(
+                            "h-4 w-4",
+                            item.completed ? "text-green-600" : "text-gray-400"
+                          )} 
+                        />
+                        <span className={cn(
+                          "text-sm",
+                          item.completed ? "line-through text-muted-foreground" : ""
+                        )}>
+                          {item.description}
+                        </span>
+                        {item.required && (
+                          <Badge variant="secondary" className="text-xs">Requis</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {selectedTask.linen_details && (
+                <div>
+                  <h4 className="font-medium">Détails du linge</h4>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                    <p>Linge de lit: {selectedTask.linen_details.bed_linen ? 'Oui' : 'Non'}</p>
+                    <p>Linge de bain: {selectedTask.linen_details.bathroom_linen ? 'Oui' : 'Non'}</p>
+                    <p>Draps: {selectedTask.linen_details.sheets}</p>
+                    <p>Taies: {selectedTask.linen_details.pillowcases}</p>
+                    <p>Serviettes: {selectedTask.linen_details.towels}</p>
+                    <p>État: {selectedTask.linen_details.linen_condition}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </PageLayout>
   );
 }
