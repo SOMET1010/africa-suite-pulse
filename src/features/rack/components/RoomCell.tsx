@@ -2,6 +2,7 @@ import React, { useMemo, useCallback, useState } from 'react';
 import { ReservationCard } from './ReservationCard';
 import { RoomTypeIndicator } from './RoomTypeIndicator';
 import { EmptyRoomInfo } from './EmptyRoomInfo';
+import { useSimpleDragDrop } from '../hooks/useSimpleDragDrop';
 import type { UIRoom, UIReservation } from '../rack.types';
 
 interface RoomCellProps {
@@ -25,6 +26,7 @@ export function RoomCell({
   onReservationMove,
   onCellClick,
 }: RoomCellProps) {
+  const { dragState, endDrag } = useSimpleDragDrop();
   const [isDragOver, setIsDragOver] = useState(false);
   const [canDrop, setCanDrop] = useState(false);
 
@@ -45,10 +47,7 @@ export function RoomCell({
   }, [reservations, room.id, day]);
 
   // Validation du drop
-  const validateDrop = useCallback((reservationId: string) => {
-    if (!reservationId) return false;
-    
-    const draggedReservation = reservations.find(r => r.id === reservationId);
+  const validateDrop = useCallback((draggedReservation: UIReservation | null) => {
     if (!draggedReservation) return false;
     
     // Chambre identique = pas de déplacement
@@ -63,17 +62,18 @@ export function RoomCell({
     );
     
     return !hasConflict;
-  }, [room, cellReservations, reservations]);
+  }, [room, cellReservations]);
 
   // Gestion du drag over
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    const reservationId = e.dataTransfer.getData('text/reservation-id');
-    const isValid = validateDrop(reservationId);
     
-    setIsDragOver(true);
-    setCanDrop(isValid);
-  }, [validateDrop]);
+    if (dragState.isDragging && dragState.draggedReservation) {
+      const isValid = validateDrop(dragState.draggedReservation);
+      setIsDragOver(true);
+      setCanDrop(isValid);
+    }
+  }, [validateDrop, dragState]);
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -91,26 +91,27 @@ export function RoomCell({
     e.preventDefault();
     console.log('🎯 RoomCell handleDrop');
     
-    const reservationId = e.dataTransfer.getData('text/reservation-id');
-    if (!reservationId) {
-      console.log('❌ Pas de reservationId dans le drop');
+    if (!dragState.isDragging || !dragState.draggedReservation) {
+      console.log('❌ Pas de réservation en cours de drag');
       return;
     }
 
-    if (validateDrop(reservationId)) {
+    if (validateDrop(dragState.draggedReservation)) {
       console.log('✅ Drop valide - calling onReservationMove:', {
-        reservationId,
+        reservationId: dragState.draggedReservation.id,
         roomId: room.id,
         day
       });
-      onReservationMove(reservationId, room.id, day);
+      onReservationMove(dragState.draggedReservation.id, room.id, day);
     } else {
       console.log('❌ Drop invalide');
     }
     
+    // Nettoyer l'état du drag
+    endDrag();
     setIsDragOver(false);
     setCanDrop(false);
-  }, [validateDrop, onReservationMove, room.id, day]);
+  }, [validateDrop, onReservationMove, room.id, day, dragState, endDrag]);
 
   // Style de la cellule selon le statut
   const getCellStyle = () => {
