@@ -60,13 +60,25 @@ export default function RackGrid() {
     setManualRelodgeDialog
   });
 
-  // 🆕 GESTION MODERNISÉE DU DÉPLACEMENT AVEC REACT QUERY ET VALIDATION
+  // 🆕 GESTION MODERNISÉE DU DÉPLACEMENT AVEC REACT QUERY ET VALIDATION + DEBUG
   const handleReservationMove = useCallback(async (reservationId: string, targetRoomId: string, targetDay: string) => {
+    console.log('🎯 handleReservationMove appelé:', {
+      reservationId,
+      targetRoomId,
+      targetDay,
+      hasData: !!data,
+      reservationsCount: data?.reservations.length
+    });
+
     // 🔍 VALIDATION AVANT DÉPLACEMENT
     const reservation = data?.reservations.find(r => r.id === reservationId);
+    console.log('🔍 Réservation trouvée:', reservation);
+    
     const validation = validateMove(reservation, targetRoomId);
+    console.log('🔍 Résultat validation:', validation);
     
     if (!validation.isValid) {
+      console.log('❌ Validation échouée:', validation.reason);
       toast({ 
         title: "❌ Déplacement impossible", 
         description: validation.reason,
@@ -75,12 +87,19 @@ export default function RackGrid() {
       return;
     }
 
+    console.log('✅ Validation réussie, lancement de la mutation...');
     try {
+      console.log('🚀 Avant mutation:', { reservationId, roomId: targetRoomId });
       await reassignMutation.mutateAsync({ reservationId, roomId: targetRoomId });
+      console.log('✅ Mutation réussie, invalidation des queries...');
       
       // 🔄 INVALIDATION DES QUERIES POUR FORCER LA MISE À JOUR
       if (orgId) {
+        console.log('🔄 Invalidation avec orgId:', orgId);
         invalidateRackQueries(orgId);
+        console.log('✅ Queries invalidées');
+      } else {
+        console.log('❌ Pas d\'orgId pour l\'invalidation');
       }
       
       toast({ 
@@ -88,6 +107,7 @@ export default function RackGrid() {
         description: `Chambre ${targetRoomId}`,
       });
     } catch (error: any) {
+      console.log('❌ Erreur mutation:', error);
       toast({ 
         title: "❌ Erreur", 
         description: error.message || "Impossible de déplacer la réservation", 
@@ -95,6 +115,16 @@ export default function RackGrid() {
       });
     }
   }, [reassignMutation, orgId, data?.reservations]);
+
+  // 🧪 DEBUG: Vérifications supplémentaires
+  useEffect(() => {
+    console.log('📊 Données rack changées:', {
+      reservationsCount: data?.reservations.length,
+      loading,
+      isRefetching,
+      orgId
+    });
+  }, [data, loading, isRefetching, orgId]);
 
   // Injection des styles CSS
   useEffect(() => {
