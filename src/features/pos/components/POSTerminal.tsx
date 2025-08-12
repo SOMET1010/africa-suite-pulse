@@ -8,7 +8,7 @@ import { OrderSummary } from "./OrderSummary";
 import { TableSelector } from "./TableSelector";
 import { PaymentDialog } from "./PaymentDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
-import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder } from "../hooks/usePOSData";
+import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder, useOpenPOSSession } from "../hooks/usePOSData";
 import { ShoppingCart, CreditCard, Users, Store, Settings, Clock, Calendar } from "lucide-react";
 import type { POSOutlet, POSTable, CartItem } from "../types";
 
@@ -22,6 +22,7 @@ export function POSTerminal() {
   const { data: outlets = [] } = usePOSOutlets();
   const { data: currentSession } = useCurrentPOSSession(selectedOutlet?.id);
   const createOrder = useCreatePOSOrder();
+  const openSession = useOpenPOSSession();
 
   const handleAddToCart = (product: any, quantity: number = 1) => {
     const existingItem = cartItems.find(item => item.product_id === product.id);
@@ -107,9 +108,18 @@ export function POSTerminal() {
             <p className="text-muted-foreground mb-6">
               Aucune session POS n'est ouverte pour {selectedOutlet.name}
             </p>
-            <Button onClick={() => setSelectedOutlet(null)}>
-              Changer de point de vente
-            </Button>
+            <div className="space-y-3">
+              <Button 
+                onClick={() => openSession.mutate({ outletId: selectedOutlet.id, openingCash: 0 })}
+                disabled={openSession.isPending}
+                className="w-full"
+              >
+                {openSession.isPending ? "Ouverture..." : "Ouvrir une session"}
+              </Button>
+              <Button variant="outline" onClick={() => setSelectedOutlet(null)} className="w-full">
+                Changer de point de vente
+              </Button>
+            </div>
           </Card>
         </div>
       </div>

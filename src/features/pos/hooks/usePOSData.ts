@@ -97,11 +97,11 @@ export const useCurrentPOSSession = (outletId?: string) => {
         .select("*")
         .eq("outlet_id", outletId)
         .eq("status", "open")
-        .order("opened_at", { ascending: false })
+        .order("started_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       return data ? {
         ...data,
         opened_at: data.started_at
@@ -242,14 +242,20 @@ export const useOpenPOSSession = () => {
       outletId: string;
       openingCash: number;
     }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Utilisateur non connecté");
+
+      const orgIdResponse = await supabase.rpc("get_current_user_org_id");
+      const orgId = orgIdResponse.data;
+
       const { data, error } = await supabase
         .from("pos_sessions")
         .insert({
-          org_id: (await supabase.rpc("get_current_user_org_id")).data,
-          session_number: `SES-${Date.now()}`,
-          cashier_id: (await supabase.rpc("get_current_user_org_id")).data,
+          org_id: orgId,
           outlet_id: outletId,
+          session_number: `SES-${Date.now()}`, // Added missing session_number
           opening_cash: openingCash,
+          cashier_id: user.id,
           status: 'open',
           total_sales: 0,
           total_transactions: 0,
