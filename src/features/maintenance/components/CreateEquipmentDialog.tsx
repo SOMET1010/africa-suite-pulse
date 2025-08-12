@@ -1,4 +1,3 @@
-
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -75,7 +74,23 @@ export function CreateEquipmentDialog({
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await createMutation.mutateAsync(values);
+      // Ensure required fields are present and properly typed
+      const createData = {
+        equipment_code: values.equipment_code!,
+        name: values.name!,
+        category: values.category!,
+        location: values.location || undefined,
+        brand: values.brand || undefined,
+        model: values.model || undefined,
+        serial_number: values.serial_number || undefined,
+        purchase_date: values.purchase_date || undefined,
+        warranty_until: values.warranty_until || undefined,
+        installation_date: values.installation_date || undefined,
+        maintenance_frequency_days: values.maintenance_frequency_days || undefined,
+        notes: values.notes || undefined,
+      };
+      
+      await createMutation.mutateAsync(createData);
       form.reset();
       onOpenChange(false);
     } catch (error) {

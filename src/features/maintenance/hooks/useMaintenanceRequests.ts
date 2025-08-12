@@ -31,7 +31,7 @@ interface MaintenanceRequest {
   scheduled_date?: string;
   started_at?: string;
   completed_at?: string;
-  parts_used?: any[];
+  parts_used?: string[];
   work_performed?: string;
   photos_before?: string[];
   photos_after?: string[];
@@ -95,9 +95,15 @@ export function useMaintenanceRequests(filters: MaintenanceRequestsFilters = {})
       // Convert JSON fields to proper types
       return (data || []).map(item => ({
         ...item,
-        parts_used: Array.isArray(item.parts_used) ? item.parts_used : [],
-        photos_before: Array.isArray(item.photos_before) ? item.photos_before : [],
-        photos_after: Array.isArray(item.photos_after) ? item.photos_after : [],
+        parts_used: Array.isArray(item.parts_used) 
+          ? item.parts_used.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
+        photos_before: Array.isArray(item.photos_before) 
+          ? item.photos_before.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
+        photos_after: Array.isArray(item.photos_after) 
+          ? item.photos_after.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
       }));
     },
   });
@@ -125,6 +131,7 @@ export function useCreateMaintenanceRequest() {
           ...data,
           org_id: orgData.org_id,
           reported_by: userOrgData.user?.id,
+          status: 'pending',
         })
         .select()
         .single();
@@ -135,9 +142,15 @@ export function useCreateMaintenanceRequest() {
 
       return {
         ...result,
-        parts_used: Array.isArray(result.parts_used) ? result.parts_used : [],
-        photos_before: Array.isArray(result.photos_before) ? result.photos_before : [],
-        photos_after: Array.isArray(result.photos_after) ? result.photos_after : [],
+        parts_used: Array.isArray(result.parts_used) 
+          ? result.parts_used.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
+        photos_before: Array.isArray(result.photos_before) 
+          ? result.photos_before.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
+        photos_after: Array.isArray(result.photos_after) 
+          ? result.photos_after.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
       };
     },
     onSuccess: (data) => {
@@ -182,9 +195,15 @@ export function useUpdateMaintenanceRequest() {
 
       return {
         ...data,
-        parts_used: Array.isArray(data.parts_used) ? data.parts_used : [],
-        photos_before: Array.isArray(data.photos_before) ? data.photos_before : [],
-        photos_after: Array.isArray(data.photos_after) ? data.photos_after : [],
+        parts_used: Array.isArray(data.parts_used) 
+          ? data.parts_used.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
+        photos_before: Array.isArray(data.photos_before) 
+          ? data.photos_before.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
+        photos_after: Array.isArray(data.photos_after) 
+          ? data.photos_after.map(p => typeof p === 'string' ? p : JSON.stringify(p))
+          : [],
       };
     },
     onSuccess: () => {

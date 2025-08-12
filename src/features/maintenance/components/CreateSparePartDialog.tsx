@@ -1,4 +1,3 @@
-
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -79,7 +78,24 @@ export function CreateSparePartDialog({
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await createMutation.mutateAsync(values);
+      // Ensure required fields are present and properly typed
+      const createData = {
+        part_code: values.part_code!,
+        name: values.name!,
+        category: values.category!,
+        description: values.description || undefined,
+        supplier: values.supplier || undefined,
+        supplier_part_number: values.supplier_part_number || undefined,
+        current_stock: values.current_stock || undefined,
+        min_stock_level: values.min_stock_level || undefined,
+        max_stock_level: values.max_stock_level || undefined,
+        unit_cost: values.unit_cost || undefined,
+        unit: values.unit || undefined,
+        storage_location: values.storage_location || undefined,
+        notes: values.notes || undefined,
+      };
+      
+      await createMutation.mutateAsync(createData);
       form.reset();
       onOpenChange(false);
     } catch (error) {

@@ -196,7 +196,7 @@ export function useExecuteMaintenanceSchedule() {
       // Créer une demande de maintenance basée sur la planification
       const { data: request, error: requestError } = await supabase
         .from("maintenance_requests")
-        .insert([{
+        .insert({
           title: `Maintenance préventive - ${schedule.schedule_name}`,
           description: schedule.task_template,
           priority: "medium",
@@ -206,7 +206,8 @@ export function useExecuteMaintenanceSchedule() {
           estimated_duration_hours: schedule.estimated_duration_hours,
           scheduled_date: new Date().toISOString(),
           org_id: orgData.org_id,
-        }])
+          status: 'pending',
+        })
         .select()
         .single();
 

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -68,7 +67,19 @@ export function CreateMaintenanceRequestDialog({
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await createMutation.mutateAsync(values);
+      // Ensure required fields are present and properly typed
+      const createData = {
+        title: values.title!,
+        description: values.description!,
+        priority: values.priority!,
+        category: values.category!,
+        location: values.location || undefined,
+        estimated_duration_hours: values.estimated_duration_hours || undefined,
+        estimated_cost: values.estimated_cost || undefined,
+        notes: values.notes || undefined,
+      };
+      
+      await createMutation.mutateAsync(createData);
       form.reset();
       onOpenChange(false);
     } catch (error) {
