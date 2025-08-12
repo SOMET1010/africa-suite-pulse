@@ -2,12 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 import { TButton } from "@/core/ui/TButton";
 import { Badge } from "@/core/ui/Badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useArrivals, useAssignRoomToReservation, useCheckinReservation } from "@/queries/arrivals.queries";
 import { useOrgId } from "@/core/auth/useOrg";
-import { Crown } from "lucide-react";
+import { Crown, FileText, MoreVertical } from "lucide-react";
 import type { ArrivalRow } from "./arrivals.types";
 import RoomAssignSheet from "./RoomAssignSheet";
+import { DocumentActionsMenu } from "./components/DocumentActionsMenu";
 
 const statusToBadge = (s: ArrivalRow["status"]) =>
   s === "present" ? "present" : s === "confirmed" ? "confirmed" : s === "option" ? "option" : "cancelled" as const;
@@ -234,13 +236,18 @@ export default function CheckinExpressPage() {
                     >
                       Assigner
                     </TButton>
-                    <TButton 
-                      variant="ghost" 
-                      onClick={()=>toast({ title: "Note ajoutée", description: `Note pour ${a.guest_name}` })}
-                      className="group-hover:scale-[1.02] transition-elegant"
-                    >
-                      Note
-                    </TButton>
+                    <DocumentActionsMenu
+                      arrival={a}
+                      trigger={
+                        <TButton 
+                          variant="ghost" 
+                          className="group-hover:scale-[1.02] transition-elegant"
+                        >
+                          <FileText className="h-4 w-4 mr-1" />
+                          Documents
+                        </TButton>
+                      }
+                    />
                     <TButton 
                       variant="ghost" 
                       onClick={()=>toast({ title: "Détails", description: `Détails de ${a.guest_name}` })}

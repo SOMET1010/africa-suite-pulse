@@ -45,13 +45,22 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.send-reservation-email]
-verify_jwt = true
+verify_jwt = false
 
 [functions.generate-reservation-pdf]
-verify_jwt = true
+verify_jwt = false
 
 [functions.duplicate-reservation]
-verify_jwt = true
+verify_jwt = false
 
 [functions.calculate-tariff]
-verify_jwt = true
+verify_jwt = false
+
+[functions.generate-police-form]
+verify_jwt = false
+
+[functions.generate-room-card]
+verify_jwt = false
+
+[functions.generate-stay-program]
+verify_jwt = false
