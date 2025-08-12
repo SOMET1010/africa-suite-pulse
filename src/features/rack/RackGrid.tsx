@@ -60,13 +60,29 @@ export default function RackGrid() {
     setManualRelodgeDialog
   });
 
-  // 🆕 GESTION MODERNISÉE DU DÉPLACEMENT AVEC REACT QUERY
+  // 🆕 GESTION MODERNISÉE DU DÉPLACEMENT AVEC REACT QUERY ET VALIDATION
   const handleReservationMove = useCallback(async (reservationId: string, targetRoomId: string, targetDay: string) => {
+    // 🔍 VALIDATION AVANT DÉPLACEMENT
+    const reservation = data?.reservations.find(r => r.id === reservationId);
+    const validation = validateMove(reservation, targetRoomId);
+    
+    if (!validation.isValid) {
+      toast({ 
+        title: "❌ Déplacement impossible", 
+        description: validation.reason,
+        variant: "destructive" 
+      });
+      return;
+    }
+
     try {
       await reassignMutation.mutateAsync({ reservationId, roomId: targetRoomId });
+      
+      // 🔄 INVALIDATION DES QUERIES POUR FORCER LA MISE À JOUR
       if (orgId) {
         invalidateRackQueries(orgId);
       }
+      
       toast({ 
         title: "✅ Réservation déplacée", 
         description: `Chambre ${targetRoomId}`,
@@ -78,7 +94,7 @@ export default function RackGrid() {
         variant: "destructive" 
       });
     }
-  }, [reassignMutation, orgId]);
+  }, [reassignMutation, orgId, data?.reservations]);
 
   // Injection des styles CSS
   useEffect(() => {
@@ -129,41 +145,6 @@ export default function RackGrid() {
     return { isValid: true };
   }
 
-  // 🆕 FONCTION DE VALIDATION MODERNISÉE
-  async function performDrop(resId: string, roomId: string) {
-    
-    const reservation = data?.reservations.find(r => r.id === resId);
-    const validation = validateMove(reservation, roomId);
-    
-    if (!validation.isValid) {
-      toast({ 
-        title: "❌ Déplacement impossible", 
-        description: validation.reason,
-        variant: "destructive" 
-      });
-      return;
-    }
-
-    try {
-      await reassignMutation.mutateAsync({ reservationId: resId, roomId });
-      // 🔄 INVALIDATION DES QUERIES POUR FORCER LA MISE À JOUR
-      if (orgId) {
-        invalidateRackQueries(orgId);
-      }
-      
-      toast({ 
-        title: "✅ Réservation réassignée", 
-        description: `Déplacée vers la chambre ${roomId}` 
-      });
-      
-    } catch (error: any) {
-      toast({ 
-        title: "❌ Erreur", 
-        description: error.message || "Impossible de réassigner la réservation",
-        variant: "destructive" 
-      });
-    }
-  }
 
 
   // Gestion des handlers avec React Query
