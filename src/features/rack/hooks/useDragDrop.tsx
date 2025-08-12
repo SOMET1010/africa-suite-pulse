@@ -356,6 +356,12 @@ export function DropZoneRoom({
     }
   }, [dragState.isDragging, dragState.draggedReservation, room.id, canDrop, setDragOver]);
 
+  const handleMouseMove = useCallback(() => {
+    if (dragState.isDragging && dragState.draggedReservation) {
+      setDragOver(room.id, canDrop);
+    }
+  }, [dragState.isDragging, dragState.draggedReservation, room.id, canDrop, setDragOver]);
+
   const handleMouseLeave = useCallback(() => {
     if (dragState.isDragging) {
       setDragOver(null, false);
@@ -408,6 +414,7 @@ export function DropZoneRoom({
           : ''
       }`}
       onMouseEnter={handleMouseEnter}
+      onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseUp={handleMouseUp}
       onTouchMove={handleTouchMove}

@@ -131,7 +131,10 @@ export function RoomCell({
           transform: `scale(${zoom / 100})`,
           transformOrigin: 'top left'
         }}
-        onClick={() => onCellClick(room, day, dayReservations[0])}
+        onClick={(e) => {
+          if (dragState.isDragging) { e.preventDefault(); e.stopPropagation(); return; }
+          onCellClick(room, day, dayReservations[0]);
+        }}
       >
         {/* Contenu de la cellule */}
         <div className={`p-1.5 ${compact ? 'space-y-1' : 'space-y-2'} h-full`}>
