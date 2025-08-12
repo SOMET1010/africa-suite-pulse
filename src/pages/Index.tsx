@@ -1,6 +1,17 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Crown, Users, Hotel, FileText, UserPlus, CreditCard, Settings, Clock, ArrowRight } from "lucide-react";
+import { 
+  Crown, 
+  Users, 
+  Hotel, 
+  FileText, 
+  UserPlus, 
+  CreditCard, 
+  Settings, 
+  Clock, 
+  ArrowRight 
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Index = () => {
