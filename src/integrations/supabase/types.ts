@@ -430,6 +430,81 @@ export type Database = {
         }
         Relationships: []
       }
+      equipment: {
+        Row: {
+          brand: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          equipment_code: string
+          id: string
+          installation_date: string | null
+          last_maintenance_date: string | null
+          location: string | null
+          maintenance_frequency_days: number | null
+          model: string | null
+          name: string
+          next_maintenance_date: string | null
+          notes: string | null
+          org_id: string
+          photo_url: string | null
+          purchase_date: string | null
+          serial_number: string | null
+          specifications: Json | null
+          status: string
+          updated_at: string
+          warranty_until: string | null
+        }
+        Insert: {
+          brand?: string | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          equipment_code: string
+          id?: string
+          installation_date?: string | null
+          last_maintenance_date?: string | null
+          location?: string | null
+          maintenance_frequency_days?: number | null
+          model?: string | null
+          name: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          org_id: string
+          photo_url?: string | null
+          purchase_date?: string | null
+          serial_number?: string | null
+          specifications?: Json | null
+          status?: string
+          updated_at?: string
+          warranty_until?: string | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          equipment_code?: string
+          id?: string
+          installation_date?: string | null
+          last_maintenance_date?: string | null
+          location?: string | null
+          maintenance_frequency_days?: number | null
+          model?: string | null
+          name?: string
+          next_maintenance_date?: string | null
+          notes?: string | null
+          org_id?: string
+          photo_url?: string | null
+          purchase_date?: string | null
+          serial_number?: string | null
+          specifications?: Json | null
+          status?: string
+          updated_at?: string
+          warranty_until?: string | null
+        }
+        Relationships: []
+      }
       guests: {
         Row: {
           address_line1: string | null
@@ -898,6 +973,164 @@ export type Database = {
           transaction_type?: string
         }
         Relationships: []
+      }
+      maintenance_requests: {
+        Row: {
+          actual_cost: number | null
+          actual_duration_hours: number | null
+          assigned_to: string | null
+          category: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          equipment_id: string | null
+          estimated_cost: number | null
+          estimated_duration_hours: number | null
+          id: string
+          location: string | null
+          notes: string | null
+          org_id: string
+          parts_used: Json | null
+          photos_after: Json | null
+          photos_before: Json | null
+          priority: string
+          reported_by: string | null
+          request_number: string
+          room_id: string | null
+          scheduled_date: string | null
+          started_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          work_performed: string | null
+        }
+        Insert: {
+          actual_cost?: number | null
+          actual_duration_hours?: number | null
+          assigned_to?: string | null
+          category: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description: string
+          equipment_id?: string | null
+          estimated_cost?: number | null
+          estimated_duration_hours?: number | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          org_id: string
+          parts_used?: Json | null
+          photos_after?: Json | null
+          photos_before?: Json | null
+          priority?: string
+          reported_by?: string | null
+          request_number: string
+          room_id?: string | null
+          scheduled_date?: string | null
+          started_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          work_performed?: string | null
+        }
+        Update: {
+          actual_cost?: number | null
+          actual_duration_hours?: number | null
+          assigned_to?: string | null
+          category?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          equipment_id?: string | null
+          estimated_cost?: number | null
+          estimated_duration_hours?: number | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          org_id?: string
+          parts_used?: Json | null
+          photos_after?: Json | null
+          photos_before?: Json | null
+          priority?: string
+          reported_by?: string | null
+          request_number?: string
+          room_id?: string | null
+          scheduled_date?: string | null
+          started_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          work_performed?: string | null
+        }
+        Relationships: []
+      }
+      maintenance_schedules: {
+        Row: {
+          assigned_technician: string | null
+          created_at: string
+          created_by: string | null
+          equipment_id: string
+          estimated_duration_hours: number | null
+          frequency_type: string
+          frequency_value: number
+          id: string
+          is_active: boolean
+          last_executed_date: string | null
+          next_execution_date: string
+          org_id: string
+          required_parts: Json | null
+          schedule_name: string
+          task_template: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_technician?: string | null
+          created_at?: string
+          created_by?: string | null
+          equipment_id: string
+          estimated_duration_hours?: number | null
+          frequency_type: string
+          frequency_value?: number
+          id?: string
+          is_active?: boolean
+          last_executed_date?: string | null
+          next_execution_date: string
+          org_id: string
+          required_parts?: Json | null
+          schedule_name: string
+          task_template: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_technician?: string | null
+          created_at?: string
+          created_by?: string | null
+          equipment_id?: string
+          estimated_duration_hours?: number | null
+          frequency_type?: string
+          frequency_value?: number
+          id?: string
+          is_active?: boolean
+          last_executed_date?: string | null
+          next_execution_date?: string
+          org_id?: string
+          required_parts?: Json | null
+          schedule_name?: string
+          task_template?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_schedules_equipment_id_fkey"
+            columns: ["equipment_id"]
+            isOneToOne: false
+            referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mobile_money_accounts: {
         Row: {
@@ -1684,6 +1917,128 @@ export type Database = {
           },
         ]
       }
+      spare_parts: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          current_stock: number
+          description: string | null
+          id: string
+          is_active: boolean
+          last_restocked_date: string | null
+          max_stock_level: number | null
+          min_stock_level: number | null
+          name: string
+          notes: string | null
+          org_id: string
+          part_code: string
+          storage_location: string | null
+          supplier: string | null
+          supplier_part_number: string | null
+          unit: string | null
+          unit_cost: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          created_by?: string | null
+          current_stock?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_restocked_date?: string | null
+          max_stock_level?: number | null
+          min_stock_level?: number | null
+          name: string
+          notes?: string | null
+          org_id: string
+          part_code: string
+          storage_location?: string | null
+          supplier?: string | null
+          supplier_part_number?: string | null
+          unit?: string | null
+          unit_cost?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          current_stock?: number
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_restocked_date?: string | null
+          max_stock_level?: number | null
+          min_stock_level?: number | null
+          name?: string
+          notes?: string | null
+          org_id?: string
+          part_code?: string
+          storage_location?: string | null
+          supplier?: string | null
+          supplier_part_number?: string | null
+          unit?: string | null
+          unit_cost?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      spare_parts_movements: {
+        Row: {
+          id: string
+          maintenance_request_id: string | null
+          movement_type: string
+          notes: string | null
+          org_id: string
+          performed_at: string
+          performed_by: string | null
+          quantity: number
+          reason: string | null
+          reference_document: string | null
+          spare_part_id: string
+          unit_cost: number | null
+        }
+        Insert: {
+          id?: string
+          maintenance_request_id?: string | null
+          movement_type: string
+          notes?: string | null
+          org_id: string
+          performed_at?: string
+          performed_by?: string | null
+          quantity: number
+          reason?: string | null
+          reference_document?: string | null
+          spare_part_id: string
+          unit_cost?: number | null
+        }
+        Update: {
+          id?: string
+          maintenance_request_id?: string | null
+          movement_type?: string
+          notes?: string | null
+          org_id?: string
+          performed_at?: string
+          performed_by?: string | null
+          quantity?: number
+          reason?: string | null
+          reference_document?: string | null
+          spare_part_id?: string
+          unit_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spare_parts_movements_spare_part_id_fkey"
+            columns: ["spare_part_id"]
+            isOneToOne: false
+            referencedRelation: "spare_parts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_invitations: {
         Row: {
           created_at: string | null
@@ -2122,6 +2477,10 @@ export type Database = {
           p_reference?: string
         }
         Returns: undefined
+      }
+      calculate_next_maintenance_date: {
+        Args: { equipment_id_param: string }
+        Returns: string
       }
       get_current_user_org_id: {
         Args: Record<PropertyKey, never>
