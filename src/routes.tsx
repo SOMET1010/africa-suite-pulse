@@ -24,6 +24,7 @@ import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
 import AnalyticsDashboard from "@/features/analytics/AnalyticsDashboard";
 import AdvancedAnalytics from "@/features/analytics/AdvancedAnalytics";
 import ReportsManagement from "@/features/reports/ReportsManagement";
+import DailyReportsPage from "@/features/reports/daily/DailyReportsPage";
 import SecurityPage from "@/features/settings/security/SecurityPage";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
@@ -68,6 +69,7 @@ export function AppRoutes() {
         <Route path="analytics" element={<AnalyticsDashboard />} />
         <Route path="analytics/advanced" element={<AdvancedAnalytics />} />
         <Route path="reports" element={<ReportsManagement />} />
+        <Route path="reports/daily" element={<DailyReportsPage />} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>

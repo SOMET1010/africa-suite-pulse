@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ClosurePanel } from "./components/ClosurePanel";
 
 export default function ReportsManagement() {
-  const [activeTab, setActiveTab] = useState("templates");
+  const [activeTab, setActiveTab] = useState("daily");
   const { data: templates, isLoading } = useReportTemplates();
   const { generateReport, isGenerating } = useReportGeneration();
   const { toast } = useToast();
@@ -49,6 +49,10 @@ export default function ReportsManagement() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="daily" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Quotidiens
+          </TabsTrigger>
           <TabsTrigger value="templates" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Templates
@@ -66,6 +70,32 @@ export default function ReportsManagement() {
             Distribution
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="daily" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapports opérationnels quotidiens</CardTitle>
+              <CardDescription>
+                Accédez aux rapports Front Office, occupation, arrivées et départs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="/reports/daily" className="block">
+                  <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                    <CardContent className="p-6 text-center">
+                      <FileText className="w-8 h-8 mx-auto mb-4 text-primary" />
+                      <h3 className="font-medium mb-2">Rapports quotidiens</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Arrivées, départs, clients présents, No-Shows et occupation
+                      </p>
+                    </CardContent>
+                  </Card>
+                </a>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="templates" className="space-y-6">
           <div className="grid gap-6">
