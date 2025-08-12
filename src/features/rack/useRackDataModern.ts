@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useRackData } from "@/queries/rack.queries";
 import { useOrgId } from "@/core/auth/useOrg";
+import { useHotelDate } from "@/features/settings/hooks/useHotelDate";
 import type { UIRoom, UIReservation } from "./rack.types";
 
 // --- utils dates (UTC-safe, jour civil par ISO 'YYYY-MM-DD') ---
@@ -63,19 +64,21 @@ function toUIReservation(r: any): UIReservation {
  */
 export function useRackDataModern() {
   const { orgId } = useOrgId();
+  const { data: hotelDateInfo } = useHotelDate(orgId);
   
-  // Génération des dates (7 jours à partir d'aujourd'hui)
+  // Génération des dates (7 jours à partir de la date-hôtel courante)
   const { startISO, endISO, days } = useMemo(() => {
-    const start = toISODate(new Date());
-    const daysArray = daysRange(start, 7);
+    // Use hotel date as start if available, otherwise fallback to current date
+    const startDate = hotelDateInfo?.currentHotelDate || toISODate(new Date());
+    const daysArray = daysRange(startDate, 7);
     const end = daysArray[daysArray.length - 1];
     
     return {
-      startISO: start,
+      startISO: startDate,
       endISO: end,
       days: daysArray,
     };
-  }, []);
+  }, [hotelDateInfo?.currentHotelDate]);
 
   // Query avec React Query
   const rackQuery = useRackData(orgId!, startISO, endISO);
