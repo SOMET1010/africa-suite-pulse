@@ -202,22 +202,35 @@ export default function HousekeepingPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-      case 'in_progress': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
-      case 'completed': return 'bg-green-100 text-green-800 hover:bg-green-100';
-      case 'verified': return 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100';
-      case 'scheduled': return 'bg-purple-100 text-purple-800 hover:bg-purple-100';
-      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
+      case 'pending': return 'bg-soft-warning text-status-option';
+      case 'in_progress': return 'bg-soft-info text-status-present';
+      case 'completed': return 'bg-soft-success text-status-confirmed';
+      case 'verified': return 'bg-soft-success text-status-confirmed';
+      case 'scheduled': return 'bg-soft-primary text-primary';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return 'bg-red-100 text-red-800 hover:bg-red-100';
-      case 'high': return 'bg-orange-100 text-orange-800 hover:bg-orange-100';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100';
-      case 'low': return 'bg-green-100 text-green-800 hover:bg-green-100';
-      default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
+      case 'urgent': return 'bg-soft-danger text-status-cancelled';
+      case 'high': return 'bg-soft-warning text-status-option';
+      case 'medium': return 'bg-soft-warning text-status-option';
+      case 'low': return 'bg-soft-success text-status-confirmed';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'clean': return 'Propre';
+      case 'dirty': return 'Sale';
+      case 'maintenance': return 'Maintenance';
+      case 'inspected': return 'Inspectée';
+      case 'out_of_order': return 'Hors service';
+      case 'recouche_pending': return 'Recouche en attente';
+      case 'recouche_in_progress': return 'Recouche en cours';
+      default: return status;
     }
   };
 
@@ -411,7 +424,7 @@ export default function HousekeepingPage() {
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{roomStats.clean}</div>
+              <div className="text-2xl font-bold text-success">{roomStats.clean}</div>
               <p className="text-xs text-muted-foreground">
                 {Math.round((roomStats.clean / roomStats.total) * 100)}% du total
               </p>
@@ -424,7 +437,7 @@ export default function HousekeepingPage() {
               <RotateCcw className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{roomStats.recouche_pending + roomStats.recouche_in_progress}</div>
+              <div className="text-2xl font-bold text-info">{roomStats.recouche_pending + roomStats.recouche_in_progress}</div>
               <p className="text-xs text-muted-foreground">
                 {roomStats.recouche_pending} en attente, {roomStats.recouche_in_progress} en cours
               </p>
@@ -633,9 +646,9 @@ export default function HousekeepingPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium">Changements nécessaires</p>
-                          <p className="text-2xl font-bold text-orange-600">{roomStats.needs_linen_change}</p>
+                          <p className="text-2xl font-bold text-warning">{roomStats.needs_linen_change}</p>
                         </div>
-                        <Shirt className="h-8 w-8 text-orange-500" />
+                        <Shirt className="h-8 w-8 text-warning" />
                       </div>
                     </Card>
                     
@@ -643,9 +656,9 @@ export default function HousekeepingPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium">Stock disponible</p>
-                          <p className="text-2xl font-bold text-green-600">89%</p>
+                          <p className="text-2xl font-bold text-success">89%</p>
                         </div>
-                        <Package className="h-8 w-8 text-green-500" />
+                        <Package className="h-8 w-8 text-success" />
                       </div>
                     </Card>
                     
@@ -653,9 +666,9 @@ export default function HousekeepingPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-sm font-medium">En lavage</p>
-                          <p className="text-2xl font-bold text-blue-600">24</p>
+                          <p className="text-2xl font-bold text-info">24</p>
                         </div>
-                        <RotateCcw className="h-8 w-8 text-blue-500" />
+                        <RotateCcw className="h-8 w-8 text-info" />
                       </div>
                     </Card>
                   </div>
@@ -703,10 +716,10 @@ export default function HousekeepingPage() {
                         <h3 className="font-semibold">Ch. {room.room_number}</h3>
                         <Badge 
                           className={cn(
-                            room.current_status === 'clean' && 'bg-green-100 text-green-800',
-                            room.current_status === 'dirty' && 'bg-red-100 text-red-800',
-                            room.current_status === 'maintenance' && 'bg-orange-100 text-orange-800',
-                            room.current_status === 'inspected' && 'bg-blue-100 text-blue-800'
+                            room.current_status === 'clean' && 'bg-soft-success text-status-confirmed',
+                            room.current_status === 'dirty' && 'bg-soft-danger text-status-cancelled',
+                            room.current_status === 'maintenance' && 'bg-soft-warning text-status-option',
+                            room.current_status === 'inspected' && 'bg-soft-info text-status-present'
                           )}
                         >
                           {room.current_status === 'clean' && 'Propre'}
@@ -762,10 +775,10 @@ export default function HousekeepingPage() {
                       <div className="flex items-center space-x-3">
                         <Badge 
                           className={cn(
-                            member.status === 'available' && 'bg-green-100 text-green-800',
-                            member.status === 'busy' && 'bg-blue-100 text-blue-800',
-                            member.status === 'break' && 'bg-yellow-100 text-yellow-800',
-                            member.status === 'off_duty' && 'bg-gray-100 text-gray-800'
+                            member.status === 'available' && 'bg-soft-success text-status-confirmed',
+                            member.status === 'busy' && 'bg-soft-info text-status-present',
+                            member.status === 'break' && 'bg-soft-warning text-status-option',
+                            member.status === 'off_duty' && 'bg-muted text-muted-foreground'
                           )}
                         >
                           {member.status === 'available' && 'Disponible'}
@@ -981,7 +994,7 @@ export default function HousekeepingPage() {
                             <div className="text-sm text-muted-foreground">Tâches totales</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-green-600">
+                            <div className="text-2xl font-bold text-success">
                               {getWeekDays(selectedDate).reduce((acc, day) => 
                                 acc + getTasksForDate(day).filter(t => t.status === 'completed').length, 0
                               )}
@@ -989,7 +1002,7 @@ export default function HousekeepingPage() {
                             <div className="text-sm text-muted-foreground">Terminées</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-blue-600">
+                            <div className="text-2xl font-bold text-info">
                               {getWeekDays(selectedDate).reduce((acc, day) => 
                                 acc + getTasksForDate(day).filter(t => t.status === 'in_progress').length, 0
                               )}
@@ -997,7 +1010,7 @@ export default function HousekeepingPage() {
                             <div className="text-sm text-muted-foreground">En cours</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-2xl font-bold text-orange-600">
+                            <div className="text-2xl font-bold text-warning">
                               {getWeekDays(selectedDate).reduce((acc, day) => 
                                 acc + getTasksForDate(day).filter(t => t.priority === 'urgent').length, 0
                               )}
@@ -1174,7 +1187,7 @@ export default function HousekeepingPage() {
                         <CheckCircle2 
                           className={cn(
                             "h-4 w-4",
-                            item.completed ? "text-green-600" : "text-gray-400"
+                            item.completed ? "text-success" : "text-muted-foreground"
                           )} 
                         />
                         <span className={cn(
