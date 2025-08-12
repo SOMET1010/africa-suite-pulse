@@ -1350,6 +1350,558 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_categories: {
+        Row: {
+          code: string
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name: string
+          org_id: string
+          outlet_id: string | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          org_id: string
+          outlet_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          org_id?: string
+          outlet_id?: string | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_categories_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "pos_outlets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_order_items: {
+        Row: {
+          created_at: string
+          discount_amount: number | null
+          id: string
+          modifiers: Json | null
+          order_id: string | null
+          product_id: string | null
+          quantity: number
+          ready_at: string | null
+          sent_to_kitchen_at: string | null
+          special_instructions: string | null
+          status: string | null
+          tax_amount: number | null
+          total_price: number
+          unit_price: number
+          updated_at: string
+          variant_selection: Json | null
+        }
+        Insert: {
+          created_at?: string
+          discount_amount?: number | null
+          id?: string
+          modifiers?: Json | null
+          order_id?: string | null
+          product_id?: string | null
+          quantity?: number
+          ready_at?: string | null
+          sent_to_kitchen_at?: string | null
+          special_instructions?: string | null
+          status?: string | null
+          tax_amount?: number | null
+          total_price: number
+          unit_price: number
+          updated_at?: string
+          variant_selection?: Json | null
+        }
+        Update: {
+          created_at?: string
+          discount_amount?: number | null
+          id?: string
+          modifiers?: Json | null
+          order_id?: string | null
+          product_id?: string | null
+          quantity?: number
+          ready_at?: string | null
+          sent_to_kitchen_at?: string | null
+          special_instructions?: string | null
+          status?: string | null
+          tax_amount?: number | null
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          variant_selection?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "pos_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "pos_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_orders: {
+        Row: {
+          cashier_id: string | null
+          created_at: string
+          customer_count: number | null
+          discount_amount: number
+          guest_id: string | null
+          id: string
+          kitchen_notes: string | null
+          order_number: string
+          order_type: string
+          org_id: string
+          outlet_id: string | null
+          paid_at: string | null
+          ready_at: string | null
+          reservation_id: string | null
+          room_id: string | null
+          sent_to_kitchen_at: string | null
+          served_at: string | null
+          server_id: string | null
+          session_id: string | null
+          special_instructions: string | null
+          status: string
+          subtotal: number
+          table_id: string | null
+          tax_amount: number
+          tip_amount: number
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          cashier_id?: string | null
+          created_at?: string
+          customer_count?: number | null
+          discount_amount?: number
+          guest_id?: string | null
+          id?: string
+          kitchen_notes?: string | null
+          order_number: string
+          order_type?: string
+          org_id: string
+          outlet_id?: string | null
+          paid_at?: string | null
+          ready_at?: string | null
+          reservation_id?: string | null
+          room_id?: string | null
+          sent_to_kitchen_at?: string | null
+          served_at?: string | null
+          server_id?: string | null
+          session_id?: string | null
+          special_instructions?: string | null
+          status?: string
+          subtotal?: number
+          table_id?: string | null
+          tax_amount?: number
+          tip_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          cashier_id?: string | null
+          created_at?: string
+          customer_count?: number | null
+          discount_amount?: number
+          guest_id?: string | null
+          id?: string
+          kitchen_notes?: string | null
+          order_number?: string
+          order_type?: string
+          org_id?: string
+          outlet_id?: string | null
+          paid_at?: string | null
+          ready_at?: string | null
+          reservation_id?: string | null
+          room_id?: string | null
+          sent_to_kitchen_at?: string | null
+          served_at?: string | null
+          server_id?: string | null
+          session_id?: string | null
+          special_instructions?: string | null
+          status?: string
+          subtotal?: number
+          table_id?: string | null
+          tax_amount?: number
+          tip_amount?: number
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_orders_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "pos_outlets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_orders_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "pos_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_outlets: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          org_id: string
+          outlet_type: string
+          settings: Json | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          org_id: string
+          outlet_type?: string
+          settings?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          org_id?: string
+          outlet_type?: string
+          settings?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pos_products: {
+        Row: {
+          allergens: Json | null
+          barcode: string | null
+          base_price: number
+          category_id: string | null
+          code: string
+          cost_price: number | null
+          created_at: string
+          current_stock: number | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          kitchen_notes: string | null
+          min_stock_level: number | null
+          name: string
+          org_id: string
+          outlet_id: string | null
+          preparation_time: number | null
+          service_id: string | null
+          sort_order: number | null
+          tax_rate: number | null
+          track_stock: boolean | null
+          updated_at: string
+          variants: Json | null
+        }
+        Insert: {
+          allergens?: Json | null
+          barcode?: string | null
+          base_price?: number
+          category_id?: string | null
+          code: string
+          cost_price?: number | null
+          created_at?: string
+          current_stock?: number | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          kitchen_notes?: string | null
+          min_stock_level?: number | null
+          name: string
+          org_id: string
+          outlet_id?: string | null
+          preparation_time?: number | null
+          service_id?: string | null
+          sort_order?: number | null
+          tax_rate?: number | null
+          track_stock?: boolean | null
+          updated_at?: string
+          variants?: Json | null
+        }
+        Update: {
+          allergens?: Json | null
+          barcode?: string | null
+          base_price?: number
+          category_id?: string | null
+          code?: string
+          cost_price?: number | null
+          created_at?: string
+          current_stock?: number | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          kitchen_notes?: string | null
+          min_stock_level?: number | null
+          name?: string
+          org_id?: string
+          outlet_id?: string | null
+          preparation_time?: number | null
+          service_id?: string | null
+          sort_order?: number | null
+          tax_rate?: number | null
+          track_stock?: boolean | null
+          updated_at?: string
+          variants?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "pos_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_products_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "pos_outlets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_promotions: {
+        Row: {
+          applicable_categories: string[] | null
+          applicable_products: string[] | null
+          code: string
+          conditions: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_discount: number | null
+          min_amount: number | null
+          name: string
+          org_id: string
+          outlet_ids: string[] | null
+          type: string
+          updated_at: string
+          usage_limit: number | null
+          used_count: number | null
+          valid_from: string
+          valid_until: string
+          value: number
+        }
+        Insert: {
+          applicable_categories?: string[] | null
+          applicable_products?: string[] | null
+          code: string
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount?: number | null
+          min_amount?: number | null
+          name: string
+          org_id: string
+          outlet_ids?: string[] | null
+          type?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number | null
+          valid_from: string
+          valid_until: string
+          value: number
+        }
+        Update: {
+          applicable_categories?: string[] | null
+          applicable_products?: string[] | null
+          code?: string
+          conditions?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount?: number | null
+          min_amount?: number | null
+          name?: string
+          org_id?: string
+          outlet_ids?: string[] | null
+          type?: string
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number | null
+          valid_from?: string
+          valid_until?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      pos_sessions: {
+        Row: {
+          cashier_id: string
+          closed_at: string | null
+          closing_cash: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          opening_cash: number | null
+          org_id: string
+          outlet_id: string | null
+          session_number: string
+          started_at: string
+          status: string
+          total_sales: number | null
+          total_transactions: number | null
+          updated_at: string
+        }
+        Insert: {
+          cashier_id: string
+          closed_at?: string | null
+          closing_cash?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          opening_cash?: number | null
+          org_id: string
+          outlet_id?: string | null
+          session_number: string
+          started_at?: string
+          status?: string
+          total_sales?: number | null
+          total_transactions?: number | null
+          updated_at?: string
+        }
+        Update: {
+          cashier_id?: string
+          closed_at?: string | null
+          closing_cash?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          opening_cash?: number | null
+          org_id?: string
+          outlet_id?: string | null
+          session_number?: string
+          started_at?: string
+          status?: string
+          total_sales?: number | null
+          total_transactions?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sessions_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "pos_outlets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_tables: {
+        Row: {
+          capacity: number | null
+          created_at: string
+          id: string
+          is_active: boolean
+          org_id: string
+          outlet_id: string | null
+          position_x: number | null
+          position_y: number | null
+          shape: string | null
+          status: string | null
+          table_number: string
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+          outlet_id?: string | null
+          position_x?: number | null
+          position_y?: number | null
+          shape?: string | null
+          status?: string | null
+          table_number: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          outlet_id?: string | null
+          position_x?: number | null
+          position_y?: number | null
+          shape?: string | null
+          status?: string | null
+          table_number?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_tables_outlet_id_fkey"
+            columns: ["outlet_id"]
+            isOneToOne: false
+            referencedRelation: "pos_outlets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_permissions: {
         Row: {
           allowed: boolean
