@@ -2356,6 +2356,51 @@ export type Database = {
           },
         ]
       }
+      pos_users: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          created_by: string | null
+          display_name: string
+          employee_code: string | null
+          id: string
+          is_active: boolean
+          last_login_at: string | null
+          org_id: string
+          pin_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          employee_code?: string | null
+          id?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          org_id: string
+          pin_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          employee_code?: string | null
+          id?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          org_id?: string
+          pin_hash?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_permissions: {
         Row: {
           allowed: boolean
@@ -3650,6 +3695,14 @@ export type Database = {
         Args: { task_id: string; staff_id: string }
         Returns: undefined
       }
+      authenticate_pos_user: {
+        Args: { p_org_id: string; p_pin: string }
+        Returns: {
+          user_id: string
+          display_name: string
+          role_name: string
+        }[]
+      }
       calculate_next_maintenance_date: {
         Args: { equipment_id_param: string }
         Returns: string
@@ -3666,6 +3719,17 @@ export type Database = {
       complete_night_audit: {
         Args: { p_session_id: string }
         Returns: boolean
+      }
+      create_pos_user: {
+        Args: {
+          p_org_id: string
+          p_user_id: string
+          p_pin: string
+          p_display_name: string
+          p_role?: string
+          p_employee_code?: string
+        }
+        Returns: string
       }
       get_current_user_org_id: {
         Args: Record<PropertyKey, never>
@@ -3784,6 +3848,9 @@ export type Database = {
         | "receptionist"
         | "accountant"
         | "housekeeping"
+        | "pos_server"
+        | "pos_cashier"
+        | "pos_manager"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3920,6 +3987,9 @@ export const Constants = {
         "receptionist",
         "accountant",
         "housekeeping",
+        "pos_server",
+        "pos_cashier",
+        "pos_manager",
       ],
     },
   },
