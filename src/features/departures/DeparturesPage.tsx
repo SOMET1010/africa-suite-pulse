@@ -21,7 +21,7 @@ export default function DeparturesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   
-  const { orgId } = useOrgId();
+  const { orgId, loading: orgLoading } = useOrgId();
   const today = new Date().toISOString().split('T')[0];
   
   const { data: departures = [], isLoading } = useDepartures(
