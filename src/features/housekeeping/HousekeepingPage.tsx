@@ -39,6 +39,9 @@ import { LinenManagement } from "./components/LinenManagement";
 import { RecoucheBoard } from "./components/RecoucheBoard";
 import { TimelineView } from "./components/TimelineView";
 import { TaskPerformanceStats } from "./components/TaskPerformanceStats";
+import { KanbanBoard } from "./components/KanbanBoard";
+import { RealTimeAlerts } from "./components/RealTimeAlerts";
+import { TeamPerformanceReports } from "./components/TeamPerformanceReports";
 import { HousekeepingTask } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -275,6 +278,17 @@ export default function HousekeepingPage() {
     }
   };
 
+  // Handler pour déplacer une tâche dans le Kanban
+  const handleTaskMove = (taskId: string, newStatus: HousekeepingTask['status']) => {
+    updateTaskStatus(taskId, newStatus);
+  };
+
+  // Handler pour les actions d'alertes
+  const handleAlertAction = (alertId: string, action: string) => {
+    console.log('Action alerte:', alertId, action);
+    // Ici on peut implémenter les actions spécifiques selon le type d'alerte
+  };
+
   return (
     <PageLayout title="Gouvernante - Housekeeping">
       <div className="space-y-6">
@@ -335,13 +349,14 @@ export default function HousekeepingPage() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="tasks" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-8">
+          <TabsList className="grid w-full grid-cols-9">
             <TabsTrigger value="tasks">Tâches</TabsTrigger>
+            <TabsTrigger value="kanban">Board</TabsTrigger>
+            <TabsTrigger value="alerts">Alertes</TabsTrigger>
             <TabsTrigger value="recouche">Recouche</TabsTrigger>
             <TabsTrigger value="linen">Linge</TabsTrigger>
             <TabsTrigger value="rooms">Statut chambres</TabsTrigger>
             <TabsTrigger value="staff">Personnel</TabsTrigger>
-            <TabsTrigger value="planning">Planning</TabsTrigger>
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
@@ -494,14 +509,25 @@ export default function HousekeepingPage() {
             </Card>
           </TabsContent>
 
-          {/* Recouche Tab */}
-          <TabsContent value="recouche" className="space-y-4">
-            <RecoucheBoard 
+          {/* Kanban Board Tab */}
+          <TabsContent value="kanban" className="space-y-4">
+            <KanbanBoard 
+              tasks={tasks}
+              staff={staff}
+              rooms={rooms}
+              onTaskAction={handleTaskAction}
+              onTaskAssign={(taskId, staffId) => assignTask(taskId, staffId)}
+              onTaskMove={handleTaskMove}
+            />
+          </TabsContent>
+
+          {/* Real-time Alerts Tab */}
+          <TabsContent value="alerts" className="space-y-4">
+            <RealTimeAlerts 
+              tasks={tasks}
               rooms={rooms}
               workflows={workflows}
-              onStartTask={startTask}
-              onCompleteTask={completeTask}
-              onAssignStaff={assignStaff}
+              onAlertAction={handleAlertAction}
             />
           </TabsContent>
 
@@ -1080,13 +1106,13 @@ export default function HousekeepingPage() {
         />
       </TabsContent>
 
-      {/* Performance Tab */}
-      <TabsContent value="performance" className="space-y-4">
-        <TaskPerformanceStats 
-          tasks={tasks}
-          staff={staff}
-        />
-      </TabsContent>
+          {/* Performance Tab */}
+          <TabsContent value="performance" className="space-y-4">
+            <TeamPerformanceReports 
+              tasks={tasks}
+              staff={staff}
+            />
+          </TabsContent>
     </PageLayout>
   );
 }
