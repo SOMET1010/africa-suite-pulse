@@ -21,11 +21,11 @@ export default function DeparturesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   
-  const { data: org } = useOrg();
+  const { orgId } = useOrgId();
   const today = new Date().toISOString().split('T')[0];
   
   const { data: departures = [], isLoading } = useDepartures(
-    org?.id || "", 
+    orgId || "", 
     today
   );
   const checkoutMutation = useCheckoutReservation();
