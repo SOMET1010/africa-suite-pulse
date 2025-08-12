@@ -1,11 +1,13 @@
 export interface HousekeepingTask {
   id: string;
-  room_id: string;
+  room_id?: string;
   room_number: string;
   task_type: 'cleaning' | 'maintenance' | 'inspection' | 'linen_change' | 'recouche';
-  status: 'pending' | 'in_progress' | 'completed' | 'verified';
+  status: 'pending' | 'in_progress' | 'completed' | 'verified' | 'paused';
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  assigned_to: string | null;
+  assigned_to?: string | null;
+  assigned_staff_id?: string;
+  staff_id?: string;
   staff_name?: string;
   estimated_duration: number;
   actual_duration?: number;
@@ -16,10 +18,14 @@ export interface HousekeepingTask {
   started_at?: string;
   completed_at?: string;
   due_at?: string;
+  due_date?: string;
   scheduled_at?: string;
+  scheduled_start_time?: string; // Format HH:MM
+  scheduled_end_time?: string; // Format HH:MM
   checkout_time?: string;
   checkin_time?: string;
-  org_id: string;
+  paused_at?: string; // ISO timestamp
+  org_id?: string;
 }
 
 export interface ChecklistItem {

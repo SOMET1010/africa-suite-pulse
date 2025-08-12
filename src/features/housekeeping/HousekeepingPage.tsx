@@ -37,6 +37,8 @@ import { useMockHousekeepingTasks, useMockHousekeepingStaff, useMockRoomStatuses
 import { useRecoucheWorkflow } from "./hooks/useRecoucheWorkflow";
 import { LinenManagement } from "./components/LinenManagement";
 import { RecoucheBoard } from "./components/RecoucheBoard";
+import { TimelineView } from "./components/TimelineView";
+import { TaskPerformanceStats } from "./components/TaskPerformanceStats";
 import { HousekeepingTask } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -258,6 +260,21 @@ export default function HousekeepingPage() {
     setIsDetailsDialogOpen(true);
   };
 
+  // Handler pour les actions de tâches dans la timeline
+  const handleTaskAction = (taskId: string, action: 'start' | 'pause' | 'complete') => {
+    switch (action) {
+      case 'start':
+        updateTaskStatus(taskId, 'in_progress');
+        break;
+      case 'pause':
+        updateTaskStatus(taskId, 'paused');
+        break;
+      case 'complete':
+        updateTaskStatus(taskId, 'completed');
+        break;
+    }
+  };
+
   return (
     <PageLayout title="Gouvernante - Housekeeping">
       <div className="space-y-6">
@@ -318,13 +335,15 @@ export default function HousekeepingPage() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="tasks" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="tasks">Tâches</TabsTrigger>
             <TabsTrigger value="recouche">Recouche</TabsTrigger>
             <TabsTrigger value="linen">Linge</TabsTrigger>
             <TabsTrigger value="rooms">Statut chambres</TabsTrigger>
             <TabsTrigger value="staff">Personnel</TabsTrigger>
             <TabsTrigger value="planning">Planning</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
           </TabsList>
 
           {/* Tasks Tab */}
@@ -1050,6 +1069,24 @@ export default function HousekeepingPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Timeline Tab */}
+      <TabsContent value="timeline" className="space-y-4">
+        <TimelineView 
+          tasks={tasks}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          onTaskAction={handleTaskAction}
+        />
+      </TabsContent>
+
+      {/* Performance Tab */}
+      <TabsContent value="performance" className="space-y-4">
+        <TaskPerformanceStats 
+          tasks={tasks}
+          staff={staff}
+        />
+      </TabsContent>
     </PageLayout>
   );
 }
