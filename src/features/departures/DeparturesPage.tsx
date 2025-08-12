@@ -15,7 +15,7 @@ import {
 import { CalendarIcon, SearchIcon, UserIcon, MapPinIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDepartures, useCheckoutReservation } from "@/queries/departures.queries";
-import { useOrg } from "@/core/auth/useOrg";
+import { useOrgId } from "@/core/auth/useOrg";
 
 export default function DeparturesPage() {
   const [searchTerm, setSearchTerm] = useState("");
