@@ -607,19 +607,58 @@ export type Database = {
         }
         Relationships: []
       }
+      hotel_dates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_hotel_date: string
+          id: string
+          mode: string
+          next_switch_at: string
+          org_id: string
+          switch_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_hotel_date: string
+          id?: string
+          mode?: string
+          next_switch_at: string
+          org_id: string
+          switch_time?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_hotel_date?: string
+          id?: string
+          mode?: string
+          next_switch_at?: string
+          org_id?: string
+          switch_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hotel_settings: {
         Row: {
           activation_code: string | null
           address: string | null
+          auto_switch_time: string
           city: string | null
           country: string | null
           created_at: string
           currency: string | null
+          date_hotel_mode: string
           description: string | null
           email: string | null
           id: string
           is_activated: boolean | null
           logo_url: string | null
+          max_overbooking: number
           name: string
           org_id: string
           phone: string | null
@@ -630,15 +669,18 @@ export type Database = {
         Insert: {
           activation_code?: string | null
           address?: string | null
+          auto_switch_time?: string
           city?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
+          date_hotel_mode?: string
           description?: string | null
           email?: string | null
           id?: string
           is_activated?: boolean | null
           logo_url?: string | null
+          max_overbooking?: number
           name: string
           org_id: string
           phone?: string | null
@@ -649,15 +691,18 @@ export type Database = {
         Update: {
           activation_code?: string | null
           address?: string | null
+          auto_switch_time?: string
           city?: string | null
           country?: string | null
           created_at?: string
           currency?: string | null
+          date_hotel_mode?: string
           description?: string | null
           email?: string | null
           id?: string
           is_activated?: boolean | null
           logo_url?: string | null
+          max_overbooking?: number
           name?: string
           org_id?: string
           phone?: string | null
@@ -1985,6 +2030,63 @@ export type Database = {
           used_count?: number
           valid_from?: string
           valid_until?: string
+        }
+        Relationships: []
+      }
+      rate_windows: {
+        Row: {
+          base_rate: number
+          code: string
+          created_at: string
+          created_by: string | null
+          day_conditions: Json
+          extra_person_rate: number | null
+          id: string
+          is_active: boolean
+          name: string
+          org_id: string
+          priority: number
+          room_type_id: string | null
+          single_rate: number | null
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          base_rate?: number
+          code: string
+          created_at?: string
+          created_by?: string | null
+          day_conditions?: Json
+          extra_person_rate?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          org_id: string
+          priority?: number
+          room_type_id?: string | null
+          single_rate?: number | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          base_rate?: number
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          day_conditions?: Json
+          extra_person_rate?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          org_id?: string
+          priority?: number
+          room_type_id?: string | null
+          single_rate?: number | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }
