@@ -28,6 +28,7 @@ import {
 import { guestsApi } from "@/services/guests.api";
 import { useOrgId } from "@/core/auth/useOrg";
 import type { GuestInsert } from "@/types/guest";
+import { DocumentScanner } from "./DocumentScanner";
 
 const guestSchema = z.object({
   first_name: z.string().min(1, "Le prénom est requis"),
@@ -348,6 +349,21 @@ export function CreateGuestDialog({ open, onOpenChange }: CreateGuestDialogProps
               </TabsContent>
 
               <TabsContent value="documents" className="space-y-4 mt-6">
+                {/* Document Scanner */}
+                <DocumentScanner
+                  onDataExtracted={(data) => {
+                    if (data.first_name) form.setValue("first_name", data.first_name);
+                    if (data.last_name) form.setValue("last_name", data.last_name);
+                    if (data.date_of_birth) form.setValue("date_of_birth", data.date_of_birth);
+                    if (data.nationality) form.setValue("nationality", data.nationality);
+                    if (data.document_type) form.setValue("document_type", data.document_type);
+                    if (data.document_number) form.setValue("document_number", data.document_number);
+                    if (data.document_expiry) form.setValue("document_expiry", data.document_expiry);
+                    if (data.document_issuing_country) form.setValue("document_issuing_country", data.document_issuing_country);
+                  }}
+                  documentType={form.watch("document_type") as 'passport' | 'id_card' | 'driving_license' || 'passport'}
+                />
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
