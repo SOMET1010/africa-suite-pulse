@@ -12,7 +12,6 @@ import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { TariffConfirmationModal } from "./components/TariffConfirmationModal";
 import { toast } from "@/hooks/use-toast";
-import { Crown } from "lucide-react";
 
 // Simple styles pour drag & drop
 const dragDropStyles = `
@@ -270,13 +269,16 @@ export default function RackGrid() {
       <div className="page-enter">
         <main className="min-h-screen bg-pearl px-2 sm:px-4 lg:px-6 pt-8 sm:pt-12 pb-20 sm:pb-12 space-y-6 sm:space-y-8 animate-fade-in">
           <div className="container mx-auto">
-        <header className="text-center mb-8 animate-fade-in">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Crown className="h-8 w-8 text-brand-accent" />
-            <h1 className="text-4xl font-luxury font-bold text-gradient">Rack Hôtel</h1>
-          </div>
-          <p className="text-lg text-charcoal/80 font-premium">Gestion visuelle • Interface de prestige</p>
-        </header>
+        <RackStatusBar 
+          occ={kpis.occ} 
+          arrivals={kpis.arrivals} 
+          presents={kpis.presents} 
+          hs={kpis.hs}
+          rooms={data.rooms}
+          reservations={data.reservations}
+          isRefetching={isRefetching}
+          onRefresh={refetch}
+        />
 
         <RackToolbar
           onFilterStatus={setStatusFilter}
@@ -348,7 +350,7 @@ export default function RackGrid() {
             }}
           />
 
-          <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
+          
 
           <RoomDetailSheet
             open={detailSheet.open}
