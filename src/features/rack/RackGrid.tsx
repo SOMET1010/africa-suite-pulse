@@ -16,6 +16,8 @@ import { Crown } from "lucide-react";
 // Import du nouveau système drag & drop
 import { DragDropProvider, DragDropStyles } from "./hooks/useDragDrop";
 import { ModernRackGrid } from "./components/ModernRackGrid";
+import { useOrgId } from "@/core/auth/useOrg";
+import { invalidateRackQueries } from "@/lib/queryClient";
 
 // Types pour les données transformées
 interface DayData {
@@ -28,6 +30,7 @@ export default function RackGrid() {
   // 🆕 UTILISATION DU NOUVEAU HOOK AVEC REACT QUERY
   const { data, kpis, loading, error, refetch, isRefetching } = useRackDataModern();
   const reassignMutation = useReassignReservation();
+  const { orgId } = useOrgId();
   const {
     zoom, setZoom,
     query, setQuery,
@@ -61,6 +64,9 @@ export default function RackGrid() {
   const handleReservationMove = useCallback(async (reservationId: string, targetRoomId: string, targetDay: string) => {
     try {
       await reassignMutation.mutateAsync({ reservationId, roomId: targetRoomId });
+      if (orgId) {
+        invalidateRackQueries(orgId);
+      }
       toast({ 
         title: "✅ Réservation déplacée", 
         description: `Chambre ${targetRoomId}`,
@@ -72,7 +78,7 @@ export default function RackGrid() {
         variant: "destructive" 
       });
     }
-  }, [reassignMutation]);
+  }, [reassignMutation, orgId]);
 
   // Injection des styles CSS
   useEffect(() => {
