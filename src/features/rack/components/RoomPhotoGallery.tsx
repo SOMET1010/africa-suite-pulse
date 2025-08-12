@@ -34,8 +34,6 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
   const [photos, setPhotos] = useState<RoomPhoto[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  
-  if (!room) return null;
 
   useEffect(() => {
     if (open && room) {
@@ -105,6 +103,10 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
   };
 
   const currentPhoto = photos[currentPhotoIndex];
+
+  if (!room) {
+    return null;
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
