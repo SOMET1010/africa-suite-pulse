@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText } from "lucide-react";
+import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard } from "lucide-react";
 import { RealtimeClock } from "./RealtimeClock";
 import { UserMenu } from "./UserMenu";
 import { NotificationCenter } from "./NotificationCenter";
@@ -20,14 +20,14 @@ export function ProfessionalHeader({
   const location = useLocation();
   
   const navigationItems = [
-    { to: "/", label: "Tableau de bord", icon: Crown },
-    { to: "/arrivals", label: "Arrivées", icon: Calendar },
+    { to: "/", label: "Accueil", icon: Crown },
+    { to: "/arrivals", label: "Arrivées", icon: UserPlus },
+    { to: "/reservations/rack", label: "Plan Chambres", icon: Hotel },
+    { to: "/guests", label: "Mes Clients", icon: Users },
     { to: "/reservations", label: "Réservations", icon: Calendar },
-    { to: "/guests", label: "Clients", icon: Users },
-    { to: "/reservations/rack", label: "Rack", icon: User },
-    { to: "/analytics", label: "Analytics", icon: BarChart3 },
+    { to: "/billing", label: "Facturation", icon: CreditCard },
     { to: "/reports", label: "Rapports", icon: FileText },
-    { to: "/settings", label: "Paramètres", icon: Settings },
+    { to: "/settings", label: "Réglages", icon: Settings },
   ];
 
   const isActive = (path: string) => {
