@@ -358,6 +358,51 @@ export type Database = {
         }
         Relationships: []
       }
+      cleaning_standards: {
+        Row: {
+          checklist_items: Json
+          created_at: string
+          estimated_duration: number
+          id: string
+          is_active: boolean
+          org_id: string
+          priority_rules: Json | null
+          quality_criteria: Json | null
+          required_supplies: Json | null
+          room_type: string | null
+          task_type: string
+          updated_at: string
+        }
+        Insert: {
+          checklist_items?: Json
+          created_at?: string
+          estimated_duration?: number
+          id?: string
+          is_active?: boolean
+          org_id: string
+          priority_rules?: Json | null
+          quality_criteria?: Json | null
+          required_supplies?: Json | null
+          room_type?: string | null
+          task_type: string
+          updated_at?: string
+        }
+        Update: {
+          checklist_items?: Json
+          created_at?: string
+          estimated_duration?: number
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          priority_rules?: Json | null
+          quality_criteria?: Json | null
+          required_supplies?: Json | null
+          room_type?: string | null
+          task_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       currencies: {
         Row: {
           active: boolean | null
@@ -712,6 +757,138 @@ export type Database = {
         }
         Relationships: []
       }
+      housekeeping_staff: {
+        Row: {
+          contact_info: Json | null
+          created_at: string
+          current_assignment: string | null
+          employee_id: string
+          hire_date: string | null
+          id: string
+          last_activity: string | null
+          name: string
+          org_id: string
+          performance_rating: number | null
+          role: string
+          shift_end: string | null
+          shift_start: string | null
+          skills: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_info?: Json | null
+          created_at?: string
+          current_assignment?: string | null
+          employee_id: string
+          hire_date?: string | null
+          id?: string
+          last_activity?: string | null
+          name: string
+          org_id: string
+          performance_rating?: number | null
+          role: string
+          shift_end?: string | null
+          shift_start?: string | null
+          skills?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_info?: Json | null
+          created_at?: string
+          current_assignment?: string | null
+          employee_id?: string
+          hire_date?: string | null
+          id?: string
+          last_activity?: string | null
+          name?: string
+          org_id?: string
+          performance_rating?: number | null
+          role?: string
+          shift_end?: string | null
+          shift_start?: string | null
+          skills?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      housekeeping_tasks: {
+        Row: {
+          actual_duration: number | null
+          assigned_to: string | null
+          checklist_items: Json | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          estimated_duration: number
+          guest_status: string | null
+          id: string
+          linen_change_details: Json | null
+          notes: string | null
+          org_id: string
+          priority: string
+          quality_notes: string | null
+          quality_score: number | null
+          room_number: string
+          scheduled_start: string | null
+          special_instructions: string | null
+          started_at: string | null
+          status: string
+          task_type: string
+          updated_at: string
+        }
+        Insert: {
+          actual_duration?: number | null
+          assigned_to?: string | null
+          checklist_items?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          estimated_duration?: number
+          guest_status?: string | null
+          id?: string
+          linen_change_details?: Json | null
+          notes?: string | null
+          org_id: string
+          priority?: string
+          quality_notes?: string | null
+          quality_score?: number | null
+          room_number: string
+          scheduled_start?: string | null
+          special_instructions?: string | null
+          started_at?: string | null
+          status?: string
+          task_type: string
+          updated_at?: string
+        }
+        Update: {
+          actual_duration?: number | null
+          assigned_to?: string | null
+          checklist_items?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          estimated_duration?: number
+          guest_status?: string | null
+          id?: string
+          linen_change_details?: Json | null
+          notes?: string | null
+          org_id?: string
+          priority?: string
+          quality_notes?: string | null
+          quality_score?: number | null
+          room_number?: string
+          scheduled_start?: string | null
+          special_instructions?: string | null
+          started_at?: string | null
+          status?: string
+          task_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           billing_condition: string | null
@@ -901,6 +1078,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      linen_inventory: {
+        Row: {
+          clean_quantity: number
+          cost_per_unit: number | null
+          created_at: string
+          damaged_quantity: number
+          description: string | null
+          dirty_quantity: number
+          id: string
+          in_use_quantity: number
+          item_code: string
+          item_type: string
+          last_restocked: string | null
+          minimum_stock: number
+          org_id: string
+          supplier: string | null
+          total_quantity: number
+          updated_at: string
+        }
+        Insert: {
+          clean_quantity?: number
+          cost_per_unit?: number | null
+          created_at?: string
+          damaged_quantity?: number
+          description?: string | null
+          dirty_quantity?: number
+          id?: string
+          in_use_quantity?: number
+          item_code: string
+          item_type: string
+          last_restocked?: string | null
+          minimum_stock?: number
+          org_id: string
+          supplier?: string | null
+          total_quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          clean_quantity?: number
+          cost_per_unit?: number | null
+          created_at?: string
+          damaged_quantity?: number
+          description?: string | null
+          dirty_quantity?: number
+          id?: string
+          in_use_quantity?: number
+          item_code?: string
+          item_type?: string
+          last_restocked?: string | null
+          minimum_stock?: number
+          org_id?: string
+          supplier?: string | null
+          total_quantity?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       loyalty_programs: {
         Row: {
@@ -2090,6 +2324,69 @@ export type Database = {
         }
         Relationships: []
       }
+      recouche_workflows: {
+        Row: {
+          arrival_guest_id: string | null
+          blocking_issues: Json | null
+          checkout_task_id: string | null
+          created_at: string
+          departure_guest_id: string | null
+          departure_time: string | null
+          expected_arrival_time: string | null
+          id: string
+          inspection_task_id: string | null
+          maintenance_task_id: string | null
+          org_id: string
+          quality_approved: boolean | null
+          quality_approved_by: string | null
+          room_number: string
+          special_requests: Json | null
+          total_turnaround_time: number | null
+          updated_at: string
+          workflow_status: string
+        }
+        Insert: {
+          arrival_guest_id?: string | null
+          blocking_issues?: Json | null
+          checkout_task_id?: string | null
+          created_at?: string
+          departure_guest_id?: string | null
+          departure_time?: string | null
+          expected_arrival_time?: string | null
+          id?: string
+          inspection_task_id?: string | null
+          maintenance_task_id?: string | null
+          org_id: string
+          quality_approved?: boolean | null
+          quality_approved_by?: string | null
+          room_number: string
+          special_requests?: Json | null
+          total_turnaround_time?: number | null
+          updated_at?: string
+          workflow_status?: string
+        }
+        Update: {
+          arrival_guest_id?: string | null
+          blocking_issues?: Json | null
+          checkout_task_id?: string | null
+          created_at?: string
+          departure_guest_id?: string | null
+          departure_time?: string | null
+          expected_arrival_time?: string | null
+          id?: string
+          inspection_task_id?: string | null
+          maintenance_task_id?: string | null
+          org_id?: string
+          quality_approved?: boolean | null
+          quality_approved_by?: string | null
+          room_number?: string
+          special_requests?: Json | null
+          total_turnaround_time?: number | null
+          updated_at?: string
+          workflow_status?: string
+        }
+        Relationships: []
+      }
       reservation_groups: {
         Row: {
           created_at: string
@@ -2954,6 +3251,36 @@ export type Database = {
           },
         ]
       }
+      housekeeping_tasks_with_staff: {
+        Row: {
+          actual_duration: number | null
+          assigned_staff_name: string | null
+          assigned_staff_role: string | null
+          assigned_staff_status: string | null
+          assigned_to: string | null
+          checklist_items: Json | null
+          completed_at: string | null
+          created_at: string | null
+          created_by: string | null
+          estimated_duration: number | null
+          guest_status: string | null
+          id: string | null
+          linen_change_details: Json | null
+          notes: string | null
+          org_id: string | null
+          priority: string | null
+          quality_notes: string | null
+          quality_score: number | null
+          room_number: string | null
+          scheduled_start: string | null
+          special_instructions: string | null
+          started_at: string | null
+          status: string | null
+          task_type: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
       rack_reservations_enriched: {
         Row: {
           adults: number | null
@@ -3078,6 +3405,18 @@ export type Database = {
           },
         ]
       }
+      room_status_summary: {
+        Row: {
+          completed_tasks: number | null
+          guest_status: string | null
+          in_progress_tasks: number | null
+          last_task_update: string | null
+          org_id: string | null
+          pending_tasks: number | null
+          room_number: string | null
+        }
+        Relationships: []
+      }
       services_with_family: {
         Row: {
           code: string | null
@@ -3132,9 +3471,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      assign_housekeeping_task: {
+        Args: { task_id: string; staff_id: string }
+        Returns: undefined
+      }
       calculate_next_maintenance_date: {
         Args: { equipment_id_param: string }
         Returns: string
+      }
+      complete_housekeeping_task: {
+        Args: {
+          task_id: string
+          actual_duration?: number
+          quality_score?: number
+          quality_notes?: string
+        }
+        Returns: undefined
       }
       get_current_user_org_id: {
         Args: Record<PropertyKey, never>
