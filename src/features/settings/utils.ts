@@ -12,6 +12,10 @@ export const hotelSettingsSchema = z.object({
   timezone: z.string().min(1, 'Fuseau horaire requis'),
   currency: z.string().min(1, 'Devise requise'),
   logo_url: z.string().url('URL invalide').optional().or(z.literal('')),
+  // Hotel Date Management
+  date_hotel_mode: z.enum(['noon', 'midnight']).default('noon'),
+  auto_switch_time: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, 'Format horaire invalide (HH:MM)').default('12:00'),
+  max_overbooking: z.number().min(0, 'Doit être positif ou nul').default(0),
 });
 
 export type HotelSettingsFormData = z.infer<typeof hotelSettingsSchema>;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Building2, MapPin, Mail, Globe, Clock, DollarSign } from 'lucide-react';
+import { Building2, MapPin, Mail, Globe, Clock, DollarSign, Calendar, Shield } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useOrgId } from '@/core/auth/useOrg';
 import { HotelService } from './hotelService';
 import { hotelSettingsSchema, type HotelSettingsFormData } from '../utils';
+import { useHotelDate, useSwitchHotelDate } from '../hooks/useHotelDate';
 import { CURRENCIES, TIMEZONES, COUNTRIES, type HotelSettings, type HotelSettingsUpdate } from '../types';
 
 export default function HotelSettingsForm() {
@@ -21,6 +22,10 @@ export default function HotelSettingsForm() {
   const [settings, setSettings] = useState<HotelSettings | null>(null);
   const { toast } = useToast();
   const { orgId } = useOrgId();
+  
+  // Hotel Date queries
+  const hotelDateQuery = useHotelDate(orgId);
+  const switchHotelDateMutation = useSwitchHotelDate(orgId);
 
   const form = useForm<HotelSettingsFormData>({
     resolver: zodResolver(hotelSettingsSchema),
@@ -36,6 +41,9 @@ export default function HotelSettingsForm() {
       timezone: 'Africa/Abidjan',
       currency: 'XOF',
       logo_url: '',
+      date_hotel_mode: 'noon' as const,
+      auto_switch_time: '12:00',
+      max_overbooking: 0,
     },
   });
 
@@ -65,6 +73,9 @@ export default function HotelSettingsForm() {
           timezone: data.timezone,
           currency: data.currency,
           logo_url: data.logo_url || '',
+          date_hotel_mode: 'noon' as const,
+          auto_switch_time: '12:00',
+          max_overbooking: 0,
         });
       }
     } catch (error) {
@@ -377,6 +388,136 @@ export default function HotelSettingsForm() {
                       </FormItem>
                     )}
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section Date-Hôtel */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Gestion Date-Hôtel
+                </CardTitle>
+                <CardDescription>
+                  Configuration de la date-hôtel et protection des données
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {hotelDateQuery.data && (
+                  <div className="bg-muted/50 rounded-lg p-4 mb-4">
+                    <div className="text-sm font-medium text-muted-foreground mb-2">Date-hôtel courante</div>
+                    <div className="text-2xl font-bold text-primary">
+                      {new Date(hotelDateQuery.data.currentHotelDate).toLocaleDateString('fr-FR')}
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">
+                      Prochaine bascule: {new Date(hotelDateQuery.data.nextSwitchAt).toLocaleString('fr-FR')}
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3"
+                      onClick={() => switchHotelDateMutation.mutate()}
+                      disabled={switchHotelDateMutation.isPending}
+                    >
+                      {switchHotelDateMutation.isPending ? 'Bascule...' : 'Basculer manuellement'}
+                    </Button>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="date_hotel_mode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mode de calcul</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="noon">Midi → Midi</SelectItem>
+                            <SelectItem value="midnight">Minuit → Minuit</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="auto_switch_time"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Heure de bascule</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="max_overbooking"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Surbooking max</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            min="0" 
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Section Sécurité et Audit */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Sécurité et Audit
+                </CardTitle>
+                <CardDescription>
+                  Protection des données et traçabilité des opérations
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-5 w-5 text-amber-600 mt-0.5" />
+                    <div>
+                      <div className="font-medium text-amber-800 mb-1">Protection des données antérieures</div>
+                      <div className="text-sm text-amber-700">
+                        Les données des dates-hôtel antérieures sont automatiquement protégées contre les modifications. 
+                        Seules les contre-passations avec motif sont autorisées.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <Clock className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <div className="font-medium text-blue-800 mb-1">Audit complet</div>
+                      <div className="text-sm text-blue-700">
+                        Toutes les actions sensibles sont tracées avec horodatage et motifs obligatoires 
+                        pour assurer une traçabilité complète.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

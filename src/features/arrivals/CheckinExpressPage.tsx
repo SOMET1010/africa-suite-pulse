@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useArrivals, useAssignRoomToReservation, useCheckinReservation } from "@/queries/arrivals.queries";
+import { useExpressCheckin } from "./hooks/useExpressCheckin";
 import { useOrgId } from "@/core/auth/useOrg";
 import { Crown, FileText, MoreVertical } from "lucide-react";
 import type { ArrivalRow } from "./arrivals.types";
@@ -29,6 +30,7 @@ export default function CheckinExpressPage() {
   const arrivalsQuery = useArrivals(orgId!, dateISO);
   const assignRoomMutation = useAssignRoomToReservation();
   const checkinMutation = useCheckinReservation();
+  const expressCheckinMutation = useExpressCheckin();
   
   const [assignOpen, setAssignOpen] = useState(false);
   const [targetResa, setTargetResa] = useState<string | undefined>();
@@ -81,6 +83,15 @@ export default function CheckinExpressPage() {
       toast({ title: "Check-in effectué", description: "✅ Client présent" });
     } catch (e: any) {
       toast({ title: "Erreur check-in", description: e.message });
+    }
+  }
+
+  async function onExpressCheckin(reservationId: string) {
+    if (!confirm("Confirmer le check-in express ? (Création automatique de la facture)")) return;
+    try {
+      await expressCheckinMutation.mutateAsync(reservationId);
+    } catch (e: any) {
+      // Error handling is done in the hook
     }
   }
 
@@ -224,11 +235,11 @@ export default function CheckinExpressPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <TButton 
                       variant="primary" 
-                      onClick={() => onCheckin(a.id)} 
-                      disabled={a.status === 'present'}
+                      onClick={() => onExpressCheckin(a.id)} 
+                      disabled={a.status === 'present' || expressCheckinMutation.isPending}
                       className="group-hover:scale-[1.02] transition-elegant"
                     >
-                      {a.status === 'present' ? 'Présent ✓' : 'Check-in'}
+                      {a.status === 'present' ? 'Présent ✓' : expressCheckinMutation.isPending ? 'Express...' : 'Check-in Express'}
                     </TButton>
                     <TButton 
                       variant="default" 
@@ -278,7 +289,7 @@ export default function CheckinExpressPage() {
                 <span>[F9] Détail</span>
               </div>
               <div className="flex items-center gap-2">
-                <TButton onClick={()=>toast({ title: "Check-in (barre)" })}>Check-in</TButton>
+                <TButton onClick={()=>toast({ title: "Check-in Express", description: "Sélectionnez une réservation" })}>Check-in Express</TButton>
                 <TButton variant="default" onClick={()=>toast({ title: "Assigner (barre)" })}>Assigner</TButton>
                 <TButton variant="ghost" onClick={()=>toast({ title: "Note (barre)" })}>Note</TButton>
               </div>
