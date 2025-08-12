@@ -927,6 +927,35 @@ export default function HousekeepingPage() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Recouche Tab */}
+          <TabsContent value="recouche" className="space-y-4">
+            <RecoucheBoard 
+              rooms={rooms}
+              workflows={workflows}
+              onStartTask={startTask}
+              onCompleteTask={completeTask}
+              onAssignStaff={assignStaff}
+            />
+          </TabsContent>
+
+          {/* Timeline Tab */}
+          <TabsContent value="timeline" className="space-y-4">
+            <TimelineView 
+              tasks={tasks}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+              onTaskAction={handleTaskAction}
+            />
+          </TabsContent>
+
+          {/* Performance Tab */}
+          <TabsContent value="performance" className="space-y-4">
+            <TeamPerformanceReports 
+              tasks={tasks}
+              staff={staff}
+            />
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -1095,24 +1124,6 @@ export default function HousekeepingPage() {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Timeline Tab */}
-      <TabsContent value="timeline" className="space-y-4">
-        <TimelineView 
-          tasks={tasks}
-          selectedDate={selectedDate}
-          onDateChange={setSelectedDate}
-          onTaskAction={handleTaskAction}
-        />
-      </TabsContent>
-
-          {/* Performance Tab */}
-          <TabsContent value="performance" className="space-y-4">
-            <TeamPerformanceReports 
-              tasks={tasks}
-              staff={staff}
-            />
-          </TabsContent>
     </PageLayout>
   );
 }
