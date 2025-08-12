@@ -1,11 +1,17 @@
 import { supabase } from '@/integrations/supabase/client';
-import { useHotelDate } from '@/features/settings/hooks/useHotelDate';
 
 export interface ProtectionCheck {
   allowed: boolean;
   reason?: string;
   requiresConfirmation?: boolean;
   suggestionMessage?: string;
+}
+
+export interface DataProtectionStatus {
+  isProtected: boolean;
+  reason?: string;
+  hotelDate?: Date;
+  recordDate?: Date;
 }
 
 export class DataProtectionService {
@@ -318,4 +324,68 @@ export class DataProtectionService {
       throw error;
     }
   }
+
+  /**
+   * Nouvelle API simplifiée pour la protection des données
+   */
+  static async getCurrentHotelDate(orgId?: string): Promise<Date | null> {
+    try {
+      const { data, error } = await supabase
+        .from('hotel_dates')
+        .select('current_hotel_date')
+        .single();
+
+      if (error) {
+        console.error('Erreur récupération date-hôtel:', error);
+        return null;
+      }
+
+      return data?.current_hotel_date ? new Date(data.current_hotel_date) : null;
+    } catch (error) {
+      console.error('Erreur service date-hôtel:', error);
+      return null;
+    }
+  }
+
+  static async canModifyData(
+    type: 'reservation' | 'invoice' | 'payment',
+    id: string
+  ): Promise<DataProtectionStatus> {
+    try {
+      const hotelDate = await this.getCurrentHotelDate();
+      if (!hotelDate) {
+        return { isProtected: false };
+      }
+
+      if (type === 'reservation') {
+        const { data: reservation } = await supabase
+          .from('reservations')
+          .select('date_arrival, date_departure, status')
+          .eq('id', id)
+          .single();
+
+        if (!reservation) {
+          return { isProtected: true, reason: 'Réservation introuvable' };
+        }
+
+        const departureDate = new Date(reservation.date_departure);
+        if (departureDate < hotelDate) {
+          return {
+            isProtected: true,
+            reason: `Réservation terminée avant la date-hôtel (${hotelDate.toLocaleDateString()})`,
+            hotelDate,
+            recordDate: departureDate
+          };
+        }
+      }
+
+      return { isProtected: false, hotelDate };
+    } catch (error) {
+      console.error('Erreur vérification protection:', error);
+      return { isProtected: true, reason: 'Erreur de vérification' };
+    }
+  }
 }
+
+// Instance singleton pour compatibilité
+export const dataProtectionService = DataProtectionService;

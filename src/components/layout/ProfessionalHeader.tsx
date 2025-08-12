@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard } from "lucide-react";
 import { RealtimeClock } from "./RealtimeClock";
 import { HotelDateWidget } from "./HotelDateWidget";
+import { DataProtectionStatus } from "./DataProtectionStatus";
 import { UserMenu } from "./UserMenu";
 import { NotificationCenter } from "./NotificationCenter";
 import { GlobalSearch } from "./GlobalSearch";
@@ -96,8 +97,9 @@ export function ProfessionalHeader({
             {/* Recherche globale */}
             <GlobalSearch />
             
-            {/* Date-Hôtel */}
-            <div className="hidden md:block">
+            {/* Date-Hôtel et Protection */}
+            <div className="hidden md:flex items-center gap-2">
+              <DataProtectionStatus />
               <HotelDateWidget />
             </div>
             
