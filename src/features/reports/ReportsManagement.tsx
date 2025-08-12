@@ -1,20 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ReportTemplateEditor } from "./components/ReportTemplateEditor";
 import { ReportScheduler } from "./components/ReportScheduler";
 import { ReportHistory } from "./components/ReportHistory";
-import { useReportTemplates } from "./hooks/useReportTemplates";
-import { Plus, FileText, Clock, History, Send } from "lucide-react";
+import { useReportGeneration, useReportTemplates } from "./hooks/useReportTemplates";
+import { Plus, FileText, Clock, History, Send, ShieldCheck } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ClosurePanel } from "./components/ClosurePanel";
 
 export default function ReportsManagement() {
   const [activeTab, setActiveTab] = useState("templates");
   const { data: templates, isLoading } = useReportTemplates();
+  const { generateReport, isGenerating } = useReportGeneration();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    document.title = "Rapports & Clôtures – AfricaSuite";
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute("content", "Gestion des rapports, planification et clôtures journalières/mensuelles.");
+  }, []);
 
   const handleGenerateReport = async (templateId: string) => {
-    // TODO: Implement manual report generation
-    console.log("Generating report for template:", templateId);
+    try {
+      generateReport({ templateId, manual: true });
+      toast({ title: "Génération lancée", description: "Le rapport est en cours de génération." });
+      setActiveTab("history");
+    } catch (e: any) {
+      toast({ title: "Erreur", description: e.message || "Impossible de lancer la génération", variant: "destructive" });
+    }
   };
 
   return (
@@ -33,7 +48,7 @@ export default function ReportsManagement() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="templates" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Templates
@@ -130,6 +145,7 @@ export default function ReportsManagement() {
                             variant="outline" 
                             size="sm"
                             onClick={() => handleGenerateReport(template.id)}
+                            disabled={isGenerating}
                           >
                             Générer
                           </Button>
