@@ -32,6 +32,10 @@ import MaintenancePage from "@/features/maintenance/MaintenancePage";
 import { HousekeepingPage } from "@/features/housekeeping";
 import { NightAuditPage } from "@/features/night-audit";
 import { POSPage } from "@/features/pos";
+import POSLoginPage from "@/features/pos/auth/POSLoginPage";
+import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
+import POSKitchen from "@/pages/POSKitchen";
+import POSReports from "@/pages/POSReports";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
 function Layout() {
@@ -48,6 +52,7 @@ export function AppRoutes() {
     <Routes>
       <Route path="/welcome" element={<AuthLanding />} />
       <Route path="/auth" element={<AuthPage />} />
+      <Route path="/pos/login" element={<POSLoginPage />} />
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Index />} />
         <Route path="dashboard" element={<Dashboard />} />
@@ -81,7 +86,9 @@ export function AppRoutes() {
         <Route path="maintenance" element={<MaintenancePage />} />
         <Route path="housekeeping" element={<HousekeepingPage />} />
         <Route path="night-audit" element={<NightAuditPage />} />
-        <Route path="pos" element={<POSPage />} />
+        <Route path="pos" element={<RequirePOSAuth><POSPage /></RequirePOSAuth>} />
+        <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
+        <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
