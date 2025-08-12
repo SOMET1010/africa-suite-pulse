@@ -10,7 +10,9 @@ import {
   CreditCard, 
   Settings, 
   Clock, 
-  ArrowRight 
+  ArrowRight,
+  Sparkles,
+  Wrench 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -166,6 +168,22 @@ const Index = () => {
                 to: "/billing",
                 iconBg: "bg-gradient-to-br from-red-500/20 to-red-600/20",
                 iconColor: "text-red-600"
+              },
+              { 
+                title: "Gouvernante", 
+                description: "Tâches ménage et statut chambres",
+                icon: Sparkles, 
+                to: "/housekeeping",
+                iconBg: "bg-gradient-to-br from-pink-500/20 to-pink-600/20",
+                iconColor: "text-pink-600"
+              },
+              { 
+                title: "Maintenance", 
+                description: "Gestion équipements et maintenance",
+                icon: Wrench, 
+                to: "/maintenance",
+                iconBg: "bg-gradient-to-br from-yellow-500/20 to-yellow-600/20",
+                iconColor: "text-yellow-600"
               },
               { 
                 title: "Configuration", 

@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { TButton } from "@/core/ui/TButton";
 import { useEffect } from "react";
-import { Crown, Hotel, Users, CreditCard, FileText, Clock } from "lucide-react";
+import { Crown, Hotel, Users, CreditCard, FileText, Clock, Sparkles, Wrench } from "lucide-react";
 
 const tiles = [
   { title: "Rack Hôtel", to: "/reservations/rack", icon: Hotel, description: "Gestion visuelle des chambres et réservations" },
   { title: "Réservations", to: "/reservations", icon: FileText, description: "Gestion des réservations et planning" },
   { title: "Arrivées", to: "/arrivals", icon: Users, description: "Check-in express et gestion des arrivées" },
+  { title: "Gouvernante", to: "/housekeeping", icon: Sparkles, description: "Tâches ménage et statut des chambres" },
+  { title: "Maintenance", to: "/maintenance", icon: Wrench, description: "Gestion maintenance et équipements" },
   { title: "Clients", to: "/guests", icon: Users, description: "Base de données clients et profils" },
   { title: "Facturation", to: "/billing", icon: CreditCard, description: "Gestion des factures et paiements" },
   { title: "Paramètres", to: "/settings", icon: Crown, description: "Configuration et administration" },

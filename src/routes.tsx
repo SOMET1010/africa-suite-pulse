@@ -29,6 +29,7 @@ import ReportsManagement from "@/features/reports/ReportsManagement";
 import DailyReportsPage from "@/features/reports/daily/DailyReportsPage";
 import SecurityPage from "@/features/settings/security/SecurityPage";
 import MaintenancePage from "@/features/maintenance/MaintenancePage";
+import { HousekeepingPage } from "@/features/housekeeping";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
 function Layout() {
@@ -76,6 +77,7 @@ export function AppRoutes() {
         <Route path="reports" element={<ReportsManagement />} />
         <Route path="reports/daily" element={<DailyReportsPage />} />
         <Route path="maintenance" element={<MaintenancePage />} />
+        <Route path="housekeeping" element={<HousekeepingPage />} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
