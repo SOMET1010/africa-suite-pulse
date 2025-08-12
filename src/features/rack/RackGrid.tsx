@@ -269,25 +269,32 @@ export default function RackGrid() {
       <div className="page-enter">
         <main className="min-h-screen bg-pearl px-2 sm:px-4 lg:px-6 pt-8 sm:pt-12 pb-20 sm:pb-12 space-y-6 sm:space-y-8 animate-fade-in">
           <div className="container mx-auto">
-        <RackStatusBar 
-          occ={kpis.occ} 
-          arrivals={kpis.arrivals} 
-          presents={kpis.presents} 
-          hs={kpis.hs}
-          rooms={data.rooms}
-          reservations={data.reservations}
-          isRefetching={isRefetching}
-          onRefresh={refetch}
-        />
-
         <RackToolbar
           onFilterStatus={setStatusFilter}
           onToggleCompact={setCompact}
           onZoom={setZoom}
           onVivid={setVivid}
+          kpis={{
+            occ: kpis.occ,
+            arrivals: kpis.arrivals,
+            presents: kpis.presents,
+            availableRooms: data.rooms.filter(r => r.status === 'clean' || r.status === 'inspected').length,
+            dailyRevenue: data.reservations
+              .filter(r => {
+                const today = new Date().toISOString().split('T')[0];
+                return r.start === today || (r.start <= today && r.end > today);
+              })
+              .reduce((sum, r) => sum + (r.rate || 0), 0),
+            issues: data.rooms.filter(r => r.status === 'dirty' || r.status === 'maintenance').length,
+            departures: data.reservations.filter(r => {
+              const today = new Date().toISOString().split('T')[0];
+              return r.end === today && r.status !== 'cancelled';
+            }).length,
+            urgentActions: kpis.hs + data.rooms.filter(r => r.status === 'dirty' || r.status === 'maintenance' || r.status === 'out_of_order').length
+          }}
+          isRefetching={isRefetching}
+          onRefresh={refetch}
         />
-
-        <RackLegend />
 
           <ModernRackGrid
             days={data.days.map(dateISO => ({ 
@@ -412,21 +419,10 @@ export default function RackGrid() {
             orgId={orgId || ''}
           />
 
-          <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">
-            <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
-              <div className="bg-card/95 backdrop-blur border-t border-border sm:rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
-                <div className="px-2 sm:px-4 py-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
-                    <span className="whitespace-nowrap">🎯 Glisser-déposer</span>
-                    <span className="whitespace-nowrap">📱 Support tactile</span>
-                    <span className="whitespace-nowrap">✅ Validation auto</span>
-                    <span className="whitespace-nowrap">🔄 Annulation intelligente</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground/80 font-mono">
-                    {filteredRooms.length} chambres • {data.reservations.length} réservations
-                  </div>
-                </div>
-              </div>
+          {/* Simplified bottom bar */}
+          <div className="mt-4 text-center">
+            <div className="text-xs text-muted-foreground/80 font-mono">
+              {filteredRooms.length} chambres • {data.reservations.length} réservations
             </div>
           </div>
           </div>
