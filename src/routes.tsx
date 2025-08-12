@@ -31,7 +31,7 @@ import SecurityPage from "@/features/settings/security/SecurityPage";
 import MaintenancePage from "@/features/maintenance/MaintenancePage";
 import { HousekeepingPage } from "@/features/housekeeping";
 import { NightAuditPage } from "@/features/night-audit";
-import { POSPage } from "@/features/pos";
+import POSPage from "@/features/pos/POSPage";
 import POSLoginPage from "@/features/pos/auth/POSLoginPage";
 import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
 import POSKitchen from "@/pages/POSKitchen";
