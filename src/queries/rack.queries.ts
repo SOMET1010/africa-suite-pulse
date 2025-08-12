@@ -148,8 +148,14 @@ export function useReassignReservation() {
       
       console.log("🎯 Cache invalidated after reassignment");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("❌ Mutation failed:", error);
+      
+      // Ne pas afficher de toast ici - laisse le composant gérer l'affichage
+      // Juste transformer le message d'erreur en français si nécessaire
+      if (error.code === "23514" && error.message?.includes("Conflicting reservation")) {
+        error.userMessage = "Des réservations en conflit empêchent ce déplacement. Résolvez d'abord les conflits.";
+      }
     },
   });
 }

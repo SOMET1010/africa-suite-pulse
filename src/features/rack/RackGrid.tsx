@@ -131,9 +131,26 @@ export default function RackGrid() {
       });
     } catch (error: any) {
       console.log('❌ Erreur mutation:', error);
+      
+      // Afficher un message utilisateur convivial basé sur le type d'erreur
+      let userMessage = "Impossible de déplacer la réservation";
+      
+      if (error.code === "23514" && error.message?.includes("Conflicting reservation")) {
+        userMessage = "Des réservations en conflit empêchent ce déplacement. Utilisez la gestion des conflits pour résoudre cette situation.";
+      } else if (error.userMessage) {
+        userMessage = error.userMessage;
+      } else if (error.message) {
+        // Traduire d'autres messages techniques courants
+        if (error.message.includes("permission denied")) {
+          userMessage = "Vous n'avez pas les permissions nécessaires pour cette action";
+        } else if (error.message.includes("network")) {
+          userMessage = "Problème de connexion réseau. Veuillez réessayer.";
+        }
+      }
+      
       toast({ 
-        title: "❌ Erreur", 
-        description: error.message || "Impossible de déplacer la réservation", 
+        title: "❌ Déplacement impossible", 
+        description: userMessage, 
         variant: "destructive" 
       });
     }
