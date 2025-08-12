@@ -35,8 +35,9 @@ export const queryKeys = {
   rackData: (orgId: string, start: string, end: string) => 
     ['rack', orgId, start, end] as const,
   
-  // Arrivals
+  // Arrivals & Departures
   arrivals: (orgId: string, date: string) => ['arrivals', orgId, date] as const,
+  departures: (orgId: string, date: string) => ['departures', orgId, date] as const,
   pickableRooms: (orgId: string, query?: string) => 
     ['pickable-rooms', orgId, query] as const,
   

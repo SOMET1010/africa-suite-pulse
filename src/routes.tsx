@@ -2,6 +2,7 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
 import CheckinExpressPage from "@/features/arrivals/CheckinExpressPage";
+import DeparturesPage from "@/features/departures/DeparturesPage";
 import RackGrid from "@/features/rack/RackGrid";
 import NotFound from "@/pages/NotFound";
 import AuthPage from "@/pages/AuthPage";
@@ -48,6 +49,7 @@ export function AppRoutes() {
         <Route index element={<Index />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
+        <Route path="departures" element={<DeparturesPage />} />
         <Route path="reservations" element={<ReservationsPage />} />
         <Route path="reservations/new/quick" element={<QuickReservationPage />} />
         <Route path="reservations/new/advanced" element={<AdvancedReservationPage />} />

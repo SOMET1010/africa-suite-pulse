@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard, ChevronDown, Wrench, TrendingUp } from "lucide-react";
+import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard, ChevronDown, Wrench, TrendingUp, LogIn, LogOut, LayoutDashboard, Plus, Package } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { RealtimeClock } from "./RealtimeClock";
 import { HotelDateWidget } from "./HotelDateWidget";
@@ -23,40 +23,44 @@ export function ProfessionalHeader({
   const location = useLocation();
   
   const navigationItems = [
-    { to: "/", label: "Accueil", icon: Crown },
-    { to: "/arrivals", label: "Arrivées", icon: UserPlus },
-    { to: "/reservations/rack", label: "Plan Chambres", icon: Hotel },
-    { to: "/guests", label: "Mes Clients", icon: Users },
+    { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/arrivals", label: "Arrivées", icon: LogIn },
+    { to: "/departures", label: "Départs", icon: LogOut },
     { 
+      to: "/reservations", 
       label: "Réservations", 
-      icon: Calendar, 
+      icon: Calendar,
       dropdown: [
-        { to: "/reservations", label: "Toutes les réservations" },
-        { to: "/reservations/new/quick", label: "Réservation rapide" },
-        { to: "/reservations/new/advanced", label: "Réservation avancée" },
-        { to: "/reservations/groups", label: "Gestion des groupes" },
-        { to: "/reservations/allotments", label: "Allotements" },
+        { to: "/reservations", label: "Toutes les réservations", icon: Calendar },
+        { to: "/reservations/new/quick", label: "Réservation rapide", icon: Plus },
+        { to: "/reservations/new/advanced", label: "Réservation avancée", icon: Settings },
+        { to: "/reservations/groups", label: "Groupes", icon: Users },
+        { to: "/reservations/allotments", label: "Allotements", icon: Package },
+        { to: "/reservations/rack", label: "Planning (Rack)", icon: Calendar },
       ]
     },
+    { to: "/guests", label: "Clients", icon: Users },
     { to: "/billing", label: "Facturation", icon: CreditCard },
     { 
+      to: "/analytics", 
       label: "Analytics", 
-      icon: TrendingUp, 
+      icon: BarChart3,
       dropdown: [
-        { to: "/analytics", label: "Tableau de bord" },
-        { to: "/analytics/advanced", label: "Analytics avancées" },
+        { to: "/analytics", label: "Dashboard Analytics", icon: BarChart3 },
+        { to: "/analytics/advanced", label: "Analytics Avancées", icon: TrendingUp },
       ]
     },
     { 
+      to: "/reports", 
       label: "Rapports", 
-      icon: FileText, 
+      icon: FileText,
       dropdown: [
-        { to: "/reports", label: "Gestion des rapports" },
-        { to: "/reports/daily", label: "Rapports quotidiens" },
+        { to: "/reports", label: "Gestion des rapports", icon: FileText },
+        { to: "/reports/daily", label: "Rapports quotidiens", icon: Calendar },
       ]
     },
     { to: "/maintenance", label: "Maintenance", icon: Wrench },
-    { to: "/settings", label: "Réglages", icon: Settings },
+    { to: "/settings", label: "Paramètres", icon: Settings },
   ];
 
   const isActive = (path: string) => {
