@@ -7,8 +7,9 @@ import { ProductCatalog } from "./ProductCatalog";
 import { OrderSummary } from "./OrderSummary";
 import { TableSelector } from "./TableSelector";
 import { PaymentDialog } from "./PaymentDialog";
+import { ModernOutletSelector } from "./ModernOutletSelector";
 import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder } from "../hooks/usePOSData";
-import { ShoppingCart, CreditCard, Users, Clock } from "lucide-react";
+import { ShoppingCart, CreditCard, Users, Store, Settings, Clock, Calendar } from "lucide-react";
 import type { POSOutlet, POSTable, CartItem } from "../types";
 
 export function POSTerminal() {
@@ -94,28 +95,7 @@ export function POSTerminal() {
   };
 
   if (!selectedOutlet) {
-    return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-6">Sélectionner un point de vente</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {outlets.map((outlet) => (
-              <Card
-                key={outlet.id}
-                className="p-6 cursor-pointer hover:bg-muted transition-colors"
-                onClick={() => setSelectedOutlet(outlet)}
-              >
-                <h3 className="text-lg font-semibold">{outlet.name}</h3>
-                <p className="text-sm text-muted-foreground">{outlet.description}</p>
-                <Badge variant="secondary" className="mt-2">
-                  {outlet.outlet_type}
-                </Badge>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <ModernOutletSelector outlets={outlets} onSelectOutlet={setSelectedOutlet} />;
   }
 
   if (!currentSession) {
@@ -139,45 +119,78 @@ export function POSTerminal() {
   const totals = calculateTotal();
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="grid grid-cols-12 h-screen">
-        {/* Product Catalog - Left Side */}
-        <div className="col-span-8 border-r">
-          <div className="h-full flex flex-col">
-            {/* Header */}
-            <div className="p-4 border-b bg-muted/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-semibold">{selectedOutlet.name}</h1>
-                  <p className="text-sm text-muted-foreground">
-                    Session: {currentSession.session_number}
-                  </p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
+      {/* Modern POS Header */}
+      <div className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b shadow-sm">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
+                  <Store className="h-5 w-5 text-primary" />
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <Input
-                      type="number"
-                      min="1"
-                      max="20"
-                      value={customerCount}
-                      onChange={(e) => setCustomerCount(parseInt(e.target.value) || 1)}
-                      className="w-16 h-8"
-                    />
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight">{selectedOutlet.name}</h1>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date().toLocaleDateString('fr-FR')}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {new Date().toLocaleTimeString('fr-FR', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
+                    <Badge variant="outline" className="text-xs">
+                      Session: {currentSession.session_number}
+                    </Badge>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedOutlet(null)}
-                  >
-                    Changer de POS
-                  </Button>
                 </div>
               </div>
             </div>
+            
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-lg">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={customerCount}
+                  onChange={(e) => setCustomerCount(parseInt(e.target.value) || 1)}
+                  className="w-16 h-8 border-0 bg-transparent"
+                />
+                <span className="text-sm text-muted-foreground">pers.</span>
+              </div>
+              
+              {selectedTable && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  Table {selectedTable.number}
+                </Badge>
+              )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedOutlet(null)}
+                className="gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                Changer
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <div className="grid grid-cols-12 min-h-[calc(100vh-5rem)]">
+        {/* Product Catalog - Left Side */}
+        <div className="col-span-8 border-r bg-background/60">
+          <div className="h-full flex flex-col">
             {/* Table Selector */}
-            <div className="p-4 border-b">
+            <div className="p-6 border-b bg-card/50">
               <TableSelector
                 outletId={selectedOutlet.id}
                 selectedTable={selectedTable}
@@ -186,7 +199,7 @@ export function POSTerminal() {
             </div>
 
             {/* Product Catalog */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-6">
               <ProductCatalog
                 outletId={selectedOutlet.id}
                 onAddToCart={handleAddToCart}
@@ -196,28 +209,25 @@ export function POSTerminal() {
         </div>
 
         {/* Order Summary - Right Side */}
-        <div className="col-span-4">
+        <div className="col-span-4 bg-card/80 backdrop-blur-sm">
           <div className="h-full flex flex-col">
             {/* Cart Header */}
-            <div className="p-4 border-b bg-muted/30">
+            <div className="p-6 border-b">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ShoppingCart className="h-5 w-5" />
-                  <h2 className="font-semibold">Commande</h2>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg">
+                    <ShoppingCart className="h-4 w-4 text-primary" />
+                  </div>
+                  <h2 className="text-lg font-semibold">Commande en cours</h2>
                 </div>
-                <Badge variant="secondary">
-                  {cartItems.length} article{cartItems.length !== 1 ? 's' : ''}
+                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                  {cartItems.length} {cartItems.length !== 1 ? 'articles' : 'article'}
                 </Badge>
               </div>
-              {selectedTable && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Table {selectedTable.number}
-                </p>
-              )}
             </div>
 
             {/* Order Items */}
-            <div className="flex-1 p-4">
+            <div className="flex-1 p-6 overflow-auto">
               <OrderSummary
                 items={cartItems}
                 onUpdateQuantity={handleUpdateQuantity}
@@ -226,37 +236,41 @@ export function POSTerminal() {
             </div>
 
             {/* Order Totals & Actions */}
-            <div className="p-4 border-t bg-muted/30">
-              <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                  <span>Sous-total:</span>
-                  <span>{totals.subtotal.toFixed(0)} FCFA</span>
+            <div className="p-6 border-t bg-gradient-to-r from-card to-muted/20">
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Sous-total</span>
+                  <span>{totals.subtotal.toLocaleString()} FCFA</span>
                 </div>
                 {totals.serviceCharge > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span>Service (10%):</span>
-                    <span>{totals.serviceCharge.toFixed(0)} FCFA</span>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Service (10%)</span>
+                    <span>{totals.serviceCharge.toLocaleString()} FCFA</span>
                   </div>
                 )}
-                <div className="flex justify-between text-sm">
-                  <span>TVA (18%):</span>
-                  <span>{totals.taxAmount.toFixed(0)} FCFA</span>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>TVA (18%)</span>
+                  <span>{totals.taxAmount.toLocaleString()} FCFA</span>
                 </div>
-                <div className="flex justify-between font-semibold text-lg border-t pt-2">
-                  <span>Total:</span>
-                  <span>{totals.total.toFixed(0)} FCFA</span>
+                <div className="border-t pt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-bold">Total</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {totals.total.toLocaleString()} FCFA
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Button
                   onClick={handleCheckout}
                   disabled={cartItems.length === 0}
-                  className="w-full"
+                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg"
                   size="lg"
                 >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Encaisser
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  Encaisser {totals.total.toLocaleString()} FCFA
                 </Button>
                 <Button
                   variant="outline"

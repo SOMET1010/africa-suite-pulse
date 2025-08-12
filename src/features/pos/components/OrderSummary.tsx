@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Plus, Minus, ShoppingCart } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Trash2, Plus, Minus, ShoppingCart, Clock } from "lucide-react";
 import type { CartItem } from "../types";
 
 interface OrderSummaryProps {
@@ -12,12 +13,14 @@ interface OrderSummaryProps {
 export function OrderSummary({ items, onUpdateQuantity, onRemoveItem }: OrderSummaryProps) {
   if (items.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center py-8">
-          <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Panier vide</p>
-          <p className="text-sm text-muted-foreground">
-            Sélectionnez des produits pour commencer
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="bg-muted/30 rounded-2xl p-8 max-w-sm">
+          <ShoppingCart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">
+            Panier vide
+          </h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Sélectionnez des produits dans le catalogue pour commencer votre commande
           </p>
         </div>
       </div>
@@ -25,82 +28,87 @@ export function OrderSummary({ items, onUpdateQuantity, onRemoveItem }: OrderSum
   }
 
   return (
-    <div className="space-y-3">
-      {items.map((item) => (
-        <div
-          key={item.id}
-          className="bg-muted/50 rounded-lg p-3 space-y-2"
-        >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h4 className="font-medium text-sm">{item.product_name}</h4>
-              <p className="text-xs text-muted-foreground">
-                {item.unit_price.toFixed(0)} FCFA × {item.quantity}
-              </p>
-              {item.special_instructions && (
-                <p className="text-xs text-orange-600 mt-1">
+    <div className="space-y-4">
+      {items.map((item, index) => (
+        <Card key={item.id} className="overflow-hidden bg-card/60 backdrop-blur-sm border-0 shadow-sm">
+          <div className="p-4">
+            {/* Product Header */}
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex-1">
+                <h4 className="font-semibold text-sm leading-tight">{item.product_name}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground">
+                    {item.unit_price.toLocaleString()} FCFA/unité
+                  </span>
+                  {item.product.preparation_time && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      <span>{item.product.preparation_time}min</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onRemoveItem(item.product_id)}
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Special Instructions */}
+            {item.special_instructions && (
+              <div className="mb-3 p-2 bg-muted/30 rounded-lg">
+                <span className="text-xs text-muted-foreground">
                   Note: {item.special_instructions}
-                </p>
-              )}
-            </div>
-            <div className="text-right">
-              <p className="font-semibold text-sm">
-                {item.total_price.toFixed(0)} FCFA
-              </p>
-              <Badge
-                variant={
-                  item.status === 'pending' 
-                    ? 'secondary' 
-                    : item.status === 'preparing'
-                    ? 'default'
-                    : 'outline'
-                }
-                className="text-xs"
-              >
-                {item.status === 'pending' && 'En attente'}
-                {item.status === 'preparing' && 'En préparation'}
-                {item.status === 'ready' && 'Prêt'}
-                {item.status === 'served' && 'Servi'}
-              </Badge>
+                </span>
+              </div>
+            )}
+
+            {/* Quantity Controls */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1)}
+                    className="h-8 w-8 p-0 hover:bg-background"
+                    disabled={item.quantity <= 1}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  
+                  <span className="w-8 text-center text-sm font-semibold">
+                    {item.quantity}
+                  </span>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1)}
+                    className="h-8 w-8 p-0 hover:bg-background"
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
+
+                <Badge variant="outline" className="text-xs bg-background">
+                  {item.status === 'pending' ? 'En attente' : item.status}
+                </Badge>
+              </div>
+
+              <div className="text-right">
+                <span className="text-base font-bold text-primary">
+                  {item.total_price.toLocaleString()} F
+                </span>
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1)}
-                disabled={item.quantity <= 1}
-                className="h-6 w-6 p-0"
-              >
-                <Minus className="h-3 w-3" />
-              </Button>
-              
-              <span className="text-sm font-medium min-w-[2rem] text-center">
-                {item.quantity}
-              </span>
-              
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1)}
-                className="h-6 w-6 p-0"
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            </div>
-
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onRemoveItem(item.product_id)}
-              className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
+        </Card>
       ))}
     </div>
   );
