@@ -28,6 +28,7 @@ import {
 import { guestsApi } from "@/services/guests.api";
 import type { Guest } from "@/types/guest";
 import { EditGuestDialog } from "./EditGuestDialog";
+import { LoyaltyStatusCard } from "./LoyaltyStatusCard";
 
 interface GuestDetailsSheetProps {
   guest: Guest;
@@ -317,6 +318,9 @@ export function GuestDetailsSheet({ guest, open, onOpenChange }: GuestDetailsShe
                 </CardContent>
               </Card>
             )}
+
+            {/* Loyalty Status */}
+            <LoyaltyStatusCard guestId={guest.id} />
 
             {/* Historique des séjours */}
             <Card>

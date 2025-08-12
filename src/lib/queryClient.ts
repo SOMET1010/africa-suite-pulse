@@ -58,6 +58,11 @@ export const queryKeys = {
   users: (orgId: string) => ['users', orgId] as const,
   profiles: (orgId: string) => ['profiles', orgId] as const,
   permissions: ['permissions'] as const,
+  
+  // Loyalty
+  customerLoyalty: (guestId: string) => ['customer-loyalty', guestId] as const,
+  loyaltyTransactions: (guestId: string) => ['loyalty-transactions', guestId] as const,
+  loyaltyProgram: (orgId: string) => ['loyalty-program', orgId] as const,
 } as const;
 
 // Helper pour invalider les queries liées au rack
