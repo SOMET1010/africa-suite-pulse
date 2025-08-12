@@ -4,7 +4,12 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Shield, AlertTriangle, Key, Eye, Clock } from "lucide-react";
+import { Shield, AlertTriangle, Key, Eye, Clock, Download } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useOrgId } from "@/core/auth/useOrg";
+import { useUserRole } from "@/core/auth/useUserRole";
+import { auditApi, type AuditLog } from "@/features/security/audit.api";
 
 export default function SecurityPage() {
   const auditLogs = [
@@ -30,6 +35,71 @@ export default function SecurityPage() {
       status: "Échec"
     }
   ];
+
+  const { orgId } = useOrgId();
+  const { hasPermission } = useUserRole();
+  const [canViewAudit, setCanViewAudit] = useState<boolean>(false);
+  const [canExportAudit, setCanExportAudit] = useState<boolean>(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const checkPerms = async () => {
+      const [view, exp] = await Promise.all([
+        hasPermission("audit.view"),
+        hasPermission("audit.export"),
+      ]);
+      if (!mounted) return;
+      setCanViewAudit(!!view);
+      setCanExportAudit(!!exp);
+    };
+    checkPerms();
+    return () => { mounted = false; };
+  }, [hasPermission]);
+
+  const { data: auditLogs = [], isLoading: auditLoading, error: auditError } = useQuery({
+    queryKey: ["audit-logs", orgId, canViewAudit],
+    queryFn: () => auditApi.listAuditLogs({ orgId, limit: 50 }),
+    enabled: !!orgId && canViewAudit,
+  });
+
+  const exportCsv = () => {
+    if (!auditLogs?.length) return;
+    const headers = [
+      "occurred_at",
+      "user_id",
+      "action",
+      "table_name",
+      "record_id",
+      "severity",
+    ];
+    const rows = auditLogs.map((l) => [
+      l.occurred_at,
+      l.user_id ?? "",
+      l.action,
+      l.table_name,
+      l.record_id ?? "",
+      l.severity,
+    ]);
+    const csv = [headers.join(","), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `audit_logs_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const severityVariant = (sev: string) => {
+    switch (sev) {
+      case "error": return "destructive";
+      case "warning": return "secondary";
+      default: return "default";
+    }
+  };
+
+  // Static demo data previously used
+  // const auditLogs = [ ... ]  -> replaced by live data
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -89,11 +159,17 @@ export default function SecurityPage() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Key className="w-5 h-5" />
-            Clés API & Accès
-          </CardTitle>
+        <CardHeader className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              <CardTitle>Clés API & Accès</CardTitle>
+            </div>
+            <div className="flex gap-2">
+              <Badge variant="default">Active</Badge>
+              <Button variant="outline" size="sm">Révoquer</Button>
+            </div>
+          </div>
           <CardDescription>Gestion des accès API et intégrations</CardDescription>
         </CardHeader>
         <CardContent>
@@ -118,34 +194,60 @@ export default function SecurityPage() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Clock className="w-5 h-5" />
-            Journal d'Audit
-          </CardTitle>
-          <CardDescription>Historique des actions importantes</CardDescription>
+            <CardTitle>Journal d'Audit</CardTitle>
+          </div>
+          {canExportAudit && (
+            <Button variant="outline" size="sm" onClick={exportCsv} disabled={!auditLogs?.length}>
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
+          )}
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {auditLogs.map((log) => (
-              <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <p className="font-medium">{log.action}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {log.user} • {log.timestamp}
-                  </p>
+          {!canViewAudit && (
+            <div className="p-3 rounded-md border text-sm text-muted-foreground">
+              Vous n'avez pas la permission de consulter le journal d'audit (audit.view).
+            </div>
+          )}
+
+          {canViewAudit && (
+            <div className="space-y-3">
+              {auditLoading && <div className="text-sm text-muted-foreground">Chargement des logs…</div>}
+              {auditError && (
+                <div className="text-sm text-destructive">
+                  Erreur lors du chargement des logs.
                 </div>
-                <Badge variant={log.status === "Succès" ? "default" : "destructive"}>
-                  {log.status}
-                </Badge>
+              )}
+              {!auditLoading && !auditError && (!auditLogs || auditLogs.length === 0) && (
+                <div className="text-sm text-muted-foreground">Aucun événement récent.</div>
+              )}
+
+              {auditLogs?.map((log) => (
+                <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">
+                      {log.action} • {log.table_name}
+                    </p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {new Date(log.occurred_at).toLocaleString()} • {log.user_id ? `User: ${log.user_id}` : "User: —"}
+                    </p>
+                  </div>
+                  <Badge variant={severityVariant(log.severity) as any} className="shrink-0">
+                    {log.severity}
+                  </Badge>
+                </div>
+              ))}
+
+              <div className="mt-4">
+                <Button variant="outline" className="w-full">
+                  Voir tout l'historique
+                </Button>
               </div>
-            ))}
-          </div>
-          <div className="mt-4">
-            <Button variant="outline" className="w-full">
-              Voir tout l'historique
-            </Button>
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
