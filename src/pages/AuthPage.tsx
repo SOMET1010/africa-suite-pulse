@@ -78,10 +78,18 @@ export default function AuthPage() {
           <button type="button" onClick={()=>setMode("signup")}
             className={`flex-1 px-3 py-2 rounded-xl border ${mode==="signup"?"bg-primary/10 border-transparent":"border-border"}`}>Créer un compte</button>
         </div>
-        <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" placeholder="Email"
-               type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
-        <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" placeholder="Mot de passe"
-               type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-foreground">Adresse email</label>
+          <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" 
+                 placeholder="votre.email@exemple.com"
+                 type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-foreground">Mot de passe</label>
+          <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" 
+                 placeholder="Votre mot de passe"
+                 type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
+        </div>
         {err && <div className="text-sm text-destructive p-2 rounded bg-destructive/10">{err}</div>}
         <button disabled={busy} className="w-full min-h-11 px-4 rounded-xl text-primary-foreground bg-primary hover:bg-primary/90">
           {busy ? "…" : (mode==="login" ? "Se connecter" : "Créer le compte")}
