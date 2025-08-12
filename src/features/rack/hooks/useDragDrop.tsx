@@ -345,22 +345,23 @@ export function DropZoneRoom({
 }) {
   const { dragState, setDragOver, onDrop } = useDragDrop();
 
-  const isDragOver = dragState.dragOverRoom === room.id;
+  const overKey = `${room.id}-${day}`;
+  const isDragOver = dragState.dragOverRoom === overKey;
   const canDrop = dragState.draggedReservation ? 
     canAcceptDrop(dragState.draggedReservation, room, day) : false;
 
   // Gestion du survol
   const handleMouseEnter = useCallback(() => {
     if (dragState.isDragging && dragState.draggedReservation) {
-      setDragOver(room.id, canDrop);
+      setDragOver(overKey, canDrop);
     }
-  }, [dragState.isDragging, dragState.draggedReservation, room.id, canDrop, setDragOver]);
+  }, [dragState.isDragging, dragState.draggedReservation, overKey, canDrop, setDragOver]);
 
   const handleMouseMove = useCallback(() => {
     if (dragState.isDragging && dragState.draggedReservation) {
-      setDragOver(room.id, canDrop);
+      setDragOver(overKey, canDrop);
     }
-  }, [dragState.isDragging, dragState.draggedReservation, room.id, canDrop, setDragOver]);
+  }, [dragState.isDragging, dragState.draggedReservation, overKey, canDrop, setDragOver]);
 
   const handleMouseLeave = useCallback(() => {
     if (dragState.isDragging) {
@@ -382,21 +383,31 @@ export function DropZoneRoom({
 
     const touch = e.touches[0];
     const elementFromPoint = document.elementFromPoint(touch.clientX, touch.clientY);
-    const dropZone = elementFromPoint?.closest('[data-drop-zone]');
+    const dropZone = elementFromPoint?.closest('[data-drop-zone]') as HTMLElement | null;
     
-    if (dropZone && dropZone.getAttribute('data-room-id') === room.id) {
-      setDragOver(room.id, canDrop);
+    if (
+      dropZone &&
+      dropZone.getAttribute('data-room-id') === room.id &&
+      dropZone.getAttribute('data-day') === day
+    ) {
+      setDragOver(overKey, canDrop);
     }
-  }, [dragState.isDragging, room.id, canDrop, setDragOver]);
+  }, [dragState.isDragging, room.id, day, overKey, canDrop, setDragOver]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     if (!dragState.isDragging) return;
 
     const touch = e.changedTouches[0];
     const elementFromPoint = document.elementFromPoint(touch.clientX, touch.clientY);
-    const dropZone = elementFromPoint?.closest('[data-drop-zone]');
+    const dropZone = elementFromPoint?.closest('[data-drop-zone]') as HTMLElement | null;
     
-    if (dropZone && dropZone.getAttribute('data-room-id') === room.id && canDrop && dragState.draggedReservation) {
+    if (
+      dropZone &&
+      dropZone.getAttribute('data-room-id') === room.id &&
+      dropZone.getAttribute('data-day') === day &&
+      canDrop &&
+      dragState.draggedReservation
+    ) {
       onReservationDrop(dragState.draggedReservation, room, day);
       onDrop(room, day);
     }
@@ -406,6 +417,7 @@ export function DropZoneRoom({
     <div
       data-drop-zone
       data-room-id={room.id}
+      data-day={day}
       className={`transition-all duration-200 ${
         isDragOver 
           ? canDrop 

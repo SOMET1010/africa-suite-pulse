@@ -121,7 +121,7 @@ export function RoomCell({
     return icons[room.status] || '🏠';
   };
 
-  const isDraggedOver = dragState.dragOverRoom === room.id;
+  const isDraggedOver = dragState.dragOverRoom === `${room.id}-${day}`;
 
   return (
     <DropZoneRoom
