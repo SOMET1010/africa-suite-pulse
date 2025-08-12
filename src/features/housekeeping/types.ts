@@ -2,7 +2,7 @@ export interface HousekeepingTask {
   id: string;
   room_id: string;
   room_number: string;
-  task_type: 'cleaning' | 'maintenance' | 'inspection';
+  task_type: 'cleaning' | 'maintenance' | 'inspection' | 'linen_change' | 'recouche';
   status: 'pending' | 'in_progress' | 'completed' | 'verified';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assigned_to: string | null;
@@ -11,10 +11,14 @@ export interface HousekeepingTask {
   actual_duration?: number;
   notes?: string;
   checklist_items: ChecklistItem[];
+  linen_details?: LinenChangeDetails;
   created_at: string;
   started_at?: string;
   completed_at?: string;
   due_at?: string;
+  scheduled_at?: string;
+  checkout_time?: string;
+  checkin_time?: string;
   org_id: string;
 }
 
@@ -62,12 +66,18 @@ export interface RoomStatus {
   room_id: string;
   room_number: string;
   room_type: string;
-  current_status: 'clean' | 'dirty' | 'out_of_order' | 'inspected' | 'maintenance';
-  guest_status: 'occupied' | 'vacant' | 'checkout' | 'checkin';
+  current_status: 'clean' | 'dirty' | 'out_of_order' | 'inspected' | 'maintenance' | 'recouche_pending' | 'recouche_in_progress';
+  guest_status: 'occupied' | 'vacant' | 'checkout' | 'checkin' | 'checkout_dirty' | 'ready_for_checkin';
   last_cleaned?: string;
+  last_linen_change?: string;
+  linen_status: LinenStatus;
   needs_inspection: boolean;
+  needs_recouche: boolean;
   priority_level: number;
   active_tasks: number;
+  checkout_time?: string;
+  expected_checkin?: string;
+  time_since_checkout?: number; // minutes
 }
 
 export interface HousekeepingStats {
@@ -99,3 +109,72 @@ export type StaffFilter = {
   status?: HousekeepingStaff['status'];
   shift?: 'morning' | 'afternoon' | 'night';
 };
+
+// Nouveaux types pour la gestion du linge et recouche
+export interface LinenChangeDetails {
+  bed_linen: boolean;
+  bathroom_linen: boolean;
+  pillowcases: number;
+  sheets: number;
+  towels: number;
+  bathrobes?: number;
+  linen_condition: 'good' | 'worn' | 'damaged' | 'stained';
+  replacement_reason: 'schedule' | 'guest_request' | 'stained' | 'damaged' | 'checkout';
+  previous_linen_id?: string;
+  new_linen_id?: string;
+}
+
+export interface LinenStatus {
+  bed_linen_last_changed: string;
+  bathroom_linen_last_changed: string;
+  days_since_bed_change: number;
+  days_since_bathroom_change: number;
+  needs_bed_linen_change: boolean;
+  needs_bathroom_linen_change: boolean;
+  linen_quality: 'excellent' | 'good' | 'acceptable' | 'needs_replacement';
+}
+
+export interface LinenInventory {
+  id: string;
+  type: 'bed_sheet' | 'pillowcase' | 'towel' | 'bathrobe' | 'blanket';
+  size: 'single' | 'double' | 'queen' | 'king' | 'small' | 'medium' | 'large';
+  quantity_available: number;
+  quantity_in_use: number;
+  quantity_in_laundry: number;
+  quality_grade: 'A' | 'B' | 'C';
+  last_restocked: string;
+  org_id: string;
+}
+
+export interface RecoucheWorkflow {
+  room_id: string;
+  reservation_id?: string;
+  checkout_completed_at?: string;
+  cleaning_started_at?: string;
+  cleaning_completed_at?: string;
+  inspection_completed_at?: string;
+  ready_for_checkin_at?: string;
+  expected_checkin_at?: string;
+  status: 'checkout_dirty' | 'cleaning_assigned' | 'cleaning_in_progress' | 'cleaning_completed' | 'inspection_pending' | 'inspection_completed' | 'ready_for_checkin';
+  priority: 'normal' | 'express' | 'vip';
+  assigned_cleaner?: string;
+  assigned_inspector?: string;
+  estimated_completion: string;
+  notes?: string;
+}
+
+export interface HousekeepingSchedule {
+  id: string;
+  room_id: string;
+  room_number: string;
+  date: string;
+  time_slot: string;
+  task_type: HousekeepingTask['task_type'];
+  estimated_duration: number;
+  assigned_staff: string[];
+  priority: HousekeepingTask['priority'];
+  guest_checkout?: string;
+  guest_checkin?: string;
+  special_requirements?: string[];
+  org_id: string;
+}

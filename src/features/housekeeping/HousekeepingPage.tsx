@@ -25,9 +25,15 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Timer
+  Timer,
+  Shirt,
+  Package,
+  RotateCcw
 } from "lucide-react";
 import { useMockHousekeepingTasks, useMockHousekeepingStaff, useMockRoomStatuses } from "./hooks/useMockHousekeeping";
+import { useRecoucheWorkflow } from "./hooks/useRecoucheWorkflow";
+import { LinenManagement } from "./components/LinenManagement";
+import { RecoucheBoard } from "./components/RecoucheBoard";
 import { cn } from "@/lib/utils";
 
 interface ScheduledTask {
@@ -53,7 +59,8 @@ export default function HousekeepingPage() {
   // Utiliser les hooks mock pour les données
   const { tasks, loading: tasksLoading, updateTaskStatus, assignTask } = useMockHousekeepingTasks();
   const { staff, loading: staffLoading } = useMockHousekeepingStaff();
-  const { rooms, loading: roomsLoading } = useMockRoomStatuses();
+  const { rooms, loading: roomsLoading, updateRoomStatus } = useMockRoomStatuses();
+  const { workflows, loading: workflowsLoading, startTask, completeTask, assignStaff } = useRecoucheWorkflow();
 
   // Génération des données de planning mock
   const generateScheduledTasks = (): ScheduledTask[] => {
@@ -126,6 +133,9 @@ export default function HousekeepingPage() {
     clean: rooms.filter(r => r.current_status === 'clean').length,
     dirty: rooms.filter(r => r.current_status === 'dirty').length,
     maintenance: rooms.filter(r => r.current_status === 'maintenance').length,
+    recouche_pending: rooms.filter(r => r.current_status === 'recouche_pending').length,
+    recouche_in_progress: rooms.filter(r => r.current_status === 'recouche_in_progress').length,
+    needs_linen_change: rooms.filter(r => r.linen_status?.needs_bed_linen_change || r.linen_status?.needs_bathroom_linen_change).length,
     occupied: rooms.filter(r => r.guest_status === 'occupied').length,
   };
 
@@ -155,6 +165,8 @@ export default function HousekeepingPage() {
       case 'cleaning': return <Bed className="h-4 w-4" />;
       case 'maintenance': return <Wrench className="h-4 w-4" />;
       case 'inspection': return <ClipboardList className="h-4 w-4" />;
+      case 'linen_change': return <Shirt className="h-4 w-4" />;
+      case 'recouche': return <RotateCcw className="h-4 w-4" />;
       default: return <ClipboardList className="h-4 w-4" />;
     }
   };
@@ -215,7 +227,14 @@ export default function HousekeepingPage() {
     setSelectedDate(newDate);
   };
 
-  const isLoading = tasksLoading || staffLoading || roomsLoading;
+  const isLoading = tasksLoading || staffLoading || roomsLoading || workflowsLoading;
+
+  // Handler pour les changements de linge
+  const handleLinenChange = (roomId: string, details: any) => {
+    console.log('Changement de linge pour la chambre', roomId, details);
+    // Ici on pourrait mettre à jour le statut de la chambre
+    updateRoomStatus(roomId, 'clean');
+  };
 
   return (
     <PageLayout title="Gouvernante - Housekeeping">
@@ -263,13 +282,13 @@ export default function HousekeepingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Maintenance</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Recouches</CardTitle>
+              <RotateCcw className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-600">{roomStats.maintenance}</div>
+              <div className="text-2xl font-bold text-blue-600">{roomStats.recouche_pending + roomStats.recouche_in_progress}</div>
               <p className="text-xs text-muted-foreground">
-                chambres en maintenance
+                {roomStats.recouche_pending} en attente, {roomStats.recouche_in_progress} en cours
               </p>
             </CardContent>
           </Card>
@@ -277,8 +296,10 @@ export default function HousekeepingPage() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="tasks" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="tasks">Tâches</TabsTrigger>
+            <TabsTrigger value="recouche">Recouche</TabsTrigger>
+            <TabsTrigger value="linen">Linge</TabsTrigger>
             <TabsTrigger value="rooms">Statut chambres</TabsTrigger>
             <TabsTrigger value="staff">Personnel</TabsTrigger>
             <TabsTrigger value="planning">Planning</TabsTrigger>
@@ -407,6 +428,90 @@ export default function HousekeepingPage() {
                       </div>
                     ))
                   )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Recouche Tab */}
+          <TabsContent value="recouche" className="space-y-4">
+            <RecoucheBoard 
+              rooms={rooms}
+              workflows={workflows}
+              onStartTask={startTask}
+              onCompleteTask={completeTask}
+              onAssignStaff={assignStaff}
+            />
+          </TabsContent>
+
+          {/* Linen Management Tab */}
+          <TabsContent value="linen" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Gestion du linge
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Statistiques du linge */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Changements nécessaires</p>
+                          <p className="text-2xl font-bold text-orange-600">{roomStats.needs_linen_change}</p>
+                        </div>
+                        <Shirt className="h-8 w-8 text-orange-500" />
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">Stock disponible</p>
+                          <p className="text-2xl font-bold text-green-600">89%</p>
+                        </div>
+                        <Package className="h-8 w-8 text-green-500" />
+                      </div>
+                    </Card>
+                    
+                    <Card className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">En lavage</p>
+                          <p className="text-2xl font-bold text-blue-600">24</p>
+                        </div>
+                        <RotateCcw className="h-8 w-8 text-blue-500" />
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Chambres nécessitant un changement de linge */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Chambres nécessitant un changement de linge</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {rooms
+                        .filter(room => room.linen_status?.needs_bed_linen_change || room.linen_status?.needs_bathroom_linen_change)
+                        .map((room) => (
+                          <LinenManagement
+                            key={room.room_id}
+                            roomId={room.room_id}
+                            roomNumber={room.room_number}
+                            currentLinenStatus={room.linen_status}
+                            onLinenChange={(details) => handleLinenChange(room.room_id, details)}
+                          />
+                        ))}
+                    </div>
+                    
+                    {roomStats.needs_linen_change === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Shirt className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>Aucun changement de linge requis actuellement</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
