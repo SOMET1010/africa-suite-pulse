@@ -2300,6 +2300,210 @@ export type Database = {
           },
         ]
       }
+      pos_stock_items: {
+        Row: {
+          average_cost: number | null
+          batch_number: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          current_stock: number
+          description: string | null
+          expiry_date: string | null
+          id: string
+          is_active: boolean
+          item_code: string
+          last_cost: number | null
+          max_stock_level: number
+          min_stock_level: number
+          name: string
+          org_id: string
+          product_id: string | null
+          supplier_code: string | null
+          supplier_name: string | null
+          unit: string
+          unit_cost: number | null
+          updated_at: string
+          warehouse_id: string
+        }
+        Insert: {
+          average_cost?: number | null
+          batch_number?: string | null
+          category: string
+          created_at?: string
+          created_by?: string | null
+          current_stock?: number
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean
+          item_code: string
+          last_cost?: number | null
+          max_stock_level?: number
+          min_stock_level?: number
+          name: string
+          org_id: string
+          product_id?: string | null
+          supplier_code?: string | null
+          supplier_name?: string | null
+          unit?: string
+          unit_cost?: number | null
+          updated_at?: string
+          warehouse_id: string
+        }
+        Update: {
+          average_cost?: number | null
+          batch_number?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          current_stock?: number
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          is_active?: boolean
+          item_code?: string
+          last_cost?: number | null
+          max_stock_level?: number
+          min_stock_level?: number
+          name?: string
+          org_id?: string
+          product_id?: string | null
+          supplier_code?: string | null
+          supplier_name?: string | null
+          unit?: string
+          unit_cost?: number | null
+          updated_at?: string
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_stock_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "pos_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_stock_items_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "pos_warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_stock_movements: {
+        Row: {
+          created_at: string
+          id: string
+          movement_type: string
+          notes: string | null
+          org_id: string
+          performed_at: string
+          performed_by: string | null
+          quantity: number
+          reason: string | null
+          reference_id: string | null
+          reference_number: string | null
+          reference_type: string | null
+          stock_item_id: string
+          total_cost: number | null
+          unit_cost: number | null
+          warehouse_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          movement_type: string
+          notes?: string | null
+          org_id: string
+          performed_at?: string
+          performed_by?: string | null
+          quantity: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          stock_item_id: string
+          total_cost?: number | null
+          unit_cost?: number | null
+          warehouse_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          movement_type?: string
+          notes?: string | null
+          org_id?: string
+          performed_at?: string
+          performed_by?: string | null
+          quantity?: number
+          reason?: string | null
+          reference_id?: string | null
+          reference_number?: string | null
+          reference_type?: string | null
+          stock_item_id?: string
+          total_cost?: number | null
+          unit_cost?: number | null
+          warehouse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_stock_movements_stock_item_id_fkey"
+            columns: ["stock_item_id"]
+            isOneToOne: false
+            referencedRelation: "pos_stock_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_stock_movements_warehouse_id_fkey"
+            columns: ["warehouse_id"]
+            isOneToOne: false
+            referencedRelation: "pos_warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_system_settings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          org_id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          org_id: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       pos_tables: {
         Row: {
           capacity: number | null
@@ -2398,6 +2602,51 @@ export type Database = {
           pin_hash?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      pos_warehouses: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          is_main: boolean
+          location: string | null
+          name: string
+          org_id: string
+          outlet_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_main?: boolean
+          location?: string | null
+          name: string
+          org_id: string
+          outlet_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_main?: boolean
+          location?: string | null
+          name?: string
+          org_id?: string
+          outlet_id?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
