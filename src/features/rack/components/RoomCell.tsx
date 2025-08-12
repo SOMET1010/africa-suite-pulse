@@ -1,100 +1,122 @@
-import React, { useCallback } from 'react';
-import { DraggableReservation, DropZoneRoom, useDragDrop } from '../hooks/useDragDrop';
+import React, { useMemo, useCallback, useState } from 'react';
 import { ReservationCard } from './ReservationCard';
 import { RoomTypeIndicator } from './RoomTypeIndicator';
+import { EmptyRoomInfo } from './EmptyRoomInfo';
+import { useSimpleDragDrop } from '../hooks/useSimpleDragDrop';
 import type { UIRoom, UIReservation } from '../rack.types';
 
 interface RoomCellProps {
   room: UIRoom;
   day: string;
   reservations: UIReservation[];
-  compact: boolean;
-  vivid: boolean;
-  zoom: number;
+  compact?: boolean;
+  vivid?: boolean;
+  zoom?: number;
   onReservationMove: (reservationId: string, targetRoomId: string, targetDay: string) => void;
   onCellClick: (room: UIRoom, day: string, reservation?: UIReservation) => void;
 }
 
-export function RoomCell({ 
-  room, 
-  day, 
-  reservations, 
-  compact, 
-  vivid, 
-  zoom,
+export function RoomCell({
+  room,
+  day,
+  reservations,
+  compact = false,
+  vivid = false,
+  zoom = 1,
   onReservationMove,
-  onCellClick 
+  onCellClick,
 }: RoomCellProps) {
-  const { dragState } = useDragDrop();
+  const { dragState } = useSimpleDragDrop();
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [canDrop, setCanDrop] = useState(false);
 
-  // Filtrer les réservations pour ce jour et cette chambre
-  const dayReservations = reservations.filter(r => {
-    // Vérifier si la réservation concerne cette chambre et ce jour
-    const start = new Date(r.start);
-    const end = new Date(r.end);
-    const currentDay = new Date(day);
-    
-    return r.roomId === room.id && 
-           currentDay >= start && 
-           currentDay < end;
-  });
+  // 📊 Réservations pour cette cellule (room + day)
+  const cellReservations = useMemo(() => {
+    return reservations.filter(reservation => {
+      // Filtrage par chambre
+      if (reservation.roomId !== room.id) return false;
+      
+      // Filtrage par jour (la réservation doit couvrir ce jour)
+      const dayDate = new Date(day);
+      const arrivalDate = new Date(reservation.start);
+      const departureDate = new Date(reservation.end);
+      
+      // Le jour doit être >= arrivée et < départ
+      return dayDate >= arrivalDate && dayDate < departureDate;
+    });
+  }, [reservations, room.id, day]);
 
   // Validation du drop
-  const canAcceptDrop = useCallback((reservation: UIReservation, targetRoom: UIRoom, targetDay: string): boolean => {
-    // Empêcher drop sur même chambre
-    if (reservation.roomId === targetRoom.id) {
-      return false;
-    }
+  const validateDrop = useCallback((reservationId: string) => {
+    if (!reservationId) return false;
+    
+    const draggedReservation = reservations.find(r => r.id === reservationId);
+    if (!draggedReservation) return false;
+    
+    // Chambre identique = pas de déplacement
+    if (draggedReservation.roomId === room.id) return false;
+    
+    // Chambre bloquée
+    if (room.status === 'out_of_order' || room.status === 'maintenance') return false;
+    
+    // Vérifier les conflits
+    const hasConflict = cellReservations.some(existing => 
+      existing.id !== draggedReservation.id
+    );
+    
+    return !hasConflict;
+  }, [room, cellReservations, reservations]);
 
-    // Interdire drop en dehors de la période du séjour
-    const resStart = new Date(reservation.start);
-    const resEnd = new Date(reservation.end);
-    const dayDate = new Date(targetDay);
-    if (dayDate < resStart || dayDate >= resEnd) {
-      return false;
-    }
+  // Gestion du drag over
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const reservationId = e.dataTransfer.getData('text/reservation-id');
+    const isValid = validateDrop(reservationId);
+    
+    setIsDragOver(true);
+    setCanDrop(isValid);
+  }, [validateDrop]);
 
-    // Vérifier statut chambre
-    if (targetRoom.status === 'out_of_order' || targetRoom.status === 'maintenance') {
-      return false;
-    }
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
 
-    // Vérifier disponibilité (pas de conflit)
-    const existingReservations = reservations.filter(r => {
-      const rStart = new Date(r.start);
-      const rEnd = new Date(r.end);
-      return r.roomId === targetRoom.id && 
-             r.id !== reservation.id &&
-             dayDate >= rStart && 
-             dayDate < rEnd;
-    });
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    setCanDrop(false);
+  }, []);
 
-    return existingReservations.length === 0;
-  }, [reservations]);
-
-  // Gestion du drop
-  const handleReservationDrop = useCallback((reservation: UIReservation, targetRoom: UIRoom, targetDay: string) => {
-    console.log('🎯 RoomCell handleReservationDrop appelé:', {
-      reservation: reservation.id,
-      guest: reservation.guestName,
-      from: reservation.roomId,
-      to: targetRoom.id,
-      day: targetDay
-    });
-
-    if (!canAcceptDrop(reservation, targetRoom, targetDay)) {
-      console.log('❌ Drop rejeté par canAcceptDrop');
+  // Gestion du drop - POINT CENTRAL
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    console.log('🎯 RoomCell handleDrop');
+    
+    const reservationId = e.dataTransfer.getData('text/reservation-id');
+    if (!reservationId) {
+      console.log('❌ Pas de reservationId dans le drop');
       return;
     }
 
-    console.log('✅ Drop validé, appel de onReservationMove...');
-    // 🔄 APPEL DU CALLBACK PARENT POUR DÉCLENCHER LE MOVE
-    onReservationMove(reservation.id, targetRoom.id, targetDay);
-  }, [canAcceptDrop, onReservationMove]);
+    if (validateDrop(reservationId)) {
+      console.log('✅ Drop valide - calling onReservationMove:', {
+        reservationId,
+        roomId: room.id,
+        day
+      });
+      onReservationMove(reservationId, room.id, day);
+    } else {
+      console.log('❌ Drop invalide');
+    }
+    
+    setIsDragOver(false);
+    setCanDrop(false);
+  }, [validateDrop, onReservationMove, room.id, day]);
 
   // Style de la cellule selon le statut
   const getCellStyle = () => {
-    const baseStyle = "relative border border-border transition-all duration-200 min-h-[60px] rounded-md";
+    const baseStyle = "relative border border-border transition-all duration-200";
     
     switch (room.status) {
       case 'clean':
@@ -113,7 +135,7 @@ export function RoomCell({
   };
 
   // Obtenir l'icône de statut de la chambre
-  const getRoomStatusIcon = () => {
+  const getRoomStatusIcon = (status: string) => {
     const icons = {
       'clean': '✨',
       'dirty': '🧹',
@@ -121,84 +143,69 @@ export function RoomCell({
       'maintenance': '🔧',
       'inspected': '👁️'
     };
-    return icons[room.status] || '🏠';
+    return icons[status] || '🏠';
   };
 
-  const isDraggedOver = dragState.dragOverRoom === `${room.id}-${day}`;
-
   return (
-    <DropZoneRoom
-      room={room}
-      day={day}
-      onReservationDrop={handleReservationDrop}
-      canAcceptDrop={canAcceptDrop}
+    <div
+      className={`
+        room-cell cell group relative overflow-hidden transition-all duration-200 min-h-[120px] border-2
+        ${getCellStyle()}
+        ${compact ? 'min-h-[80px]' : ''}
+        ${zoom !== 1 ? `scale-${Math.round(zoom * 100)}` : ''}
+        ${isDragOver && canDrop ? 'drag-over-valid' : ''}
+        ${isDragOver && !canDrop ? 'drag-over-invalid' : ''}
+        hover:shadow-sm hover:z-10
+      `}
+      onClick={() => onCellClick(room, day, cellReservations[0] || null)}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
-      <div 
-        className={`${getCellStyle()} ${isDraggedOver ? 'ring-2 ring-primary/50' : ''}`}
-        style={{ 
-          transform: `scale(${zoom / 100})`,
-          transformOrigin: 'top left'
-        }}
-        onClick={(e) => {
-          if (dragState.isDragging) { e.preventDefault(); e.stopPropagation(); return; }
-          onCellClick(room, day, dayReservations[0]);
-        }}
-      >
-        {/* Contenu de la cellule */}
-        <div className={`p-1.5 ${compact ? 'space-y-1' : 'space-y-2'} h-full`}>
-          {dayReservations.map((reservation) => (
-            <DraggableReservation
-              key={reservation.id}
-              reservation={reservation}
-              onDragStart={() => {
-                console.log('🎯 Début drag:', reservation.guestName);
-                // Feedback haptique
-                if ('vibrate' in navigator) {
-                  navigator.vibrate(50);
-                }
-              }}
-            >
-              <ReservationCard 
-                reservation={reservation} 
-                compact={compact}
-                vivid={vivid}
-              />
-            </DraggableReservation>
-          ))}
+      {/* Contenu de la cellule */}
+      <div className={`p-2 h-full ${compact ? 'space-y-1' : 'space-y-2'}`}>
+        {/* Réservations */}
+        {cellReservations.map((reservation) => (
+          <ReservationCard 
+            key={reservation.id}
+            reservation={reservation} 
+            compact={compact}
+            vivid={vivid}
+          />
+        ))}
 
-          {/* Cellule vide */}
-          {dayReservations.length === 0 && (
-            <div className={`
-              empty-cell text-center text-muted-foreground rounded-md border-2 border-dashed border-muted/30
-              flex items-center justify-center h-full min-h-[48px]
-              ${compact ? 'text-xs' : 'text-sm'}
-              transition-all duration-200 hover:border-muted/50 hover:bg-muted/10
-              ${isDraggedOver ? 'border-primary/50 bg-primary/5' : ''}
-            `}>
-            <div className="flex flex-col items-center gap-1 opacity-60">
-              <span className="text-lg">{getRoomStatusIcon()}</span>
-              <span className="text-xs">
-                {room.status === 'out_of_order' || room.status === 'maintenance' 
-                  ? 'Indisponible' 
-                  : 'Libre'
-                }
-              </span>
+        {/* Cellule vide */}
+        {cellReservations.length === 0 && (
+          <div className={`
+            empty-cell text-center text-muted-foreground rounded-md border-2 border-dashed border-muted/30
+            flex flex-col items-center justify-center h-full min-h-[48px] gap-1
+            ${compact ? 'text-xs' : 'text-sm'}
+            transition-all duration-200 hover:border-muted/50 hover:bg-muted/10
+            ${isDragOver ? (canDrop ? 'border-success/50 bg-success/5' : 'border-destructive/50 bg-destructive/5') : ''}
+          `}>
+            <span className="text-lg opacity-60">
+              {getRoomStatusIcon(room.status)}
+            </span>
+            <div className="text-xs opacity-50">
+              {room.status === 'out_of_order' || room.status === 'maintenance' 
+                ? 'Indisponible' 
+                : 'Libre'
+              }
+            </div>
+            {!compact && (
               <RoomTypeIndicator typeCode={room.type} compact />
-            </div>
-            </div>
-          )}
-        </div>
-
-        {/* Indicateur de statut chambre - coin */}
-        <div className="absolute bottom-1 right-1 text-xs opacity-40 hover:opacity-60 transition-opacity">
-          {getRoomStatusIcon()}
-        </div>
-
-        {/* Overlay de feedback pour drag over */}
-        {isDraggedOver && (
-          <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary/50 rounded-md animate-pulse" />
+            )}
+          </div>
         )}
       </div>
-    </DropZoneRoom>
+
+      {/* Badge de statut dans le coin */}
+      {!cellReservations.length && (
+        <div className="absolute top-1 right-1 text-xs opacity-50 group-hover:opacity-75 transition-opacity z-20">
+          {getRoomStatusIcon(room.status)}
+        </div>
+      )}
+    </div>
   );
 }

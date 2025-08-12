@@ -13,8 +13,8 @@ import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { toast } from "@/hooks/use-toast";
 import { Crown } from "lucide-react";
 
-// Import du nouveau système drag & drop
-import { DragDropProvider, DragDropStyles } from "./hooks/useDragDrop";
+// Import du nouveau système drag & drop simplifié
+import { SimpleDragDropProvider, SimpleDragDropStyles } from "./hooks/useSimpleDragDrop";
 import { ModernRackGrid } from "./components/ModernRackGrid";
 import { useOrgId } from "@/core/auth/useOrg";
 import { invalidateRackQueries } from "@/lib/queryClient";
@@ -126,10 +126,10 @@ export default function RackGrid() {
     });
   }, [data, loading, isRefetching, orgId]);
 
-  // Injection des styles CSS
+  // Injection des styles CSS simplifiés
   useEffect(() => {
     const styleSheet = document.createElement("style");
-    styleSheet.textContent = DragDropStyles;
+    styleSheet.textContent = SimpleDragDropStyles;
     document.head.appendChild(styleSheet);
     return () => { if (document.head.contains(styleSheet)) document.head.removeChild(styleSheet); };
   }, []);
@@ -227,7 +227,7 @@ export default function RackGrid() {
   if (!data) return null;
 
   return (
-    <DragDropProvider onReservationMove={handleReservationMove}>
+    <SimpleDragDropProvider onReservationMove={handleReservationMove}>
       <div className="page-enter">
         <main className="min-h-screen bg-pearl px-2 sm:px-4 lg:px-6 pt-8 sm:pt-12 pb-20 sm:pb-12 space-y-6 sm:space-y-8 animate-fade-in">
           <div className="container mx-auto">
@@ -335,6 +335,6 @@ export default function RackGrid() {
           </div>
         </main>
       </div>
-    </DragDropProvider>
+    </SimpleDragDropProvider>
   );
 }
