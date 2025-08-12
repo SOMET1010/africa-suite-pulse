@@ -274,6 +274,45 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          id: string
+          new_values: Json | null
+          occurred_at: string
+          old_values: Json | null
+          org_id: string
+          record_id: string | null
+          severity: string
+          table_name: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          id?: string
+          new_values?: Json | null
+          occurred_at?: string
+          old_values?: Json | null
+          org_id: string
+          record_id?: string | null
+          severity?: string
+          table_name: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          id?: string
+          new_values?: Json | null
+          occurred_at?: string
+          old_values?: Json | null
+          org_id?: string
+          record_id?: string | null
+          severity?: string
+          table_name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       cancellation_policies: {
         Row: {
           code: string
