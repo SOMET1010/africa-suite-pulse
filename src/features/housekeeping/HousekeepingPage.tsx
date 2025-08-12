@@ -22,135 +22,80 @@ import {
   Wrench,
   Search,
   Plus,
-  Calendar
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Timer
 } from "lucide-react";
+import { useMockHousekeepingTasks, useMockHousekeepingStaff, useMockRoomStatuses } from "./hooks/useMockHousekeeping";
 import { cn } from "@/lib/utils";
 
-// Types temporaires en attendant la migration
-interface HousekeepingTask {
+interface ScheduledTask {
   id: string;
+  task_id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  staff_id: string;
   room_number: string;
-  task_type: 'cleaning' | 'maintenance' | 'inspection';
-  status: 'pending' | 'in_progress' | 'completed' | 'verified';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  assigned_to: string | null;
-  staff_name?: string;
-  estimated_duration: number;
-  notes?: string;
-  created_at: string;
-  due_at?: string;
+  task_type: string;
+  priority: string;
+  status: string;
 }
-
-interface HousekeepingStaff {
-  id: string;
-  name: string;
-  role: 'housekeeper' | 'supervisor' | 'maintenance';
-  status: 'available' | 'busy' | 'break' | 'off_duty';
-  current_task_count: number;
-}
-
-interface RoomStatus {
-  room_number: string;
-  room_type: string;
-  current_status: 'clean' | 'dirty' | 'out_of_order' | 'inspected' | 'maintenance';
-  guest_status: 'occupied' | 'vacant' | 'checkout' | 'checkin';
-  last_cleaned?: string;
-  priority_level: number;
-}
-
-// Données de démonstration
-const mockTasks: HousekeepingTask[] = [
-  {
-    id: '1',
-    room_number: '101',
-    task_type: 'cleaning',
-    status: 'pending',
-    priority: 'high',
-    assigned_to: 'staff1',
-    staff_name: 'Marie Dubois',
-    estimated_duration: 45,
-    created_at: '2024-01-15T08:00:00Z',
-    due_at: '2024-01-15T12:00:00Z'
-  },
-  {
-    id: '2',
-    room_number: '102',
-    task_type: 'maintenance',
-    status: 'in_progress',
-    priority: 'urgent',
-    assigned_to: 'staff2',
-    staff_name: 'Jean Martin',
-    estimated_duration: 90,
-    created_at: '2024-01-15T07:30:00Z'
-  },
-  {
-    id: '3',
-    room_number: '103',
-    task_type: 'cleaning',
-    status: 'completed',
-    priority: 'medium',
-    assigned_to: 'staff1',
-    staff_name: 'Marie Dubois',
-    estimated_duration: 30,
-    created_at: '2024-01-15T06:00:00Z'
-  }
-];
-
-const mockStaff: HousekeepingStaff[] = [
-  {
-    id: 'staff1',
-    name: 'Marie Dubois',
-    role: 'housekeeper',
-    status: 'busy',
-    current_task_count: 2
-  },
-  {
-    id: 'staff2',
-    name: 'Jean Martin',
-    role: 'maintenance',
-    status: 'busy',
-    current_task_count: 1
-  },
-  {
-    id: 'staff3',
-    name: 'Sophie Laurent',
-    role: 'supervisor',
-    status: 'available',
-    current_task_count: 0
-  }
-];
-
-const mockRooms: RoomStatus[] = [
-  {
-    room_number: '101',
-    room_type: 'Standard',
-    current_status: 'dirty',
-    guest_status: 'checkout',
-    priority_level: 3
-  },
-  {
-    room_number: '102',
-    room_type: 'Deluxe',
-    current_status: 'maintenance',
-    guest_status: 'vacant',
-    priority_level: 4
-  },
-  {
-    room_number: '103',
-    room_type: 'Standard',
-    current_status: 'clean',
-    guest_status: 'vacant',
-    last_cleaned: '2024-01-15T10:30:00Z',
-    priority_level: 1
-  }
-];
 
 export default function HousekeepingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
 
-  const filteredTasks = mockTasks.filter(task => {
+  // Utiliser les hooks mock pour les données
+  const { tasks, loading: tasksLoading, updateTaskStatus, assignTask } = useMockHousekeepingTasks();
+  const { staff, loading: staffLoading } = useMockHousekeepingStaff();
+  const { rooms, loading: roomsLoading } = useMockRoomStatuses();
+
+  // Génération des données de planning mock
+  const generateScheduledTasks = (): ScheduledTask[] => {
+    const scheduledTasks: ScheduledTask[] = [];
+    const today = new Date();
+    
+    // Générer des tâches pour les 7 prochains jours
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dateStr = date.toISOString().split('T')[0];
+      
+      // 3-5 tâches par jour
+      const tasksPerDay = 3 + Math.floor(Math.random() * 3);
+      for (let j = 0; j < tasksPerDay; j++) {
+        const startHour = 8 + Math.floor(Math.random() * 8); // 8h-16h
+        const duration = 30 + Math.floor(Math.random() * 90); // 30-120 min
+        const endTime = new Date(date);
+        endTime.setHours(startHour, 0);
+        endTime.setMinutes(endTime.getMinutes() + duration);
+        
+        scheduledTasks.push({
+          id: `scheduled-${i}-${j}`,
+          task_id: `task-${i}-${j}`,
+          date: dateStr,
+          start_time: `${startHour.toString().padStart(2, '0')}:00`,
+          end_time: `${endTime.getHours().toString().padStart(2, '0')}:${endTime.getMinutes().toString().padStart(2, '0')}`,
+          staff_id: staff[Math.floor(Math.random() * staff.length)]?.id || 'staff1',
+          room_number: `${101 + Math.floor(Math.random() * 20)}`,
+          task_type: ['cleaning', 'maintenance', 'inspection'][Math.floor(Math.random() * 3)],
+          priority: ['low', 'medium', 'high', 'urgent'][Math.floor(Math.random() * 4)],
+          status: ['scheduled', 'in_progress', 'completed'][Math.floor(Math.random() * 3)]
+        });
+      }
+    }
+    
+    return scheduledTasks.sort((a, b) => a.start_time.localeCompare(b.start_time));
+  };
+
+  const [scheduledTasks] = useState<ScheduledTask[]>(generateScheduledTasks());
+
+  const filteredTasks = tasks.filter(task => {
     const matchesSearch = 
       task.room_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.staff_name?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -162,26 +107,26 @@ export default function HousekeepingPage() {
   });
 
   const taskStats = {
-    total: mockTasks.length,
-    pending: mockTasks.filter(t => t.status === 'pending').length,
-    in_progress: mockTasks.filter(t => t.status === 'in_progress').length,
-    completed: mockTasks.filter(t => t.status === 'completed').length,
-    urgent: mockTasks.filter(t => t.priority === 'urgent').length,
+    total: tasks.length,
+    pending: tasks.filter(t => t.status === 'pending').length,
+    in_progress: tasks.filter(t => t.status === 'in_progress').length,
+    completed: tasks.filter(t => t.status === 'completed').length,
+    urgent: tasks.filter(t => t.priority === 'urgent').length,
   };
 
   const staffStats = {
-    total: mockStaff.length,
-    available: mockStaff.filter(s => s.status === 'available').length,
-    busy: mockStaff.filter(s => s.status === 'busy').length,
-    break: mockStaff.filter(s => s.status === 'break').length,
+    total: staff.length,
+    available: staff.filter(s => s.status === 'available').length,
+    busy: staff.filter(s => s.status === 'busy').length,
+    break: staff.filter(s => s.status === 'break').length,
   };
 
   const roomStats = {
-    total: mockRooms.length,
-    clean: mockRooms.filter(r => r.current_status === 'clean').length,
-    dirty: mockRooms.filter(r => r.current_status === 'dirty').length,
-    maintenance: mockRooms.filter(r => r.current_status === 'maintenance').length,
-    occupied: mockRooms.filter(r => r.guest_status === 'occupied').length,
+    total: rooms.length,
+    clean: rooms.filter(r => r.current_status === 'clean').length,
+    dirty: rooms.filter(r => r.current_status === 'dirty').length,
+    maintenance: rooms.filter(r => r.current_status === 'maintenance').length,
+    occupied: rooms.filter(r => r.guest_status === 'occupied').length,
   };
 
   const getStatusColor = (status: string) => {
@@ -190,6 +135,7 @@ export default function HousekeepingPage() {
       case 'in_progress': return 'bg-blue-100 text-blue-800 hover:bg-blue-100';
       case 'completed': return 'bg-green-100 text-green-800 hover:bg-green-100';
       case 'verified': return 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100';
+      case 'scheduled': return 'bg-purple-100 text-purple-800 hover:bg-purple-100';
       default: return 'bg-gray-100 text-gray-800 hover:bg-gray-100';
     }
   };
@@ -212,6 +158,64 @@ export default function HousekeepingPage() {
       default: return <ClipboardList className="h-4 w-4" />;
     }
   };
+
+  // Fonctions de planning
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('fr-FR', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const getTasksForDate = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return scheduledTasks.filter(task => task.date === dateStr);
+  };
+
+  const getWeekDays = (date: Date) => {
+    const week = [];
+    const start = new Date(date);
+    start.setDate(date.getDate() - date.getDay() + 1); // Lundi
+    
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(start);
+      day.setDate(start.getDate() + i);
+      week.push(day);
+    }
+    return week;
+  };
+
+  const getStaffName = (staffId: string) => {
+    return staff.find(s => s.id === staffId)?.name || 'Non assigné';
+  };
+
+  const previousDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() - 1);
+    setSelectedDate(newDate);
+  };
+
+  const nextDay = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + 1);
+    setSelectedDate(newDate);
+  };
+
+  const previousWeek = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() - 7);
+    setSelectedDate(newDate);
+  };
+
+  const nextWeek = () => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(selectedDate.getDate() + 7);
+    setSelectedDate(newDate);
+  };
+
+  const isLoading = tasksLoading || staffLoading || roomsLoading;
 
   return (
     <PageLayout title="Gouvernante - Housekeeping">
@@ -335,50 +339,74 @@ export default function HousekeepingPage() {
 
                 {/* Tasks List */}
                 <div className="space-y-3">
-                  {filteredTasks.map((task) => (
-                    <div
-                      key={task.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-center space-x-4">
-                        {getTaskTypeIcon(task.task_type)}
-                        <div className="flex flex-col">
-                          <div className="font-semibold">Chambre {task.room_number}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {task.staff_name || 'Non assigné'} • {task.estimated_duration}min
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="text-muted-foreground">Chargement des tâches...</div>
+                    </div>
+                  ) : filteredTasks.length === 0 ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="text-muted-foreground">
+                        {searchTerm || statusFilter !== "all" || priorityFilter !== "all"
+                          ? "Aucune tâche trouvée avec ces critères" 
+                          : "Aucune tâche programmée"}
+                      </div>
+                    </div>
+                  ) : (
+                    filteredTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center space-x-4">
+                          {getTaskTypeIcon(task.task_type)}
+                          <div className="flex flex-col">
+                            <div className="font-semibold">Chambre {task.room_number}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {task.staff_name || 'Non assigné'} • {task.estimated_duration}min
+                              {task.notes && (
+                                <span className="block text-xs mt-1">Note: {task.notes}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-3">
+                          <Badge className={cn(getPriorityColor(task.priority))}>
+                            {task.priority}
+                          </Badge>
+                          <Badge className={cn(getStatusColor(task.status))}>
+                            {task.status === 'pending' && 'En attente'}
+                            {task.status === 'in_progress' && 'En cours'}
+                            {task.status === 'completed' && 'Terminé'}
+                            {task.status === 'verified' && 'Vérifié'}
+                          </Badge>
+                          
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm">
+                              Détails
+                            </Button>
+                            {task.status === 'pending' && (
+                              <Button 
+                                size="sm"
+                                onClick={() => updateTaskStatus(task.id, 'in_progress')}
+                              >
+                                Démarrer
+                              </Button>
+                            )}
+                            {task.status === 'in_progress' && (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => updateTaskStatus(task.id, 'completed')}
+                              >
+                                Terminer
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>
-                      
-                      <div className="flex items-center space-x-3">
-                        <Badge className={cn(getPriorityColor(task.priority))}>
-                          {task.priority}
-                        </Badge>
-                        <Badge className={cn(getStatusColor(task.status))}>
-                          {task.status === 'pending' && 'En attente'}
-                          {task.status === 'in_progress' && 'En cours'}
-                          {task.status === 'completed' && 'Terminé'}
-                          {task.status === 'verified' && 'Vérifié'}
-                        </Badge>
-                        
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            Détails
-                          </Button>
-                          {task.status === 'pending' && (
-                            <Button size="sm">
-                              Démarrer
-                            </Button>
-                          )}
-                          {task.status === 'in_progress' && (
-                            <Button size="sm" variant="outline">
-                              Terminer
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -392,7 +420,7 @@ export default function HousekeepingPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {mockRooms.map((room) => (
+                  {rooms.map((room) => (
                     <Card key={room.room_number} className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold">Ch. {room.room_number}</h3>
@@ -439,16 +467,17 @@ export default function HousekeepingPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockStaff.map((staff) => (
+                  {staff.map((member) => (
                     <div
-                      key={staff.id}
+                      key={member.id}
                       className="flex items-center justify-between p-4 border rounded-lg"
                     >
                       <div className="flex items-center space-x-4">
                         <div className="flex flex-col">
-                          <div className="font-semibold">{staff.name}</div>
+                          <div className="font-semibold">{member.name}</div>
                           <div className="text-sm text-muted-foreground capitalize">
-                            {staff.role} • {staff.current_task_count} tâche(s) en cours
+                            {member.role} • {member.shift_start || '08:00'} - {member.shift_end || '16:00'}
+                            {member.phone && <span className="block">{member.phone}</span>}
                           </div>
                         </div>
                       </div>
@@ -456,16 +485,16 @@ export default function HousekeepingPage() {
                       <div className="flex items-center space-x-3">
                         <Badge 
                           className={cn(
-                            staff.status === 'available' && 'bg-green-100 text-green-800',
-                            staff.status === 'busy' && 'bg-blue-100 text-blue-800',
-                            staff.status === 'break' && 'bg-yellow-100 text-yellow-800',
-                            staff.status === 'off_duty' && 'bg-gray-100 text-gray-800'
+                            member.status === 'available' && 'bg-green-100 text-green-800',
+                            member.status === 'busy' && 'bg-blue-100 text-blue-800',
+                            member.status === 'break' && 'bg-yellow-100 text-yellow-800',
+                            member.status === 'off_duty' && 'bg-gray-100 text-gray-800'
                           )}
                         >
-                          {staff.status === 'available' && 'Disponible'}
-                          {staff.status === 'busy' && 'Occupé'}
-                          {staff.status === 'break' && 'Pause'}
-                          {staff.status === 'off_duty' && 'Hors service'}
+                          {member.status === 'available' && 'Disponible'}
+                          {member.status === 'busy' && 'Occupé'}
+                          {member.status === 'break' && 'Pause'}
+                          {member.status === 'off_duty' && 'Hors service'}
                         </Badge>
                         
                         <Button variant="outline" size="sm">
@@ -485,18 +514,224 @@ export default function HousekeepingPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Planning des tâches</CardTitle>
-                  <Button>
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Planifier
-                  </Button>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 border rounded-lg p-1">
+                      <Button
+                        variant={viewMode === 'day' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setViewMode('day')}
+                      >
+                        Jour
+                      </Button>
+                      <Button
+                        variant={viewMode === 'week' ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => setViewMode('week')}
+                      >
+                        Semaine
+                      </Button>
+                    </div>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Planifier tâche
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <Calendar className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <h3 className="font-semibold mb-2">Planning des tâches</h3>
-                  <p>Fonctionnalité de planning à venir...</p>
+                {/* Navigation de dates */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={viewMode === 'day' ? previousDay : previousWeek}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={viewMode === 'day' ? nextDay : nextWeek}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="text-center">
+                    <h3 className="font-semibold text-lg">
+                      {viewMode === 'day' 
+                        ? formatDate(selectedDate)
+                        : `Semaine du ${getWeekDays(selectedDate)[0].toLocaleDateString('fr-FR')}`
+                      }
+                    </h3>
+                  </div>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSelectedDate(new Date())}
+                  >
+                    Aujourd'hui
+                  </Button>
                 </div>
+
+                {/* Vue jour */}
+                {viewMode === 'day' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between py-2 border-b">
+                      <div className="font-medium">Tâches planifiées</div>
+                      <div className="text-sm text-muted-foreground">
+                        {getTasksForDate(selectedDate).length} tâche(s)
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {getTasksForDate(selectedDate).length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p>Aucune tâche planifiée pour cette date</p>
+                        </div>
+                      ) : (
+                        getTasksForDate(selectedDate).map((scheduledTask) => (
+                          <div
+                            key={scheduledTask.id}
+                            className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                          >
+                            <div className="flex items-center space-x-4">
+                              {getTaskTypeIcon(scheduledTask.task_type)}
+                              <div className="flex flex-col">
+                                <div className="font-semibold">
+                                  Chambre {scheduledTask.room_number}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {getStaffName(scheduledTask.staff_id)} • 
+                                  {scheduledTask.start_time} - {scheduledTask.end_time}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center space-x-3">
+                              <Badge className={cn(getPriorityColor(scheduledTask.priority))}>
+                                {scheduledTask.priority}
+                              </Badge>
+                              <Badge className={cn(getStatusColor(scheduledTask.status))}>
+                                {scheduledTask.status === 'scheduled' && 'Planifié'}
+                                {scheduledTask.status === 'in_progress' && 'En cours'}
+                                {scheduledTask.status === 'completed' && 'Terminé'}
+                              </Badge>
+                              
+                              <div className="flex space-x-2">
+                                <Button variant="outline" size="sm">
+                                  <Timer className="h-4 w-4 mr-1" />
+                                  Modifier
+                                </Button>
+                                {scheduledTask.status === 'scheduled' && (
+                                  <Button size="sm">
+                                    Démarrer
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Vue semaine */}
+                {viewMode === 'week' && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-7 gap-2">
+                      {getWeekDays(selectedDate).map((day, index) => {
+                        const dayTasks = getTasksForDate(day);
+                        const isToday = day.toDateString() === new Date().toDateString();
+                        
+                        return (
+                          <div key={index} className="border rounded-lg p-3">
+                            <div className={cn(
+                              "text-center mb-3 font-medium",
+                              isToday ? "text-primary font-semibold" : "text-muted-foreground"
+                            )}>
+                              <div className="text-xs uppercase">
+                                {day.toLocaleDateString('fr-FR', { weekday: 'short' })}
+                              </div>
+                              <div className={cn(
+                                "text-lg",
+                                isToday && "bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mx-auto"
+                              )}>
+                                {day.getDate()}
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              {dayTasks.slice(0, 3).map((task) => (
+                                <div
+                                  key={task.id}
+                                  className="text-xs p-2 rounded border-l-2 border-l-primary bg-muted/50"
+                                >
+                                  <div className="font-medium">Ch. {task.room_number}</div>
+                                  <div className="text-muted-foreground">
+                                    {task.start_time}
+                                  </div>
+                                </div>
+                              ))}
+                              {dayTasks.length > 3 && (
+                                <div className="text-xs text-center text-muted-foreground">
+                                  +{dayTasks.length - 3} autre(s)
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {/* Résumé hebdomadaire */}
+                    <Card className="mt-6">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Résumé de la semaine</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-primary">
+                              {getWeekDays(selectedDate).reduce((acc, day) => 
+                                acc + getTasksForDate(day).length, 0
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Tâches totales</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-green-600">
+                              {getWeekDays(selectedDate).reduce((acc, day) => 
+                                acc + getTasksForDate(day).filter(t => t.status === 'completed').length, 0
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Terminées</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-blue-600">
+                              {getWeekDays(selectedDate).reduce((acc, day) => 
+                                acc + getTasksForDate(day).filter(t => t.status === 'in_progress').length, 0
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">En cours</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-orange-600">
+                              {getWeekDays(selectedDate).reduce((acc, day) => 
+                                acc + getTasksForDate(day).filter(t => t.priority === 'urgent').length, 0
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Urgentes</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
