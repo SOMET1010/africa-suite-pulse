@@ -40,9 +40,12 @@ export function useSystemSettings() {
 
   const updateSettingMutation = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: any }) => {
+      const orgId = await supabase.rpc('get_current_user_org_id');
+      
       const { data, error } = await supabase
         .from("pos_system_settings")
         .upsert([{
+          org_id: orgId.data,
           setting_key: key,
           setting_value: value,
           category: 'general',
