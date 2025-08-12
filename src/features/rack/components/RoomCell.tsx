@@ -2,6 +2,7 @@ import React, { useMemo, useCallback, useState } from 'react';
 import { ReservationCard } from './ReservationCard';
 import { RoomTypeIndicator } from './RoomTypeIndicator';
 import { EmptyRoomInfo } from './EmptyRoomInfo';
+import { toast } from '@/hooks/use-toast';
 import type { UIRoom, UIReservation } from '../rack.types';
 
 interface RoomCellProps {
@@ -44,62 +45,65 @@ export function RoomCell({
     });
   }, [reservations, room.id, day]);
 
-  // Validation du drop - avec logs détaillés pour debug
+  // Validation du drop avec messages utilisateur
   const validateDrop = useCallback((reservationId: string) => {
-    console.log('🔍 validateDrop appelé:', {
-      reservationId,
-      targetRoomId: room.id,
-      targetDay: day
-    });
-    
-    if (!reservationId) {
-      console.log('❌ Pas de reservationId');
-      return false;
-    }
+    if (!reservationId) return false;
     
     const draggedReservation = reservations.find(r => r.id === reservationId);
-    if (!draggedReservation) {
-      console.log('❌ Réservation non trouvée');
-      return false;
-    }
+    if (!draggedReservation) return false;
     
-    console.log('🔍 Réservation trouvée:', {
-      id: draggedReservation.id,
-      currentRoomId: draggedReservation.roomId,
-      targetRoomId: room.id,
-      guestName: draggedReservation.guestName
-    });
-    
-    // Date passée (comme dans votre code)
+    // Date passée
     const today = new Date().toISOString().split('T')[0];
     if (day < today) {
-      console.log('❌ Impossible de déplacer vers une date passée');
-      return false;
-    }
-    
-    // Même chambre = pas de déplacement
-    if (draggedReservation.roomId === room.id) {
-      console.log('❌ Même chambre:', {
-        current: draggedReservation.roomId,
-        target: room.id
+      toast({
+        title: "⏰ Déplacement impossible",
+        description: "Impossible de déplacer une réservation vers une date passée",
+        variant: "destructive"
       });
       return false;
     }
     
-    // Chambre hors service ou maintenance (comme dans votre code)
-    if (room.status === 'out_of_order' || room.status === 'maintenance') {
-      console.log('❌ Chambre non disponible:', room.status);
+    // Même chambre
+    if (draggedReservation.roomId === room.id) {
+      toast({
+        title: "🏠 Déjà dans cette chambre",
+        description: `${draggedReservation.guestName} est déjà dans la chambre ${room.number}`,
+        variant: "destructive"
+      });
       return false;
     }
     
-    // Conflit avec une réservation existante
+    // Chambre hors service
+    if (room.status === 'out_of_order') {
+      toast({
+        title: "🚫 Chambre hors service",
+        description: `La chambre ${room.number} est actuellement hors service`,
+        variant: "destructive"
+      });
+      return false;
+    }
+    
+    // Chambre en maintenance
+    if (room.status === 'maintenance') {
+      toast({
+        title: "🔧 Chambre en maintenance",
+        description: `La chambre ${room.number} est en cours de maintenance`,
+        variant: "destructive"
+      });
+      return false;
+    }
+    
+    // Conflit avec réservation existante
     const existingReservation = cellReservations.find(res => res.id !== reservationId);
     if (existingReservation) {
-      console.log('❌ Chambre déjà occupée par:', existingReservation.guestName);
+      toast({
+        title: "❌ Chambre occupée",
+        description: `La chambre ${room.number} est déjà occupée par ${existingReservation.guestName}`,
+        variant: "destructive"
+      });
       return false;
     }
     
-    console.log('✅ Validation réussie - drop autorisé');
     return true;
   }, [room, cellReservations, reservations, day]);
 
@@ -126,31 +130,33 @@ export function RoomCell({
     setCanDrop(false);
   }, []);
 
-  // Gestion du drop - POINT CENTRAL
+  // Gestion du drop
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    console.log('🎯 RoomCell handleDrop');
     
     const reservationId = e.dataTransfer.getData('text/reservation-id');
-    if (!reservationId) {
-      console.log('❌ Pas de reservationId dans le drop');
+    if (!reservationId) return;
+
+    // Validation silencieuse pour le drop (les messages ont déjà été affichés dans validateDrop)
+    const draggedReservation = reservations.find(r => r.id === reservationId);
+    if (!draggedReservation) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    if (day < today || 
+        draggedReservation.roomId === room.id || 
+        room.status === 'out_of_order' || 
+        room.status === 'maintenance' ||
+        cellReservations.find(res => res.id !== reservationId)) {
+      setIsDragOver(false);
+      setCanDrop(false);
       return;
     }
 
-    if (validateDrop(reservationId)) {
-      console.log('✅ Drop valide - calling onReservationMove:', {
-        reservationId,
-        roomId: room.id,
-        day
-      });
-      onReservationMove(reservationId, room.id, day);
-    } else {
-      console.log('❌ Drop invalide');
-    }
-    
+    // Drop valide
+    onReservationMove(reservationId, room.id, day);
     setIsDragOver(false);
     setCanDrop(false);
-  }, [validateDrop, onReservationMove, room.id, day]);
+  }, [reservations, onReservationMove, room.id, room.status, day, cellReservations]);
 
   // Style de la cellule selon le statut
   const getCellStyle = () => {
