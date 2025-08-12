@@ -2,7 +2,6 @@ import React, { useMemo, useCallback, useState } from 'react';
 import { ReservationCard } from './ReservationCard';
 import { RoomTypeIndicator } from './RoomTypeIndicator';
 import { EmptyRoomInfo } from './EmptyRoomInfo';
-import { useSimpleDragDrop } from '../hooks/useSimpleDragDrop';
 import type { UIRoom, UIReservation } from '../rack.types';
 
 interface RoomCellProps {
@@ -26,7 +25,6 @@ export function RoomCell({
   onReservationMove,
   onCellClick,
 }: RoomCellProps) {
-  const { dragState } = useSimpleDragDrop();
   const [isDragOver, setIsDragOver] = useState(false);
   const [canDrop, setCanDrop] = useState(false);
 
