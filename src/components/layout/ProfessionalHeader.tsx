@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard } from "lucide-react";
+import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard, ChevronDown, Wrench, TrendingUp } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { RealtimeClock } from "./RealtimeClock";
 import { HotelDateWidget } from "./HotelDateWidget";
 import { DataProtectionStatus } from "./DataProtectionStatus";
@@ -26,9 +27,35 @@ export function ProfessionalHeader({
     { to: "/arrivals", label: "Arrivées", icon: UserPlus },
     { to: "/reservations/rack", label: "Plan Chambres", icon: Hotel },
     { to: "/guests", label: "Mes Clients", icon: Users },
-    { to: "/reservations", label: "Réservations", icon: Calendar },
+    { 
+      label: "Réservations", 
+      icon: Calendar, 
+      dropdown: [
+        { to: "/reservations", label: "Toutes les réservations" },
+        { to: "/reservations/new/quick", label: "Réservation rapide" },
+        { to: "/reservations/new/advanced", label: "Réservation avancée" },
+        { to: "/reservations/groups", label: "Gestion des groupes" },
+        { to: "/reservations/allotments", label: "Allotements" },
+      ]
+    },
     { to: "/billing", label: "Facturation", icon: CreditCard },
-    { to: "/reports", label: "Rapports", icon: FileText },
+    { 
+      label: "Analytics", 
+      icon: TrendingUp, 
+      dropdown: [
+        { to: "/analytics", label: "Tableau de bord" },
+        { to: "/analytics/advanced", label: "Analytics avancées" },
+      ]
+    },
+    { 
+      label: "Rapports", 
+      icon: FileText, 
+      dropdown: [
+        { to: "/reports", label: "Gestion des rapports" },
+        { to: "/reports/daily", label: "Rapports quotidiens" },
+      ]
+    },
+    { to: "/maintenance", label: "Maintenance", icon: Wrench },
     { to: "/settings", label: "Réglages", icon: Settings },
   ];
 
@@ -36,6 +63,10 @@ export function ProfessionalHeader({
     if (path === "/" && location.pathname === "/") return true;
     if (path !== "/" && location.pathname.startsWith(path)) return true;
     return false;
+  };
+
+  const isDropdownActive = (dropdown: any[]) => {
+    return dropdown.some(item => isActive(item.to));
   };
 
   return (
@@ -66,8 +97,48 @@ export function ProfessionalHeader({
 
           {/* Navigation principale - Desktop */}
           <nav className="hidden lg:flex items-center gap-1 ml-6">
-            {navigationItems.map((item) => {
+            {navigationItems.map((item, index) => {
               const Icon = item.icon;
+              
+              if (item.dropdown) {
+                const active = isDropdownActive(item.dropdown);
+                
+                return (
+                  <DropdownMenu key={index}>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        className={cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-elegant",
+                          "hover:bg-soft-primary hover:text-primary",
+                          active 
+                            ? "bg-brand-accent/20 text-brand-accent border border-brand-accent/30 shadow-soft" 
+                            : "text-muted-foreground"
+                        )}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.label}
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-background/95 backdrop-blur-sm border-accent-gold/20">
+                      {item.dropdown.map((subItem) => (
+                        <DropdownMenuItem key={subItem.to} asChild>
+                          <Link
+                            to={subItem.to}
+                            className={cn(
+                              "cursor-pointer",
+                              isActive(subItem.to) ? "bg-brand-accent/10 text-brand-accent" : ""
+                            )}
+                          >
+                            {subItem.label}
+                          </Link>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
+              
               const active = isActive(item.to);
               
               return (
@@ -123,8 +194,46 @@ export function ProfessionalHeader({
       {/* Navigation mobile - Bottom Sheet Style */}
       <div className="lg:hidden border-t border-accent-gold/20 bg-pearl/50 backdrop-blur-sm">
         <div className="flex items-center justify-around py-2 px-4">
-          {navigationItems.map((item) => {
+          {navigationItems.map((item, index) => {
             const Icon = item.icon;
+            
+            if (item.dropdown) {
+              const active = isDropdownActive(item.dropdown);
+              
+              return (
+                <DropdownMenu key={index}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-2 rounded-lg transition-elegant tap-target",
+                        active 
+                          ? "text-brand-accent" 
+                          : "text-muted-foreground hover:text-primary"
+                      )}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="w-56 bg-background/95 backdrop-blur-sm border-accent-gold/20">
+                    {item.dropdown.map((subItem) => (
+                      <DropdownMenuItem key={subItem.to} asChild>
+                        <Link
+                          to={subItem.to}
+                          className={cn(
+                            "cursor-pointer",
+                            isActive(subItem.to) ? "bg-brand-accent/10 text-brand-accent" : ""
+                          )}
+                        >
+                          {subItem.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            }
+            
             const active = isActive(item.to);
             
             return (
