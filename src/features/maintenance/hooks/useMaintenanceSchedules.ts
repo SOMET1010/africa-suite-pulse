@@ -171,7 +171,7 @@ export function useExecuteMaintenanceSchedule() {
 
   return useMutation({
     mutationFn: async (scheduleId: string) => {
-      // Récupérer la planification
+      // Get the schedule
       const { data: schedule, error: scheduleError } = await supabase
         .from("maintenance_schedules")
         .select("*")
@@ -193,21 +193,24 @@ export function useExecuteMaintenanceSchedule() {
         throw new Error("Organization not found");
       }
 
-      // Créer une demande de maintenance basée sur la planification
+      // Create a maintenance request based on the schedule
+      // Don't include request_number - it will be auto-generated
+      const requestData = {
+        title: `Maintenance préventive - ${schedule.schedule_name}`,
+        description: schedule.task_template,
+        priority: "medium",
+        category: "preventive",
+        equipment_id: schedule.equipment_id,
+        assigned_to: schedule.assigned_technician,
+        estimated_duration_hours: schedule.estimated_duration_hours,
+        scheduled_date: new Date().toISOString(),
+        org_id: orgData.org_id,
+        status: 'pending',
+      };
+
       const { data: request, error: requestError } = await supabase
         .from("maintenance_requests")
-        .insert({
-          title: `Maintenance préventive - ${schedule.schedule_name}`,
-          description: schedule.task_template,
-          priority: "medium",
-          category: "preventive",
-          equipment_id: schedule.equipment_id,
-          assigned_to: schedule.assigned_technician,
-          estimated_duration_hours: schedule.estimated_duration_hours,
-          scheduled_date: new Date().toISOString(),
-          org_id: orgData.org_id,
-          status: 'pending',
-        })
+        .insert(requestData)
         .select()
         .single();
 
@@ -215,7 +218,7 @@ export function useExecuteMaintenanceSchedule() {
         throw new Error(requestError.message);
       }
 
-      // Calculer la prochaine date d'exécution
+      // Calculate next execution date
       const today = new Date();
       let nextDate = new Date();
 
@@ -236,10 +239,10 @@ export function useExecuteMaintenanceSchedule() {
           nextDate.setFullYear(today.getFullYear() + schedule.frequency_value);
           break;
         default:
-          nextDate.setDate(today.getDate() + 30); // Par défaut 30 jours
+          nextDate.setDate(today.getDate() + 30); // Default 30 days
       }
 
-      // Mettre à jour la planification
+      // Update the schedule
       const { error: updateError } = await supabase
         .from("maintenance_schedules")
         .update({

@@ -21,7 +21,7 @@ interface SparePart {
   current_stock: number;
   min_stock_level: number;
   max_stock_level: number;
-  unit_cost?: string;
+  unit_cost?: number; // Changed from string to number to match database
   unit: string;
   storage_location?: string;
   last_restocked_date?: string;
@@ -59,7 +59,7 @@ export function useSpareParts(filters: SparePartsFilters = {}) {
         .eq("is_active", true)
         .order("current_stock", { ascending: true });
 
-      // Appliquer les filtres
+      // Apply filters
       if (filters.search) {
         query = query.or(`name.ilike.%${filters.search}%,part_code.ilike.%${filters.search}%,supplier.ilike.%${filters.search}%`);
       }
@@ -80,7 +80,7 @@ export function useSpareParts(filters: SparePartsFilters = {}) {
 
       let result = data || [];
 
-      // Filtrer par stock bas côté client pour plus de flexibilité
+      // Filter by low stock on client side for more flexibility
       if (filters.lowStock) {
         result = result.filter(part => part.current_stock <= part.min_stock_level);
       }
@@ -216,11 +216,23 @@ export function useCreateSparePartMovement() {
       reference_document?: string;
       notes?: string;
     }) => {
+      const { data: userOrgData } = await supabase.auth.getUser();
+      const { data: orgData } = await supabase
+        .from("app_users")
+        .select("org_id")
+        .eq("user_id", userOrgData.user?.id)
+        .single();
+
+      if (!orgData?.org_id) {
+        throw new Error("Organization not found");
+      }
+
       const { data: result, error } = await supabase
         .from("spare_parts_movements")
         .insert([{
           ...data,
-          performed_by: (await supabase.auth.getUser()).data.user?.id,
+          org_id: orgData.org_id,
+          performed_by: userOrgData.user?.id,
         }])
         .select()
         .single();
