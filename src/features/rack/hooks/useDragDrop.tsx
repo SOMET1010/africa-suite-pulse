@@ -403,10 +403,11 @@ export function DropZoneRoom({
   // Gestion du drop
   const handleMouseUp = useCallback(() => {
     if (dragState.isDragging && isDragOver && canDrop && dragState.draggedReservation) {
+      console.log('🎯 DropZoneRoom handleMouseUp - calling onReservationDrop');
       onReservationDrop(dragState.draggedReservation, room, day);
-      onDrop(room, day);
+      // Suppression de onDrop() pour éviter double appel - RoomCell gère déjà le move
     }
-  }, [dragState, isDragOver, canDrop, room, day, onReservationDrop, onDrop]);
+  }, [dragState, isDragOver, canDrop, room, day, onReservationDrop]);
 
   // Gestion tactile pour le drop
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -439,8 +440,9 @@ export function DropZoneRoom({
       canDrop &&
       dragState.draggedReservation
     ) {
+      console.log('🎯 DropZoneRoom handleTouchEnd - calling onReservationDrop');
       onReservationDrop(dragState.draggedReservation, room, day);
-      onDrop(room, day);
+      // Suppression de onDrop() pour éviter double appel - RoomCell gère déjà le move
     }
   }, [dragState, room, day, canDrop, onReservationDrop, onDrop]);
 
