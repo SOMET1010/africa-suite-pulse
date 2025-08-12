@@ -1,6 +1,5 @@
 import React from 'react';
 import type { UIReservation } from '../rack.types';
-import { useSimpleDragDrop } from '../hooks/useSimpleDragDrop';
 
 interface ReservationCardProps {
   reservation: UIReservation;
@@ -9,18 +8,14 @@ interface ReservationCardProps {
 }
 
 export function ReservationCard({ reservation, compact = false, vivid = false }: ReservationCardProps) {
-  const { dragState, startDrag, endDrag } = useSimpleDragDrop();
-  
   const handleDragStart = (e: React.DragEvent) => {
     console.log('🎯 ReservationCard dragStart:', reservation.id);
     e.dataTransfer.setData('text/reservation-id', reservation.id);
     e.dataTransfer.effectAllowed = 'move';
-    startDrag(reservation);
   };
 
   const handleDragEnd = (e: React.DragEvent) => {
     console.log('🎯 ReservationCard dragEnd:', reservation.id);
-    endDrag();
   };
 
   const getStatusColor = (status: UIReservation["status"]) => {
@@ -65,7 +60,6 @@ export function ReservationCard({ reservation, compact = false, vivid = false }:
         hover:shadow-elegant hover:scale-[1.02] active:scale-95
         ${vivid ? 'shadow-soft' : 'shadow-sm'}
         cursor-grab active:cursor-grabbing
-        ${dragState.isDragging && dragState.draggedReservation?.id === reservation.id ? 'dragging' : ''}
       `}
       draggable
       onDragStart={handleDragStart}

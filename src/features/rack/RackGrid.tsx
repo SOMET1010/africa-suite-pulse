@@ -13,8 +13,26 @@ import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { toast } from "@/hooks/use-toast";
 import { Crown } from "lucide-react";
 
-// Import du nouveau système drag & drop simplifié
-import { SimpleDragDropProvider, SimpleDragDropStyles } from "./hooks/useSimpleDragDrop";
+// Simple styles pour drag & drop
+const dragDropStyles = `
+.reservation-card:hover {
+  transform: scale(1.02);
+}
+.reservation-card:active {
+  transform: scale(0.98);
+  opacity: 0.7;
+}
+.room-cell.drag-over-valid {
+  background-color: rgba(34, 197, 94, 0.1);
+  border-color: rgb(34, 197, 94);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+.room-cell.drag-over-invalid {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgb(239, 68, 68);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+`;
 import { ModernRackGrid } from "./components/ModernRackGrid";
 import { useOrgId } from "@/core/auth/useOrg";
 import { invalidateRackQueries } from "@/lib/queryClient";
@@ -129,7 +147,7 @@ export default function RackGrid() {
   // Injection des styles CSS simplifiés
   useEffect(() => {
     const styleSheet = document.createElement("style");
-    styleSheet.textContent = SimpleDragDropStyles;
+    styleSheet.textContent = dragDropStyles;
     document.head.appendChild(styleSheet);
     return () => { if (document.head.contains(styleSheet)) document.head.removeChild(styleSheet); };
   }, []);
@@ -227,7 +245,6 @@ export default function RackGrid() {
   if (!data) return null;
 
   return (
-    <SimpleDragDropProvider onReservationMove={handleReservationMove}>
       <div className="page-enter">
         <main className="min-h-screen bg-pearl px-2 sm:px-4 lg:px-6 pt-8 sm:pt-12 pb-20 sm:pb-12 space-y-6 sm:space-y-8 animate-fade-in">
           <div className="container mx-auto">
@@ -335,6 +352,5 @@ export default function RackGrid() {
           </div>
         </main>
       </div>
-    </SimpleDragDropProvider>
   );
 }
