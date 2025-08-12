@@ -5,6 +5,7 @@ import CheckinExpressPage from "@/features/arrivals/CheckinExpressPage";
 import RackGrid from "@/features/rack/RackGrid";
 import NotFound from "@/pages/NotFound";
 import AuthPage from "@/pages/AuthPage";
+import AuthLanding from "@/pages/AuthLanding";
 import RequireAuth from "@/core/auth/RequireAuth";
 import { SettingsHome, HotelSettingsForm, TariffsPage } from "@/features/settings";
 import RoomsPage from "@/features/settings/rooms/RoomsPage";
@@ -40,6 +41,7 @@ function Layout() {
 export function AppRoutes() {
   return (
     <Routes>
+      <Route path="/welcome" element={<AuthLanding />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Index />} />
