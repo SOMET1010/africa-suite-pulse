@@ -46,6 +46,14 @@ export function RoomCell({
       return false;
     }
 
+    // Interdire drop en dehors de la période du séjour
+    const resStart = new Date(reservation.start);
+    const resEnd = new Date(reservation.end);
+    const dayDate = new Date(targetDay);
+    if (dayDate < resStart || dayDate >= resEnd) {
+      return false;
+    }
+
     // Vérifier statut chambre
     if (targetRoom.status === 'out_of_order' || targetRoom.status === 'maintenance') {
       return false;
@@ -55,8 +63,6 @@ export function RoomCell({
     const existingReservations = reservations.filter(r => {
       const rStart = new Date(r.start);
       const rEnd = new Date(r.end);
-      const dayDate = new Date(targetDay);
-      
       return r.roomId === targetRoom.id && 
              r.id !== reservation.id &&
              dayDate >= rStart && 
@@ -69,7 +75,7 @@ export function RoomCell({
   // Gestion du drop
   const handleReservationDrop = useCallback((reservation: UIReservation, targetRoom: UIRoom, targetDay: string) => {
     if (!canAcceptDrop(reservation, targetRoom, targetDay)) {
-      // Le feedback d'erreur sera géré par le composant parent
+      // Drop invalide: en dehors du séjour ou conflit
       return;
     }
 
@@ -80,9 +86,8 @@ export function RoomCell({
       to: targetRoom.id,
       day: targetDay
     });
-
-    onReservationMove(reservation.id, targetRoom.id, targetDay);
-  }, [canAcceptDrop, onReservationMove]);
+    // Le déplacement effectif est déclenché par onDrop() du provider pour éviter des appels en double
+  }, [canAcceptDrop]);
 
   // Style de la cellule selon le statut
   const getCellStyle = () => {
