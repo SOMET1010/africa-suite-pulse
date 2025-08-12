@@ -146,6 +146,10 @@ export default function RackGrid() {
 
     try {
       await reassignMutation.mutateAsync({ reservationId: resId, roomId });
+      // 🔄 INVALIDATION DES QUERIES POUR FORCER LA MISE À JOUR
+      if (orgId) {
+        invalidateRackQueries(orgId);
+      }
       
       toast({ 
         title: "✅ Réservation réassignée", 
