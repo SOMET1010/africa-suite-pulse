@@ -135,7 +135,7 @@ export function useCreateMaintenanceRequest() {
 
       const { data: result, error } = await supabase
         .from("maintenance_requests")
-        .insert(insertData)
+        .insert([insertData])
         .select()
         .single();
 

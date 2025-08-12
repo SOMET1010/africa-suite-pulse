@@ -210,7 +210,7 @@ export function useExecuteMaintenanceSchedule() {
 
       const { data: request, error: requestError } = await supabase
         .from("maintenance_requests")
-        .insert(requestData)
+        .insert([requestData])
         .select()
         .single();
 

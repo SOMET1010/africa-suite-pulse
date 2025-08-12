@@ -173,14 +173,11 @@ export function SparePartsList() {
                         Min: {part.min_stock_level} • Max: {part.max_stock_level}
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm">
-                      {part.unit_cost ? (
-                        <span className="font-medium">
-                          {new Intl.NumberFormat('fr-FR').format(parseFloat(part.unit_cost as string))} FCFA
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">Non défini</span>
-                      )}
+                    <TableCell>
+                      {part.unit_cost !== null && part.unit_cost !== undefined 
+                        ? `${part.unit_cost.toString()} ${part.unit || 'unité'}`
+                        : "Non défini"
+                      }
                     </TableCell>
                     <TableCell className="text-sm">
                       {part.supplier || (
