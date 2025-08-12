@@ -9,9 +9,16 @@ interface ReservationCardProps {
 
 export function ReservationCard({ reservation, compact = false, vivid = false }: ReservationCardProps) {
   const handleDragStart = (e: React.DragEvent) => {
-    console.log('🎯 ReservationCard dragStart:', reservation.id);
+    console.log('🎯 ReservationCard dragStart:', {
+      id: reservation.id,
+      roomId: reservation.roomId,
+      guestName: reservation.guestName
+    });
     e.dataTransfer.setData('text/reservation-id', reservation.id);
     e.dataTransfer.effectAllowed = 'move';
+    
+    // Empêcher la propagation pour éviter que le clic sur la cellule se déclenche
+    e.stopPropagation();
   };
 
   const handleDragEnd = (e: React.DragEvent) => {

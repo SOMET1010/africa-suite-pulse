@@ -44,12 +44,31 @@ export function RoomCell({
     });
   }, [reservations, room.id, day]);
 
-  // Validation du drop - logique inspirée de votre code
+  // Validation du drop - avec logs détaillés pour debug
   const validateDrop = useCallback((reservationId: string) => {
-    if (!reservationId) return false;
+    console.log('🔍 validateDrop appelé:', {
+      reservationId,
+      targetRoomId: room.id,
+      targetDay: day
+    });
+    
+    if (!reservationId) {
+      console.log('❌ Pas de reservationId');
+      return false;
+    }
     
     const draggedReservation = reservations.find(r => r.id === reservationId);
-    if (!draggedReservation) return false;
+    if (!draggedReservation) {
+      console.log('❌ Réservation non trouvée');
+      return false;
+    }
+    
+    console.log('🔍 Réservation trouvée:', {
+      id: draggedReservation.id,
+      currentRoomId: draggedReservation.roomId,
+      targetRoomId: room.id,
+      guestName: draggedReservation.guestName
+    });
     
     // Date passée (comme dans votre code)
     const today = new Date().toISOString().split('T')[0];
@@ -60,23 +79,27 @@ export function RoomCell({
     
     // Même chambre = pas de déplacement
     if (draggedReservation.roomId === room.id) {
-      console.log('❌ Même chambre');
+      console.log('❌ Même chambre:', {
+        current: draggedReservation.roomId,
+        target: room.id
+      });
       return false;
     }
     
     // Chambre hors service ou maintenance (comme dans votre code)
     if (room.status === 'out_of_order' || room.status === 'maintenance') {
-      console.log('❌ Chambre non disponible');
+      console.log('❌ Chambre non disponible:', room.status);
       return false;
     }
     
     // Conflit avec une réservation existante
     const existingReservation = cellReservations.find(res => res.id !== reservationId);
     if (existingReservation) {
-      console.log('❌ Chambre déjà occupée');
+      console.log('❌ Chambre déjà occupée par:', existingReservation.guestName);
       return false;
     }
     
+    console.log('✅ Validation réussie - drop autorisé');
     return true;
   }, [room, cellReservations, reservations, day]);
 
