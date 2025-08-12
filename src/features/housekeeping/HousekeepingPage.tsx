@@ -33,8 +33,17 @@ import {
   UserPlus,
   Eye
 } from "lucide-react";
-import { useMockHousekeepingTasks, useMockHousekeepingStaff, useMockRoomStatuses } from "./hooks/useMockHousekeeping";
-import { useRecoucheWorkflow } from "./hooks/useRecoucheWorkflow";
+import { 
+  useHousekeepingTasks, 
+  useHousekeepingStaff, 
+  useRoomStatusSummary,
+  useRecoucheWorkflows,
+  useCreateHousekeepingTask,
+  useUpdateHousekeepingTask,
+  useAssignHousekeepingTask,
+  useCompleteHousekeepingTask,
+  useHousekeepingRealtime
+} from "@/queries/housekeeping.queries";
 import { LinenManagement } from "./components/LinenManagement";
 import { RecoucheBoard } from "./components/RecoucheBoard";
 import { TimelineView } from "./components/TimelineView";
@@ -42,7 +51,7 @@ import { TaskPerformanceStats } from "./components/TaskPerformanceStats";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { RealTimeAlerts } from "./components/RealTimeAlerts";
 import { TeamPerformanceReports } from "./components/TeamPerformanceReports";
-import { HousekeepingTask } from "./types";
+import { HousekeepingTask, RoomStatus, RecoucheWorkflow } from "./types";
 import { cn } from "@/lib/utils";
 
 interface ScheduledTask {
@@ -68,11 +77,51 @@ export default function HousekeepingPage() {
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
-  // Utiliser les hooks mock pour les données
-  const { tasks, loading: tasksLoading, updateTaskStatus, assignTask } = useMockHousekeepingTasks();
-  const { staff, loading: staffLoading } = useMockHousekeepingStaff();
-  const { rooms, loading: roomsLoading, updateRoomStatus } = useMockRoomStatuses();
-  const { workflows, loading: workflowsLoading, startTask, completeTask, assignStaff } = useRecoucheWorkflow();
+  // Utiliser les vrais hooks pour les données
+  const { data: tasks = [], isLoading: tasksLoading } = useHousekeepingTasks();
+  const { data: staff = [], isLoading: staffLoading } = useHousekeepingStaff();
+  const { data: roomStatusData = [], isLoading: roomsLoading } = useRoomStatusSummary();
+  const { data: workflowsData = [], isLoading: workflowsLoading } = useRecoucheWorkflows();
+  
+  // Enable realtime updates
+  useHousekeepingRealtime();
+  
+  // Convert workflows data for compatibility
+  const workflows: RecoucheWorkflow[] = workflowsData.map(wf => ({
+    room_id: wf.room_number,
+    status: 'checkout_dirty' as const,
+    priority: 'normal' as const,
+    estimated_completion: new Date().toISOString()
+  }));
+  
+  // Mutations pour les opérations
+  const updateTaskMutation = useUpdateHousekeepingTask();
+  const assignTaskMutation = useAssignHousekeepingTask();
+  const completeTaskMutation = useCompleteHousekeepingTask();
+  const createTaskMutation = useCreateHousekeepingTask();
+
+  // Convertir les données de room status pour compatibilité avec l'interface existante
+  const rooms = roomStatusData.map(room => ({
+    room_id: room.room_number,
+    room_number: room.room_number,
+    room_type: 'standard', // Default type
+    current_status: (room.pending_tasks > 0 ? 'dirty' : 'clean') as 'clean' | 'dirty' | 'out_of_order' | 'inspected' | 'maintenance' | 'recouche_pending' | 'recouche_in_progress',
+    guest_status: (room.guest_status || 'vacant') as 'occupied' | 'vacant' | 'checkout' | 'checkin' | 'checkout_dirty' | 'ready_for_checkin',
+    last_cleaned: room.last_task_update,
+    linen_status: {
+      bed_linen_last_changed: room.last_task_update,
+      bathroom_linen_last_changed: room.last_task_update,
+      days_since_bed_change: 0,
+      days_since_bathroom_change: 0,
+      needs_bed_linen_change: false,
+      needs_bathroom_linen_change: false,
+      linen_quality: 'good' as const
+    },
+    needs_inspection: false,
+    needs_recouche: false,
+    priority_level: 1,
+    active_tasks: room.pending_tasks + room.in_progress_tasks
+  }));
 
   // Génération des données de planning mock
   const generateScheduledTasks = (): ScheduledTask[] => {
@@ -244,14 +293,16 @@ export default function HousekeepingPage() {
   // Handler pour les changements de linge
   const handleLinenChange = (roomId: string, details: any) => {
     console.log('Changement de linge pour la chambre', roomId, details);
-    // Ici on pourrait mettre à jour le statut de la chambre
-    updateRoomStatus(roomId, 'clean');
+    // TODO: Ajouter API pour mettre à jour le statut de chambre
   };
 
   // Handler pour assigner une tâche
   const handleAssignTask = (staffId: string) => {
     if (selectedTask) {
-      assignTask(selectedTask.id, staffId);
+      assignTaskMutation.mutate({
+        taskId: selectedTask.id,
+        staffId
+      });
       setIsAssignDialogOpen(false);
       setSelectedTask(null);
     }
@@ -265,22 +316,56 @@ export default function HousekeepingPage() {
 
   // Handler pour les actions de tâches dans la timeline
   const handleTaskAction = (taskId: string, action: 'start' | 'pause' | 'complete') => {
-    switch (action) {
-      case 'start':
-        updateTaskStatus(taskId, 'in_progress');
-        break;
-      case 'pause':
-        updateTaskStatus(taskId, 'paused');
-        break;
-      case 'complete':
-        updateTaskStatus(taskId, 'completed');
-        break;
+    const statusMap = {
+      'start': 'in_progress',
+      'pause': 'paused', 
+      'complete': 'completed'
+    } as const;
+    
+    if (action === 'complete') {
+      completeTaskMutation.mutate({
+        taskId,
+        actualDuration: undefined,
+        qualityScore: undefined
+      });
+    } else {
+      updateTaskMutation.mutate({
+        id: taskId,
+        status: statusMap[action]
+      });
     }
   };
 
   // Handler pour déplacer une tâche dans le Kanban
   const handleTaskMove = (taskId: string, newStatus: HousekeepingTask['status']) => {
-    updateTaskStatus(taskId, newStatus);
+    if (newStatus === 'completed') {
+      completeTaskMutation.mutate({
+        taskId,
+        actualDuration: undefined,
+        qualityScore: undefined
+      });
+    } else {
+      updateTaskMutation.mutate({
+        id: taskId,
+        status: newStatus
+      });
+    }
+  };
+
+  // Functions for recouche workflow
+  const startTask = (roomId: string, taskType: 'cleaning' | 'inspection') => {
+    // TODO: Implement start task logic
+    console.log('Starting task:', roomId, taskType);
+  };
+
+  const completeTask = (roomId: string, taskType: 'cleaning' | 'inspection') => {
+    // TODO: Implement complete task logic
+    console.log('Completing task:', roomId, taskType);
+  };
+
+  const assignStaff = (roomId: string, staffId: string, role: 'cleaner' | 'inspector') => {
+    // TODO: Implement staff assignment logic
+    console.log('Assigning staff:', roomId, staffId, role);
   };
 
   // Handler pour les actions d'alertes
@@ -485,7 +570,7 @@ export default function HousekeepingPage() {
                             {task.status === 'pending' && (
                               <Button 
                                 size="sm"
-                                onClick={() => updateTaskStatus(task.id, 'in_progress')}
+                                onClick={() => handleTaskAction(task.id, 'start')}
                               >
                                 Démarrer
                               </Button>
@@ -494,7 +579,7 @@ export default function HousekeepingPage() {
                               <Button 
                                 size="sm" 
                                 variant="outline"
-                                onClick={() => updateTaskStatus(task.id, 'completed')}
+                                onClick={() => handleTaskAction(task.id, 'complete')}
                               >
                                 Terminer
                               </Button>
@@ -516,7 +601,7 @@ export default function HousekeepingPage() {
               staff={staff}
               rooms={rooms}
               onTaskAction={handleTaskAction}
-              onTaskAssign={(taskId, staffId) => assignTask(taskId, staffId)}
+              onTaskAssign={(taskId, staffId) => assignTaskMutation.mutate({ taskId, staffId })}
               onTaskMove={handleTaskMove}
             />
           </TabsContent>
