@@ -113,7 +113,7 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
       <DialogContent className="max-w-4xl h-[80vh] p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-4">
           <DialogTitle className="text-2xl font-display">
-            Chambre {room.number} - {room.type}
+            Chambre {room?.number || 'N/A'} - {room?.type || 'N/A'}
           </DialogTitle>
         </DialogHeader>
 
@@ -176,11 +176,11 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Étage</span>
-                    <span>{room.floor}</span>
+                    <span>{room?.floor || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Type</span>
-                    <span>{room.type}</span>
+                    <span>{room?.type || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Capacité</span>
@@ -188,10 +188,10 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Statut</span>
-                    <Badge variant={room.status === 'clean' ? 'default' : 'secondary'}>
-                      {room.status === 'clean' ? 'Propre' : 
-                       room.status === 'dirty' ? 'Sale' :
-                       room.status === 'maintenance' ? 'Maintenance' : 'Indisponible'}
+                    <Badge variant={room?.status === 'clean' ? 'default' : 'secondary'}>
+                      {room?.status === 'clean' ? 'Propre' : 
+                       room?.status === 'dirty' ? 'Sale' :
+                       room?.status === 'maintenance' ? 'Maintenance' : 'Indisponible'}
                     </Badge>
                   </div>
                 </div>
