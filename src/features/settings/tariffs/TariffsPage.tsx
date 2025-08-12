@@ -9,10 +9,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTariffs } from './hooks/useTariffs';
 import { useRoomTypes } from '../rooms/useRoomTypes';
 import { useOrgId } from '@/core/auth/useOrg';
 import { toast } from '@/hooks/use-toast';
+import { RateWindowsTab } from './components/RateWindowsTab';
+import { RateCalculatorPreview } from './components/RateCalculatorPreview';
 
 interface TariffFormData {
   code: string;
@@ -151,14 +154,34 @@ export default function TariffsPage() {
                   <div className="flex items-center gap-2 mt-2">
                     <Sparkles className="h-4 w-4 accent-gold" />
                     <span className="text-lg text-muted-foreground font-premium">
-                      Gestion des tarifs par type de chambre
+                      Gestion avancée des tarifs et fenêtres saisonnières
                     </span>
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div className="flex items-center gap-4">
+          </div>
+        </div>
+
+        {/* Tabs for different sections */}
+        <Tabs defaultValue="tariffs" className="space-y-6">
+          <TabsList className="grid grid-cols-3 w-full max-w-md">
+            <TabsTrigger value="tariffs" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Tarifs de Base
+            </TabsTrigger>
+            <TabsTrigger value="windows" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Fenêtres Tarifaires
+            </TabsTrigger>
+            <TabsTrigger value="calculator" className="flex items-center gap-2">
+              <Percent className="h-4 w-4" />
+              Simulateur
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="tariffs" className="space-y-6">
+            <div className="flex items-center gap-4 mb-6">
               <Input
                 placeholder="Rechercher un tarif..."
                 value={searchQuery}
@@ -339,11 +362,9 @@ export default function TariffsPage() {
                 </DialogContent>
               </Dialog>
             </div>
-          </div>
-        </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="glass-card border-primary/30">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Tarifs</CardTitle>
@@ -389,8 +410,8 @@ export default function TariffsPage() {
           </Card>
         </div>
 
-        {/* Tariffs List */}
-        <Card className="glass-card">
+            {/* Tariffs List */}
+            <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
@@ -451,8 +472,18 @@ export default function TariffsPage() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="windows">
+            <RateWindowsTab />
+          </TabsContent>
+
+          <TabsContent value="calculator">
+            <RateCalculatorPreview />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
