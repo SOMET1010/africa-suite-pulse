@@ -120,7 +120,7 @@ export function ProfessionalHeader({
                         <ChevronDown className="w-3 h-3" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-56 bg-background/95 backdrop-blur-sm border-accent-gold/20">
+                    <DropdownMenuContent align="start" className="w-56 bg-background border-accent-gold/20 shadow-luxury z-50">
                       {item.dropdown.map((subItem) => (
                         <DropdownMenuItem key={subItem.to} asChild>
                           <Link
@@ -215,7 +215,7 @@ export function ProfessionalHeader({
                       <span className="text-xs font-medium">{item.label}</span>
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="center" className="w-56 bg-background/95 backdrop-blur-sm border-accent-gold/20">
+                  <DropdownMenuContent align="center" className="w-56 bg-background border-accent-gold/20 shadow-luxury z-50">
                     {item.dropdown.map((subItem) => (
                       <DropdownMenuItem key={subItem.to} asChild>
                         <Link
