@@ -34,6 +34,8 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
   const [photos, setPhotos] = useState<RoomPhoto[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  
+  if (!room) return null;
 
   useEffect(() => {
     if (open && room) {
