@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -94,11 +95,23 @@ export function useCreateSparePart() {
 
   return useMutation({
     mutationFn: async (data: CreateSparePartData): Promise<SparePart> => {
+      const { data: userOrgData } = await supabase.auth.getUser();
+      const { data: orgData } = await supabase
+        .from("app_users")
+        .select("org_id")
+        .eq("user_id", userOrgData.user?.id)
+        .single();
+
+      if (!orgData?.org_id) {
+        throw new Error("Organization not found");
+      }
+
       const { data: result, error } = await supabase
         .from("spare_parts")
         .insert([{
           ...data,
-          created_by: (await supabase.auth.getUser()).data.user?.id,
+          org_id: orgData.org_id,
+          created_by: userOrgData.user?.id,
         }])
         .select()
         .single();

@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -58,7 +59,11 @@ export function useMaintenanceSchedules() {
         throw new Error(error.message);
       }
 
-      return data || [];
+      // Convert JSON fields to proper types
+      return (data || []).map(item => ({
+        ...item,
+        required_parts: Array.isArray(item.required_parts) ? item.required_parts : [],
+      }));
     },
   });
 }
@@ -68,11 +73,23 @@ export function useCreateMaintenanceSchedule() {
 
   return useMutation({
     mutationFn: async (data: CreateMaintenanceScheduleData): Promise<MaintenanceSchedule> => {
+      const { data: userOrgData } = await supabase.auth.getUser();
+      const { data: orgData } = await supabase
+        .from("app_users")
+        .select("org_id")
+        .eq("user_id", userOrgData.user?.id)
+        .single();
+
+      if (!orgData?.org_id) {
+        throw new Error("Organization not found");
+      }
+
       const { data: result, error } = await supabase
         .from("maintenance_schedules")
         .insert([{
           ...data,
-          created_by: (await supabase.auth.getUser()).data.user?.id,
+          org_id: orgData.org_id,
+          created_by: userOrgData.user?.id,
         }])
         .select()
         .single();
@@ -81,7 +98,10 @@ export function useCreateMaintenanceSchedule() {
         throw new Error(error.message);
       }
 
-      return result;
+      return {
+        ...result,
+        required_parts: Array.isArray(result.required_parts) ? result.required_parts : [],
+      };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["maintenance-schedules"] });
@@ -123,7 +143,10 @@ export function useUpdateMaintenanceSchedule() {
         throw new Error(error.message);
       }
 
-      return data;
+      return {
+        ...data,
+        required_parts: Array.isArray(data.required_parts) ? data.required_parts : [],
+      };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["maintenance-schedules"] });
@@ -159,6 +182,17 @@ export function useExecuteMaintenanceSchedule() {
         throw new Error(scheduleError.message);
       }
 
+      const { data: userOrgData } = await supabase.auth.getUser();
+      const { data: orgData } = await supabase
+        .from("app_users")
+        .select("org_id")
+        .eq("user_id", userOrgData.user?.id)
+        .single();
+
+      if (!orgData?.org_id) {
+        throw new Error("Organization not found");
+      }
+
       // Créer une demande de maintenance basée sur la planification
       const { data: request, error: requestError } = await supabase
         .from("maintenance_requests")
@@ -171,6 +205,7 @@ export function useExecuteMaintenanceSchedule() {
           assigned_to: schedule.assigned_technician,
           estimated_duration_hours: schedule.estimated_duration_hours,
           scheduled_date: new Date().toISOString(),
+          org_id: orgData.org_id,
         }])
         .select()
         .single();
