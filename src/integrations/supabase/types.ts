@@ -83,6 +83,7 @@ export type Database = {
       app_users: {
         Row: {
           active: boolean | null
+          avatar_url: string | null
           created_at: string | null
           email: string | null
           full_name: string
@@ -92,11 +93,13 @@ export type Database = {
           login_code: string | null
           org_id: string
           password_expires_on: string | null
+          phone: string | null
           profile_id: string | null
           user_id: string
         }
         Insert: {
           active?: boolean | null
+          avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           full_name: string
@@ -106,11 +109,13 @@ export type Database = {
           login_code?: string | null
           org_id: string
           password_expires_on?: string | null
+          phone?: string | null
           profile_id?: string | null
           user_id: string
         }
         Update: {
           active?: boolean | null
+          avatar_url?: string | null
           created_at?: string | null
           email?: string | null
           full_name?: string
@@ -120,6 +125,7 @@ export type Database = {
           login_code?: string | null
           org_id?: string
           password_expires_on?: string | null
+          phone?: string | null
           profile_id?: string | null
           user_id?: string
         }
@@ -1753,6 +1759,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_security_settings: {
+        Row: {
+          created_at: string
+          id: string
+          last_password_reset_at: string | null
+          read_only_until: string | null
+          two_factor_enabled: boolean
+          two_factor_method: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_password_reset_at?: string | null
+          read_only_until?: string | null
+          two_factor_enabled?: boolean
+          two_factor_method?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_password_reset_at?: string | null
+          read_only_until?: string | null
+          two_factor_enabled?: boolean
+          two_factor_method?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       arrangements_with_calculated_price: {
@@ -2004,10 +2043,13 @@ export type Database = {
         Returns: boolean
       }
       has_role: {
-        Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
-        }
+        Args:
+          | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
+          | { _user_id: string; _role: string }
+        Returns: boolean
+      }
+      is_user_read_only: {
+        Args: { _user_id: string }
         Returns: boolean
       }
       pms_assign_room: {
@@ -2082,7 +2124,15 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "manager" | "staff" | "user"
+      app_role:
+        | "admin"
+        | "manager"
+        | "staff"
+        | "user"
+        | "super_admin"
+        | "receptionist"
+        | "accountant"
+        | "housekeeping"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2210,7 +2260,16 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "manager", "staff", "user"],
+      app_role: [
+        "admin",
+        "manager",
+        "staff",
+        "user",
+        "super_admin",
+        "receptionist",
+        "accountant",
+        "housekeeping",
+      ],
     },
   },
 } as const
