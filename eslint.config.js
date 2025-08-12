@@ -24,6 +24,9 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "max-lines": ["warn", { max: 200, skipBlankLines: true, skipComments: true }],
+      "max-lines-per-function": ["warn", { max: 100, skipBlankLines: true, skipComments: true }],
     },
   }
 );

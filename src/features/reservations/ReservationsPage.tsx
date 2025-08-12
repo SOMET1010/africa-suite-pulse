@@ -13,7 +13,7 @@ import { CreateReservationDialog } from "./components/CreateReservationDialog";
 import { DuplicateReservationDialog } from "./components/DuplicateReservationDialog";
 import { ReservationFiltersSheet } from "./components/ReservationFiltersSheet";
 import { reservationsApi } from "@/services/reservations.api";
-import type { ReservationFilters } from "@/types/reservation";
+import type { Reservation, ReservationFilters } from "@/types/reservation";
 
 export default function ReservationsPage() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function ReservationsPage() {
   const [filters, setFilters] = useState<ReservationFilters>({});
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<any>(null);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
 
@@ -205,7 +205,7 @@ export default function ReservationsPage() {
           ) : (
             <div className="grid gap-4">
             {reservations?.map((reservation) => (
-                <ReservationCard key={reservation.id} reservation={reservation as any} />
+                <ReservationCard key={reservation.id} reservation={reservation as Reservation} />
               ))}
             </div>
           )}
