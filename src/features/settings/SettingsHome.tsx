@@ -14,7 +14,8 @@ import {
   Clock4,
   Crown,
   Star,
-  Sparkles
+  Sparkles,
+  DollarSign
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +53,17 @@ const settingsTiles = [
     priority: 'medium',
     lastModified: '3 jours',
     category: 'Services',
+  },
+  {
+    title: 'Grille Tarifaire',
+    description: 'Configuration des tarifs par type de chambre et période',
+    to: '/settings/tariffs',
+    icon: DollarSign,
+    color: 'glass-card border-accent-gold',
+    status: 'partial',
+    priority: 'high',
+    lastModified: '2 jours',
+    category: 'Finance',
   },
   {
     title: 'Paiements & Facturation',

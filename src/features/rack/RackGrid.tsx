@@ -10,6 +10,7 @@ import RoomDetailSheet from "./components/RoomDetailSheet";
 import { NewConflictDialog } from "./components/NewConflictDialog";
 import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
+import { TariffConfirmationModal } from "./components/TariffConfirmationModal";
 import { toast } from "@/hooks/use-toast";
 import { Crown } from "lucide-react";
 
@@ -60,6 +61,10 @@ export default function RackGrid() {
     moveConfirmDialog, setMoveConfirmDialog,
     manualRelodgeDialog, setManualRelodgeDialog,
   } = useRackState();
+
+  // Add tariff confirmation state
+  const [showTariffConfirmation, setShowTariffConfirmation] = React.useState(false);
+  const [tariffConfirmationData, setTariffConfirmationData] = React.useState<any>(null);
 
   const {
     handleConflict,
@@ -277,12 +282,53 @@ export default function RackGrid() {
             vivid={vivid}
             zoom={zoom}
             onReservationMove={handleReservationMove}
-            onCellClick={(room, day, reservation) => setDetailSheet({ 
-              open: true, 
-              room, 
-              dayISO: day, 
-              reservation: reservation || null 
-            })}
+            onCellClick={(room, day, reservation) => {
+              if (reservation) {
+                // Check if this is a tariff confirmation scenario (drag & drop with room type change)
+                const currentRoom = data.rooms.find(r => r.id === reservation.roomId);
+                const currentRoomType = currentRoom?.type || '';
+                const targetRoomType = room.type || '';
+                
+                if (currentRoomType !== targetRoomType) {
+                  if (currentRoom) {
+                    setTariffConfirmationData({
+                      reservation: {
+                        id: reservation.id,
+                        reference: reservation.id,
+                        guest_name: reservation.guestName,
+                        date_arrival: reservation.start,
+                        date_departure: reservation.end,
+                        adults: 1,
+                        children: 0,
+                        rate_total: reservation.rate || 0
+                      },
+                      currentRoom: {
+                        number: currentRoom.number,
+                        type: currentRoom.type
+                      },
+                      targetRoom: {
+                        number: room.number,
+                        type: room.type
+                      },
+                      moveData: {
+                        reservationId: reservation.id,
+                        targetRoomId: room.id,
+                        targetDay: day
+                      }
+                    });
+                    setShowTariffConfirmation(true);
+                    return;
+                  }
+                }
+              }
+              
+              setDetailSheet({ 
+                open: true, 
+                room, 
+                dayISO: day, 
+                reservation: reservation || null 
+              });
+            }}
           />
 
           <RackStatusBar occ={kpis.occ} arrivals={kpis.arrivals} presents={kpis.presents} hs={kpis.hs} />
@@ -330,6 +376,21 @@ export default function RackGrid() {
             onCancel={closeManualRelodgeDialog}
             onConfirm={confirmManualRelodge}
             onRestart={closeManualRelodgeDialog}
+          />
+
+          <TariffConfirmationModal
+            isOpen={showTariffConfirmation}
+            onClose={() => setShowTariffConfirmation(false)}
+            onConfirm={() => {
+              if (tariffConfirmationData?.moveData) {
+                const { reservationId, targetRoomId, targetDay } = tariffConfirmationData.moveData;
+                handleReservationMove(reservationId, targetRoomId, targetDay);
+              }
+            }}
+            reservation={tariffConfirmationData?.reservation}
+            currentRoom={tariffConfirmationData?.currentRoom}
+            targetRoom={tariffConfirmationData?.targetRoom}
+            orgId={orgId || ''}
           />
 
           <div className="fixed inset-x-0 bottom-0 z-30 sm:relative sm:z-auto">

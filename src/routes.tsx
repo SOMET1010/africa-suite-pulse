@@ -5,7 +5,7 @@ import RackGrid from "@/features/rack/RackGrid";
 import NotFound from "@/pages/NotFound";
 import AuthPage from "@/pages/AuthPage";
 import RequireAuth from "@/core/auth/RequireAuth";
-import { SettingsHome, HotelSettingsForm } from "@/features/settings";
+import { SettingsHome, HotelSettingsForm, TariffsPage } from "@/features/settings";
 import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
@@ -56,6 +56,7 @@ export function AppRoutes() {
         <Route path="settings/room-types" element={<RoomsPage />} />
         <Route path="settings/rooms-catalog" element={<RoomsPage />} />
         <Route path="settings/services" element={<ServicesPage />} />
+        <Route path="settings/tariffs" element={<TariffsPage />} />
         <Route path="settings/payments" element={<PaymentsPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="settings/users" element={<UsersPage />} />

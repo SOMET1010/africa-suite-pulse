@@ -152,11 +152,28 @@ export function RoomCell({
       return;
     }
 
-    // Drop valide
+    // Check if room type change requires tariff confirmation
+    const currentReservation = reservations.find(r => r.id === reservationId);
+    if (currentReservation) {
+      // Get current room to determine room type
+      const currentRoom = reservations.find(r => r.id === reservationId && r.roomId);
+      const currentRoomType = currentRoom ? room.type : '';
+      const targetRoomType = room.type || '';
+      
+      if (currentRoomType !== targetRoomType) {
+        // Trigger tariff confirmation through cell click
+        onCellClick(room, day, currentReservation);
+        setIsDragOver(false);
+        setCanDrop(false);
+        return;
+      }
+    }
+    
+    // Drop valide - no room type change
     onReservationMove(reservationId, room.id, day);
     setIsDragOver(false);
     setCanDrop(false);
-  }, [reservations, onReservationMove, room.id, room.status, day, cellReservations]);
+  }, [reservations, onReservationMove, onCellClick, room.id, room.type, room.status, day, cellReservations]);
 
   // Style de la cellule selon le statut
   const getCellStyle = () => {
