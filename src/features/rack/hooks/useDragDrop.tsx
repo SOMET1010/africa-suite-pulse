@@ -14,8 +14,9 @@ interface DragDropContextValue {
   dragState: DragState;
   startDrag: (reservation: UIReservation, offset: { x: number; y: number }) => void;
   endDrag: () => void;
-  setDragOver: (roomId: string | null, canDrop: boolean) => void;
+  setDragOver: (roomKey: string | null, canDrop: boolean) => void;
   onDrop: (targetRoom: UIRoom, targetDay: string) => void;
+  dropByIds: (roomId: string, targetDay: string) => void;
 }
 
 // Context pour partager l'état drag & drop
@@ -195,6 +196,23 @@ export function DragDropProvider({
     endDrag();
   }, [dragState, onReservationMove, endDrag]);
 
+  // Fallback global: exécuter le drop via identifiants (document mouseup)
+  const dropByIds = useCallback((roomId: string, targetDay: string) => {
+    if (dragState.draggedReservation && dragState.canDrop && dragState.dragOverRoom === `${roomId}-${targetDay}`) {
+      console.log('🎯 Executing drop (by ids):', {
+        reservation: dragState.draggedReservation.guestName,
+        roomId,
+        targetDay
+      });
+      onReservationMove(
+        dragState.draggedReservation.id,
+        roomId,
+        targetDay
+      );
+    }
+    endDrag();
+  }, [dragState, onReservationMove, endDrag]);
+
   // Suivre la souris pour positionner le ghost
   useEffect(() => {
     if (!dragState.isDragging || !ghostRef.current) return;
@@ -216,7 +234,8 @@ export function DragDropProvider({
     startDrag,
     endDrag,
     setDragOver,
-    onDrop
+    onDrop,
+    dropByIds
   };
 
   return (
@@ -245,7 +264,7 @@ export function DraggableReservation({
   children: React.ReactNode;
   onDragStart?: () => void;
 }) {
-  const { startDrag, endDrag, dragState } = useDragDrop();
+  const { startDrag, endDrag, dragState, dropByIds } = useDragDrop();
   const elementRef = useRef<HTMLDivElement>(null);
 
   const isDragSource = dragState.draggedReservation?.id === reservation.id;
@@ -265,8 +284,20 @@ export function DraggableReservation({
 
     startDrag(reservation, offset);
 
-    const handleMouseUp = () => {
-      endDrag();
+    const handleMouseUp = (ev: MouseEvent) => {
+      const el = document.elementFromPoint(ev.clientX, ev.clientY);
+      const dropZone = el?.closest('[data-drop-zone]') as HTMLElement | null;
+      if (dropZone) {
+        const roomId = dropZone.getAttribute('data-room-id');
+        const day = dropZone.getAttribute('data-day');
+        if (roomId && day) {
+          dropByIds(roomId, day);
+        } else {
+          endDrag();
+        }
+      } else {
+        endDrag();
+      }
       document.removeEventListener('mouseup', handleMouseUp);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
