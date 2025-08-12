@@ -79,7 +79,7 @@ export default function SecurityPage() {
   // const auditLogs = [ ... ]  -> replaced by live data
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6 animate-fade-in">
       <div>
         <h1 className="text-3xl font-bold">Sécurité & Audit</h1>
         <p className="text-muted-foreground">Configuration de la sécurité et suivi des activités</p>
