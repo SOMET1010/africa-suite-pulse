@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,7 @@ export function POSManagerDashboard({ outletId }: POSManagerDashboardProps) {
         .select(`
           *,
           pos_order_items (
-            product_name,
+            product_id,
             quantity,
             unit_price,
             total_price
@@ -106,18 +107,20 @@ export function POSManagerDashboard({ outletId }: POSManagerDashboardProps) {
         current.orders > max.orders ? current : max
       );
 
-      // Calculate top products
+      // Calculate top products - using product_id as name for now
+      // In a real app, you'd join with the products table to get actual names
       const productMap = new Map();
       orders.forEach(order => {
         order.pos_order_items?.forEach(item => {
-          const existing = productMap.get(item.product_name) || { 
-            name: item.product_name, 
+          const productName = `Product ${item.product_id}`;
+          const existing = productMap.get(productName) || { 
+            name: productName, 
             quantity: 0, 
             revenue: 0 
           };
           existing.quantity += item.quantity;
           existing.revenue += item.total_price;
-          productMap.set(item.product_name, existing);
+          productMap.set(productName, existing);
         });
       });
 

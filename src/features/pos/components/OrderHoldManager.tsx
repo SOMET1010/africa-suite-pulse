@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,17 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import type { CartItem } from "../types";
+
+interface HeldOrderItem {
+  id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  product_name: string;
+  product_code: string;
+  special_instructions?: string;
+}
 
 interface HeldOrder {
   id: string;
@@ -29,7 +40,7 @@ interface HeldOrder {
   table_number?: string;
   customer_count: number;
   total_amount: number;
-  items: CartItem[];
+  items: HeldOrderItem[];
   held_at: Date;
   hold_reason?: string;
   notes?: string;
@@ -37,7 +48,14 @@ interface HeldOrder {
 
 interface OrderHoldManagerProps {
   currentOrder: {
-    items: CartItem[];
+    items: Array<{
+      id: string;
+      product_id: string;
+      product_name: string;
+      quantity: number;
+      unit_price: number;
+      total_price: number;
+    }>;
     tableNumber?: string;
     customerCount: number;
     total: number;
@@ -70,7 +88,14 @@ export function OrderHoldManager({
       .from('pos_orders')
       .select(`
         *,
-        pos_order_items (*)
+        pos_order_items (
+          id,
+          product_id,
+          quantity,
+          unit_price,
+          total_price,
+          special_instructions
+        )
       `)
       .eq('status', 'hold')
       .order('created_at', { ascending: false });
@@ -87,11 +112,15 @@ export function OrderHoldManager({
       customer_count: order.customer_count || 1,
       total_amount: order.total_amount,
       items: (order.pos_order_items || []).map(item => ({
-        ...item,
-        product_name: item.product_name || 'Article',
-        product_code: item.product_code || 'CODE',
-        product: { preparation_time: 15 }
-      })) as CartItem[],
+        id: item.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.total_price,
+        product_name: `Product ${item.product_id}`, // We'll need to join with products table later
+        product_code: `CODE-${item.product_id}`,
+        special_instructions: item.special_instructions
+      })),
       held_at: new Date(order.created_at),
       hold_reason: order.kitchen_notes,
       notes: order.kitchen_notes || ''
@@ -136,8 +165,6 @@ export function OrderHoldManager({
       const orderItems = currentOrder.items.map(item => ({
         order_id: order.id,
         product_id: item.product_id,
-        product_name: item.product_name,
-        product_code: item.product_code,
         quantity: item.quantity,
         unit_price: item.unit_price,
         total_price: item.total_price,
