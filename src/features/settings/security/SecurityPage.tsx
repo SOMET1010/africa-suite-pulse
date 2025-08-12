@@ -33,14 +33,14 @@ export default function SecurityPage() {
     return () => { mounted = false; };
   }, [hasPermission]);
 
-  const { data: auditLogs = [], isLoading: auditLoading, error: auditError } = useQuery({
+  const { data: logs = [], isLoading: auditLoading, error: auditError } = useQuery<AuditLog[]>({
     queryKey: ["audit-logs", orgId, canViewAudit],
     queryFn: () => auditApi.listAuditLogs({ orgId, limit: 50 }),
     enabled: !!orgId && canViewAudit,
   });
 
   const exportCsv = () => {
-    if (!auditLogs?.length) return;
+    if (!logs?.length) return;
     const headers = [
       "occurred_at",
       "user_id",
@@ -49,7 +49,7 @@ export default function SecurityPage() {
       "record_id",
       "severity",
     ];
-    const rows = auditLogs.map((l) => [
+    const rows = logs.map((l) => [
       l.occurred_at,
       l.user_id ?? "",
       l.action,
@@ -177,7 +177,7 @@ export default function SecurityPage() {
             <CardTitle>Journal d'Audit</CardTitle>
           </div>
           {canExportAudit && (
-            <Button variant="outline" size="sm" onClick={exportCsv} disabled={!auditLogs?.length}>
+            <Button variant="outline" size="sm" onClick={exportCsv} disabled={!logs?.length}>
               <Download className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
@@ -198,11 +198,11 @@ export default function SecurityPage() {
                   Erreur lors du chargement des logs.
                 </div>
               )}
-              {!auditLoading && !auditError && (!auditLogs || auditLogs.length === 0) && (
+              {!auditLoading && !auditError && (!logs || logs.length === 0) && (
                 <div className="text-sm text-muted-foreground">Aucun événement récent.</div>
               )}
 
-              {auditLogs?.map((log) => (
+              {logs?.map((log) => (
                 <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="min-w-0">
                     <p className="font-medium truncate">
