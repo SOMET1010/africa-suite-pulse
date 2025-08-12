@@ -30,6 +30,7 @@ import DailyReportsPage from "@/features/reports/daily/DailyReportsPage";
 import SecurityPage from "@/features/settings/security/SecurityPage";
 import MaintenancePage from "@/features/maintenance/MaintenancePage";
 import { HousekeepingPage } from "@/features/housekeeping";
+import { NightAuditPage } from "@/features/night-audit";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
 function Layout() {
@@ -78,6 +79,7 @@ export function AppRoutes() {
         <Route path="reports/daily" element={<DailyReportsPage />} />
         <Route path="maintenance" element={<MaintenancePage />} />
         <Route path="housekeeping" element={<HousekeepingPage />} />
+        <Route path="night-audit" element={<NightAuditPage />} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>

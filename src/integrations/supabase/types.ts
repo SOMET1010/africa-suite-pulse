@@ -280,6 +280,62 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_checkpoints: {
+        Row: {
+          checkpoint_name: string
+          checkpoint_type: string
+          completed_at: string | null
+          created_at: string
+          data: Json
+          error_message: string | null
+          id: string
+          is_critical: boolean
+          order_index: number
+          session_id: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          checkpoint_name: string
+          checkpoint_type: string
+          completed_at?: string | null
+          created_at?: string
+          data?: Json
+          error_message?: string | null
+          id?: string
+          is_critical?: boolean
+          order_index?: number
+          session_id: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          checkpoint_name?: string
+          checkpoint_type?: string
+          completed_at?: string | null
+          created_at?: string
+          data?: Json
+          error_message?: string | null
+          id?: string
+          is_critical?: boolean
+          order_index?: number
+          session_id?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_checkpoints_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "night_audit_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -474,6 +530,71 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      daily_closures: {
+        Row: {
+          arrivals_count: number
+          closure_date: string
+          created_at: string
+          departures_count: number
+          discrepancies: Json
+          id: string
+          no_shows_count: number
+          occupied_rooms: number
+          org_id: string
+          outstanding_balance: number
+          payments_total: number
+          revenue_total: number
+          session_id: string
+          system_totals: Json
+          tax_total: number
+          total_rooms: number
+        }
+        Insert: {
+          arrivals_count?: number
+          closure_date: string
+          created_at?: string
+          departures_count?: number
+          discrepancies?: Json
+          id?: string
+          no_shows_count?: number
+          occupied_rooms?: number
+          org_id?: string
+          outstanding_balance?: number
+          payments_total?: number
+          revenue_total?: number
+          session_id: string
+          system_totals?: Json
+          tax_total?: number
+          total_rooms?: number
+        }
+        Update: {
+          arrivals_count?: number
+          closure_date?: string
+          created_at?: string
+          departures_count?: number
+          discrepancies?: Json
+          id?: string
+          no_shows_count?: number
+          occupied_rooms?: number
+          org_id?: string
+          outstanding_balance?: number
+          payments_total?: number
+          revenue_total?: number
+          session_id?: string
+          system_totals?: Json
+          tax_total?: number
+          total_rooms?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_closures_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "night_audit_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       equipment: {
         Row: {
@@ -1460,6 +1581,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      night_audit_sessions: {
+        Row: {
+          audit_date: string
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          hotel_date_after: string | null
+          hotel_date_before: string
+          id: string
+          notes: string | null
+          org_id: string
+          post_audit_data: Json | null
+          pre_audit_data: Json
+          started_at: string
+          started_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audit_date: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          hotel_date_after?: string | null
+          hotel_date_before: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          post_audit_data?: Json | null
+          pre_audit_data?: Json
+          started_at?: string
+          started_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audit_date?: string
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          hotel_date_after?: string | null
+          hotel_date_before?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          post_audit_data?: Json | null
+          pre_audit_data?: Json
+          started_at?: string
+          started_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       organization_members: {
         Row: {
@@ -3488,6 +3663,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      complete_night_audit: {
+        Args: { p_session_id: string }
+        Returns: boolean
+      }
       get_current_user_org_id: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -3576,6 +3755,19 @@ export type Database = {
           ok: boolean
           reason: string
         }[]
+      }
+      start_night_audit: {
+        Args: { p_audit_date: string }
+        Returns: string
+      }
+      update_audit_checkpoint: {
+        Args: {
+          p_checkpoint_id: string
+          p_status: string
+          p_data?: Json
+          p_error_message?: string
+        }
+        Returns: boolean
       }
       update_customer_loyalty_tier: {
         Args: { p_guest_id: string; p_program_id: string }
