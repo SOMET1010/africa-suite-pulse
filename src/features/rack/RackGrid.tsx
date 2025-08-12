@@ -175,6 +175,15 @@ export default function RackGrid() {
     return { isValid: true };
   }
 
+  // 🧪 TEST MANUEL - Pour vérifier que handleReservationMove fonctionne
+  const testManualMove = () => {
+    const testReservationId = "R-1003"; // Utilisez un ID réel de vos données
+    const testTargetRoomId = "102"; // Utilisez un room ID différent de l'actuel
+    
+    console.log('🧪 Test manuel de handleReservationMove');
+    handleReservationMove(testReservationId, testTargetRoomId, 'current');
+  };
+
 
 
   // Gestion des handlers avec React Query

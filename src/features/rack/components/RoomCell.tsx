@@ -74,20 +74,23 @@ export function RoomCell({
 
   // Gestion du drop
   const handleReservationDrop = useCallback((reservation: UIReservation, targetRoom: UIRoom, targetDay: string) => {
-    if (!canAcceptDrop(reservation, targetRoom, targetDay)) {
-      // Drop invalide: en dehors du séjour ou conflit
-      return;
-    }
-
-    console.log('🎯 Drop validé:', {
+    console.log('🎯 RoomCell handleReservationDrop appelé:', {
       reservation: reservation.id,
       guest: reservation.guestName,
       from: reservation.roomId,
       to: targetRoom.id,
       day: targetDay
     });
-    // Le déplacement effectif est déclenché par onDrop() du provider pour éviter des appels en double
-  }, [canAcceptDrop]);
+
+    if (!canAcceptDrop(reservation, targetRoom, targetDay)) {
+      console.log('❌ Drop rejeté par canAcceptDrop');
+      return;
+    }
+
+    console.log('✅ Drop validé, appel de onReservationMove...');
+    // 🔄 APPEL DU CALLBACK PARENT POUR DÉCLENCHER LE MOVE
+    onReservationMove(reservation.id, targetRoom.id, targetDay);
+  }, [canAcceptDrop, onReservationMove]);
 
   // Style de la cellule selon le statut
   const getCellStyle = () => {
