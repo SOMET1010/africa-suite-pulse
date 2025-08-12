@@ -48,7 +48,7 @@ export function RackGridTable({
         <div className="grid touch-manipulation" 
              style={{ gridTemplateColumns: `${compact ? '200px' : '260px'} repeat(${days.length}, ${compact ? '60px' : '80px'})` }}>
           
-          <RackGridHeader days={days} />
+          <RackGridHeader days={days} rooms={filteredRooms} reservations={reservations} />
           
           {/* Rows avec animations */}
           {filteredRooms.map((room, index) => (
