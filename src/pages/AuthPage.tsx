@@ -20,17 +20,49 @@ export default function AuthPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true); setErr(undefined);
+    
+    console.log('Form submission started:', { mode, email });
+    
     try {
       if (mode === "login") {
+        console.log('Attempting login...');
         const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (error) {
+          console.error('Login error:', error);
+          throw error;
+        }
+        console.log('Login successful');
       } else {
-        const redirectUrl = `${window.location.origin}/`; // Required for email confirmation flows
-        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectUrl } });
-        if (error) throw error;
+        console.log('Attempting signup...');
+        const redirectUrl = `${window.location.origin}/`;
+        console.log('Redirect URL:', redirectUrl);
+        
+        const { data, error } = await supabase.auth.signUp({ 
+          email, 
+          password, 
+          options: { 
+            emailRedirectTo: redirectUrl 
+          } 
+        });
+        
+        console.log('Signup response:', { data, error });
+        
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
+        
+        if (data.user && !data.session) {
+          setErr("Compte créé ! Vérifiez votre email pour confirmer votre inscription.");
+          console.log('Account created, email confirmation required');
+          return;
+        }
+        
+        console.log('Signup successful');
       }
     } catch (e: any) {
-      setErr(e.message);
+      console.error('Auth error:', e);
+      setErr(e.message || "Une erreur s'est produite lors de l'authentification");
     } finally {
       setBusy(false);
     }
@@ -50,7 +82,7 @@ export default function AuthPage() {
                type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
         <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" placeholder="Mot de passe"
                type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
-        {err && <div className="text-sm text-destructive">{err}</div>}
+        {err && <div className="text-sm text-destructive p-2 rounded bg-destructive/10">{err}</div>}
         <button disabled={busy} className="w-full min-h-11 px-4 rounded-xl text-primary-foreground bg-primary hover:bg-primary/90">
           {busy ? "…" : (mode==="login" ? "Se connecter" : "Créer le compte")}
         </button>
