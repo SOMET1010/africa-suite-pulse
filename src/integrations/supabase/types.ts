@@ -2076,8 +2076,6 @@ export type Database = {
           created_at: string | null
           description: string | null
           family_code: string | null
-          family_color: string | null
-          family_icon: string | null
           family_id: string | null
           family_label: string | null
           id: string | null
