@@ -31,6 +31,7 @@ import SecurityPage from "@/features/settings/security/SecurityPage";
 import MaintenancePage from "@/features/maintenance/MaintenancePage";
 import { HousekeepingPage } from "@/features/housekeeping";
 import { NightAuditPage } from "@/features/night-audit";
+import { POSPage } from "@/features/pos";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
 function Layout() {
@@ -80,6 +81,7 @@ export function AppRoutes() {
         <Route path="maintenance" element={<MaintenancePage />} />
         <Route path="housekeeping" element={<HousekeepingPage />} />
         <Route path="night-audit" element={<NightAuditPage />} />
+        <Route path="pos" element={<POSPage />} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
