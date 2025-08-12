@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard } from "lucide-react";
 import { RealtimeClock } from "./RealtimeClock";
+import { HotelDateWidget } from "./HotelDateWidget";
 import { UserMenu } from "./UserMenu";
 import { NotificationCenter } from "./NotificationCenter";
 import { GlobalSearch } from "./GlobalSearch";
@@ -95,8 +96,13 @@ export function ProfessionalHeader({
             {/* Recherche globale */}
             <GlobalSearch />
             
-            {/* Horloge temps réel */}
+            {/* Date-Hôtel */}
             <div className="hidden md:block">
+              <HotelDateWidget />
+            </div>
+            
+            {/* Horloge temps réel */}
+            <div className="hidden lg:block">
               <RealtimeClock />
             </div>
             
