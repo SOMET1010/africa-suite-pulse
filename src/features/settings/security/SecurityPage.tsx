@@ -12,29 +12,6 @@ import { useUserRole } from "@/core/auth/useUserRole";
 import { auditApi, type AuditLog } from "@/features/security/audit.api";
 
 export default function SecurityPage() {
-  const auditLogs = [
-    {
-      id: 1,
-      action: "Connexion utilisateur",
-      user: "admin@hotel.com",
-      timestamp: "Il y a 5 minutes",
-      status: "Succès"
-    },
-    {
-      id: 2,
-      action: "Modification chambre #205",
-      user: "manager@hotel.com",
-      timestamp: "Il y a 1 heure",
-      status: "Succès"
-    },
-    {
-      id: 3,
-      action: "Tentative connexion échouée",
-      user: "unknown@email.com",
-      timestamp: "Il y a 2 heures",
-      status: "Échec"
-    }
-  ];
 
   const { orgId } = useOrgId();
   const { hasPermission } = useUserRole();
