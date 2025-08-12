@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ProductCatalog } from "./ProductCatalog";
 import { OrderSummary } from "./OrderSummary";
 import { TableSelector } from "./TableSelector";
-import { PaymentDialog } from "./PaymentDialog";
+import { ComprehensivePaymentDialog } from "./ComprehensivePaymentDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
 import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder, useOpenPOSSession } from "../hooks/usePOSData";
 import { ShoppingCart, CreditCard, Users, Store, Settings, Clock, Calendar } from "lucide-react";
@@ -296,16 +296,17 @@ export function POSTerminal() {
         </div>
       </div>
 
-      <PaymentDialog
+      <ComprehensivePaymentDialog
         isOpen={isPaymentOpen}
         onClose={() => setIsPaymentOpen(false)}
-        order={{
-          items: cartItems,
-          totals,
-          table: selectedTable,
-          customerCount,
-        }}
+        cartItems={cartItems}
+        subtotal={totals.subtotal}
+        serviceCharge={totals.serviceCharge}
+        taxAmount={totals.taxAmount}
+        total={totals.total}
         onPaymentComplete={clearCart}
+        tableNumber={selectedTable?.table_number}
+        customerCount={customerCount}
       />
     </div>
   );
