@@ -14,6 +14,7 @@ interface RoomCellProps {
   zoom?: number;
   onReservationMove: (reservationId: string, targetRoomId: string, targetDay: string) => void;
   onCellClick: (room: UIRoom, day: string, reservation?: UIReservation) => void;
+  onDoubleClick?: (room: UIRoom) => void;
 }
 
 export function RoomCell({
@@ -25,9 +26,11 @@ export function RoomCell({
   zoom = 1,
   onReservationMove,
   onCellClick,
+  onDoubleClick,
 }: RoomCellProps) {
   const [isDragOver, setIsDragOver] = useState(false);
   const [canDrop, setCanDrop] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
 
   // 📊 Réservations pour cette cellule (room + day)
   const cellReservations = useMemo(() => {
@@ -207,6 +210,26 @@ export function RoomCell({
     return icons[status] || '🏠';
   };
 
+  // Handle double click for photo gallery
+  const handleCellClick = () => {
+    const newClickCount = clickCount + 1;
+    setClickCount(newClickCount);
+
+    if (newClickCount === 1) {
+      // Single click - normal behavior
+      setTimeout(() => {
+        if (clickCount === 1) {
+          onCellClick(room, day, cellReservations[0] || null);
+        }
+        setClickCount(0);
+      }, 300);
+    } else if (newClickCount === 2) {
+      // Double click - open photo gallery
+      setClickCount(0);
+      onDoubleClick?.(room);
+    }
+  };
+
   return (
     <div
       className={`
@@ -218,7 +241,7 @@ export function RoomCell({
         ${isDragOver && !canDrop ? 'drag-over-invalid' : ''}
         hover:shadow-sm hover:z-10
       `}
-      onClick={() => onCellClick(room, day, cellReservations[0] || null)}
+      onClick={handleCellClick}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
@@ -267,6 +290,11 @@ export function RoomCell({
           {getRoomStatusIcon(room.status)}
         </div>
       )}
+
+      {/* Double-click hint for photos */}
+      <div className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-50 transition-opacity z-20">
+        <div className="text-xs">📸</div>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, Camera } from "lucide-react";
 import { RoomStatusBadge } from "./RoomBadges";
 import { RoomInfo } from "./RoomInfo";
 import { ReservationInfo } from "./ReservationInfo";
 import { EmptyRoomInfo } from "./EmptyRoomInfo";
+import { RoomPhotoGallery } from "./RoomPhotoGallery";
 import type { UIRoom, UIReservation } from "../rack.types";
 
 interface RoomDetailSheetProps {
@@ -28,6 +29,8 @@ export default function RoomDetailSheet({
   onCheckin,
   onNewReservation 
 }: RoomDetailSheetProps) {
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false);
+  
   if (!room) return null;
 
   const isOccupied = !!reservation;
@@ -75,6 +78,15 @@ export default function RoomDetailSheet({
           <div className="space-y-3">
             <h3 className="font-semibold text-foreground">Actions rapides</h3>
             <div className="grid grid-cols-2 gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="text-xs"
+                onClick={() => setShowPhotoGallery(true)}
+              >
+                <Camera className="w-3 h-3 mr-1" />
+                Photos
+              </Button>
               <Button variant="outline" size="sm" className="text-xs">
                 <Phone className="w-3 h-3 mr-1" />
                 Appeler
@@ -87,6 +99,13 @@ export default function RoomDetailSheet({
           </div>
         </div>
       </SheetContent>
+
+      {/* Photo Gallery Dialog */}
+      <RoomPhotoGallery
+        room={room}
+        open={showPhotoGallery}
+        onOpenChange={setShowPhotoGallery}
+      />
     </Sheet>
   );
 }

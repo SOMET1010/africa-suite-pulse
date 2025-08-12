@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { RoomCell } from './RoomCell';
+import { RoomPhotoGallery } from './RoomPhotoGallery';
 import type { UIRoom, UIReservation } from '../rack.types';
 
 interface ModernRackGridProps {
@@ -23,6 +24,14 @@ export function ModernRackGrid({
   onReservationMove,
   onCellClick 
 }: ModernRackGridProps) {
+  const [photoGallery, setPhotoGallery] = useState<{
+    room: UIRoom | null;
+    open: boolean;
+  }>({ room: null, open: false });
+
+  const handleRoomDoubleClick = (room: UIRoom) => {
+    setPhotoGallery({ room, open: true });
+  };
   return (
     <div className="rack-grid-container overflow-auto border border-border rounded-lg bg-card shadow-soft">
       <div className="grid-wrapper" style={{ minWidth: 'fit-content' }}>
@@ -100,7 +109,7 @@ export function ModernRackGrid({
 
               {/* Cellules des jours */}
               {days.map((day) => (
-                <div key={`${room.id}-${day.date}`} className="p-1">
+                <div key={`${room.id}-${day.date}`} className="p-1 group">
                   <RoomCell
                     room={room}
                     day={day.date}
@@ -110,6 +119,7 @@ export function ModernRackGrid({
                     zoom={zoom}
                     onReservationMove={onReservationMove}
                     onCellClick={onCellClick}
+                    onDoubleClick={handleRoomDoubleClick}
                   />
                 </div>
               ))}
@@ -126,6 +136,13 @@ export function ModernRackGrid({
           </div>
         )}
       </div>
+
+      {/* Photo Gallery */}
+      <RoomPhotoGallery
+        room={photoGallery.room}
+        open={photoGallery.open}
+        onOpenChange={(open) => setPhotoGallery({ room: null, open })}
+      />
     </div>
   );
 }
