@@ -3,7 +3,7 @@ import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
 import CheckinExpressPage from "@/features/arrivals/CheckinExpressPage";
 import DeparturesPage from "@/features/departures/DeparturesPage";
-import RackGrid from "@/features/rack/RackGrid";
+import RackPage from "@/pages/RackPage";
 import NotFound from "@/pages/NotFound";
 import AuthPage from "@/pages/AuthPage";
 import AuthLanding from "@/pages/AuthLanding";
@@ -19,18 +19,18 @@ import QuickReservationPage from "@/features/reservations/QuickReservationPage";
 import AdvancedReservationPage from "@/features/reservations/AdvancedReservationPage";
 import GroupsManagementPage from "@/features/reservations/GroupsManagementPage";
 import AllotmentsPage from "@/features/reservations/AllotmentsPage";
-import GuestsPage from "@/features/guests/GuestsPage";
+import GuestsPage from "@/pages/GuestsPage";
 import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
-import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
+import SettingsAnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
 import CardexPage from "@/features/cardex/CardexPage";
-import AnalyticsDashboard from "@/features/analytics/AnalyticsDashboard";
+import AnalyticsPage from "@/pages/AnalyticsPage";
 import AdvancedAnalytics from "@/features/analytics/AdvancedAnalytics";
-import ReportsManagement from "@/features/reports/ReportsManagement";
+import ReportsPage from "@/pages/ReportsPage";
 import DailyReportsPage from "@/features/reports/daily/DailyReportsPage";
 import SecurityPage from "@/features/settings/security/SecurityPage";
-import MaintenancePage from "@/features/maintenance/MaintenancePage";
-import { HousekeepingPage } from "@/features/housekeeping";
+import MaintenancePage from "@/pages/MaintenancePage";
+import HousekeepingPage from "@/pages/HousekeepingPage";
 import { NightAuditPage } from "@/features/night-audit";
 import POSPage from "@/features/pos/POSPage";
 import POSLoginPage from "@/features/pos/auth/POSLoginPage";
@@ -80,7 +80,7 @@ export function AppRoutes() {
       <Route path="settings/users" element={<RequireAuth><UsersPage /></RequireAuth>} />
       <Route path="settings/system" element={<RequireAuth><SystemSettingsPage /></RequireAuth>} />
       <Route path="settings/templates" element={<RequireAuth><TemplatesPage /></RequireAuth>} />
-      <Route path="settings/analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
+      <Route path="settings/analytics" element={<RequireAuth><SettingsAnalyticsPage /></RequireAuth>} />
       <Route path="settings/security" element={<RequireAuth><SecurityPage /></RequireAuth>} />
       
       {/* Legacy redirects */}
@@ -91,26 +91,26 @@ export function AppRoutes() {
       <Route path="departures" element={<RequireAuth><DeparturesPage /></RequireAuth>} />
       <Route path="reservations" element={<RequireAuth><ReservationsPage /></RequireAuth>} />
       <Route path="reservations/new/quick" element={<RequireAuth><QuickReservationPage /></RequireAuth>} />
-      <Route path="reservations/rack" element={<RequireAuth><RackGrid /></RequireAuth>} />
-      <Route path="rack" element={<RequireAuth><RackGrid /></RequireAuth>} />
+      <Route path="reservations/rack" element={<RequireAuth><RackPage /></RequireAuth>} />
+      <Route path="rack" element={<RequireAuth><RackPage /></RequireAuth>} />
       
       <Route path="billing" element={<RequireAuth><BillingPage /></RequireAuth>} />
       
       <Route path="arrivals" element={<RequireAuth><CheckinExpressPage /></RequireAuth>} />
+      <Route path="guests" element={<RequireAuth><GuestsPage /></RequireAuth>} />
+      <Route path="analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
+      <Route path="reports" element={<RequireAuth><ReportsPage /></RequireAuth>} />
+      <Route path="maintenance" element={<RequireAuth><MaintenancePage /></RequireAuth>} />
+      <Route path="housekeeping" element={<RequireAuth><HousekeepingPage /></RequireAuth>} />
       
       {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route path="reservations/new/advanced" element={<AdvancedReservationPage />} />
         <Route path="reservations/groups" element={<GroupsManagementPage />} />
         <Route path="reservations/allotments" element={<AllotmentsPage />} />
-        <Route path="guests" element={<GuestsPage />} />
         <Route path="cardex" element={<CardexPage />} />
-        <Route path="analytics" element={<AnalyticsDashboard />} />
         <Route path="analytics/advanced" element={<AdvancedAnalytics />} />
-        <Route path="reports" element={<ReportsManagement />} />
         <Route path="reports/daily" element={<DailyReportsPage />} />
-        <Route path="maintenance" element={<MaintenancePage />} />
-        <Route path="housekeeping" element={<HousekeepingPage />} />
         <Route path="night-audit" element={<NightAuditPage />} />
         <Route path="pos" element={<RequirePOSAuth><POSPage /></RequirePOSAuth>} />
         <Route path="pos/maitre-hotel" element={<RequirePOSAuth requiredRole="pos_hostess"><POSMaitreHotelPage /></RequirePOSAuth>} />
