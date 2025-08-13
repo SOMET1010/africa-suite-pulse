@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { TButton } from "@/core/ui/TButton";
 import { Badge } from "@/core/ui/Badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { BottomActionBar } from "@/core/layout/BottomActionBar";
 import { toast } from "@/hooks/use-toast";
 import { useArrivals, useAssignRoomToReservation, useCheckinReservation } from "@/queries/arrivals.queries";
 import { useExpressCheckin } from "./hooks/useExpressCheckin";
@@ -277,26 +277,29 @@ export default function CheckinExpressPage() {
 
       <div className="h-24" />
 
-      {/* Bottom Action Bar */}
-      <div className="fixed inset-x-0 bottom-0">
-        <div className="mx-auto max-w-screen-2xl px-4">
-          <div className="bg-card/90 backdrop-blur border-t border-border rounded-t-xl shadow-soft [padding-bottom:env(safe-area-inset-bottom)]">
-            <div className="px-4 py-2 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>[F1] Check-in</span>
-                <span>[F2] Assigner</span>
-                <span>[F5] Note</span>
-                <span>[F9] Détail</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <TButton onClick={()=>toast({ title: "Check-in Express", description: "Sélectionnez une réservation" })}>Check-in Express</TButton>
-                <TButton variant="default" onClick={()=>toast({ title: "Assigner (barre)" })}>Assigner</TButton>
-                <TButton variant="ghost" onClick={()=>toast({ title: "Note (barre)" })}>Note</TButton>
-              </div>
-            </div>
-          </div>
+      {/* Bottom Action Bar pour Arrivées */}
+      <BottomActionBar>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>[F1] Check-in</span>
+          <span>[F2] Assigner</span>
+          <span>[F5] Note</span>
+          <span>[F9] Détail</span>
         </div>
-      </div>
+        <div className="flex items-center gap-2">
+          <TButton onClick={()=>toast({ title: "Check-in Express", description: "Sélectionnez une réservation" })}>
+            Check-in Express
+          </TButton>
+          <TButton variant="default" onClick={()=>toast({ title: "Assigner (barre)" })}>
+            Assigner
+          </TButton>
+          <TButton variant="ghost" onClick={()=>toast({ title: "Note (barre)" })}>
+            Note
+          </TButton>
+          <TButton variant="ghost" onClick={()=>toast({ title: "Détails (barre)" })}>
+            Détails
+          </TButton>
+        </div>
+      </BottomActionBar>
 
       <RoomAssignSheet
         open={assignOpen}

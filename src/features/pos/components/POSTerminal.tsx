@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { TButton } from "@/core/ui/TButton";
+import { BottomActionBar } from "@/core/layout/BottomActionBar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ProductCatalog } from "./ProductCatalog";
@@ -109,16 +110,16 @@ export function POSTerminal() {
               Aucune session POS n'est ouverte pour {selectedOutlet.name}
             </p>
             <div className="space-y-3">
-              <Button 
+              <TButton 
                 onClick={() => openSession.mutate({ outletId: selectedOutlet.id, openingCash: 0 })}
                 disabled={openSession.isPending}
                 className="w-full"
               >
                 {openSession.isPending ? "Ouverture..." : "Ouvrir une session"}
-              </Button>
-              <Button variant="outline" onClick={() => setSelectedOutlet(null)} className="w-full">
+              </TButton>
+              <TButton variant="default" onClick={() => setSelectedOutlet(null)} className="w-full">
                 Changer de point de vente
-              </Button>
+              </TButton>
             </div>
           </Card>
         </div>
@@ -181,15 +182,15 @@ export function POSTerminal() {
                 </Badge>
               )}
               
-              <Button
-                variant="outline"
+              <TButton
+                variant="default"
                 size="sm"
                 onClick={() => setSelectedOutlet(null)}
                 className="gap-2"
               >
                 <Settings className="h-4 w-4" />
                 Changer
-              </Button>
+              </TButton>
             </div>
           </div>
         </div>
@@ -273,24 +274,49 @@ export function POSTerminal() {
               </div>
 
               <div className="space-y-3">
-                <Button
+                <TButton
                   onClick={handleCheckout}
                   disabled={cartItems.length === 0}
-                  className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg"
+                  className="w-full h-12 text-base font-semibold"
                   size="lg"
                 >
                   <CreditCard className="h-5 w-5 mr-2" />
                   Encaisser {totals.total.toLocaleString()} FCFA
-                </Button>
-                <Button
-                  variant="outline"
+                </TButton>
+                <TButton
+                  variant="default"
                   onClick={clearCart}
                   disabled={cartItems.length === 0}
                   className="w-full"
                 >
                   Vider le panier
-                </Button>
+                </TButton>
               </div>
+              
+              {/* Bottom Action Bar pour POS */}
+              <BottomActionBar>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Session: {currentSession.session_number}</span>
+                  <span>•</span>
+                  <span>{cartItems.length} articles</span>
+                  <span>•</span>
+                  <span>{totals.total.toLocaleString()} FCFA</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TButton onClick={handleCheckout} disabled={cartItems.length === 0}>
+                    Encaisser
+                  </TButton>
+                  <TButton variant="default" onClick={() => console.log("Remise")}>
+                    Remise
+                  </TButton>
+                  <TButton variant="ghost" onClick={() => console.log("Annuler commande")}>
+                    Annuler
+                  </TButton>
+                  <TButton variant="ghost" onClick={() => console.log("Imprimer")}>
+                    Imprimer
+                  </TButton>
+                </div>
+              </BottomActionBar>
             </div>
           </div>
         </div>

@@ -1,0 +1,56 @@
+/* Unified focus states for accessibility and UX */
+
+@layer components {
+  /* Global focus ring utility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Touch-friendly focus state for buttons */
+  .focus-button {
+    @apply focus-ring transition-colors transition-shadow duration-200;
+  }
+
+  /* Input focus with subtle glow */
+  .focus-input {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+  }
+
+  /* Select/dropdown focus */
+  .focus-select {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
+  }
+
+  /* Card/interactive element focus */
+  .focus-interactive {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Skip link for accessibility */
+  .skip-link {
+    @apply absolute -top-40 left-6 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md transition-all;
+    @apply focus:top-6;
+  }
+}
+
+/* Enhanced focus for touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .focus-ring {
+    @apply focus:ring-4 focus:ring-primary/40;
+  }
+  
+  .focus-button {
+    @apply focus:ring-4 focus:ring-primary/40;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .focus-ring,
+  .focus-button,
+  .focus-input,
+  .focus-select,
+  .focus-interactive {
+    transition: none;
+  }
+}

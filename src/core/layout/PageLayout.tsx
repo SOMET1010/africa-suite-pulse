@@ -2,6 +2,7 @@ import React from 'react';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { StatusBar } from './StatusBar';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface PageLayoutProps {
   breadcrumbs?: { label: string; href?: string }[];
   headerActions?: React.ReactNode;
   className?: string;
+  showStatusBar?: boolean;
 }
 
 export function PageLayout({
@@ -18,10 +20,12 @@ export function PageLayout({
   description,
   breadcrumbs = [],
   headerActions,
-  className
+  className,
+  showStatusBar = true
 }: PageLayoutProps) {
   return (
     <div className="min-h-screen bg-pearl">
+      {showStatusBar && <StatusBar />}
       {/* Luxury gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-pearl via-background to-platinum/50" />
       

@@ -2,6 +2,7 @@
 
 @import "./styles/tokens.css";
 @import "./styles/animations.css";
+@import "./styles/focus.css";
 
 @tailwind base;
 @tailwind components;

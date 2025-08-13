@@ -12,6 +12,7 @@ import { MoveConfirmationDialog } from "./components/MoveConfirmationDialog";
 import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { TariffConfirmationModal } from "./components/TariffConfirmationModal";
 import { toast } from "@/hooks/use-toast";
+import { TButton } from "@/core/ui/TButton";
 
 // Simple styles pour drag & drop
 const dragDropStyles = `
@@ -419,10 +420,29 @@ export default function RackGrid() {
             orgId={orgId || ''}
           />
 
-          {/* Simplified bottom bar */}
-          <div className="mt-4 text-center">
-            <div className="text-xs text-muted-foreground/80 font-mono">
-              {filteredRooms.length} chambres • {data.reservations.length} réservations
+          {/* Bottom Action Bar pour Rack */}
+          <div className="mt-4">
+            <div className="bg-card/90 backdrop-blur border border-border rounded-xl shadow-soft p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span>{filteredRooms.length} chambres</span>
+                  <span>•</span>
+                  <span>{data.reservations.length} réservations</span>
+                  <span>•</span>
+                  <span>Occ: {kpis.occ.toFixed(0)}%</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <TButton onClick={() => setDetailSheet({ open: true, room: null, dayISO: new Date().toISOString().split('T')[0], reservation: undefined })}>
+                    Nouvelle réservation
+                  </TButton>
+                  <TButton variant="default" onClick={() => console.log("Déloger assisté")}>
+                    Déloger (assisté)
+                  </TButton>
+                  <TButton variant="ghost" onClick={() => refetch()}>
+                    Actualiser
+                  </TButton>
+                </div>
+              </div>
             </div>
           </div>
           </div>

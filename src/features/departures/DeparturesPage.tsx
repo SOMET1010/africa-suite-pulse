@@ -2,7 +2,8 @@
 import React, { useState } from "react";
 import { PageLayout } from "@/core/layout/PageLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { TButton } from "@/core/ui/TButton";
+import { BottomActionBar } from "@/core/layout/BottomActionBar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -194,13 +195,13 @@ export default function DeparturesPage() {
                       </Badge>
                       
                       {departure.status === "checked_in" && (
-                        <Button 
+                        <TButton 
                           size="sm"
                           onClick={() => handleCheckout(departure.id)}
                           disabled={checkoutMutation.isPending}
                         >
                           {checkoutMutation.isPending ? "En cours..." : "Effectuer le départ"}
-                        </Button>
+                        </TButton>
                       )}
                     </div>
                   </div>
@@ -209,6 +210,26 @@ export default function DeparturesPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Bottom Action Bar pour Départs */}
+        <BottomActionBar>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>{departureStats.total} départs prévus</span>
+            <span>•</span>
+            <span>{departureStats.checked_out} effectués</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <TButton onClick={() => window.print()}>
+              Imprimer liste
+            </TButton>
+            <TButton variant="default" onClick={() => console.log("Export Excel")}>
+              Export Excel
+            </TButton>
+            <TButton variant="ghost" onClick={() => window.location.reload()}>
+              Actualiser
+            </TButton>
+          </div>
+        </BottomActionBar>
       </div>
     </PageLayout>
   );
