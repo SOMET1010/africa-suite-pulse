@@ -19,7 +19,9 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
   outletId 
 }) => {
   const { session } = usePOSAuth();
+  console.log('ServerOrderInterface - serverId:', serverId, 'org_id:', session?.org_id);
   const { data: serverTables = [], error: tablesError } = useServerTables(serverId, session?.org_id);
+  console.log('ServerOrderInterface - serverTables:', serverTables);
   const { data: categories = [], error: categoriesError } = usePOSCategories(outletId);
   const { data: products = [], error: productsError } = usePOSProducts(outletId);
   const [selectedTable, setSelectedTable] = useState<any>(null);
