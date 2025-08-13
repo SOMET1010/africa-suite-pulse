@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Users, Clock, Bed, Package, CreditCard, Settings, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
@@ -36,7 +37,7 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Nouvelle Réservation',
       icon: Clock,
       shortcut: 'Ctrl+R',
-      action: () => console.log('New reservation'),
+      action: () => logger.debug('New reservation action triggered'),
       category: 'primary'
     },
     {
@@ -44,7 +45,7 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Check-in',
       icon: Users,
       shortcut: 'Ctrl+I',
-      action: () => console.log('Check-in'),
+      action: () => logger.debug('Check-in action triggered'),
       badge: '3',
       category: 'primary'
     },
@@ -53,14 +54,14 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Check-out',
       icon: CreditCard,
       shortcut: 'Ctrl+O',
-      action: () => console.log('Check-out'),
+      action: () => logger.debug('Check-out action triggered'),
       category: 'primary'
     },
     {
       id: 'room-status',
       label: 'État des Chambres',
       icon: Bed,
-      action: () => console.log('Room status'),
+      action: () => logger.debug('Room status action triggered'),
       category: 'secondary'
     }
   ],
@@ -70,14 +71,14 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Nouvelle Commande',
       icon: Plus,
       shortcut: 'Ctrl+N',
-      action: () => console.log('New order'),
+      action: () => logger.debug('New order action triggered'),
       category: 'primary'
     },
     {
       id: 'table-management',
       label: 'Gestion Tables',
       icon: Package,
-      action: () => console.log('Table management'),
+      action: () => logger.debug('Table management action triggered'),
       badge: '2',
       category: 'primary'
     },
@@ -86,7 +87,7 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Encaissement',
       icon: CreditCard,
       shortcut: 'Ctrl+P',
-      action: () => console.log('Payment'),
+      action: () => logger.debug('Payment action triggered'),
       category: 'primary'
     }
   ],
@@ -95,21 +96,21 @@ const actionsByRole: Record<string, QuickAction[]> = {
       id: 'dashboard',
       label: 'Dashboard',
       icon: Package,
-      action: () => console.log('Dashboard'),
+      action: () => logger.debug('Dashboard action triggered'),
       category: 'primary'
     },
     {
       id: 'reports',
       label: 'Rapports',
       icon: CreditCard,
-      action: () => console.log('Reports'),
+      action: () => logger.debug('Reports action triggered'),
       category: 'secondary'
     },
     {
       id: 'settings',
       label: 'Paramètres',
       icon: Settings,
-      action: () => console.log('Settings'),
+      action: () => logger.debug('Settings action triggered'),
       category: 'admin'
     }
   ],
@@ -118,14 +119,14 @@ const actionsByRole: Record<string, QuickAction[]> = {
       id: 'system-config',
       label: 'Configuration',
       icon: Settings,
-      action: () => console.log('System config'),
+      action: () => logger.debug('System config action triggered'),
       category: 'admin'
     },
     {
       id: 'user-management',
       label: 'Utilisateurs',
       icon: Users,
-      action: () => console.log('User management'),
+      action: () => logger.debug('User management action triggered'),
       category: 'admin'
     }
   ]

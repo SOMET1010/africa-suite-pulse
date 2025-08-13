@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface Notification {
   id: string;
@@ -178,16 +179,16 @@ export function EnhancedNotificationCenter() {
     // Handle quick actions based on notification type
     switch (notification.type) {
       case 'checkin':
-        console.log('Navigate to check-in for:', notification.metadata?.guestName);
+        logger.debug('Navigate to check-in', { guestName: notification.metadata?.guestName });
         break;
       case 'room':
-        console.log('View room status for:', notification.metadata?.roomNumber);
+        logger.debug('View room status', { roomNumber: notification.metadata?.roomNumber });
         break;
       case 'order':
-        console.log('Navigate to order:', notification.metadata?.entityId);
+        logger.debug('Navigate to order', { entityId: notification.metadata?.entityId });
         break;
       case 'maintenance':
-        console.log('Create maintenance ticket for:', notification.metadata?.roomNumber);
+        logger.debug('Create maintenance ticket', { roomNumber: notification.metadata?.roomNumber });
         break;
     }
     markAsRead(notification.id);
