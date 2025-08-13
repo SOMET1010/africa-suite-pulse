@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrgId } from "@/core/auth/useOrg";
+import { GlobalNavigationLayout } from "@/core/layout/GlobalNavigationLayout";
 import ProfilesTab from "./components/ProfilesTab";
 import UsersTab from "./components/UsersTab";
 
@@ -13,9 +14,8 @@ export default function UsersPage() {
   if(!orgId) return <div className="p-6">Aucune organisation trouvée. Veuillez configurer votre profil.</div>;
 
   return (
-    <div className="p-4 md:p-6">
+    <GlobalNavigationLayout title="Gestion des Utilisateurs">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold mb-2">Gestion des Utilisateurs</h1>
         <p className="text-muted-foreground">
           Gérez les profils de permissions et les comptes utilisateurs de votre organisation.
         </p>
@@ -35,6 +35,6 @@ export default function UsersPage() {
           <ProfilesTab orgId={orgId} />
         </TabsContent>
       </Tabs>
-    </div>
+    </GlobalNavigationLayout>
   );
 }
