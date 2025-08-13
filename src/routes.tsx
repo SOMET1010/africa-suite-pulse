@@ -65,6 +65,9 @@ export function AppRoutes() {
       <Route path="/welcome" element={<AuthLanding />} />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/pos/login" element={<POSLoginPage />} />
+      {/* Special pages that need direct auth without Layout wrapper */}
+      <Route path="ux-demo" element={<RequireAuth><UXFoundationsDemo /></RequireAuth>} />
+      
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route index element={<Index />} />
         <Route path="dashboard" element={<Dashboard />} />
@@ -111,7 +114,6 @@ export function AppRoutes() {
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="settings/security" element={<SecurityPage />} />
         <Route path="demo" element={<DemoPage />} />
-        <Route path="ux-demo" element={<UXFoundationsDemo />} />
         <Route path="pricing" element={<PricingPage />} />
         {/* Role-based dashboards */}
         <Route path="dashboard/receptionist" element={<ReceptionistDashboard />} />
