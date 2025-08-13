@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Zap, User, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, Zap, User, Calendar, MapPin, Save } from "lucide-react";
+import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -110,30 +111,51 @@ export default function QuickReservationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
+    <UnifiedLayout
+      title="Réservation Express"
+      showStatusBar={true}
+      headerAction={
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="mb-4"
+            size="sm"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
-          
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-              <Zap className="h-8 w-8 text-primary" />
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Réservation Express
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Créez une réservation en moins d'une minute
-            </p>
+        </div>
+      }
+      showBottomBar={true}
+      actions={[
+        {
+          id: 'advanced',
+          label: 'Mode Avancé',
+          icon: <div className="text-sm">⚙️</div>,
+          onClick: () => navigate("/reservations/new/advanced"),
+          variant: 'ghost',
+        },
+        {
+          id: 'save',
+          label: 'Créer & Confirmer',
+          icon: <Save className="h-4 w-4" />,
+          onClick: () => form.handleSubmit(onSubmit)(),
+          variant: 'primary',
+          disabled: isSubmitting,
+        },
+      ]}
+      className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+      contentClassName="max-w-2xl mx-auto"
+    >
+      <div className="space-y-8">
+        {/* Header avec icône */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+            <Zap className="h-8 w-8 text-primary" />
           </div>
+          <p className="text-muted-foreground text-lg">
+            Créez une réservation en moins d'une minute
+          </p>
         </div>
 
         {/* Quick Form */}
@@ -291,36 +313,17 @@ export default function QuickReservationPage() {
                   </div>
                 )}
 
-                {/* Actions */}
-                <div className="flex gap-4 pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => navigate("/reservations/new/advanced")}
-                    className="flex-1"
-                  >
-                    Mode Avancé
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 bg-primary hover:bg-primary/90"
-                  >
-                    {isSubmitting ? "Création..." : "Créer & Confirmer"}
-                  </Button>
+                {/* Actions intégrées dans le formulaire pour feedback visuel */}
+                <div className="text-center pt-4">
+                  <p className="text-sm text-muted-foreground">
+                    💡 Les détails manquants pourront être complétés après la création
+                  </p>
                 </div>
               </form>
             </Form>
           </CardContent>
         </Card>
-
-        {/* Quick tip */}
-        <div className="text-center mt-6">
-          <p className="text-sm text-muted-foreground">
-            💡 Les détails manquants pourront être complétés après la création
-          </p>
-        </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 }

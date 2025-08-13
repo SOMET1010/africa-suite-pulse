@@ -87,16 +87,18 @@ export function AppRoutes() {
       <Route path="settings/room-types" element={<RequireAuth><RoomsPage /></RequireAuth>} />
       <Route path="settings/rooms-catalog" element={<RequireAuth><RoomsPage /></RequireAuth>} />
       
+      {/* Phase 2 - Reservation Features migrated to UnifiedLayout */}
+      <Route path="departures" element={<RequireAuth><DeparturesPage /></RequireAuth>} />
+      <Route path="reservations" element={<RequireAuth><ReservationsPage /></RequireAuth>} />
+      <Route path="reservations/new/quick" element={<RequireAuth><QuickReservationPage /></RequireAuth>} />
+      <Route path="reservations/rack" element={<RequireAuth><RackGrid /></RequireAuth>} />
+      
       {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route path="arrivals" element={<CheckinExpressPage />} />
-        <Route path="departures" element={<DeparturesPage />} />
-        <Route path="reservations" element={<ReservationsPage />} />
-        <Route path="reservations/new/quick" element={<QuickReservationPage />} />
         <Route path="reservations/new/advanced" element={<AdvancedReservationPage />} />
         <Route path="reservations/groups" element={<GroupsManagementPage />} />
         <Route path="reservations/allotments" element={<AllotmentsPage />} />
-        <Route path="reservations/rack" element={<RackGrid />} />
         <Route path="guests" element={<GuestsPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="cardex" element={<CardexPage />} />

@@ -1,9 +1,8 @@
 
 import React, { useState } from "react";
-import { PageLayout } from "@/core/layout/PageLayout";
+import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TButton } from "@/core/ui/TButton";
-import { BottomActionBar } from "@/core/layout/BottomActionBar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CalendarIcon, SearchIcon, UserIcon, MapPinIcon } from "lucide-react";
+import { CalendarIcon, SearchIcon, UserIcon, MapPinIcon, LogOut, RefreshCw, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDepartures, useCheckoutReservation } from "@/queries/departures.queries";
 import { useOrgId } from "@/core/auth/useOrg";
@@ -57,7 +56,33 @@ export default function DeparturesPage() {
   };
 
   return (
-    <PageLayout title="Départs du jour">
+    <UnifiedLayout
+      title="Départs du jour"
+      showStatusBar={true}
+      headerAction={
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <LogOut className="h-5 w-5" />
+          <span className="text-sm">{departureStats.total} départs prévus</span>
+        </div>
+      }
+      showBottomBar={true}
+      actions={[
+        {
+          id: 'print',
+          label: 'Imprimer',
+          icon: <Printer className="h-4 w-4" />,
+          onClick: () => window.print(),
+          variant: 'ghost',
+        },
+        {
+          id: 'refresh',
+          label: 'Actualiser', 
+          icon: <RefreshCw className="h-4 w-4" />,
+          onClick: () => window.location.reload(),
+          variant: 'primary',
+        },
+      ]}
+    >
       <div className="space-y-6">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -210,27 +235,7 @@ export default function DeparturesPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* Bottom Action Bar pour Départs */}
-        <BottomActionBar>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{departureStats.total} départs prévus</span>
-            <span>•</span>
-            <span>{departureStats.checked_out} effectués</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <TButton onClick={() => window.print()}>
-              Imprimer liste
-            </TButton>
-            <TButton variant="default" onClick={() => console.log("Export Excel")}>
-              Export Excel
-            </TButton>
-            <TButton variant="ghost" onClick={() => window.location.reload()}>
-              Actualiser
-            </TButton>
-          </div>
-        </BottomActionBar>
       </div>
-    </PageLayout>
+    </UnifiedLayout>
   );
 }
