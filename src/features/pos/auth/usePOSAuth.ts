@@ -45,6 +45,14 @@ export function usePOSAuth() {
     localStorage.removeItem("pos_session");
   };
 
+  const updateOutlet = (outletId: string) => {
+    if (!session) return;
+    
+    const updatedSession = { ...session, outlet_id: outletId };
+    setSession(updatedSession);
+    localStorage.setItem("pos_session", JSON.stringify(updatedSession));
+  };
+
   const hasRole = (requiredRole: POSRole): boolean => {
     if (!session) return false;
     
@@ -67,6 +75,7 @@ export function usePOSAuth() {
     session,
     loading,
     logout,
+    updateOutlet,
     hasRole,
     isHostess,
     isServer,
