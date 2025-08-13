@@ -1,7 +1,7 @@
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
-import { AppHeader } from './AppHeader';
+import { ModernAppHeader } from './ModernAppHeader';
 import { cn } from '@/lib/utils';
 
 interface MainAppLayoutProps {
@@ -16,7 +16,7 @@ export function MainAppLayout({ children, className }: MainAppLayoutProps) {
         <AppSidebar />
         
         <div className="flex flex-col flex-1 overflow-hidden">
-          <AppHeader />
+          <ModernAppHeader />
           
           <main className="flex-1 overflow-auto">
             <div className="container-app p-6">
