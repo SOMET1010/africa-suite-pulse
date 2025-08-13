@@ -134,7 +134,7 @@ const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: typ
 export default function ModernDashboard() {
   return (
     <UnifiedLayout
-      title="TopHotel Pro"
+      title="AfricaSuite"
       showStatusBar={true}
       headerAction={
         <Button variant="ghost" size="icon">
