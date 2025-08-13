@@ -20,7 +20,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useRealTimeKPIs } from '@/features/dashboard/hooks/useRealTimeKPIs';
-import { DashboardCharts } from '@/features/dashboard/components/DashboardCharts';
+import { DashboardCharts } from '@/features/dashboard/components/DashboardChartsSimple';
 import { AlertsWidget } from '@/features/dashboard/components/AlertsWidget';
 import { QuickActionsWidget } from '@/features/dashboard/components/QuickActionsWidget';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -135,7 +135,14 @@ const StatCard = ({ title, value, change, suffix = "", isLoading = false }: {
   );
 };
 
-const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: typeof moduleCards[0]) => {
+const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: {
+  title: string;
+  description: string;
+  icon: any;
+  stats: string;
+  color: string;
+  route: string;
+}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -173,8 +180,6 @@ const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: typ
 export default function ModernDashboard() {
   const navigate = useNavigate();
   const { data: kpis, isLoading, error } = useRealTimeKPIs();
-
-  const moduleCards = getModuleCards(kpis);
 
   return (
     <UnifiedLayout
@@ -292,7 +297,7 @@ export default function ModernDashboard() {
             <h2 className="text-xl font-semibold">Modules Hôteliers</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {moduleCards.map((module, index) => (
+            {getModuleCards(kpis).map((module, index) => (
               <ModuleCard key={index} {...module} />
             ))}
           </div>

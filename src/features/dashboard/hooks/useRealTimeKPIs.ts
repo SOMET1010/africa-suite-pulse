@@ -110,19 +110,19 @@ export function useRealTimeKPIs() {
           .eq('org_id', orgId)
           .eq('date_departure', today),
 
-        // Housekeeping tasks
+        // Housekeeping tasks - simplifié pour éviter les erreurs de type
         supabase
           .from('housekeeping_tasks')
           .select('id, status')
           .eq('org_id', orgId)
-          .eq('created_at::date', today),
+          .gte('created_at', today),
 
-        // POS orders today
+        // POS orders today - simplifié en utilisant les factures du jour  
         supabase
-          .from('orders')
+          .from('invoices')
           .select('id, total_amount, status')
           .eq('org_id', orgId)
-          .eq('created_at::date', today)
+          .gte('created_at', today)
       ]);
 
       // Calculate metrics
@@ -161,7 +161,7 @@ export function useRealTimeKPIs() {
       const departures = departuresData.data || [];
       const pendingDepartures = departures.filter(r => r.status === 'present').length;
 
-      // Process POS data
+      // Process POS data - temporairement basé sur les factures
       const posOrders = posOrdersData.data || [];
       const posRevenue = posOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
 
