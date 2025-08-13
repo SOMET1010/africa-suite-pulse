@@ -18,7 +18,7 @@ import {
   DollarSign
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 
 const settingsTiles = [
   {

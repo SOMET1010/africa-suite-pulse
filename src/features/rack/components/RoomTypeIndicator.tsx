@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { useRoomTypesLookup } from '../hooks/useRoomTypesLookup';
 import { useOrgId } from '@/core/auth/useOrg';
 

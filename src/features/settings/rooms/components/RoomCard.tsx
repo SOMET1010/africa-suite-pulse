@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import type { Room } from '@/types/room';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { RoomStatusBadge } from '@/features/rack/components/RoomBadges';
 

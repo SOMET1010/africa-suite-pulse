@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { RefreshCw, Users, CalendarCheck, Bed, AlertTriangle, Euro, Clock, Filter, Timer, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui/badge";
 import { RealtimeClock } from "@/components/layout/RealtimeClock";
 import { useTemporalKPIs } from "./hooks/useTemporalKPIs";
 

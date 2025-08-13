@@ -1,7 +1,7 @@
 import React from 'react';
 import { Shield, ShieldAlert, ShieldCheck, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 export interface DataProtectionIndicatorProps {
