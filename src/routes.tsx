@@ -35,6 +35,10 @@ import POSPage from "@/features/pos/POSPage";
 import POSLoginPage from "@/features/pos/auth/POSLoginPage";
 import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
 import POSTerminalPage from "@/pages/POSTerminalPage";
+import POSInventoryPage from "@/pages/POSInventoryPage";
+import POSSessionsPage from "@/pages/POSSessionsPage";
+import POSUsersPage from "@/pages/POSUsersPage";
+import POSSettingsPage from "@/pages/POSSettingsPage";
 import POSKitchen from "@/pages/POSKitchen";
 import POSReports from "@/pages/POSReports";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
@@ -89,6 +93,10 @@ export function AppRoutes() {
         <Route path="night-audit" element={<NightAuditPage />} />
         <Route path="pos" element={<RequirePOSAuth><POSPage /></RequirePOSAuth>} />
         <Route path="pos/terminal" element={<RequirePOSAuth><POSTerminalPage /></RequirePOSAuth>} />
+        <Route path="pos/inventory" element={<RequirePOSAuth requiredRole="pos_cashier"><POSInventoryPage /></RequirePOSAuth>} />
+        <Route path="pos/sessions" element={<RequirePOSAuth requiredRole="pos_cashier"><POSSessionsPage /></RequirePOSAuth>} />
+        <Route path="pos/users" element={<RequirePOSAuth requiredRole="pos_manager"><POSUsersPage /></RequirePOSAuth>} />
+        <Route path="pos/settings" element={<RequirePOSAuth requiredRole="pos_manager"><POSSettingsPage /></RequirePOSAuth>} />
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="settings/security" element={<SecurityPage />} />
