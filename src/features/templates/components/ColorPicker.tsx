@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { Palette } from 'lucide-react';
-import { Input } from '@/core/ui/input';
-import { Label } from '@/core/ui/label';
-import { Popover, PopoverContent, PopoverTrigger } from '@/core/ui/popover';
-import { TButton } from '@/core/ui/TButton';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 
 interface ColorPickerProps {
   label: string;
@@ -33,14 +34,14 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
         />
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
-            <TButton
+            <Button
               variant="outline"
               size="sm"
               className="w-10 h-10 p-0"
               style={{ backgroundColor: value }}
             >
               <Palette className="h-4 w-4" style={{ color: value === '#ffffff' ? '#000000' : '#ffffff' }} />
-            </TButton>
+            </Button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-3" align="end">
             <div className="space-y-3">

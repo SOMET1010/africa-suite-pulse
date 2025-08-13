@@ -1,16 +1,17 @@
+
 import { useState } from 'react';
 import { Plus, Settings, Eye, Edit, Trash2, Star } from 'lucide-react';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { TButton } from '@/core/ui/TButton';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/core/ui/card';
-import { Badge } from '@/core/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/core/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
-} from '@/core/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 import { useDocumentTemplates } from '../hooks/useDocumentTemplates';
 import { TemplateEditor } from './TemplateEditor';
 import { TemplatePreview } from './TemplatePreview';
@@ -53,8 +54,6 @@ export default function TemplatesPage() {
       deleteTemplate(template.id);
     }
   };
-
-  const currentTypeInfo = TEMPLATE_TYPES.find(t => t.value === selectedType);
 
   const headerAction = (
     <TButton onClick={handleCreate} variant="primary" className="gap-2">
@@ -145,7 +144,7 @@ export default function TemplatesPage() {
                           </p>
                           <TButton
                             onClick={handleCreate}
-                            variant="outline"
+                            variant="ghost"
                             className="mt-4"
                           >
                             Créer un template

@@ -1,10 +1,11 @@
+
 import { QrCode } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/core/ui/card';
-import { Label } from '@/core/ui/label';
-import { Switch } from '@/core/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/core/ui/select';
-import { Input } from '@/core/ui/input';
-import { Textarea } from '@/core/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import type { TemplateQRCode } from '@/types/templates';
 
 interface QRCodeConfigProps {

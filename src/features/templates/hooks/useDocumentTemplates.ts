@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { 
   DocumentTemplate, 
@@ -8,191 +7,134 @@ import type {
   TemplateType 
 } from '@/types/templates';
 
+// Mock data for now - will be replaced with real Supabase calls once the table exists
+const mockTemplates: DocumentTemplate[] = [];
+
 export function useDocumentTemplates(type?: TemplateType) {
-  const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [templates, setTemplates] = useState<DocumentTemplate[]>(
+    type ? mockTemplates.filter(t => t.type === type) : mockTemplates
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
-  const queryKey = type ? ['document-templates', type] : ['document-templates'];
-
-  const { data: templates = [], isLoading } = useQuery({
-    queryKey,
-    queryFn: async () => {
-      let query = supabase
-        .from('document_templates')
-        .select('*')
-        .eq('is_active', true)
-        .order('is_default', { ascending: false })
-        .order('name');
-
-      if (type) {
-        query = query.eq('type', type);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as DocumentTemplate[];
-    },
-  });
-
-  const createTemplateMutation = useMutation({
-    mutationFn: async (template: DocumentTemplateInsert) => {
-      const { data, error } = await supabase
-        .from('document_templates')
-        .insert(template)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as DocumentTemplate;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-templates'] });
+  const createTemplate = async (template: DocumentTemplateInsert) => {
+    try {
+      setIsLoading(true);
+      const newTemplate: DocumentTemplate = {
+        ...template,
+        id: `temp_${Date.now()}`,
+        org_id: 'temp',
+        is_active: true,
+        is_default: template.is_default || false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      setTemplates(prev => [...prev, newTemplate]);
+      
       toast({
         title: 'Template créé',
         description: 'Le template de document a été créé avec succès.',
       });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({
         title: 'Erreur',
         description: `Impossible de créer le template: ${error.message}`,
         variant: 'destructive',
       });
-    },
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const updateTemplateMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<DocumentTemplate> }) => {
-      const { data, error } = await supabase
-        .from('document_templates')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as DocumentTemplate;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-templates'] });
+  const updateTemplate = async ({ id, updates }: { id: string; updates: Partial<DocumentTemplate> }) => {
+    try {
+      setIsLoading(true);
+      setTemplates(prev => prev.map(t => t.id === id ? { ...t, ...updates, updated_at: new Date().toISOString() } : t));
+      
       toast({
         title: 'Template modifié',
         description: 'Le template de document a été modifié avec succès.',
       });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({
         title: 'Erreur',
         description: `Impossible de modifier le template: ${error.message}`,
         variant: 'destructive',
       });
-    },
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const deleteTemplateMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('document_templates')
-        .update({ is_active: false })
-        .eq('id', id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-templates'] });
+  const deleteTemplate = async (id: string) => {
+    try {
+      setIsLoading(true);
+      setTemplates(prev => prev.filter(t => t.id !== id));
+      
       toast({
         title: 'Template supprimé',
         description: 'Le template de document a été supprimé avec succès.',
       });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({
         title: 'Erreur',
         description: `Impossible de supprimer le template: ${error.message}`,
         variant: 'destructive',
       });
-    },
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const setDefaultTemplateMutation = useMutation({
-    mutationFn: async ({ id, type }: { id: string; type: TemplateType }) => {
-      // Retirer le défaut de tous les templates du même type
-      await supabase
-        .from('document_templates')
-        .update({ is_default: false })
-        .eq('type', type);
-
-      // Définir le nouveau template par défaut
-      const { data, error } = await supabase
-        .from('document_templates')
-        .update({ is_default: true })
-        .eq('id', id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data as DocumentTemplate;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-templates'] });
+  const setDefaultTemplate = async ({ id, type }: { id: string; type: TemplateType }) => {
+    try {
+      setIsLoading(true);
+      setTemplates(prev => prev.map(t => ({ 
+        ...t, 
+        is_default: t.type === type ? t.id === id : t.is_default 
+      })));
+      
       toast({
         title: 'Template par défaut défini',
         description: 'Ce template est maintenant le template par défaut.',
       });
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({
         title: 'Erreur',
         description: `Impossible de définir le template par défaut: ${error.message}`,
         variant: 'destructive',
       });
-    },
-  });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return {
     templates,
     isLoading,
-    createTemplate: createTemplateMutation.mutate,
-    updateTemplate: updateTemplateMutation.mutate,
-    deleteTemplate: deleteTemplateMutation.mutate,
-    setDefaultTemplate: setDefaultTemplateMutation.mutate,
-    isCreating: createTemplateMutation.isPending,
-    isUpdating: updateTemplateMutation.isPending,
-    isDeleting: deleteTemplateMutation.isPending,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
+    setDefaultTemplate,
+    isCreating: isLoading,
+    isUpdating: isLoading,
+    isDeleting: isLoading,
   };
 }
 
 export function useTemplateById(id: string) {
-  return useQuery({
-    queryKey: ['document-template', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('document_templates')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return data as DocumentTemplate;
-    },
-    enabled: !!id,
-  });
+  return {
+    data: mockTemplates.find(t => t.id === id),
+    isLoading: false,
+    error: null,
+  };
 }
 
 export function useDefaultTemplate(type: TemplateType) {
-  return useQuery({
-    queryKey: ['default-template', type],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('document_templates')
-        .select('*')
-        .eq('type', type)
-        .eq('is_default', true)
-        .eq('is_active', true)
-        .single();
-
-      if (error) throw error;
-      return data as DocumentTemplate;
-    },
-  });
+  return {
+    data: mockTemplates.find(t => t.type === type && t.is_default),
+    isLoading: false,
+    error: null,
+  };
 }

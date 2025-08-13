@@ -1,3 +1,4 @@
+
 // Types pour le gestionnaire de templates de documents
 export type TemplateType = 'invoice' | 'receipt' | 'reminder' | 'pos_ticket' | 'email' | 'report';
 
@@ -137,6 +138,13 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       border_color: '#e2e8f0',
       table_style: 'bordered',
     },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: true,
+      custom_fields: [],
+      sections: [],
+    },
   },
   receipt: {
     name: 'Reçu Standard',
@@ -159,6 +167,23 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       position: 'bottom_right',
       size: 'small',
     },
+    style: {
+      font_family: 'inter',
+      font_size: 'medium',
+      primary_color: '#2563eb',
+      secondary_color: '#64748b',
+      text_color: '#1e293b',
+      background_color: '#ffffff',
+      border_color: '#e2e8f0',
+      table_style: 'minimal',
+    },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: true,
+      custom_fields: [],
+      sections: [],
+    },
   },
   reminder: {
     name: 'Relance Standard',
@@ -180,6 +205,23 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       content: 'payment_url',
       position: 'footer',
       size: 'medium',
+    },
+    style: {
+      font_family: 'inter',
+      font_size: 'medium',
+      primary_color: '#2563eb',
+      secondary_color: '#64748b',
+      text_color: '#1e293b',
+      background_color: '#ffffff',
+      border_color: '#e2e8f0',
+      table_style: 'bordered',
+    },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: true,
+      custom_fields: [],
+      sections: [],
     },
   },
   pos_ticket: {
@@ -213,6 +255,13 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       border_color: '#000000',
       table_style: 'minimal',
     },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: true,
+      custom_fields: [],
+      sections: [],
+    },
   },
   email: {
     name: 'Email Standard',
@@ -235,6 +284,23 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       position: 'footer',
       size: 'medium',
     },
+    style: {
+      font_family: 'inter',
+      font_size: 'medium',
+      primary_color: '#2563eb',
+      secondary_color: '#64748b',
+      text_color: '#1e293b',
+      background_color: '#ffffff',
+      border_color: '#e2e8f0',
+      table_style: 'minimal',
+    },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: false,
+      custom_fields: [],
+      sections: [],
+    },
   },
   report: {
     name: 'Rapport Standard',
@@ -256,6 +322,23 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       content: 'verification_url',
       position: 'top_right',
       size: 'small',
+    },
+    style: {
+      font_family: 'inter',
+      font_size: 'medium',
+      primary_color: '#2563eb',
+      secondary_color: '#64748b',
+      text_color: '#1e293b',
+      background_color: '#ffffff',
+      border_color: '#e2e8f0',
+      table_style: 'bordered',
+    },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: true,
+      custom_fields: [],
+      sections: [],
     },
   },
 };
