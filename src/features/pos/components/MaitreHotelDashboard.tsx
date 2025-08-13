@@ -63,7 +63,14 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
   const handleOpenAssignDialog = (table?: POSTable) => {
     if (table) {
       setSelectedTable(table);
+    } else if (unassignedTables.length > 0) {
+      // Si pas de table spécifiée, prendre la première table non assignée
+      setSelectedTable(unassignedTables[0]);
+    } else {
+      toast.warning('Aucune table disponible pour assignation');
+      return;
     }
+    setSelectedServerId(''); // Reset du serveur sélectionné
     setShowAssignDialog(true);
   };
 
