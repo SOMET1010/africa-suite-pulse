@@ -1,145 +1,197 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  Hotel,
-  UtensilsCrossed,
+  LayoutDashboard,
+  Building,
+  CalendarDays,
+  Users,
+  LogIn,
+  Receipt,
+  Bed,
+  Wrench,
+  ShoppingCart,
   BarChart3,
   Settings,
-  Calendar,
-  Users,
-  Package,
-  CreditCard,
-  Home,
-  ClipboardList
 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuBadge,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarHeader,
   useSidebar,
 } from '@/components/ui/sidebar';
-import { Badge } from '@/components/ui/badge';
 
 const navigationItems = [
   {
-    title: "Tableau de Bord",
-    icon: Home,
-    url: "/dashboard",
-    badge: null
+    title: "Tableau de bord",
+    icon: LayoutDashboard,
+    url: "/",
   },
   {
-    title: "Réception",
-    icon: Hotel,
-    url: "/reception",
-    badge: null,
-    subItems: [
-      { title: "Planning", url: "/rack", icon: Calendar },
-      { title: "Réservations", url: "/reservations", icon: ClipboardList },
-      { title: "Clients", url: "/clients", icon: Users },
-    ]
+    title: "Plan des chambres",
+    icon: Building,
+    url: "/rack",
+    badge: "Live",
   },
   {
-    title: "Restaurant",
-    icon: UtensilsCrossed,
-    url: "/restaurant",
+    title: "Réservations",
+    icon: CalendarDays,
+    url: "/reservations",
     badge: "3",
     subItems: [
-      { title: "Plan de Salle", url: "/restaurant/tables", icon: UtensilsCrossed },
-      { title: "Commandes", url: "/restaurant/orders", icon: ClipboardList },
-      { title: "Menu", url: "/restaurant/menu", icon: Package },
-    ]
+      { title: "Nouvelle réservation", url: "/reservations/new" },
+      { title: "Réservations avancées", url: "/reservations/advanced" },
+    ],
+  },
+  {
+    title: "Mes clients",
+    icon: Users,
+    url: "/guests",
+  },
+  {
+    title: "Arrivées du jour",
+    icon: LogIn,
+    url: "/arrivals",
+    badge: "2",
   },
   {
     title: "Facturation",
-    icon: CreditCard,
+    icon: Receipt,
     url: "/billing",
-    badge: null
   },
   {
-    title: "Rapports",
+    title: "Ménage",
+    icon: Bed,
+    url: "/housekeeping",
+  },
+  {
+    title: "Maintenance",
+    icon: Wrench,
+    url: "/maintenance",
+  },
+  {
+    title: "Point de vente",
+    icon: ShoppingCart,
+    url: "/pos",
+    subItems: [
+      { title: "Restaurant", url: "/restaurant" },
+      { title: "Commandes", url: "/pos/orders" },
+      { title: "Menu", url: "/pos/menu" },
+      { title: "Caisse", url: "/pos/checkout" },
+    ],
+  },
+  {
+    title: "Rapports & Analytics",
     icon: BarChart3,
     url: "/reports",
-    badge: null
+    subItems: [
+      { title: "Analytics", url: "/analytics" },
+      { title: "Ventes", url: "/reports/sales" },
+      { title: "Occupancy", url: "/reports/occupancy" },
+    ],
   },
   {
     title: "Paramètres",
     icon: Settings,
     url: "/settings",
-    badge: null
-  }
+    subItems: [
+      { title: "Général", url: "/settings" },
+      { title: "Tarifs", url: "/settings/tariffs" },
+      { title: "Utilisateurs", url: "/settings/users" },
+    ],
+  },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  
+
   const isActive = (url: string) => {
-    if (url === "/dashboard") return location.pathname === "/" || location.pathname === "/dashboard";
+    if (url === "/") {
+      return location.pathname === "/";
+    }
     return location.pathname.startsWith(url);
   };
 
-  const getNavClassName = (url: string) => {
-    return isActive(url) 
-      ? "bg-primary/10 text-primary border-r-2 border-primary" 
-      : "text-muted-foreground hover:bg-muted hover:text-foreground";
+  const isAnySubItemActive = (subItems?: Array<{ url: string }>) => {
+    if (!subItems) return false;
+    return subItems.some(sub => location.pathname.startsWith(sub.url));
+  };
+
+  const getNavClassName = (url: string, subItems?: Array<{ url: string }>) => {
+    const active = isActive(url) || isAnySubItemActive(subItems);
+    return active 
+      ? "bg-sidebar-accent text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" 
+      : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
   };
 
   return (
-    <Sidebar className="border-r border-border bg-card">
-      <SidebarHeader className="border-b border-border p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <Hotel className="w-4 h-4 text-white" />
+    <Sidebar variant="inset" className="border-r-0" collapsible="icon">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-2 py-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80">
+            <span className="text-sm font-bold text-primary-foreground">AS</span>
           </div>
           {!collapsed && (
-            <div>
-              <h2 className="font-semibold text-foreground">AfricaSuite</h2>
-              <p className="text-xs text-muted-foreground">Hotel Management</p>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold">AfricaSuite</span>
+              <span className="text-xs text-sidebar-muted-foreground">PMS & Restaurant</span>
             </div>
           )}
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-2">
+      <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className={collapsed ? "sr-only" : ""}>
-            Navigation
-          </SidebarGroupLabel>
-          
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navigationItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild className="h-11">
-                    <NavLink 
-                      to={item.url} 
-                      className={getNavClassName(item.url)}
-                      title={collapsed ? item.title : undefined}
-                    >
-                      <item.icon className="w-5 h-5 shrink-0" />
-                      {!collapsed && (
-                        <>
-                          <span className="font-medium">{item.title}</span>
-                          {item.badge && (
-                            <Badge variant="destructive" className="ml-auto h-5 w-5 flex items-center justify-center p-0 text-xs">
-                              {item.badge}
-                            </Badge>
-                          )}
-                        </>
+          <SidebarMenu>
+            {navigationItems.map((item) => {
+              const hasActiveSubItem = isAnySubItemActive(item.subItems);
+              const shouldShowSubItems = !collapsed && item.subItems && (isActive(item.url) || hasActiveSubItem);
+              
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild className={getNavClassName(item.url, item.subItems)}>
+                    <NavLink to={item.url} end={item.url === "/"}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                      {!collapsed && item.badge && (
+                        <SidebarMenuBadge className="ml-auto">
+                          {item.badge}
+                        </SidebarMenuBadge>
                       )}
                     </NavLink>
                   </SidebarMenuButton>
+                  
+                  {shouldShowSubItems && (
+                    <SidebarMenuSub>
+                      {item.subItems!.map((subItem) => (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton asChild>
+                            <NavLink 
+                              to={subItem.url} 
+                              className={({ isActive }) => 
+                                isActive ? "bg-sidebar-accent/50" : ""
+                              }
+                            >
+                              <span>{subItem.title}</span>
+                            </NavLink>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  )}
                 </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
+              );
+            })}
+          </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { GlobalNavigationLayout } from "@/core/layout/GlobalNavigationLayout";
 import { 
   Crown, 
   Users, 
@@ -56,7 +56,7 @@ const Index = () => {
   );
 
   return (
-    <UnifiedLayout
+    <GlobalNavigationLayout
       title={`${getGreeting()} ! 👋`}
       headerAction={headerAction}
       showStatusBar={true}
@@ -249,7 +249,7 @@ const Index = () => {
           })}
         </div>
       </section>
-    </UnifiedLayout>
+    </GlobalNavigationLayout>
   );
 };
 

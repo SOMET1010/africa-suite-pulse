@@ -1,18 +1,17 @@
 import React from 'react';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { GlobalNavigationLayout } from '@/core/layout/GlobalNavigationLayout';
 import { Settings } from 'lucide-react';
 import { POSSettings } from '@/features/pos/settings/POSSettings';
 
 export default function SettingsPage() {
   return (
-    <UnifiedLayout
+    <GlobalNavigationLayout
       title="Paramètres"
-      showStatusBar={true}
       headerAction={
         <Settings className="h-5 w-5 text-muted-foreground" />
       }
     >
       <POSSettings />
-    </UnifiedLayout>
+    </GlobalNavigationLayout>
   );
 }
