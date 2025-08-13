@@ -118,8 +118,9 @@ export function useRealtimeNotifications() {
 
   // Set up realtime listeners
   useEffect(() => {
-    const { data: { user } } = supabase.auth.getUser();
-    if (!user) return;
+    const setupListeners = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
     console.log('🔔 Setting up realtime notification listeners');
 
@@ -192,11 +193,14 @@ export function useRealtimeNotifications() {
       )
       .subscribe();
 
-    return () => {
-      console.log('🔔 Cleaning up notification listeners');
-      supabase.removeChannel(reservationsChannel);
-      supabase.removeChannel(paymentsChannel);
+      return () => {
+        console.log('🔔 Cleaning up notification listeners');
+        supabase.removeChannel(reservationsChannel);
+        supabase.removeChannel(paymentsChannel);
+      };
     };
+
+    setupListeners();
   }, [addNotification]);
 
   // Request notification permission on mount

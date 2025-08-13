@@ -49,10 +49,18 @@ export function usePredictiveAnalytics() {
       const pastDays = 30;
       const futureDays = 7;
 
-      // Get historical data
+      // Get historical data with guest information
       const { data: historicalReservations } = await supabase
         .from('reservations')
-        .select('*')
+        .select(`
+          *,
+          guests!guest_id (
+            first_name,
+            last_name,
+            email,
+            phone
+          )
+        `)
         .eq('org_id', orgId)
         .gte('date_arrival', format(subDays(today, pastDays), 'yyyy-MM-dd'))
         .lte('date_arrival', format(today, 'yyyy-MM-dd'));
@@ -97,7 +105,7 @@ export function usePredictiveAnalytics() {
       ) || [];
       
       const currentADR = currentReservations.length > 0 
-        ? currentReservations.reduce((sum, r) => sum + (r.total_amount || 0), 0) / currentReservations.length
+        ? currentReservations.reduce((sum, r) => sum + (r.rate_total || 0), 0) / currentReservations.length
         : 50000; // Default ADR
 
       const revenueRecommendations = {
@@ -110,10 +118,11 @@ export function usePredictiveAnalytics() {
       // VIP detection based on spending patterns
       const guestSpending = new Map();
       historicalReservations?.forEach(r => {
-        if (r.guest_name && r.total_amount) {
-          const current = guestSpending.get(r.guest_name) || { total: 0, visits: 0 };
-          guestSpending.set(r.guest_name, {
-            total: current.total + r.total_amount,
+        const guestName = r.guests ? `${r.guests.first_name} ${r.guests.last_name}` : 'Client Inconnu';
+        if (guestName && r.rate_total) {
+          const current = guestSpending.get(guestName) || { total: 0, visits: 0 };
+          guestSpending.set(guestName, {
+            total: current.total + r.rate_total,
             visits: current.visits + 1,
             guestId: r.id
           });
@@ -138,7 +147,15 @@ export function usePredictiveAnalytics() {
       // No-show prediction (simplified)
       const { data: futureReservations } = await supabase
         .from('reservations')
-        .select('*')
+        .select(`
+          *,
+          guests!guest_id (
+            first_name,
+            last_name,
+            email,
+            phone
+          )
+        `)
         .eq('org_id', orgId)
         .eq('status', 'confirmed')
         .gte('date_arrival', format(today, 'yyyy-MM-dd'))
@@ -160,20 +177,20 @@ export function usePredictiveAnalytics() {
           }
 
           // No contact info
-          if (!r.guest_email && !r.guest_phone) {
+          if (!r.guests?.email && !r.guests?.phone) {
             riskScore += 25;
             factors.push('Informations de contact manquantes');
           }
 
           // Low total amount
-          if ((r.total_amount || 0) < 30000) {
+          if ((r.rate_total || 0) < 30000) {
             riskScore += 20;
             factors.push('Montant faible');
           }
 
           return {
             reservationId: r.id,
-            guestName: r.guest_name || 'Inconnu',
+            guestName: r.guests ? `${r.guests.first_name} ${r.guests.last_name}` : 'Inconnu',
             riskScore: Math.min(100, riskScore),
             factors
           };
@@ -188,7 +205,7 @@ export function usePredictiveAnalytics() {
         const month = format(new Date(r.date_arrival), 'yyyy-MM');
         const current = monthlyData.get(month) || { reservations: [], revenue: 0 };
         current.reservations.push(r);
-        current.revenue += r.total_amount || 0;
+        current.revenue += r.rate_total || 0;
         monthlyData.set(month, current);
       });
 

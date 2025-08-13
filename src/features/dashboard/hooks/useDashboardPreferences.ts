@@ -110,30 +110,15 @@ export function useDashboardPreferences() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Load preferences from Supabase
+  // Load preferences from localStorage for now (until we add dashboard_preferences to app_users)
   useEffect(() => {
-    const loadPreferences = async () => {
+    const loadPreferences = () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          setPreferences(DEFAULT_PREFERENCES);
-          setIsLoading(false);
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('dashboard_preferences')
-          .eq('user_id', user.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error loading preferences:', error);
-          setPreferences(DEFAULT_PREFERENCES);
-        } else if (data?.dashboard_preferences) {
+        const savedPreferences = localStorage.getItem('dashboard_preferences');
+        if (savedPreferences) {
           setPreferences({
             ...DEFAULT_PREFERENCES,
-            ...data.dashboard_preferences
+            ...JSON.parse(savedPreferences)
           });
         } else {
           setPreferences(DEFAULT_PREFERENCES);
@@ -149,32 +134,14 @@ export function useDashboardPreferences() {
     loadPreferences();
   }, []);
 
-  // Save preferences to Supabase
+  // Save preferences to localStorage for now
   const savePreferences = useCallback(async (newPreferences: Partial<DashboardPreferences>) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
       const updatedPreferences = { ...preferences, ...newPreferences };
       
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          dashboard_preferences: updatedPreferences
-        });
-
-      if (error) {
-        console.error('Error saving preferences:', error);
-        toast({
-          title: 'Erreur',
-          description: 'Impossible de sauvegarder les préférences',
-          variant: 'destructive'
-        });
-        return;
-      }
-
+      localStorage.setItem('dashboard_preferences', JSON.stringify(updatedPreferences));
       setPreferences(updatedPreferences);
+      
       toast({
         title: 'Préférences sauvegardées',
         description: 'Vos préférences ont été mises à jour'
