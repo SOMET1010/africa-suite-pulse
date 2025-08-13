@@ -4117,9 +4117,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"]
       }
       get_server_tables: {
-        Args:
-          | { p_server_id: string }
-          | { p_server_id: string; p_org_id?: string }
+        Args: { p_server_id: string; p_org_id?: string }
         Returns: {
           assignment_id: string
           table_id: string
