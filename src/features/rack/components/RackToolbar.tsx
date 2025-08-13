@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Grid3X3, Palette, ZoomIn, ZoomOut, Columns3, Eye, RefreshCw, Timer, TrendingUp, Clock, CalendarCheck, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { RealtimeClock } from "@/components/layout/RealtimeClock";
 

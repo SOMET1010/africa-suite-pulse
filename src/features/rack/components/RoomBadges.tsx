@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/Badge";
 import type { UIRoom, UIReservation } from "../rack.types";
 
 interface RoomBadgesProps {

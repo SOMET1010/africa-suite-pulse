@@ -1,7 +1,7 @@
 import React from 'react';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { TButton } from '@/components/ui/TButton';
-import { Badge } from '@/components/ui/Badge';
+import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Wifi, KeyRound, MapPin, MessageSquare } from 'lucide-react';
 
 export default function UXFoundationsDemo() {

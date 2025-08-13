@@ -15,6 +15,10 @@ type Action = {
 type Props = {
   children: React.ReactNode;
   
+  // Header props
+  title?: string;
+  headerAction?: React.ReactNode;
+  
   // StatusBar props
   hotelDate?: string;
   shiftLabel?: string;
@@ -24,6 +28,7 @@ type Props = {
   // BottomActionBar props
   actions?: Action[];
   showBottomBar?: boolean;
+  bottomActions?: React.ReactNode;
   
   // Layout props
   className?: string;
@@ -33,12 +38,15 @@ type Props = {
 
 export function UnifiedLayout({
   children,
+  title,
+  headerAction,
   hotelDate = new Date().toISOString().split('T')[0],
   shiftLabel = "Jour",
   orgName = "AfricaSuite PMS",
   showStatusBar = true,
   actions = [],
   showBottomBar = false,
+  bottomActions,
   className,
   contentClassName,
   paddingBottom = true,
@@ -53,6 +61,15 @@ export function UnifiedLayout({
         />
       )}
       
+      {(title || headerAction) && (
+        <div className="mx-auto max-w-6xl px-3 py-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            {title && <h1 className="text-2xl font-semibold text-foreground">{title}</h1>}
+            {headerAction}
+          </div>
+        </div>
+      )}
+      
       <main className={cn(
         "mx-auto max-w-6xl px-3 py-4",
         showBottomBar && paddingBottom && "pb-20", // Space for BottomActionBar
@@ -61,9 +78,11 @@ export function UnifiedLayout({
         {children}
       </main>
       
-      {showBottomBar && actions.length > 0 && (
+      {(showBottomBar && actions.length > 0) && (
         <BottomActionBar actions={actions} />
       )}
+      
+      {bottomActions}
     </div>
   );
 }
