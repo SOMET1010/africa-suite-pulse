@@ -5,7 +5,7 @@ import type { POSOutlet, POSCategory, POSProduct, POSOrder, POSTable, POSSession
 
 export const usePOSOutlets = () => {
   return useQuery({
-    queryKey: ["pos-outlets"],
+    queryKey: ["pos-outlets-fixed"], // Changed key to force cache invalidation
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pos_outlets")
