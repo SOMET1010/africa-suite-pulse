@@ -56,7 +56,25 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
   const assignedTables = tables.filter(table => getTableAssignment(table.id));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-6">
+      {/* Header avec actions */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Maître d'Hôtel</h1>
+          <p className="text-muted-foreground">Gestion des tables et assignations serveurs</p>
+        </div>
+        <div className="flex gap-2">
+          <Button className="bg-primary">
+            <Users className="h-4 w-4 mr-2" />
+            Assigner Serveur
+          </Button>
+          <Button variant="outline">
+            <Clock className="h-4 w-4 mr-2" />
+            Planning
+          </Button>
+        </div>
+      </div>
+
       {/* Header Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -66,6 +84,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{tables.length}</div>
+            <p className="text-xs text-muted-foreground">tables configurées</p>
           </CardContent>
         </Card>
         
@@ -76,6 +95,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">{assignedTables.length}</div>
+            <p className="text-xs text-muted-foreground">avec serveur</p>
           </CardContent>
         </Card>
         
@@ -86,6 +106,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-warning">{unassignedTables.length}</div>
+            <p className="text-xs text-muted-foreground">besoin d'assignation</p>
           </CardContent>
         </Card>
         
@@ -98,36 +119,76 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
             <div className="text-2xl font-bold text-destructive">
               {tables.filter(t => t.status === 'occupied').length}
             </div>
+            <p className="text-xs text-muted-foreground">en service</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Actions rapides */}
+      {unassignedTables.length > 0 && (
+        <Card className="border-warning bg-warning/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-warning">
+              <AlertTriangle className="h-5 w-5" />
+              Action Requise
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{unassignedTables.length} table(s) sans serveur assigné</p>
+                <p className="text-sm text-muted-foreground">Assignez des serveurs pour optimiser le service</p>
+              </div>
+              <Button>Assigner Maintenant</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Table Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Tables non assignées */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-warning" />
-              Tables Non Assignées ({unassignedTables.length})
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-warning" />
+                Tables Non Assignées ({unassignedTables.length})
+              </div>
+              {unassignedTables.length > 0 && (
+                <Button size="sm" variant="outline">Assigner Tout</Button>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {unassignedTables.map((table) => (
-                <Button
-                  key={table.id}
-                  variant="outline"
-                  className="h-16 flex flex-col items-center justify-center gap-1"
-                  onClick={() => setSelectedTable(table)}
-                >
-                  <span className="font-semibold">{table.table_number}</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {table.capacity} places
-                  </Badge>
-                </Button>
-              ))}
-            </div>
+            {unassignedTables.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-success" />
+                <p className="font-medium">Toutes les tables sont assignées !</p>
+                <p className="text-sm">Excellent travail d'organisation</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {unassignedTables.map((table) => (
+                  <Button
+                    key={table.id}
+                    variant="outline"
+                    className="h-16 flex flex-col items-center justify-center gap-1 hover:border-primary"
+                    onClick={() => setSelectedTable(table)}
+                  >
+                    <span className="font-semibold">Table {table.table_number}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {table.capacity} places
+                    </Badge>
+                    {table.zone && (
+                      <Badge variant="outline" className="text-xs">
+                        {table.zone}
+                      </Badge>
+                    )}
+                  </Button>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -140,74 +201,85 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {assignedTables.map((table) => {
-                const assignment = getTableAssignment(table.id);
-                return (
-                  <div
-                    key={table.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="font-semibold">{table.table_number}</div>
-                      <Badge className={getStatusColor(table.status)}>
-                        {table.status}
-                      </Badge>
-                      {table.zone && (
-                        <Badge variant="outline">{table.zone}</Badge>
-                      )}
+            {assignedTables.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Users className="h-12 w-12 mx-auto mb-4" />
+                <p className="font-medium">Aucune table assignée</p>
+                <p className="text-sm">Commencez par assigner des serveurs aux tables</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {assignedTables.map((table) => {
+                  const assignment = getTableAssignment(table.id);
+                  return (
+                    <div
+                      key={table.id}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                      onClick={() => setSelectedTable(table)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="font-semibold">Table {table.table_number}</div>
+                        <Badge className={getStatusColor(table.status)}>
+                          {table.status}
+                        </Badge>
+                        {table.zone && (
+                          <Badge variant="outline">{table.zone}</Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {assignment && (
+                          <span>Serveur: {assignment.server_id}</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {assignment && (
-                        <span>Serveur: {assignment.server_id}</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Plan de salle visuel */}
-      <Card>
+      {/* Guide d'utilisation */}
+      <Card className="bg-muted/30">
         <CardHeader>
-          <CardTitle>Plan de Salle</CardTitle>
+          <CardTitle className="text-lg">Guide d'utilisation</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-6 gap-4 p-4 bg-muted/50 rounded-lg min-h-96">
-            {tables.map((table) => {
-              const assignment = getTableAssignment(table.id);
-              const status = getTableStatus(table);
-              
-              return (
-                <div
-                  key={table.id}
-                  className={`
-                    relative flex flex-col items-center justify-center
-                    rounded-lg border-2 cursor-pointer transition-all
-                    hover:scale-105 min-h-20 p-2
-                    ${status === 'unassigned' ? 'border-warning bg-warning/10' : ''}
-                    ${status === 'occupied' ? 'border-destructive bg-destructive/10' : ''}
-                    ${status === 'available' ? 'border-success bg-success/10' : ''}
-                    ${status === 'reserved' ? 'border-primary bg-primary/10' : ''}
-                    ${status === 'cleaning' ? 'border-muted bg-muted/20' : ''}
-                  `}
-                  onClick={() => setSelectedTable(table)}
-                  style={{
-                    gridColumn: table.position_x ? `${table.position_x}` : 'auto',
-                    gridRow: table.position_y ? `${table.position_y}` : 'auto'
-                  }}
-                >
-                  <div className="font-bold text-sm">{table.table_number}</div>
-                  <div className="text-xs opacity-70">{table.capacity}p</div>
-                  {assignment && (
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-success rounded-full"></div>
-                  )}
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-sm font-bold text-primary">1</span>
+              </div>
+              <div>
+                <h4 className="font-medium">Assigner des serveurs</h4>
+                <p className="text-sm text-muted-foreground">
+                  Cliquez sur une table non assignée pour lui attribuer un serveur
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-sm font-bold text-primary">2</span>
+              </div>
+              <div>
+                <h4 className="font-medium">Gérer les statuts</h4>
+                <p className="text-sm text-muted-foreground">
+                  Surveillez les tables occupées et disponibles en temps réel
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-sm font-bold text-primary">3</span>
+              </div>
+              <div>
+                <h4 className="font-medium">Optimiser le service</h4>
+                <p className="text-sm text-muted-foreground">
+                  Répartissez équitablement les tables entre les serveurs
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
