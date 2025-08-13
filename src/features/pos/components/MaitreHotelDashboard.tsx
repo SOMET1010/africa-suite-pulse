@@ -4,12 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Clock, AlertTriangle, CheckCircle, UserPlus, Calendar } from 'lucide-react';
+import { Users, Clock, AlertTriangle, CheckCircle, UserPlus, Calendar, Zap } from 'lucide-react';
 import { usePOSTables } from '../hooks/usePOSData';
 import { useTableAssignments, useAssignTable } from '../hooks/useTableAssignments';
 import { POSTable, POSTableAssignment } from '../types';
 import { toast } from 'sonner';
 import { PlanningDialog } from './PlanningDialog';
+import { AutoAssignmentDialog } from './AutoAssignmentDialog';
 
 interface MaitreHotelDashboardProps {
   outletId: string;
@@ -23,6 +24,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [showPlanningDialog, setShowPlanningDialog] = useState(false);
+  const [showAutoAssignDialog, setShowAutoAssignDialog] = useState(false);
   const [selectedServerId, setSelectedServerId] = useState<string>('');
   
   // Mock data pour les serveurs avec de vrais UUIDs
@@ -123,9 +125,13 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           <p className="text-muted-foreground">Gestion des tables et assignations serveurs</p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-primary" onClick={() => handleOpenAssignDialog()}>
+          <Button className="bg-primary" onClick={() => setShowAutoAssignDialog(true)}>
+            <Zap className="h-4 w-4 mr-2" />
+            Assignation Auto
+          </Button>
+          <Button variant="outline" onClick={() => handleOpenAssignDialog()}>
             <UserPlus className="h-4 w-4 mr-2" />
-            Assigner Serveur
+            Assigner Manuel
           </Button>
           <Button variant="outline" onClick={handleShowPlanning}>
             <Calendar className="h-4 w-4 mr-2" />
@@ -196,9 +202,17 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{unassignedTables.length} table(s) sans serveur assigné</p>
-                <p className="text-sm text-muted-foreground">Assignez des serveurs pour optimiser le service</p>
+                <p className="text-sm text-muted-foreground">Utilisez l'assignation automatique pour gagner du temps</p>
               </div>
-              <Button onClick={() => handleOpenAssignDialog()}>Assigner Maintenant</Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setShowAutoAssignDialog(true)}>
+                  <Zap className="h-4 w-4 mr-2" />
+                  Assignation Auto
+                </Button>
+                <Button variant="outline" onClick={() => handleOpenAssignDialog()}>
+                  Assigner Manuel
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -215,7 +229,10 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
                 Tables Non Assignées ({unassignedTables.length})
               </div>
               {unassignedTables.length > 0 && (
-                <Button size="sm" variant="outline" onClick={handleAssignAll}>Assigner Tout</Button>
+                <Button size="sm" onClick={() => setShowAutoAssignDialog(true)}>
+                  <Zap className="h-4 w-4 mr-1" />
+                  Assigner Auto
+                </Button>
               )}
             </CardTitle>
           </CardHeader>
@@ -419,6 +436,14 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
         open={showPlanningDialog}
         onOpenChange={setShowPlanningDialog}
         outletId={outletId}
+      />
+
+      {/* Dialogue d'assignation automatique */}
+      <AutoAssignmentDialog
+        open={showAutoAssignDialog}
+        onOpenChange={setShowAutoAssignDialog}
+        tables={unassignedTables}
+        onAssign={handleAssignTable}
       />
     </div>
   );
