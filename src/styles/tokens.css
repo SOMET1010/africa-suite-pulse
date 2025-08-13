@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    /* AfricaSuite - Côte d'Ivoire Brand Palette */
-    --brand-primary: 20 80% 53%;             /* Orange profond #E67227 - Dynamisme & chaleur */
-    --brand-primary-hover: 20 80% 48%;       /* Orange plus foncé hover */
-    --brand-primary-glow: 20 80% 60%;        /* Orange plus clair pour gradients */
-    --brand-accent: 42 47% 52%;              /* Or raffiné #C69B46 - Luxe & prestige */
-    --brand-accent-hover: 42 47% 45%;        /* Or plus foncé hover */
-    --brand-secondary: 150 50% 32%;          /* Vert forêt #2D7A4B - Élégance & nature */
+    /* AfricaSuite - Palette Panafricaine */
+    --brand-primary: 30 45% 35%;             /* Marron profond #8B5A3C - Terre africaine & tradition */
+    --brand-primary-hover: 30 45% 30%;       /* Marron plus foncé hover */
+    --brand-primary-glow: 30 45% 42%;        /* Marron plus clair pour gradients */
+    --brand-accent: 35 65% 55%;              /* Caramel doré #D4A574 - Chaleur & convivialité */
+    --brand-accent-hover: 35 65% 48%;        /* Caramel plus foncé hover */
+    --brand-secondary: 50 90% 55%;           /* Jaune africain #F4D03F - Soleil & prospérité */
 
     /* Status colors (semantic) - Enhanced vibrancy */
     --status-confirmed: 142 76% 36%;     /* vibrant green #16A249 */
@@ -24,8 +24,8 @@
     --charcoal: 225 39% 13%;                 /* Charcoal */
     --platinum: 210 6% 93%;                  /* Platinum */
 
-    /* Base surfaces and text - TopHotel Pro */
-    --background: 38 43% 97%;                /* Fond clair #FAF6F1 - Sobriété & lisibilité */
+    /* Base surfaces and text - AfricaSuite */
+    --background: 35 25% 96%;                /* Fond clair sable #F7F4F0 - Sobriété & lisibilité */
     --foreground: 0 0% 17%;                  /* Texte principal #2B2B2B - Lisibilité optimale */
 
     --card: 0 0% 100%;
@@ -157,10 +157,10 @@
   .bg-accent-gold { background-color: hsl(var(--brand-accent)); }
   .border-accent-gold { border-color: hsl(var(--brand-accent)); }
   
-  /* Copper accents */
-  .accent-copper { color: hsl(var(--brand-copper)); }
-  .bg-accent-copper { background-color: hsl(var(--brand-copper)); }
-  .border-accent-copper { border-color: hsl(var(--brand-copper)); }
+  /* Caramel accents */
+  .accent-caramel { color: hsl(var(--brand-accent)); }
+  .bg-accent-caramel { background-color: hsl(var(--brand-accent)); }
+  .border-accent-caramel { border-color: hsl(var(--brand-accent)); }
   
   /* Pearl backgrounds */
   .bg-pearl { background-color: hsl(var(--pearl)); }
