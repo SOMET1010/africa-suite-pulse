@@ -39,6 +39,12 @@ const navigationSections = [
         title: "Tableau de bord",
         icon: LayoutDashboard,
         url: "/",
+        subItems: [
+          { title: "Vue générale", url: "/" },
+          { title: "Réceptionniste", url: "/dashboard/receptionist" },
+          { title: "Serveur", url: "/dashboard/server" },
+          { title: "Manager", url: "/dashboard/manager" },
+        ],
       }
     ]
   },
@@ -117,6 +123,7 @@ const navigationSections = [
           { title: "Sessions", url: "/pos/sessions" },
           { title: "Utilisateurs POS", url: "/pos/users" },
           { title: "Paramètres POS", url: "/pos/settings" },
+          { title: "Rapports POS", url: "/pos/reports" },
         ],
       },
     ]
