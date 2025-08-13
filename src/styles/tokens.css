@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    /* Luxury Hotel Brand Palette */
-    --brand-primary: 226 64% 33%;            /* Deep hotel blue */
-    --brand-primary-hover: 226 64% 29%;      /* Darker blue hover */
-    --brand-primary-glow: 226 64% 45%;       /* Lighter blue for gradients */
-    --brand-accent: 45 100% 42%;             /* Champagne gold #D4AF37 */
-    --brand-accent-hover: 45 100% 35%;       /* Darker gold hover */
-    --brand-copper: 25 45% 47%;              /* Copper accents #B87333 */
+    /* TopHotel Pro - Côte d'Ivoire Brand Palette */
+    --brand-primary: 20 80% 53%;             /* Orange profond #E67227 - Dynamisme & chaleur */
+    --brand-primary-hover: 20 80% 48%;       /* Orange plus foncé hover */
+    --brand-primary-glow: 20 80% 60%;        /* Orange plus clair pour gradients */
+    --brand-accent: 42 47% 52%;              /* Or raffiné #C69B46 - Luxe & prestige */
+    --brand-accent-hover: 42 47% 45%;        /* Or plus foncé hover */
+    --brand-secondary: 150 50% 32%;          /* Vert forêt #2D7A4B - Élégance & nature */
 
     /* Status colors (semantic) - Enhanced vibrancy */
     --status-confirmed: 142 76% 36%;     /* vibrant green #16A249 */
@@ -24,27 +24,27 @@
     --charcoal: 225 39% 13%;                 /* Charcoal */
     --platinum: 210 6% 93%;                  /* Platinum */
 
-    /* Base surfaces and text taken from shadcn defaults but can be overridden */
-    --background: 0 0% 100%;
-    --foreground: 222 84% 5%;
+    /* Base surfaces and text - TopHotel Pro */
+    --background: 38 43% 97%;                /* Fond clair #FAF6F1 - Sobriété & lisibilité */
+    --foreground: 0 0% 17%;                  /* Texte principal #2B2B2B - Lisibilité optimale */
 
     --card: 0 0% 100%;
-    --card-foreground: 222 84% 5%;
+    --card-foreground: 0 0% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 84% 5%;
+    --popover-foreground: 0 0% 17%;
 
     --primary: var(--brand-primary);
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: var(--brand-secondary);
+    --secondary-foreground: 0 0% 98%;
 
     --muted: 220 14% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 0 0% 43%;            /* Texte secondaire #6E6E6E - Discrétion & hiérarchie */
 
     --accent: var(--brand-accent);
-    --accent-foreground: 222 47% 11%;
+    --accent-foreground: 30 20% 15%;
 
     --destructive: var(--status-cancelled);
     --destructive-foreground: 210 40% 98%;
