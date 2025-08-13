@@ -92,6 +92,7 @@ export function AppRoutes() {
       <Route path="reservations" element={<RequireAuth><ReservationsPage /></RequireAuth>} />
       <Route path="reservations/new/quick" element={<RequireAuth><QuickReservationPage /></RequireAuth>} />
       <Route path="reservations/rack" element={<RequireAuth><RackGrid /></RequireAuth>} />
+      <Route path="rack" element={<RequireAuth><RackGrid /></RequireAuth>} />
       
       <Route path="billing" element={<RequireAuth><BillingPage /></RequireAuth>} />
       
