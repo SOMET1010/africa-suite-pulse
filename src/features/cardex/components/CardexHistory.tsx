@@ -102,11 +102,11 @@ export function CardexHistory({ reservationId }: CardexHistoryProps) {
             Historique détaillé
           </CardTitle>
           <div className="flex gap-2">
-            <TButton size="sm" variant="outline">
+            <TButton size="sm" variant="ghost">
               <Filter className="h-4 w-4" />
               Filtrer
             </TButton>
-            <TButton size="sm" variant="outline">
+            <TButton size="sm" variant="ghost">
               <Download className="h-4 w-4" />
               Export
             </TButton>
@@ -117,7 +117,7 @@ export function CardexHistory({ reservationId }: CardexHistoryProps) {
         <div className="flex gap-2 flex-wrap">
           <TButton
             size="sm"
-            variant={filterFolio === null ? "default" : "outline"}
+            variant={filterFolio === null ? "primary" : "ghost"}
             onClick={() => setFilterFolio(null)}
           >
             Tous
@@ -130,7 +130,7 @@ export function CardexHistory({ reservationId }: CardexHistoryProps) {
               <TButton
                 key={folioNum}
                 size="sm"
-                variant={filterFolio === folioNum ? "default" : "outline"}
+                variant={filterFolio === folioNum ? "primary" : "ghost"}
                 onClick={() => setFilterFolio(folioNum)}
                 disabled={!hasActivity}
               >

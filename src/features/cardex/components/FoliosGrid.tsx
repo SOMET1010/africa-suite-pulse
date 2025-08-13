@@ -134,11 +134,11 @@ export function FoliosGrid({ reservationId }: FoliosGridProps) {
 
               {/* Actions */}
               <div className="flex gap-2 pt-2">
-                <TButton size="sm" variant="outline" className="flex-1">
+                <TButton size="sm" variant="ghost" className="flex-1">
                   <Plus className="h-4 w-4" />
                   Ajouter
                 </TButton>
-                <TButton size="sm" variant="secondary" className="flex-1" disabled={!hasActivity}>
+                <TButton size="sm" variant="primary" className="flex-1" disabled={!hasActivity}>
                   <FileText className="h-4 w-4" />
                   Détails
                 </TButton>

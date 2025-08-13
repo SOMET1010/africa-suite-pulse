@@ -59,7 +59,7 @@ export default function CardexPage() {
           <TButton
             onClick={handleQuickPosting}
             disabled={!selectedReservationId}
-            variant="secondary"
+            variant="primary"
             size="sm"
           >
             <Plus className="h-4 w-4" />
@@ -67,7 +67,7 @@ export default function CardexPage() {
           </TButton>
           <TButton
             onClick={() => setFilterDialogOpen(true)}
-            variant="outline"
+            variant="ghost"
             size="sm"
           >
             <Filter className="h-4 w-4" />
@@ -131,7 +131,7 @@ export default function CardexPage() {
                     <p className="text-charcoal/70 mb-4">
                       Fonctionnalité de transfert entre folios en cours de développement
                     </p>
-                    <TButton variant="outline" disabled>
+                    <TButton variant="ghost" disabled>
                       Bientôt disponible
                     </TButton>
                   </CardContent>

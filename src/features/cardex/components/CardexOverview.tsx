@@ -106,7 +106,7 @@ export function CardexOverview({ reservationId }: CardexOverviewProps) {
           title="Total débité"
           value={formatCurrency(cardex.total_debit)}
           icon={TrendingUp}
-          trend="up"
+          variant="primary"
           subtitle={`${cardex.lines.filter(l => l.debit > 0).length} opérations`}
         />
         
@@ -114,7 +114,7 @@ export function CardexOverview({ reservationId }: CardexOverviewProps) {
           title="Total crédité"
           value={formatCurrency(cardex.total_credit)}
           icon={CreditCard}
-          trend="stable"
+          variant="success"
           subtitle={`${cardex.lines.filter(l => l.credit > 0).length} paiements`}
         />
         
@@ -122,9 +122,8 @@ export function CardexOverview({ reservationId }: CardexOverviewProps) {
           title="Solde actuel"
           value={formatCurrency(Math.abs(cardex.total_balance))}
           icon={Euro}
-          trend={cardex.total_balance > 0 ? "down" : cardex.total_balance < 0 ? "up" : "stable"}
+          variant={cardex.total_balance > 0 ? "warning" : cardex.total_balance < 0 ? "success" : "default"}
           subtitle={getBalanceStatus(cardex.total_balance)}
-          className={getBalanceColor(cardex.total_balance)}
         />
         
         <DataCard
@@ -134,7 +133,7 @@ export function CardexOverview({ reservationId }: CardexOverviewProps) {
             "Aucune"
           }
           icon={Clock}
-          trend="stable"
+          variant="default"
           subtitle={`${formatCurrency(cardex.payment_summary.pending_amount)} restant`}
         />
       </div>
