@@ -3,44 +3,85 @@
 @layer components {
   /* Global focus ring utility */
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+    outline: none;
+  }
+
+  .focus-ring:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
   }
 
   /* Touch-friendly focus state for buttons */
   .focus-button {
-    @apply focus-ring transition-colors transition-shadow duration-200;
+    outline: none;
+    transition: box-shadow 200ms ease, outline 200ms ease;
+  }
+
+  .focus-button:focus {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.1);
   }
 
   /* Input focus with subtle glow */
   .focus-input {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+
+  .focus-input:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
   }
 
   /* Select/dropdown focus */
   .focus-select {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
+    outline: none;
+  }
+
+  .focus-select:focus {
+    outline: 2px solid hsl(var(--primary) / 0.2);
+    border-color: hsl(var(--primary));
   }
 
   /* Card/interactive element focus */
   .focus-interactive {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-background;
+    outline: none;
+  }
+
+  .focus-interactive:focus {
+    outline: 2px solid hsl(var(--primary) / 0.3);
+    outline-offset: 2px;
   }
 
   /* Skip link for accessibility */
   .skip-link {
-    @apply absolute -top-40 left-6 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md transition-all;
-    @apply focus:top-6;
+    position: absolute;
+    top: -10rem;
+    left: 1.5rem;
+    z-index: 50;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: top 200ms ease;
+  }
+
+  .skip-link:focus {
+    top: 1.5rem;
   }
 }
 
 /* Enhanced focus for touch devices */
 @media (hover: none) and (pointer: coarse) {
-  .focus-ring {
-    @apply focus:ring-4 focus:ring-primary/40;
+  .focus-ring:focus {
+    outline-width: 4px;
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.4);
   }
   
-  .focus-button {
-    @apply focus:ring-4 focus:ring-primary/40;
+  .focus-button:focus {
+    outline-width: 4px;
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.4);
   }
 }
 

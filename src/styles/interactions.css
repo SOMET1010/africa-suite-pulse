@@ -3,77 +3,157 @@
 @layer components {
   /* Ensure all dropdowns have solid backgrounds and proper z-index */
   .dropdown-content-solid {
-    @apply bg-card/95 backdrop-blur-md border border-border shadow-elegant z-50;
-    @apply supports-[backdrop-filter]:bg-card/90;
+    background-color: hsl(var(--card) / 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-elegant);
+    z-index: 50;
   }
 
   .select-content-solid {
-    @apply bg-card border border-border shadow-soft z-50;
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-soft);
+    z-index: 50;
   }
 
   .popover-content-solid {
-    @apply bg-card border border-border shadow-soft z-50;
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-soft);
+    z-index: 50;
   }
 
   /* Touch-first interaction patterns */
   .touch-tap {
-    @apply cursor-pointer transition-transform duration-150 active:scale-95;
+    cursor: pointer;
+    transition: transform 150ms ease;
+  }
+
+  .touch-tap:active {
+    transform: scale(0.95);
   }
 
   .touch-long-press {
-    @apply cursor-pointer select-none;
+    cursor: pointer;
+    user-select: none;
   }
 
   .touch-swipe {
-    @apply touch-pan-x select-none;
+    touch-action: pan-x;
+    user-select: none;
   }
 
   /* Mobile Money provider buttons */
   .mobile-money-btn {
-    @apply tap-target min-h-16 flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 transition-all duration-200;
-    @apply hover:scale-105 active:scale-95 focus-button;
+    min-height: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    border-width: 2px;
+    transition: all 200ms ease;
+  }
+
+  .mobile-money-btn:hover {
+    transform: scale(1.05);
+  }
+
+  .mobile-money-btn:active {
+    transform: scale(0.95);
   }
 
   .mobile-money-orange {
-    @apply border-orange-500/30 bg-orange-50 text-orange-700 hover:border-orange-500 hover:bg-orange-100;
+    border-color: hsl(24 95% 53% / 0.3);
+    background-color: hsl(24 95% 97%);
+    color: hsl(20 90% 48%);
+  }
+
+  .mobile-money-orange:hover {
+    border-color: hsl(24 95% 53%);
+    background-color: hsl(24 95% 94%);
   }
 
   .mobile-money-mtn {
-    @apply border-yellow-500/30 bg-yellow-50 text-yellow-700 hover:border-yellow-500 hover:bg-yellow-100;
+    border-color: hsl(45 93% 47% / 0.3);
+    background-color: hsl(48 96% 97%);
+    color: hsl(42 96% 40%);
+  }
+
+  .mobile-money-mtn:hover {
+    border-color: hsl(45 93% 47%);
+    background-color: hsl(48 96% 94%);
   }
 
   .mobile-money-moov {
-    @apply border-blue-500/30 bg-blue-50 text-blue-700 hover:border-blue-500 hover:bg-blue-100;
+    border-color: hsl(217 91% 60% / 0.3);
+    background-color: hsl(214 100% 97%);
+    color: hsl(217 91% 60%);
+  }
+
+  .mobile-money-moov:hover {
+    border-color: hsl(217 91% 60%);
+    background-color: hsl(214 100% 94%);
   }
 
   .mobile-money-wave {
-    @apply border-pink-500/30 bg-pink-50 text-pink-700 hover:border-pink-500 hover:bg-pink-100;
+    border-color: hsl(330 81% 60% / 0.3);
+    background-color: hsl(322 100% 97%);
+    color: hsl(330 81% 60%);
+  }
+
+  .mobile-money-wave:hover {
+    border-color: hsl(330 81% 60%);
+    background-color: hsl(322 100% 94%);
   }
 
   /* Preview panels */
   .preview-panel {
-    @apply bg-card/95 backdrop-blur-md border border-border rounded-xl shadow-elegant p-4 z-40;
-    @apply animate-scale-in;
+    background-color: hsl(var(--card) / 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-elegant);
+    padding: 1rem;
+    z-index: 40;
   }
 
   .conflict-badge {
-    @apply bg-warning/10 text-warning border border-warning/30 rounded-lg px-3 py-2 text-sm;
+    background-color: hsl(var(--warning) / 0.1);
+    color: hsl(var(--warning));
+    border: 1px solid hsl(var(--warning) / 0.3);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
   }
 
   /* Improved DnD states */
   .drag-preview {
-    @apply opacity-75 scale-95 rotate-2 shadow-glow;
+    opacity: 0.75;
+    transform: scale(0.95) rotate(2deg);
+    box-shadow: var(--shadow-glow);
   }
 
   .drop-zone-highlight {
-    @apply ring-2 ring-primary ring-offset-2 bg-primary/5 scale-105 transition-all duration-200;
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    background-color: hsl(var(--primary) / 0.05);
+    transform: scale(1.05);
+    transition: all 200ms ease;
   }
 
   .drop-zone-conflict {
-    @apply ring-2 ring-warning ring-offset-2 bg-warning/5;
+    outline: 2px solid hsl(var(--warning));
+    outline-offset: 2px;
+    background-color: hsl(var(--warning) / 0.05);
   }
 
   .drop-zone-invalid {
-    @apply ring-2 ring-danger ring-offset-2 bg-danger/5;
+    outline: 2px solid hsl(var(--danger));
+    outline-offset: 2px;
+    background-color: hsl(var(--danger) / 0.05);
   }
 }

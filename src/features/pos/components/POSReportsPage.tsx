@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { TButton } from "@/core/ui/TButton";
+import { BottomActionBar } from "@/core/layout/BottomActionBar";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -229,10 +230,10 @@ export function POSReportsPage() {
             <h1 className="text-3xl font-bold">Rapports POS</h1>
           </div>
           <div className="flex items-center gap-4">
-            <Button onClick={exportReport} variant="outline">
+            <TButton onClick={exportReport} variant="default" className="tap-target">
               <Download className="h-4 w-4 mr-2" />
-              Exporter
-            </Button>
+              Exporter PDF
+            </TButton>
           </div>
         </div>
 
@@ -491,6 +492,29 @@ export function POSReportsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Bottom Action Bar pour Reports */}
+        <BottomActionBar>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Période: {selectedPeriod}</span>
+            <span>•</span>
+            <span>{stats.totalRevenue.toFixed(0)}€ CA</span>
+            <span>•</span>
+            <span>{stats.totalOrders} commandes</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <TButton onClick={exportReport} className="tap-target">
+              <Download className="h-4 w-4 mr-2" />
+              Exporter PDF
+            </TButton>
+            <TButton variant="default" onClick={() => window.print()} className="tap-target">
+              Imprimer
+            </TButton>
+            <TButton variant="ghost" onClick={loadReportsData} className="tap-target">
+              Actualiser
+            </TButton>
+          </div>
+        </BottomActionBar>
       </div>
     </div>
   );
