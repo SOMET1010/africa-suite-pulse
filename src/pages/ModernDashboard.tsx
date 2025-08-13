@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { NotificationCenter } from '@/features/dashboard/components/NotificationCenter';
+import { PredictiveInsights } from '@/features/dashboard/components/PredictiveInsights';
+import { useDashboardPreferences } from '@/features/dashboard/hooks/useDashboardPreferences';
 import { 
   Users, 
   Building, 
