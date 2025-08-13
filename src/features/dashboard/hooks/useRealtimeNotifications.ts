@@ -12,6 +12,8 @@ export interface NotificationData {
   timestamp: Date;
   data?: any;
   read: boolean;
+  action_url?: string;
+  context_id?: string;
 }
 
 const NOTIFICATION_SOUNDS = {
@@ -64,7 +66,7 @@ export function useRealtimeNotifications() {
     }
   }, [preferences.notifications.desktop]);
 
-  // Add new notification
+  // Add new notification with enhanced context
   const addNotification = useCallback((notificationData: Omit<NotificationData, 'id' | 'timestamp' | 'read'>) => {
     const notification: NotificationData = {
       ...notificationData,
@@ -75,6 +77,16 @@ export function useRealtimeNotifications() {
 
     setNotifications(prev => [notification, ...prev.slice(0, 99)]); // Keep last 100
     setUnreadCount(prev => prev + 1);
+
+    // Store in localStorage for persistence
+    try {
+      const stored = localStorage.getItem('notifications_cache') || '[]';
+      const cachedNotifications = JSON.parse(stored);
+      cachedNotifications.unshift(notification);
+      localStorage.setItem('notifications_cache', JSON.stringify(cachedNotifications.slice(0, 100)));
+    } catch (error) {
+      console.error('Error caching notification:', error);
+    }
 
     // Check if notification type is enabled
     const isEnabled = preferences.notifications[notification.type as keyof typeof preferences.notifications];
@@ -116,6 +128,20 @@ export function useRealtimeNotifications() {
     setUnreadCount(0);
   }, []);
 
+  // Load cached notifications on mount
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('notifications_cache');
+      if (cached) {
+        const cachedNotifications = JSON.parse(cached);
+        setNotifications(cachedNotifications);
+        setUnreadCount(cachedNotifications.filter((n: NotificationData) => !n.read).length);
+      }
+    } catch (error) {
+      console.error('Error loading cached notifications:', error);
+    }
+  }, []);
+
   // Set up realtime listeners
   useEffect(() => {
     const setupListeners = async () => {
@@ -139,9 +165,11 @@ export function useRealtimeNotifications() {
           addNotification({
             type: 'reservation',
             title: 'Nouvelle Réservation',
-            message: `Réservation ${reservation.confirmation_number} créée`,
+            message: `Réservation ${reservation.reference || 'nouvelle'} créée`,
             priority: 'medium',
-            data: reservation
+            data: reservation,
+            action_url: `/reservations/${reservation.id}`,
+            context_id: reservation.id
           });
         }
       )
@@ -156,14 +184,16 @@ export function useRealtimeNotifications() {
           const reservation = payload.new;
           const oldReservation = payload.old;
           
-          // Check if status changed to checked_in
-          if (oldReservation.status !== 'checked_in' && reservation.status === 'checked_in') {
+          // Check if status changed to checked_in  
+          if (oldReservation.status !== 'present' && reservation.status === 'present') {
             addNotification({
               type: 'reservation',
               title: 'Check-in Effectué',
-              message: `Client ${reservation.guest_name} a effectué son check-in`,
+              message: `Check-in confirmé pour la réservation ${reservation.reference}`,
               priority: 'medium',
-              data: reservation
+              data: reservation,
+              action_url: `/reservations/${reservation.id}`,
+              context_id: reservation.id
             });
           }
         }
@@ -187,7 +217,9 @@ export function useRealtimeNotifications() {
             title: 'Nouveau Paiement',
             message: `Paiement de ${payment.amount} XOF reçu`,
             priority: 'low',
-            data: payment
+            data: payment,
+            action_url: `/payments/${payment.id}`,
+            context_id: payment.id
           });
         }
       )

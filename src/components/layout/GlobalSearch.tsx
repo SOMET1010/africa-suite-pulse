@@ -4,92 +4,63 @@ import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, Comma
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { GlobalSearchService, SearchResult } from '@/services/globalSearch.api';
+import { supabase } from '@/integrations/supabase/client';
 
-interface SearchResult {
-  id: string;
-  type: 'client' | 'reservation' | 'room' | 'product' | 'invoice';
-  title: string;
-  subtitle: string;
-  metadata?: string;
-  status?: string;
-  action?: () => void;
-}
+// SearchResult interface is now imported from service
 
 interface GlobalSearchProps {
   className?: string;
   onResultSelect?: (result: SearchResult) => void;
 }
 
-const mockResults: SearchResult[] = [
-  {
-    id: '1',
-    type: 'client',
-    title: 'Jean Dupont',
-    subtitle: 'jean.dupont@email.com',
-    metadata: 'Client VIP • 12 séjours',
-    status: 'active'
-  },
-  {
-    id: '2',
-    type: 'reservation',
-    title: 'RES-2024-001',
-    subtitle: 'Marie Martin • 15-20 Jan 2024',
-    metadata: 'Chambre Deluxe • 5 nuits',
-    status: 'confirmed'
-  },
-  {
-    id: '3',
-    type: 'room',
-    title: 'Chambre 101',
-    subtitle: 'Standard Double',
-    metadata: 'Disponible • Nettoyée',
-    status: 'available'
-  },
-  {
-    id: '4',
-    type: 'product',
-    title: 'Menu Déjeuner',
-    subtitle: 'Restaurant Principal',
-    metadata: '25.00€ • En stock',
-    status: 'available'
-  },
-  {
-    id: '5',
-    type: 'invoice',
-    title: 'FAC-2024-0156',
-    subtitle: 'Pierre Bernard • 450.00€',
-    metadata: 'Payée • 12/01/2024',
-    status: 'paid'
-  }
-];
+// Mock results removed - now using real search
 
 export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [orgId, setOrgId] = useState<string>('');
 
-  // Search function with debouncing
+  // Get user org on mount
+  useEffect(() => {
+    const getOrgId = async () => {
+      const { data: user } = await supabase.auth.getUser();
+      if (user.user) {
+        const { data: orgData } = await supabase
+          .from('app_users')
+          .select('org_id')
+          .eq('user_id', user.user.id)
+          .single();
+        
+        if (orgData) {
+          setOrgId(orgData.org_id);
+        }
+      }
+    };
+    getOrgId();
+  }, []);
+
+  // Real search function
   const searchItems = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
+    if (!searchQuery.trim() || !orgId) {
       setResults([]);
       return;
     }
 
     setLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const filtered = mockResults.filter(item =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.metadata?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    
-    setResults(filtered);
-    setLoading(false);
-  }, []);
+    try {
+      const searchResults = await GlobalSearchService.searchAll(searchQuery, orgId);
+      setResults(searchResults);
+    } catch (error) {
+      console.error('Search error:', error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [orgId]);
 
   // Debounced search effect
   useEffect(() => {
@@ -102,7 +73,7 @@ export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
 
   const getTypeIcon = (type: SearchResult['type']) => {
     switch (type) {
-      case 'client':
+      case 'guest':
         return <Users className="h-4 w-4" />;
       case 'reservation':
         return <Clock className="h-4 w-4" />;
@@ -121,7 +92,7 @@ export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
     if (!status) return '';
     
     switch (type) {
-      case 'client':
+      case 'guest':
         return status === 'active' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground';
       case 'reservation':
         return status === 'confirmed' ? 'bg-primary/10 text-primary' : 'bg-warning/10 text-warning';
@@ -138,7 +109,7 @@ export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
 
   const getTypeLabel = (type: SearchResult['type']) => {
     switch (type) {
-      case 'client': return 'Client';
+      case 'guest': return 'Client';
       case 'reservation': return 'Réservation';
       case 'room': return 'Chambre';
       case 'product': return 'Produit';
@@ -206,7 +177,7 @@ export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
           {!loading && results.length > 0 && (
             <>
               {/* Group by type */}
-              {['client', 'reservation', 'room', 'product', 'invoice'].map(type => {
+              {['guest', 'reservation', 'room', 'product', 'invoice'].map(type => {
                 const typeResults = results.filter(r => r.type === type);
                 if (typeResults.length === 0) return null;
                 
