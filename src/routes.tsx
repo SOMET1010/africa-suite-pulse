@@ -67,9 +67,9 @@ export function AppRoutes() {
       <Route path="/pos/login" element={<POSLoginPage />} />
       {/* Special pages that need direct auth without Layout wrapper */}
       <Route path="ux-demo" element={<RequireAuth><UXFoundationsDemo /></RequireAuth>} />
+      <Route index element={<RequireAuth><Index /></RequireAuth>} />
       
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
-        <Route index element={<Index />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
         <Route path="departures" element={<DeparturesPage />} />

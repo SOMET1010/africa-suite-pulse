@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
+import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
 import { 
   Crown, 
   Users, 
@@ -12,36 +13,64 @@ import {
   Clock, 
   ArrowRight,
   Sparkles,
-  Wrench 
+  Wrench,
+  Eye,
+  UserCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Index = () => {
-  return (
-    <main className="min-h-screen bg-pearl px-4 py-6 animate-fade-in">
-      <div className="container mx-auto max-w-7xl">
-        
-        {/* En-tête Accueil Hôtelier */}
-        <header className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-brand-accent to-brand-copper rounded-xl flex items-center justify-center shadow-luxury">
-              <Crown className="w-7 h-7 text-charcoal" />
-            </div>
-          </div>
-          <h1 className="text-3xl lg:text-4xl font-luxury font-bold text-charcoal mb-2">
-            Bon{new Date().getHours() < 12 ? 'jour' : new Date().getHours() < 18 ? ' après-midi' : 'soir'} ! 👋
-          </h1>
-          <p className="text-lg text-muted-foreground font-premium">
-            Comment puis-je vous aider aujourd'hui ?
-          </p>
-        </header>
+  const navigate = useNavigate();
+  
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Bonjour';
+    if (hour < 18) return 'Bon après-midi';
+    return 'Bonsoir';
+  };
 
-        {/* Actions Rapides du Jour */}
-        <section className="mb-8">
-          <h2 className="text-xl font-luxury font-semibold text-charcoal mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-brand-accent" />
-            Actions du moment
-          </h2>
+  const bottomActions = [
+    {
+      id: 'checkin-express',
+      label: 'Check-in Express',
+      icon: <UserCheck className="w-5 h-5" />,
+      onClick: () => navigate('/arrivals'),
+      variant: 'primary' as const
+    },
+    {
+      id: 'voir-rack',
+      label: 'Voir Rack',
+      icon: <Eye className="w-5 h-5" />,
+      onClick: () => navigate('/reservations/rack'),
+      variant: 'accent' as const
+    }
+  ];
+
+  const headerAction = (
+    <Link 
+      to="/settings"
+      className="p-2 rounded-lg bg-muted/60 hover:bg-muted transition-smooth"
+    >
+      <Settings className="w-5 h-5 text-muted-foreground" />
+    </Link>
+  );
+
+  return (
+    <UnifiedLayout
+      title={`${getGreeting()} ! 👋`}
+      headerAction={headerAction}
+      showStatusBar={true}
+      showBottomBar={true}
+      actions={bottomActions}
+      className="animate-fade-in"
+    >
+
+      {/* Actions Rapides du Jour */}
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-primary" />
+          Actions du moment
+        </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { 
@@ -88,19 +117,19 @@ const Index = () => {
                     <div className="absolute -top-2 -right-2 w-4 h-4 bg-danger rounded-full animate-pulse"></div>
                   )}
                   <Icon className="w-8 h-8 text-foreground mb-3" />
-                  <h3 className="font-luxury font-semibold text-foreground mb-1">{action.title}</h3>
+                  <h3 className="font-semibold text-foreground mb-1">{action.title}</h3>
                   <p className="text-sm text-muted-foreground">{action.subtitle}</p>
                 </Link>
               );
             })}
-          </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Vue d'Ensemble Rapide */}
-        <section className="mb-8">
-          <h2 className="text-xl font-luxury font-semibold text-charcoal mb-4">
-            Vue d'ensemble de l'hôtel
-          </h2>
+      {/* Vue d'Ensemble Rapide */}
+      <section className="mb-8">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Vue d'ensemble de l'hôtel
+        </h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               {label:"Clients présents",value:42,color:"text-success", bg: "bg-soft-success"},
@@ -111,7 +140,7 @@ const Index = () => {
               <Card key={stat.label} className={cn("border-0 shadow-soft transition-elegant hover:shadow-luxury", stat.bg)}>
                 <CardContent className="p-4">
                   <div className="text-center">
-                    <div className={cn("text-2xl lg:text-3xl font-luxury font-bold mb-1", stat.color)}>
+                    <div className={cn("text-2xl lg:text-3xl font-bold mb-1", stat.color)}>
                       {stat.value}
                     </div>
                     <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
@@ -122,11 +151,11 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Modules Principaux */}
-        <section>
-          <h2 className="text-xl font-luxury font-semibold text-charcoal mb-4">
-            Accès aux modules
-          </h2>
+      {/* Modules Principaux */}
+      <section>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Accès aux modules
+        </h2>
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {[
               { 
@@ -196,32 +225,31 @@ const Index = () => {
             ].map((module, index) => {
               const Icon = module.icon;
               return (
-                <Card key={module.title} className="border-0 shadow-soft hover:shadow-luxury transition-elegant group">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={cn("p-3 rounded-xl shrink-0", module.iconBg)}>
-                        <Icon className={cn("w-6 h-6", module.iconColor)} />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-luxury font-semibold text-foreground mb-2">{module.title}</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{module.description}</p>
-                        <Link 
-                          to={module.to}
-                          className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-elegant"
-                        >
-                          Accéder
-                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-elegant" />
-                        </Link>
-                      </div>
+              <Card key={module.title} className="border-0 shadow-soft hover:shadow-luxury transition-elegant group">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className={cn("p-3 rounded-xl shrink-0", module.iconBg)}>
+                      <Icon className={cn("w-6 h-6", module.iconColor)} />
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-foreground mb-2">{module.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{module.description}</p>
+                      <Link 
+                        to={module.to}
+                        className="inline-flex items-center gap-2 mt-4 text-sm font-medium text-primary hover:text-primary/80 transition-elegant"
+                      >
+                        Accéder
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-elegant" />
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
               );
-            })}
-          </div>
-        </section>
-      </div>
-    </main>
+          })}
+        </div>
+      </section>
+    </UnifiedLayout>
   );
 };
 
