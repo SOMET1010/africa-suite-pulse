@@ -1,5 +1,5 @@
-import { POSTerminal } from "./components/POSTerminal";
+import { POSMainMenu } from "./components/POSMainMenu";
 
 export default function POSPage() {
-  return <POSTerminal />;
+  return <POSMainMenu />;
 }
