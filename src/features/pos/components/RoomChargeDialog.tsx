@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Hotel, User, CreditCard, FileSignature } from "lucide-react";
 
@@ -37,7 +37,7 @@ export function RoomChargeDialog({
   const [signature, setSignature] = useState("");
   const signatureRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const { toast } = useToast();
+  
 
   const searchReservation = async () => {
     if (!roomNumber) return;
@@ -52,29 +52,17 @@ export function RoomChargeDialog({
         .maybeSingle();
       
       if (error) {
-        toast({
-          title: "Erreur",
-          description: "Aucune réservation active trouvée pour cette chambre",
-          variant: "destructive"
-        });
+        toast.error("Aucune réservation active trouvée pour cette chambre");
         return;
       }
       
       setReservation(data);
       setGuestName(`Client Chambre ${roomNumber}`);
       
-      toast({
-        title: "Réservation trouvée",
-        description: `Chambre ${roomNumber} - Client présent`,
-        variant: "default"
-      });
+      toast.success(`Réservation trouvée - Chambre ${roomNumber} - Client présent`);
     } catch (error) {
-      console.error('Error searching reservation:', error);
-      toast({
-        title: "Erreur",
-        description: "Erreur lors de la recherche de la réservation",
-        variant: "destructive"
-      });
+      
+      toast.error("Erreur lors de la recherche de la réservation");
     } finally {
       setIsLoading(false);
     }
@@ -82,11 +70,7 @@ export function RoomChargeDialog({
 
   const handleProcessRoomCharge = async () => {
     if (!reservation || !guestName || !signature) {
-      toast({
-        title: "Informations manquantes",
-        description: "Veuillez remplir tous les champs et signer",
-        variant: "destructive"
-      });
+      toast.error("Veuillez remplir tous les champs et signer");
       return;
     }
 
@@ -98,33 +82,15 @@ export function RoomChargeDialog({
           `${item.product_name} x${item.quantity} = ${item.total_price.toLocaleString()} XOF`
         ).join('\n');
 
-      // Pour l'instant, simuler le room charge
-      console.log('Room Charge Details:', {
-        reservation_id: reservation.id,
-        room_number: roomNumber,
-        guest_name: guestName,
-        amount: amount,
-        description: description,
-        signature: signature
-      });
-
-
-      toast({
-        title: "Room Charge créé",
-        description: `Consommation de ${amount.toLocaleString()} XOF facturée à la chambre ${roomNumber}`,
-        variant: "default"
-      });
+      // Process room charge
+      toast.success(`Room Charge créé - ${amount.toLocaleString()} XOF facturée à la chambre ${roomNumber}`);
 
       onSuccess();
       onOpenChange(false);
       resetForm();
     } catch (error) {
-      console.error('Error processing room charge:', error);
-      toast({
-        title: "Erreur",
-        description: "Erreur lors du traitement du Room Charge",
-        variant: "destructive"
-      });
+      
+      toast.error("Erreur lors du traitement du Room Charge");
     } finally {
       setIsLoading(false);
     }

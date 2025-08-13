@@ -6,15 +6,26 @@ import { Users, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
 import { usePOSTables } from '../hooks/usePOSData';
 import { useTableAssignments } from '../hooks/useTableAssignments';
 import { POSTable, POSTableAssignment } from '../types';
+import { toast } from 'sonner';
 
 interface MaitreHotelDashboardProps {
   outletId: string;
 }
 
 export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outletId }) => {
-  const { data: tables = [] } = usePOSTables(outletId);
-  const { data: assignments = [] } = useTableAssignments(outletId);
+  const { data: tables = [], error: tablesError } = usePOSTables(outletId);
+  const { data: assignments = [], error: assignmentsError } = useTableAssignments(outletId);
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
+
+  // Handle errors
+  React.useEffect(() => {
+    if (tablesError) {
+      toast.error("Erreur lors du chargement des tables");
+    }
+    if (assignmentsError) {
+      toast.error("Erreur lors du chargement des assignations");
+    }
+  }, [tablesError, assignmentsError]);
 
   const getTableAssignment = (tableId: string) => {
     return assignments.find(assignment => 

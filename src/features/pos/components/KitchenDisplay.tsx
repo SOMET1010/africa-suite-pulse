@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Clock, CheckCircle, ChefHat, AlertCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface KitchenOrder {
@@ -30,7 +30,7 @@ interface KitchenOrder {
 export function KitchenDisplay() {
   const [orders, setOrders] = useState<KitchenOrder[]>([]);
   const [selectedTab, setSelectedTab] = useState('all');
-  const { toast } = useToast();
+  
 
   useEffect(() => {
     fetchOrders();
@@ -57,11 +57,7 @@ export function KitchenDisplay() {
       .order('created_at', { ascending: true });
 
     if (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les commandes",
-        variant: "destructive"
-      });
+      toast.error("Impossible de charger les commandes");
       return;
     }
 
@@ -91,11 +87,9 @@ export function KitchenDisplay() {
       .eq('id', orderId);
 
     if (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le statut",
-        variant: "destructive"
-      });
+      toast.error("Impossible de mettre à jour le statut");
+    } else {
+      toast.success("Statut de commande mis à jour");
     }
   };
 
@@ -106,11 +100,9 @@ export function KitchenDisplay() {
       .eq('id', itemId);
 
     if (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour l'article",
-        variant: "destructive"
-      });
+      toast.error("Impossible de mettre à jour l'article");
+    } else {
+      toast.success("Article mis à jour");
     }
   };
 

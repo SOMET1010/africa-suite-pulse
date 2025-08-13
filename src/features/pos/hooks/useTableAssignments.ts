@@ -48,7 +48,6 @@ export const useAssignTable = () => {
       toast.success('Table assignée avec succès');
     },
     onError: (error) => {
-      console.error('Error assigning table:', error);
       toast.error('Erreur lors de l\'assignation de la table');
     },
   });
@@ -119,7 +118,6 @@ export const useCreateServerAssignment = () => {
       toast.success('Assignation serveur créée');
     },
     onError: (error) => {
-      console.error('Error creating server assignment:', error);
       toast.error('Erreur lors de la création de l\'assignation');
     },
   });

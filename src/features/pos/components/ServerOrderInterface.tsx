@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
 import { Clock, Users, ChefHat, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ServerOrderInterfaceProps {
   serverId: string;
@@ -16,11 +17,24 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
   serverId, 
   outletId 
 }) => {
-  const { data: serverTables = [] } = useServerTables(serverId);
-  const { data: categories = [] } = usePOSCategories(outletId);
-  const { data: products = [] } = usePOSProducts(outletId);
+  const { data: serverTables = [], error: tablesError } = useServerTables(serverId);
+  const { data: categories = [], error: categoriesError } = usePOSCategories(outletId);
+  const { data: products = [], error: productsError } = usePOSProducts(outletId);
   const [selectedTable, setSelectedTable] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+
+  // Handle errors
+  React.useEffect(() => {
+    if (tablesError) {
+      toast.error("Erreur lors du chargement des tables assignées");
+    }
+    if (categoriesError) {
+      toast.error("Erreur lors du chargement des catégories");
+    }
+    if (productsError) {
+      toast.error("Erreur lors du chargement des produits");
+    }
+  }, [tablesError, categoriesError, productsError]);
 
   const filteredProducts = selectedCategory 
     ? products.filter(p => p.category_id === selectedCategory)

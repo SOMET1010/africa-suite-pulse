@@ -20,7 +20,7 @@ import {
   Gift,
   Hotel
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { CartItem } from "../types";
 import { RoomChargeDialog } from "./RoomChargeDialog";
 
@@ -72,7 +72,7 @@ export function ComprehensivePaymentDialog({
   const [cashReceived, setCashReceived] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showRoomChargeDialog, setShowRoomChargeDialog] = useState(false);
-  const { toast } = useToast();
+  
 
   useEffect(() => {
     if (isOpen) {
@@ -88,11 +88,7 @@ export function ComprehensivePaymentDialog({
       .order('label');
 
     if (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les méthodes de paiement",
-        variant: "destructive"
-      });
+      toast.error("Impossible de charger les méthodes de paiement");
       return;
     }
 
@@ -165,26 +161,13 @@ export function ComprehensivePaymentDialog({
     setIsProcessing(true);
     
     try {
-      // Simuler la création d'une commande POS
-      console.log('Processing POS Payment:', {
-        items: cartItems,
-        total: calculateFinalTotal(),
-        method: selectedMethod?.label
-      });
-
-      toast({
-        title: "Paiement réussi",
-        description: `Commande payée avec succès pour ${calculateFinalTotal().toLocaleString()} XOF`,
-      });
+      // Process POS Payment
+      toast.success(`Paiement réussi - ${calculateFinalTotal().toLocaleString()} XOF avec ${selectedMethod?.label}`);
 
       onPaymentComplete();
       onClose();
     } catch (error: any) {
-      toast({
-        title: "Erreur de paiement",
-        description: error.message || "Une erreur s'est produite lors du paiement",
-        variant: "destructive"
-      });
+      toast.error(error.message || "Erreur lors du paiement");
     } finally {
       setIsProcessing(false);
     }
