@@ -92,6 +92,17 @@ export default function ReportsManagement() {
                     </CardContent>
                   </Card>
                 </a>
+                <a href="/reports/closure" className="block">
+                  <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                    <CardContent className="p-6 text-center">
+                      <ShieldCheck className="w-8 h-8 mx-auto mb-4 text-primary" />
+                      <h3 className="font-medium mb-2">Rapports de clôture</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Pré-clôture, Z POS, main courante et export SYSCOHADA
+                      </p>
+                    </CardContent>
+                  </Card>
+                </a>
               </div>
             </CardContent>
           </Card>
