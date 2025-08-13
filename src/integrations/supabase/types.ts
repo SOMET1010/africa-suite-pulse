@@ -1160,6 +1160,13 @@ export type Database = {
             foreignKeyName: "invoices_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "invoices_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
             referencedRelation: "guests"
             referencedColumns: ["id"]
           },
@@ -3177,6 +3184,13 @@ export type Database = {
             foreignKeyName: "fk_reservations_guest_id"
             columns: ["guest_id"]
             isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "fk_reservations_guest_id"
+            columns: ["guest_id"]
+            isOneToOne: false
             referencedRelation: "guests"
             referencedColumns: ["id"]
           },
@@ -3186,6 +3200,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
           },
           {
             foreignKeyName: "reservations_guest_id_fkey"
@@ -3839,6 +3860,40 @@ export type Database = {
           valid_from: string | null
           valid_until: string | null
         }
+        Insert: {
+          base_price?: number | null
+          calculated_price?: never
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          label?: string | null
+          max_nights?: number | null
+          min_nights?: number | null
+          org_id?: string | null
+          services_count?: never
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          base_price?: number | null
+          calculated_price?: never
+          code?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          label?: string | null
+          max_nights?: number | null
+          min_nights?: number | null
+          org_id?: string | null
+          services_count?: never
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
         Relationships: []
       }
       guest_stay_history: {
@@ -3862,22 +3917,7 @@ export type Database = {
           room_number: string | null
           room_type: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_reservations_guest_id"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reservations_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       housekeeping_tasks_with_staff: {
         Row: {
@@ -4014,6 +4054,13 @@ export type Database = {
             foreignKeyName: "fk_reservations_guest_id"
             columns: ["guest_id"]
             isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "fk_reservations_guest_id"
+            columns: ["guest_id"]
+            isOneToOne: false
             referencedRelation: "guests"
             referencedColumns: ["id"]
           },
@@ -4023,6 +4070,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
           },
           {
             foreignKeyName: "reservations_guest_id_fkey"
