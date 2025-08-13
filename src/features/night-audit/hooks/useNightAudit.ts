@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/toast-unified";
 import type { NightAuditSession, AuditCheckpoint, DailyClosure } from "../types";
 
 export const useNightAuditSessions = () => {
@@ -9,8 +9,9 @@ export const useNightAuditSessions = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("night_audit_sessions")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("id, audit_date, status, started_at, completed_at, started_by, hotel_date_before, hotel_date_after, org_id")
+        .order("created_at", { ascending: false })
+        .range(0, 50);
 
       if (error) throw error;
       return data as NightAuditSession[];
@@ -26,7 +27,7 @@ export const useAuditCheckpoints = (sessionId?: string) => {
       
       const { data, error } = await supabase
         .from("audit_checkpoints")
-        .select("*")
+        .select("id, checkpoint_type, checkpoint_name, status, order_index, is_critical, started_at, completed_at, error_message")
         .eq("session_id", sessionId)
         .order("order_index", { ascending: true });
 
@@ -38,7 +39,6 @@ export const useAuditCheckpoints = (sessionId?: string) => {
 };
 
 export const useStartNightAudit = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -54,6 +54,7 @@ export const useStartNightAudit = () => {
       toast({
         title: "Audit de nuit démarré",
         description: "La session d'audit a été créée avec succès",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["night-audit-sessions"] });
     },
@@ -68,7 +69,6 @@ export const useStartNightAudit = () => {
 };
 
 export const useCompleteNightAudit = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -84,6 +84,7 @@ export const useCompleteNightAudit = () => {
       toast({
         title: "Audit terminé",
         description: "L'audit de nuit a été complété avec succès",
+        variant: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["night-audit-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["daily-closures"] });
@@ -99,7 +100,6 @@ export const useCompleteNightAudit = () => {
 };
 
 export const useUpdateCheckpoint = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -129,6 +129,7 @@ export const useUpdateCheckpoint = () => {
         toast({
           title: "Checkpoint complété",
           description: "L'étape a été marquée comme terminée",
+          variant: "success",
         });
       }
       queryClient.invalidateQueries({ queryKey: ["audit-checkpoints"] });
@@ -149,7 +150,7 @@ export const useDailyClosures = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("daily_closures")
-        .select("*")
+        .select("id, closure_date, total_rooms, occupied_rooms, arrivals_count, departures_count, revenue_total, org_id")
         .order("closure_date", { ascending: false })
         .limit(30);
 

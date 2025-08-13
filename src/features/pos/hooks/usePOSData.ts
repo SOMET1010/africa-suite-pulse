@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/toast-unified";
 import type { POSOutlet, POSCategory, POSProduct, POSOrder, POSTable, POSSession, CartItem } from "../types";
 
 export const usePOSOutlets = () => {
@@ -9,9 +9,10 @@ export const usePOSOutlets = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pos_outlets")
-        .select("*")
+        .select("id, name, location, is_active, org_id, created_at")
         .eq("is_active", true)
-        .order("name");
+        .order("name")
+        .range(0, 99);
 
       if (error) throw error;
       return data as unknown as POSOutlet[];
@@ -27,10 +28,11 @@ export const usePOSCategories = (outletId?: string) => {
       
       const { data, error } = await supabase
         .from("pos_categories")
-        .select("*")
+        .select("id, name, outlet_id, sort_order, is_active, color")
         .eq("outlet_id", outletId)
         .eq("is_active", true)
-        .order("sort_order");
+        .order("sort_order")
+        .range(0, 99);
 
       if (error) throw error;
       return data as POSCategory[];
@@ -47,7 +49,7 @@ export const usePOSProducts = (outletId?: string, categoryId?: string) => {
       
       let query = supabase
         .from("pos_products")
-        .select("*")
+        .select("id, name, code, category_id, outlet_id, base_price, is_active, description")
         .eq("outlet_id", outletId)
         .eq("is_active", true);
 
@@ -55,7 +57,7 @@ export const usePOSProducts = (outletId?: string, categoryId?: string) => {
         query = query.eq("category_id", categoryId);
       }
 
-      const { data, error } = await query.order("name");
+      const { data, error } = await query.order("name").range(0, 199);
 
       if (error) throw error;
       return data as unknown as POSProduct[];
@@ -72,9 +74,10 @@ export const usePOSTables = (outletId?: string) => {
       
       const { data, error } = await supabase
         .from("pos_tables")
-        .select("*")
+        .select("id, table_number, zone, capacity, status, outlet_id")
         .eq("outlet_id", outletId)
-        .order("number");
+        .order("table_number")
+        .range(0, 99);
 
       if (error) throw error;
       return data.map(table => ({
@@ -94,7 +97,7 @@ export const useCurrentPOSSession = (outletId?: string) => {
       
       const { data, error } = await supabase
         .from("pos_sessions")
-        .select("*")
+        .select("id, session_number, outlet_id, opening_cash, status, started_at, cashier_id")
         .eq("outlet_id", outletId)
         .eq("status", "open")
         .order("started_at", { ascending: false })
@@ -112,7 +115,6 @@ export const useCurrentPOSSession = (outletId?: string) => {
 };
 
 export const useCreatePOSOrder = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -152,6 +154,7 @@ export const useCreatePOSOrder = () => {
       toast({
         title: "Commande créée",
         description: "Nouvelle commande initialisée avec succès",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -165,7 +168,6 @@ export const useCreatePOSOrder = () => {
 };
 
 export const useAddToCart = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -183,7 +185,7 @@ export const useAddToCart = () => {
       // Get product details
       const { data: product, error: productError } = await supabase
         .from("pos_products")
-        .select("*")
+        .select("id, name, code, base_price")
         .eq("id", productId)
         .single();
 
@@ -218,6 +220,7 @@ export const useAddToCart = () => {
       toast({
         title: "Article ajouté",
         description: "L'article a été ajouté à la commande",
+        variant: "success",
       });
     },
     onError: (error: any) => {
@@ -231,7 +234,6 @@ export const useAddToCart = () => {
 };
 
 export const useOpenPOSSession = () => {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -275,6 +277,7 @@ export const useOpenPOSSession = () => {
       toast({
         title: "Session ouverte",
         description: "Session POS ouverte avec succès",
+        variant: "success",
       });
     },
     onError: (error: any) => {

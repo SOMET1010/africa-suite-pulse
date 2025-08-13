@@ -124,10 +124,10 @@ export async function createInvoice(input: CreateInvoiceInput) {
 export async function listInvoices(orgId: string, limit = 50) {
   const { data, error } = await (supabase as any)
     .from('invoices')
-    .select('*')
+    .select('id, number, issue_date, due_date, status, total_amount, guest_name, created_at')
     .eq('org_id', orgId)
     .order('created_at', { ascending: false })
-    .limit(limit);
+    .range(0, limit - 1);
 
   if (error) throw error;
   return data;
@@ -137,8 +137,11 @@ export async function getInvoiceById(invoiceId: string): Promise<InvoiceWithItem
   const { data, error } = await (supabase as any)
     .from('invoices')
     .select(`
-      *,
-      invoice_items (*)
+      id, number, issue_date, due_date, status, subtotal, tax_amount, total_amount,
+      guest_name, guest_email, guest_phone, guest_address, reservation_id, room_number,
+      room_type, check_in_date, check_out_date, nights_count, adults_count, children_count,
+      reference, notes, created_at, updated_at,
+      invoice_items (id, description, quantity, unit_price, tax_rate, total)
     `)
     .eq('id', invoiceId)
     .single();

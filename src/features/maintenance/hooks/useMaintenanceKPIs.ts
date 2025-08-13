@@ -58,7 +58,7 @@ export function useMaintenanceKPIs() {
       // Récupérer les demandes de maintenance
       const { data: requests, error: requestsError } = await supabase
         .from("maintenance_requests")
-        .select("*");
+        .select("id, status, priority, created_at, completed_at, started_at, scheduled_date, category");
 
       if (requestsError) {
         throw new Error(requestsError.message);
@@ -67,7 +67,7 @@ export function useMaintenanceKPIs() {
       // Récupérer les équipements
       const { data: equipment, error: equipmentError } = await supabase
         .from("equipment")
-        .select("*");
+        .select("id, name, status, next_maintenance_date, category");
 
       if (equipmentError) {
         throw new Error(equipmentError.message);
@@ -76,7 +76,7 @@ export function useMaintenanceKPIs() {
       // Récupérer les pièces détachées
       const { data: spareParts, error: sparePartsError } = await supabase
         .from("spare_parts")
-        .select("*")
+        .select("id, name, current_stock, min_stock_level")
         .eq("is_active", true);
 
       if (sparePartsError) {
@@ -86,7 +86,7 @@ export function useMaintenanceKPIs() {
       // Récupérer les planifications de maintenance
       const { data: schedules, error: schedulesError } = await supabase
         .from("maintenance_schedules")
-        .select("*")
+        .select("id, name, next_due_date, frequency")
         .eq("is_active", true);
 
       if (schedulesError) {
@@ -139,10 +139,10 @@ export function useMaintenanceKPIs() {
 
       // Calculer les KPIs de planification
       const upcomingMaintenance = schedulesData.filter(s => 
-        s.next_execution_date && s.next_execution_date <= today
+        s.next_due_date && s.next_due_date <= today
       ).length;
       const overdueMaintenance = schedulesData.filter(s => 
-        s.next_execution_date && s.next_execution_date < today
+        s.next_due_date && s.next_due_date < today
       ).length;
       const dueMaintenances = upcomingMaintenance;
 

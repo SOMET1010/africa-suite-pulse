@@ -51,9 +51,10 @@ export const useHousekeepingTasks = (filters?: TaskFilter) => {
       
       let query = supabase
         .from('housekeeping_tasks_with_staff')
-        .select('*')
+        .select('id, task_type, room_number, status, priority, assigned_to, staff_name, scheduled_start, created_at, estimated_duration, org_id')
         .eq('org_id', orgId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(0, 99);
 
       // Apply filters
       if (filters?.status?.length) {
@@ -237,9 +238,10 @@ export const useHousekeepingStaff = (filters?: StaffFilter) => {
       
       let query = supabase
         .from('housekeeping_staff')
-        .select('*')
+        .select('id, employee_id, name, role, status, current_assignment, shift_start, shift_end, org_id')
         .eq('org_id', orgId)
-        .order('name');
+        .order('name')
+        .range(0, 99);
 
       // Apply filters
       if (filters?.status?.length) {
@@ -343,10 +345,11 @@ export const useCleaningStandards = () => {
       
       const { data, error } = await supabase
         .from('cleaning_standards')
-        .select('*')
+        .select('id, task_type, room_type, checklist_items, estimated_duration, is_active, org_id')
         .eq('org_id', orgId)
         .eq('is_active', true)
-        .order('task_type');
+        .order('task_type')
+        .range(0, 99);
 
       if (error) throw error;
       return data || [];
@@ -408,9 +411,10 @@ export const useLinenInventory = () => {
       
       const { data, error } = await supabase
         .from('linen_inventory')
-        .select('*')
+        .select('id, item_type, size, color, clean_quantity, dirty_quantity, in_use_quantity, damaged_quantity, min_stock_level, org_id')
         .eq('org_id', orgId)
-        .order('item_type');
+        .order('item_type')
+        .range(0, 99);
 
       if (error) throw error;
       return data || [];
@@ -479,9 +483,10 @@ export const useRecoucheWorkflows = () => {
       
       const { data, error } = await supabase
         .from('recouche_workflows')
-        .select('*')
+        .select('id, room_number, departure_guest_id, arrival_guest_id, status, created_at, org_id')
         .eq('org_id', orgId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(0, 99);
 
       if (error) throw error;
       return data || [];
@@ -543,7 +548,7 @@ export const useRoomStatusSummary = () => {
       
       const { data, error } = await supabase
         .from('room_status_summary')
-        .select('*')
+        .select('room_number, status, last_cleaned, next_scheduled, assigned_staff, pending_tasks, in_progress_tasks, guest_status, last_task_update, org_id')
         .eq('org_id', orgId);
 
       if (error) throw error;
