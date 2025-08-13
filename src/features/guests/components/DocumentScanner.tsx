@@ -3,7 +3,7 @@ import { Camera, Upload, Scan, Loader2, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 

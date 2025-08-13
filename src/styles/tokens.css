@@ -1,7 +1,5 @@
-/* Design Tokens for AfricaSuite PMS 2025
-   - HSL only
-   - Pastel surfaces via color-mix in oklab
-   - Touch-first sizing and motion tokens
+/* Design Tokens pour AfricaSuite PMS 2025 - Sprint 1 UX Foundations
+   Système tactile-first, pastel professionnel AA, architecture hôtelière
 */
 
 @layer base {

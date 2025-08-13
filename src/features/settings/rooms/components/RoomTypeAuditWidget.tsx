@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AlertTriangle, CheckCircle, ArrowRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/hooks/use-toast';
 import { RoomTypeValidationService } from '../roomTypeValidation.service';
 import { useOrgId } from '@/core/auth/useOrg';

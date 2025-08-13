@@ -1,7 +1,7 @@
 import React from 'react';
 import { Shield, Calendar, Clock, AlertTriangle } from 'lucide-react';
 import { useDataProtection } from '@/hooks/useDataProtection';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 

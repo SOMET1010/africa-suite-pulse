@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Check, Edit3, Trash2, Wifi, Coffee, Sun, Building, Package, ArrowUpDown } from 'lucide-react';
 import type { Room } from '@/types/room';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RoomStatusBadge } from '@/features/rack/components/RoomBadges';
 

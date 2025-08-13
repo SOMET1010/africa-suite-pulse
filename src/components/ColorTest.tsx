@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from './ui/badge';
+import { Badge } from './ui/Badge';
 
 export function ColorTest() {
   return (
