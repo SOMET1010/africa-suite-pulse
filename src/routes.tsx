@@ -93,6 +93,8 @@ export function AppRoutes() {
       <Route path="reservations/new/quick" element={<RequireAuth><QuickReservationPage /></RequireAuth>} />
       <Route path="reservations/rack" element={<RequireAuth><RackGrid /></RequireAuth>} />
       
+      <Route path="billing" element={<RequireAuth><BillingPage /></RequireAuth>} />
+      
       {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
         <Route path="arrivals" element={<CheckinExpressPage />} />
@@ -100,7 +102,6 @@ export function AppRoutes() {
         <Route path="reservations/groups" element={<GroupsManagementPage />} />
         <Route path="reservations/allotments" element={<AllotmentsPage />} />
         <Route path="guests" element={<GuestsPage />} />
-        <Route path="billing" element={<BillingPage />} />
         <Route path="cardex" element={<CardexPage />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
         <Route path="analytics/advanced" element={<AdvancedAnalytics />} />
