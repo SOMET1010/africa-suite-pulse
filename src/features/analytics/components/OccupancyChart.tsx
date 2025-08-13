@@ -66,7 +66,7 @@ export function OccupancyChart({ data, isLoading, showComparison }: OccupancyCha
                 tickFormatter={(value) => `${value}%`}
               />
               <ChartTooltip 
-                content={<ChartTooltipContent />}
+                content={ChartTooltipContent}
                 labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR', {
                   weekday: 'long',
                   year: 'numeric',

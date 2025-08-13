@@ -143,7 +143,7 @@ export function ForecastPanel({ data, isLoading }: ForecastPanelProps) {
                           tick={{ fontSize: 10 }}
                         />
                         <ChartTooltip 
-                          content={<ChartTooltipContent />}
+                          content={ChartTooltipContent}
                           labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
                         />
                         <Area

@@ -13,9 +13,11 @@ export function ReservationSourceChart({ data, isLoading }: ReservationSourceCha
   const chartConfig = {
     count: {
       label: "Nombre",
+      color: "hsl(var(--brand-primary))",
     },
     revenue: {
       label: "Revenus",
+      color: "hsl(var(--success))",
     }
   };
 
@@ -91,7 +93,7 @@ export function ReservationSourceChart({ data, isLoading }: ReservationSourceCha
                         ))}
                       </Pie>
                       <ChartTooltip 
-                        content={<ChartTooltipContent />}
+                        content={ChartTooltipContent}
                         formatter={(value: any, name: any) => [
                           Number(value).toString(),
                           'Réservations'
@@ -146,7 +148,7 @@ export function ReservationSourceChart({ data, isLoading }: ReservationSourceCha
                     tick={{ fontSize: 12 }}
                   />
                   <ChartTooltip 
-                    content={<ChartTooltipContent />}
+                    content={ChartTooltipContent}
                     formatter={(value: any, name: any) => [
                       Number(value).toString(),
                       name === 'count' ? 'Réservations' : 'Revenus'

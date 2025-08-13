@@ -76,7 +76,7 @@ export function RevenueChart({ data, isLoading, showComparison }: RevenueChartPr
                     tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
                   />
                   <ChartTooltip 
-                    content={<ChartTooltipContent />}
+                    content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
                     formatter={(value: any) => [
                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
@@ -113,7 +113,7 @@ export function RevenueChart({ data, isLoading, showComparison }: RevenueChartPr
                     tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
                   />
                   <ChartTooltip 
-                    content={<ChartTooltipContent />}
+                    content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
                     formatter={(value: any) => [
                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
@@ -153,7 +153,7 @@ export function RevenueChart({ data, isLoading, showComparison }: RevenueChartPr
                     tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
                   />
                   <ChartTooltip 
-                    content={<ChartTooltipContent />}
+                    content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
                     formatter={(value: any) => [
                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
