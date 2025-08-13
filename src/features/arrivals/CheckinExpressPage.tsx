@@ -124,22 +124,30 @@ export default function CheckinExpressPage() {
       title="Arrivées du jour"
       headerAction={
         <div className="flex items-center gap-2">
+          <TButton variant="ghost" size="sm" onClick={() => arrivalsQuery.refetch()}>
+            Actualiser
+          </TButton>
           <TButton variant="ghost" size="sm" onClick={() => setMode(mode === 'express' ? 'detailed' : 'express')}>
             Mode {mode === 'express' ? 'détaillé' : 'express'}
           </TButton>
         </div>
       }
-      bottomActions={
-        <>
-          <TButton size="lg" onClick={() => toast({ title: "Check-in Express", description: "Sélectionnez une réservation" })} className="flex-1">
-            <UserCheck className="h-5 w-5 mr-2" />
-            Check-in Express
-          </TButton>
-          <TButton variant="default" size="lg" onClick={() => toast({ title: "Assigner chambres" })} className="flex-1">
-            Assigner
-          </TButton>
-        </>
-      }
+      showBottomBar={true}
+      actions={[
+        {
+          id: 'checkin-express',
+          label: 'Check-in Express',
+          icon: <UserCheck className="h-5 w-5" />,
+          onClick: () => toast({ title: "Check-in Express", description: "Sélectionnez une réservation" }),
+          variant: 'primary'
+        },
+        {
+          id: 'assign-bulk',
+          label: 'Assigner',
+          onClick: () => toast({ title: "Assigner chambres" }),
+          variant: 'accent'
+        }
+      ]}
     >
       <div className="space-y-6">
         {/* Statistiques */}

@@ -95,9 +95,10 @@ export function AppRoutes() {
       
       <Route path="billing" element={<RequireAuth><BillingPage /></RequireAuth>} />
       
+      <Route path="arrivals" element={<RequireAuth><CheckinExpressPage /></RequireAuth>} />
+      
       {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
-        <Route path="arrivals" element={<CheckinExpressPage />} />
         <Route path="reservations/new/advanced" element={<AdvancedReservationPage />} />
         <Route path="reservations/groups" element={<GroupsManagementPage />} />
         <Route path="reservations/allotments" element={<AllotmentsPage />} />
