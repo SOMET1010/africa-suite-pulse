@@ -4,6 +4,7 @@ import { AppSidebar } from './AppSidebar';
 import { ModernAppHeader } from './ModernAppHeader';
 import { StatusBar } from '@/components/layout/StatusBar';
 import { BottomActionBar } from '@/components/layout/BottomActionBar';
+import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
 import { cn } from '@/lib/utils';
 
 type Action = {
@@ -99,6 +100,9 @@ export function GlobalNavigationLayout({
         )}
         
         {bottomActions}
+        
+        {/* Navigation mobile en bas */}
+        <MobileBottomNav />
       </div>
     </SidebarProvider>
   );

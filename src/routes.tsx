@@ -1,10 +1,10 @@
 import { Outlet, Route, Routes } from "react-router-dom";
 import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
-import CheckinExpressPage from "@/features/arrivals/CheckinExpressPage";
-import DeparturesPage from "@/features/departures/DeparturesPage";
+import ArrivalsPage from "@/pages/ArrivalsPage";
+import DeparturesPage from "@/pages/DeparturesPage";
 import RackPage from "@/pages/RackPage";
-import NotFound from "@/pages/NotFound";
+import NotFoundPage from "@/pages/NotFoundPage";
 import AuthPage from "@/pages/AuthPage";
 import AuthLanding from "@/pages/AuthLanding";
 import RequireAuth from "@/core/auth/RequireAuth";
@@ -12,10 +12,10 @@ import { SettingsHome, HotelSettingsForm, TariffsPage } from "@/features/setting
 import RoomsPage from "@/features/settings/rooms/RoomsPage";
 import ServicesPage from "@/features/settings/services/ServicesPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
-import BillingPage from "@/features/billing/BillingPage";
+import BillingPageWrapper from "@/pages/BillingPageWrapper";
 import UsersPage from "@/features/users/UsersPage";
-import ReservationsPage from "@/features/reservations/ReservationsPage";
-import QuickReservationPage from "@/features/reservations/QuickReservationPage";
+import ReservationsPage from "@/pages/ReservationsPage";
+import QuickReservationPage from "@/pages/QuickReservationPage";
 import AdvancedReservationPage from "@/features/reservations/AdvancedReservationPage";
 import GroupsManagementPage from "@/features/reservations/GroupsManagementPage";
 import AllotmentsPage from "@/features/reservations/AllotmentsPage";
@@ -94,9 +94,9 @@ export function AppRoutes() {
       <Route path="reservations/rack" element={<RequireAuth><RackPage /></RequireAuth>} />
       <Route path="rack" element={<RequireAuth><RackPage /></RequireAuth>} />
       
-      <Route path="billing" element={<RequireAuth><BillingPage /></RequireAuth>} />
+      <Route path="billing" element={<RequireAuth><BillingPageWrapper /></RequireAuth>} />
       
-      <Route path="arrivals" element={<RequireAuth><CheckinExpressPage /></RequireAuth>} />
+      <Route path="arrivals" element={<RequireAuth><ArrivalsPage /></RequireAuth>} />
       <Route path="guests" element={<RequireAuth><GuestsPage /></RequireAuth>} />
       <Route path="analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
       <Route path="reports" element={<RequireAuth><ReportsPage /></RequireAuth>} />
@@ -128,7 +128,7 @@ export function AppRoutes() {
         <Route path="dashboard/receptionist" element={<ReceptionistDashboard />} />
         <Route path="dashboard/server" element={<ServerDashboard />} />
         <Route path="dashboard/manager" element={<ManagerDashboard />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
