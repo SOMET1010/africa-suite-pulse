@@ -44,6 +44,8 @@ import POSServerPage from "@/pages/POSServerPage";
 import POSKitchen from "@/pages/POSKitchen";
 import POSReports from "@/pages/POSReports";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
+import DemoPage from "@/pages/DemoPage";
+import PricingPage from "@/pages/PricingPage";
 
 function Layout() {
   return (
@@ -104,6 +106,8 @@ export function AppRoutes() {
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="settings/security" element={<SecurityPage />} />
+        <Route path="demo" element={<DemoPage />} />
+        <Route path="pricing" element={<PricingPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
