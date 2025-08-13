@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, AlertTriangle, TrendingUp, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { InventoryManagement } from "@/features/pos/inventory/InventoryManagement";
 
 export default function POSInventoryPage() {
   const navigate = useNavigate();
@@ -89,21 +90,7 @@ export default function POSInventoryPage() {
         </div>
 
         {/* Content */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Gestion des Stocks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-12">
-              <Package className="h-24 w-24 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Module Inventaire</h3>
-              <p className="text-muted-foreground mb-4">
-                Cette section sera développée pour gérer les stocks et produits POS
-              </p>
-              <Badge variant="outline">En développement</Badge>
-            </div>
-          </CardContent>
-        </Card>
+        <InventoryManagement />
       </div>
     </div>
   );

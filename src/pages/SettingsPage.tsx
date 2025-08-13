@@ -1,6 +1,7 @@
 import React from 'react';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { Settings } from 'lucide-react';
+import { POSSettings } from '@/features/pos/settings/POSSettings';
 
 export default function SettingsPage() {
   return (
@@ -11,9 +12,7 @@ export default function SettingsPage() {
         <Settings className="h-5 w-5 text-muted-foreground" />
       }
     >
-      <div className="bg-card rounded-lg p-6">
-        <p className="text-muted-foreground">Paramètres système en développement...</p>
-      </div>
+      <POSSettings />
     </UnifiedLayout>
   );
 }
