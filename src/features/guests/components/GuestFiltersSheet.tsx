@@ -54,13 +54,13 @@ export function GuestFiltersSheet({
             <Label>Type de client</Label>
             <Select
               value={filters.guest_type || ""}
-              onValueChange={(value) => updateFilter("guest_type", value || undefined)}
+              onValueChange={(value) => updateFilter("guest_type", value === "all" ? undefined : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les types</SelectItem>
+                <SelectItem value="all">Tous les types</SelectItem>
                 <SelectItem value="individual">Particulier</SelectItem>
                 <SelectItem value="corporate">Entreprise</SelectItem>
                 <SelectItem value="group">Groupe</SelectItem>

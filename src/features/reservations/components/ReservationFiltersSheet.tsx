@@ -117,13 +117,13 @@ export function ReservationFiltersSheet({
             <Label className="text-base font-medium">Type de chambre</Label>
             <Select
               value={localFilters.room_type || ""}
-              onValueChange={(value) => updateFilter("room_type", value || undefined)}
+              onValueChange={(value) => updateFilter("room_type", value === "all" ? undefined : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous types</SelectItem>
+                <SelectItem value="all">Tous types</SelectItem>
                 <SelectItem value="STD">Standard</SelectItem>
                 <SelectItem value="SUP">Supérieure</SelectItem>
                 <SelectItem value="DEL">Deluxe</SelectItem>
@@ -139,13 +139,13 @@ export function ReservationFiltersSheet({
             <Label className="text-base font-medium">Type de client</Label>
             <Select
               value={localFilters.guest_type || ""}
-              onValueChange={(value) => updateFilter("guest_type", value || undefined)}
+              onValueChange={(value) => updateFilter("guest_type", value === "all" ? undefined : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous types</SelectItem>
+                <SelectItem value="all">Tous types</SelectItem>
                 <SelectItem value="individual">Individuel</SelectItem>
                 <SelectItem value="corporate">Entreprise</SelectItem>
                 <SelectItem value="group">Groupe</SelectItem>
@@ -160,13 +160,13 @@ export function ReservationFiltersSheet({
             <Label className="text-base font-medium">Source</Label>
             <Select
               value={localFilters.source || ""}
-              onValueChange={(value) => updateFilter("source", value || undefined)}
+              onValueChange={(value) => updateFilter("source", value === "all" ? undefined : value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Toutes sources" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes sources</SelectItem>
+                <SelectItem value="all">Toutes sources</SelectItem>
                 <SelectItem value="walk_in">Walk-in</SelectItem>
                 <SelectItem value="phone">Téléphone</SelectItem>
                 <SelectItem value="email">Email</SelectItem>

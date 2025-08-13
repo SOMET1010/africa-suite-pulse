@@ -29,7 +29,7 @@ interface POSUser {
 
 export function POSUserManagement() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState<string>("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [showEditUser, setShowEditUser] = useState(false);
   const [editingUser, setEditingUser] = useState<POSUser | null>(null);
@@ -121,7 +121,7 @@ export function POSUserManagement() {
       (searchTerm === "" || 
        user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        (user.employee_code && user.employee_code.toLowerCase().includes(searchTerm.toLowerCase()))) &&
-      (roleFilter === "" || user.role === roleFilter)
+      (roleFilter === "all" || user.role === roleFilter)
     );
   });
 
@@ -265,7 +265,7 @@ export function POSUserManagement() {
                     <SelectValue placeholder="Filtrer par rôle" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les rôles</SelectItem>
+                    <SelectItem value="all">Tous les rôles</SelectItem>
                     <SelectItem value="pos_manager">Manager</SelectItem>
                     <SelectItem value="pos_cashier">Caissier</SelectItem>
                     <SelectItem value="pos_server">Serveur</SelectItem>

@@ -15,8 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 
 export function InventoryManagement() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [warehouseFilter, setWarehouseFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [warehouseFilter, setWarehouseFilter] = useState<string>("all");
   const [showAddItem, setShowAddItem] = useState(false);
   const [showMovement, setShowMovement] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
@@ -39,8 +39,8 @@ export function InventoryManagement() {
       (searchTerm === "" || 
        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        item.item_code.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (categoryFilter === "" || item.category === categoryFilter) &&
-      (warehouseFilter === "" || item.warehouse_id === warehouseFilter)
+       (categoryFilter === "all" || item.category === categoryFilter) &&
+       (warehouseFilter === "all" || item.warehouse_id === warehouseFilter)
     );
   });
 
@@ -204,7 +204,7 @@ export function InventoryManagement() {
                     <SelectValue placeholder="Catégorie" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Toutes les catégories</SelectItem>
+                    <SelectItem value="all">Toutes les catégories</SelectItem>
                     {categories.map((category, index) => (
                       <SelectItem key={`${category}-${index}`} value={category}>{category}</SelectItem>
                     ))}
@@ -215,7 +215,7 @@ export function InventoryManagement() {
                     <SelectValue placeholder="Entrepôt" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous les entrepôts</SelectItem>
+                    <SelectItem value="all">Tous les entrepôts</SelectItem>
                     {warehouses.map(warehouse => (
                       <SelectItem key={warehouse.id} value={warehouse.id}>{warehouse.name}</SelectItem>
                     ))}
