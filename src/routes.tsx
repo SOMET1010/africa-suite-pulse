@@ -8,9 +8,11 @@ import NotFoundPage from "@/pages/NotFoundPage";
 import AuthPage from "@/pages/AuthPage";
 import AuthLanding from "@/pages/AuthLanding";
 import RequireAuth from "@/core/auth/RequireAuth";
-import { SettingsHome, HotelSettingsForm, TariffsPage } from "@/features/settings";
-import RoomsPage from "@/features/settings/rooms/RoomsPage";
-import ServicesPage from "@/features/settings/services/ServicesPage";
+import SettingsHomePage from "@/pages/SettingsHomePage";
+import HotelSettingsFormPage from "@/pages/HotelSettingsFormPage";
+import RoomsSettingsPage from "@/pages/RoomsSettingsPage";
+import ServicesSettingsPage from "@/pages/ServicesSettingsPage";
+import TariffsSettingsPage from "@/pages/TariffsSettingsPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
 import BillingPageWrapper from "@/pages/BillingPageWrapper";
 import UsersPage from "@/features/users/UsersPage";
@@ -71,11 +73,11 @@ export function AppRoutes() {
       
       {/* Critical Business Pages - Migrated to UnifiedLayout */}
       <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-      <Route path="settings" element={<RequireAuth><SettingsHome /></RequireAuth>} />
-      <Route path="settings/hotel" element={<RequireAuth><HotelSettingsForm /></RequireAuth>} />
-      <Route path="settings/rooms" element={<RequireAuth><RoomsPage /></RequireAuth>} />
-      <Route path="settings/services" element={<RequireAuth><ServicesPage /></RequireAuth>} />
-      <Route path="settings/tariffs" element={<RequireAuth><TariffsPage /></RequireAuth>} />
+      <Route path="settings" element={<RequireAuth><SettingsHomePage /></RequireAuth>} />
+      <Route path="settings/hotel" element={<RequireAuth><HotelSettingsFormPage /></RequireAuth>} />
+      <Route path="settings/rooms" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />
+      <Route path="settings/services" element={<RequireAuth><ServicesSettingsPage /></RequireAuth>} />
+      <Route path="settings/tariffs" element={<RequireAuth><TariffsSettingsPage /></RequireAuth>} />
       <Route path="settings/payments" element={<RequireAuth><PaymentsPage /></RequireAuth>} />
       <Route path="settings/users" element={<RequireAuth><UsersPage /></RequireAuth>} />
       <Route path="settings/system" element={<RequireAuth><SystemSettingsPage /></RequireAuth>} />
@@ -84,8 +86,8 @@ export function AppRoutes() {
       <Route path="settings/security" element={<RequireAuth><SecurityPage /></RequireAuth>} />
       
       {/* Legacy redirects */}
-      <Route path="settings/room-types" element={<RequireAuth><RoomsPage /></RequireAuth>} />
-      <Route path="settings/rooms-catalog" element={<RequireAuth><RoomsPage /></RequireAuth>} />
+      <Route path="settings/room-types" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />
+      <Route path="settings/rooms-catalog" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />
       
       {/* Phase 2 - Reservation Features migrated to UnifiedLayout */}
       <Route path="departures" element={<RequireAuth><DeparturesPage /></RequireAuth>} />
