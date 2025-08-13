@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type POSRole = "pos_hostess" | "pos_server" | "pos_cashier" | "pos_manager";
 
@@ -45,10 +46,21 @@ export function usePOSAuth() {
     localStorage.removeItem("pos_session");
   };
 
-  const updateOutlet = (outletId: string) => {
+  const updateOutlet = async (outletId: string) => {
     if (!session) return;
     
-    const updatedSession = { ...session, outlet_id: outletId };
+    // Récupérer l'org_id de l'outlet sélectionné
+    const { data: outlet } = await supabase
+      .from('pos_outlets')
+      .select('org_id')
+      .eq('id', outletId)
+      .single();
+    
+    const updatedSession = { 
+      ...session, 
+      outlet_id: outletId,
+      org_id: outlet?.org_id || session.org_id 
+    };
     setSession(updatedSession);
     localStorage.setItem("pos_session", JSON.stringify(updatedSession));
   };

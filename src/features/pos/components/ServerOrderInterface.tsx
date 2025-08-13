@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
+import { usePOSAuth } from '../auth/usePOSAuth';
 import { Clock, Users, ChefHat, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -17,7 +18,8 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
   serverId, 
   outletId 
 }) => {
-  const { data: serverTables = [], error: tablesError } = useServerTables(serverId);
+  const { session } = usePOSAuth();
+  const { data: serverTables = [], error: tablesError } = useServerTables(serverId, session?.org_id);
   const { data: categories = [], error: categoriesError } = usePOSCategories(outletId);
   const { data: products = [], error: productsError } = usePOSProducts(outletId);
   const [selectedTable, setSelectedTable] = useState<any>(null);

@@ -45,14 +45,15 @@ export const useAssignTable = () => {
   });
 };
 
-export const useServerTables = (serverId?: string) => {
+export const useServerTables = (serverId?: string, orgId?: string) => {
   return useQuery({
-    queryKey: ['server-tables', serverId],
+    queryKey: ['server-tables', serverId, orgId],
     queryFn: async () => {
       if (!serverId) return [];
 
       const { data, error } = await supabase.rpc('get_server_tables', {
-        p_server_id: serverId
+        p_server_id: serverId,
+        p_org_id: orgId
       });
 
       if (error) throw error;
