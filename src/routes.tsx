@@ -18,7 +18,7 @@ import BillingPageWrapper from "@/pages/BillingPageWrapper";
 import UsersPage from "@/features/users/UsersPage";
 import ReservationsPage from "@/pages/ReservationsPage";
 import QuickReservationPage from "@/pages/QuickReservationPage";
-import AdvancedReservationPage from "@/features/reservations/AdvancedReservationPage";
+import AdvancedReservationPage from "@/pages/AdvancedReservationPage";
 import GroupsManagementPage from "@/features/reservations/GroupsManagementPage";
 import AllotmentsPage from "@/features/reservations/AllotmentsPage";
 import GuestsPage from "@/pages/GuestsPage";
@@ -93,6 +93,7 @@ export function AppRoutes() {
       <Route path="departures" element={<RequireAuth><DeparturesPage /></RequireAuth>} />
       <Route path="reservations" element={<RequireAuth><ReservationsPage /></RequireAuth>} />
       <Route path="reservations/new/quick" element={<RequireAuth><QuickReservationPage /></RequireAuth>} />
+      <Route path="reservations/new/advanced" element={<RequireAuth><AdvancedReservationPage /></RequireAuth>} />
       <Route path="reservations/rack" element={<RequireAuth><RackPage /></RequireAuth>} />
       <Route path="rack" element={<RequireAuth><RackPage /></RequireAuth>} />
       
@@ -107,7 +108,6 @@ export function AppRoutes() {
       
       {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
-        <Route path="reservations/new/advanced" element={<AdvancedReservationPage />} />
         <Route path="reservations/groups" element={<GroupsManagementPage />} />
         <Route path="reservations/allotments" element={<AllotmentsPage />} />
         <Route path="cardex" element={<CardexPage />} />

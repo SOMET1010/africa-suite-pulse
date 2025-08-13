@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import type { 
@@ -6,9 +5,18 @@ import type {
   DocumentTemplateInsert, 
   TemplateType 
 } from '@/types/templates';
+import { POSTemplatePresets } from '@/features/templates/components/POSTemplatePresets';
 
-// Mock data for now - will be replaced with real Supabase calls once the table exists
-const mockTemplates: DocumentTemplate[] = [];
+// Temporary mock data - replace with actual API calls
+const mockTemplates: DocumentTemplate[] = [
+  ...POSTemplatePresets.map((preset, index) => ({
+    id: `pos-preset-${index + 1}`,
+    org_id: 'default',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    ...preset
+  })),
+];
 
 export function useDocumentTemplates(type?: TemplateType) {
   const { toast } = useToast();

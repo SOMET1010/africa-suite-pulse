@@ -1,6 +1,6 @@
 
 // Types pour le gestionnaire de templates de documents
-export type TemplateType = 'invoice' | 'receipt' | 'reminder' | 'pos_ticket' | 'email' | 'report';
+export type TemplateType = 'invoice' | 'receipt' | 'reminder' | 'pos_ticket' | 'pos_receipt' | 'kitchen_order' | 'email' | 'report';
 
 export interface TemplateHeader {
   show_logo: boolean;
@@ -263,6 +263,84 @@ export const DEFAULT_TEMPLATES: Record<TemplateType, Partial<DocumentTemplate>> 
       sections: [],
     },
   },
+  pos_receipt: {
+    name: 'Ticket de Caisse POS',
+    type: 'pos_receipt',
+    header: {
+      show_logo: true,
+      logo_size: 'small',
+      logo_position: 'center',
+      show_company_info: true,
+    },
+    footer: {
+      show_legal_info: false,
+      show_bank_info: false,
+      show_tax_info: true,
+      show_page_numbers: false,
+    },
+    qr_code: {
+      enabled: true,
+      content: 'verification_url',
+      position: 'footer',
+      size: 'small',
+    },
+    style: {
+      font_family: 'roboto',
+      font_size: 'small',
+      primary_color: '#000000',
+      secondary_color: '#666666',
+      text_color: '#000000',
+      background_color: '#ffffff',
+      border_color: '#000000',
+      table_style: 'minimal',
+    },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: true,
+      custom_fields: [],
+      sections: [],
+    },
+  },
+  kitchen_order: {
+    name: 'Bon de Commande Cuisine',
+    type: 'kitchen_order',
+    header: {
+      show_logo: false,
+      logo_size: 'small',
+      logo_position: 'center',
+      show_company_info: false,
+    },
+    footer: {
+      show_legal_info: false,
+      show_bank_info: false,
+      show_tax_info: false,
+      show_page_numbers: false,
+    },
+    qr_code: {
+      enabled: false,
+      content: 'custom',
+      position: 'header',
+      size: 'small',
+    },
+    style: {
+      font_family: 'roboto',
+      font_size: 'large',
+      primary_color: '#000000',
+      secondary_color: '#666666',
+      text_color: '#000000',
+      background_color: '#ffffff',
+      border_color: '#ff0000',
+      table_style: 'bordered',
+    },
+    content: {
+      show_date: true,
+      show_reference: true,
+      show_qr_code: false,
+      custom_fields: [],
+      sections: [],
+    },
+  },
   email: {
     name: 'Email Standard',
     type: 'email',
@@ -348,6 +426,8 @@ export const TEMPLATE_TYPES: { value: TemplateType; label: string; description: 
   { value: 'receipt', label: 'Reçu', description: 'Reçus de paiement et accusés' },
   { value: 'reminder', label: 'Relance', description: 'Lettres de relance de paiement' },
   { value: 'pos_ticket', label: 'Ticket de caisse', description: 'Tickets de caisse POS' },
+  { value: 'pos_receipt', label: 'Reçu POS', description: 'Reçus de point de vente' },
+  { value: 'kitchen_order', label: 'Bon cuisine', description: 'Bons de commande pour la cuisine' },
   { value: 'email', label: 'Email', description: 'Templates d\'emails automatiques' },
   { value: 'report', label: 'Rapport', description: 'Rapports et états de gestion' },
 ];
