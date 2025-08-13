@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 
-export type POSRole = "pos_server" | "pos_cashier" | "pos_manager";
+export type POSRole = "pos_hostess" | "pos_server" | "pos_cashier" | "pos_manager";
 
 export interface POSSession {
   user_id: string;
   display_name: string;
   role: POSRole;
   org_id: string;
+  outlet_id: string;
   login_time: string;
 }
 
@@ -48,14 +49,16 @@ export function usePOSAuth() {
     if (!session) return false;
     
     const roleHierarchy = {
-      'pos_server': 1,
-      'pos_cashier': 2,
-      'pos_manager': 3,
+      'pos_hostess': 1,
+      'pos_server': 2,
+      'pos_cashier': 3,
+      'pos_manager': 4,
     };
     
     return roleHierarchy[session.role] >= roleHierarchy[requiredRole];
   };
 
+  const isHostess = session?.role === 'pos_hostess';
   const isServer = session?.role === 'pos_server';
   const isCashier = hasRole('pos_cashier');
   const isManager = hasRole('pos_manager');
@@ -65,6 +68,7 @@ export function usePOSAuth() {
     loading,
     logout,
     hasRole,
+    isHostess,
     isServer,
     isCashier,
     isManager,

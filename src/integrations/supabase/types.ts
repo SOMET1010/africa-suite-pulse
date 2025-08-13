@@ -1636,6 +1636,39 @@ export type Database = {
         }
         Relationships: []
       }
+      order_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          estimated_completion_time: string | null
+          id: string
+          notes: string | null
+          order_id: string
+          org_id: string
+          status: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          estimated_completion_time?: string | null
+          id?: string
+          notes?: string | null
+          order_id: string
+          org_id?: string
+          status: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          estimated_completion_time?: string | null
+          id?: string
+          notes?: string | null
+          order_id?: string
+          org_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       organization_members: {
         Row: {
           created_at: string | null
@@ -3217,6 +3250,51 @@ export type Database = {
           },
         ]
       }
+      server_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          id: string
+          max_tables: number | null
+          org_id: string
+          server_id: string
+          shift_date: string
+          shift_end: string | null
+          shift_start: string | null
+          status: string
+          updated_at: string
+          zone: string | null
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          max_tables?: number | null
+          org_id?: string
+          server_id: string
+          shift_date?: string
+          shift_end?: string | null
+          shift_start?: string | null
+          status?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          max_tables?: number | null
+          org_id?: string
+          server_id?: string
+          shift_date?: string
+          shift_end?: string | null
+          shift_start?: string | null
+          status?: string
+          updated_at?: string
+          zone?: string | null
+        }
+        Relationships: []
+      }
       service_families: {
         Row: {
           code: string
@@ -3492,6 +3570,48 @@ export type Database = {
           status?: string
           token?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      table_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          org_id: string
+          server_id: string
+          shift_date: string
+          status: string
+          table_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          server_id: string
+          shift_date?: string
+          status?: string
+          table_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          server_id?: string
+          shift_date?: string
+          status?: string
+          table_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -3944,6 +4064,14 @@ export type Database = {
         Args: { task_id: string; staff_id: string }
         Returns: undefined
       }
+      assign_table_to_server: {
+        Args: {
+          p_table_id: string
+          p_server_id: string
+          p_assigned_by?: string
+        }
+        Returns: string
+      }
       authenticate_pos_user: {
         Args: { p_org_id: string; p_pin: string }
         Returns: {
@@ -3987,6 +4115,18 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      get_server_tables: {
+        Args: { p_server_id: string }
+        Returns: {
+          assignment_id: string
+          table_id: string
+          table_number: string
+          zone: string
+          capacity: number
+          status: string
+          assigned_at: string
+        }[]
       }
       has_permission: {
         Args: { p_permission: string }
@@ -4100,6 +4240,7 @@ export type Database = {
         | "pos_server"
         | "pos_cashier"
         | "pos_manager"
+        | "pos_hostess"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4239,6 +4380,7 @@ export const Constants = {
         "pos_server",
         "pos_cashier",
         "pos_manager",
+        "pos_hostess",
       ],
     },
   },

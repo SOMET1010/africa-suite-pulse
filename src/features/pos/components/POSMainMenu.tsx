@@ -20,6 +20,24 @@ import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   {
+    id: "maitre-hotel",
+    title: "Maître d'Hôtel",
+    description: "Gestion des tables et assignations serveurs",
+    icon: Users,
+    path: "/pos/maitre-hotel",
+    color: "bg-emerald-600",
+    requiredRole: "pos_hostess"
+  },
+  {
+    id: "server",
+    title: "Interface Serveur",
+    description: "Prise de commandes par les serveurs",
+    icon: ShoppingCart,
+    path: "/pos/server",
+    color: "bg-blue-600",
+    requiredRole: "pos_server"
+  },
+  {
     id: "terminal",
     title: "Terminal de vente",
     description: "Prendre des commandes et encaisser",
@@ -152,6 +170,7 @@ export function POSMainMenu() {
                 <CardTitle className="text-xl">{session.display_name}</CardTitle>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="outline">
+                    {session.role === 'pos_hostess' && 'Maître d\'Hôtel'}
                     {session.role === 'pos_server' && 'Serveur'}
                     {session.role === 'pos_cashier' && 'Caissier'}
                     {session.role === 'pos_manager' && 'Manager'}

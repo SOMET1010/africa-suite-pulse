@@ -121,6 +121,46 @@ export interface CartItem extends POSOrderItem {
   product: POSProduct;
 }
 
+export interface POSTableAssignment {
+  id: string;
+  org_id: string;
+  table_id: string;
+  server_id: string;
+  assigned_at: string;
+  assigned_by?: string;
+  shift_date: string;
+  status: 'active' | 'inactive' | 'transferred';
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface POSServerAssignment {
+  id: string;
+  org_id: string;
+  server_id: string;
+  zone?: string;
+  shift_start?: string;
+  shift_end?: string;
+  shift_date: string;
+  status: 'active' | 'break' | 'finished';
+  assigned_by?: string;
+  max_tables: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface POSOrderStatusHistory {
+  id: string;
+  org_id: string;
+  order_id: string;
+  status: string;
+  changed_by?: string;
+  changed_at: string;
+  notes?: string;
+  estimated_completion_time?: string;
+}
+
 export interface POSState {
   currentOrder: POSOrder | null;
   cartItems: CartItem[];
