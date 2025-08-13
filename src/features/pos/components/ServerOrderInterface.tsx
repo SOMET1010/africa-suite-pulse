@@ -153,24 +153,37 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
 
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="h-screen flex w-full bg-surface">
-        {/* Sidebar des fonctionnalités principales */}
-        <Sidebar className="w-16 border-r-2 border-primary/20">
-          <SidebarContent>
+      <div className="h-screen flex w-full bg-gradient-to-br from-surface via-background to-surface/50 animate-fade-in">
+        {/* Sidebar moderne avec logo et animations */}
+        <Sidebar className="w-20 bg-gradient-to-b from-primary to-primary/90 border-r-4 border-primary-glow shadow-luxury">
+          <SidebarContent className="pt-4">
+            {/* Logo/Brand */}
+            <div className="mb-6 px-2">
+              <div className="w-12 h-12 mx-auto bg-gradient-to-br from-accent to-accent-light rounded-lg flex items-center justify-center shadow-glow">
+                <span className="text-lg font-bold text-white">AS</span>
+              </div>
+            </div>
+            
             <SidebarGroup>
               <SidebarGroupLabel className="sr-only">Fonctionnalités POS</SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu>
+                <SidebarMenu className="space-y-2">
                   {sidebarItems.map((item) => (
                     <SidebarMenuItem key={item.id}>
                       <SidebarMenuButton 
                         isActive={activeSidebarItem === item.id}
                         onClick={() => setActiveSidebarItem(item.id)}
-                        className="w-full h-14 flex flex-col items-center justify-center gap-1 text-xs"
+                        className={`w-full h-16 flex flex-col items-center justify-center gap-1 text-xs rounded-xl mx-2 transition-all duration-300 group ${
+                          activeSidebarItem === item.id 
+                            ? 'bg-white/20 shadow-elegant text-white transform scale-105' 
+                            : 'text-white/80 hover:bg-white/10 hover:text-white hover:scale-105'
+                        }`}
                         tooltip={item.title}
                       >
-                        <item.icon className="h-5 w-5" />
-                        <span className="text-[10px] font-medium">{item.title}</span>
+                        <item.icon className={`h-6 w-6 transition-transform duration-300 ${
+                          activeSidebarItem === item.id ? 'scale-110' : 'group-hover:scale-110'
+                        }`} />
+                        <span className="text-[9px] font-medium text-center leading-tight">{item.title}</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -181,66 +194,97 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
         </Sidebar>
 
         <div className="flex-1 flex flex-col">
-          {/* Header fixe style POS classique */}
-          <div className="h-16 bg-primary text-primary-foreground px-6 flex items-center justify-between border-b-2 border-primary-dark">
-            <div className="flex items-center gap-6">
-              <h1 className="text-xl font-bold">AfricaSuite POS</h1>
+          {/* Header moderne avec gradients et animations */}
+          <div className="h-20 bg-gradient-to-r from-primary via-primary-dark to-primary text-primary-foreground px-8 flex items-center justify-between border-b-4 border-primary-glow shadow-luxury relative overflow-hidden">
+            {/* Effet de brillance animé */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse"></div>
+            
+            <div className="flex items-center gap-8 relative z-10">
+              <div className="flex items-center gap-4">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-accent-light bg-clip-text text-transparent">
+                  AfricaSuite POS
+                </h1>
+                <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+              </div>
+              
               {selectedTable && (
-                <div className="flex items-center gap-2 bg-primary-dark/20 px-4 py-2 rounded">
-                  <span className="text-lg font-semibold">TABLE {selectedTable.table_number}</span>
-                  <Badge variant="outline" className="bg-background text-foreground">
+                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/20 shadow-glow animate-scale-in">
+                  <div className="w-3 h-3 bg-accent rounded-full animate-pulse"></div>
+                  <span className="text-xl font-bold">TABLE {selectedTable.table_number}</span>
+                  <Badge variant="outline" className="bg-white/20 text-white border-white/30 backdrop-blur-sm">
                     {selectedTable.capacity} pers.
                   </Badge>
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-6">
-              <div className="text-right">
-                <div className="text-sm opacity-90">Total</div>
-                <div className="text-2xl font-bold">{orderTotal.toLocaleString()} FCFA</div>
+            
+            <div className="flex items-center gap-8 relative z-10">
+              <div className="text-right bg-white/10 backdrop-blur-sm px-6 py-3 rounded-xl border border-white/20">
+                <div className="text-sm opacity-90 font-medium">Total Commande</div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
+                  {orderTotal.toLocaleString()} FCFA
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm opacity-90">Heure</div>
-                <div className="text-lg font-mono">{getCurrentTime()}</div>
+              <div className="text-right bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/20">
+                <div className="text-sm opacity-90 font-medium">Heure</div>
+                <div className="text-xl font-mono font-bold">{getCurrentTime()}</div>
               </div>
             </div>
           </div>
 
           <div className="flex-1 flex">
-            {/* Panneau tables gauche - plus compact */}
-            <div className="w-64 bg-muted border-r">
-              <div className="p-4 border-b bg-background">
-                <h2 className="font-semibold text-lg">Mes Tables ({serverTables.length})</h2>
+            {/* Panneau tables avec design moderne */}
+            <div className="w-72 bg-gradient-to-b from-background to-muted/30 border-r-2 border-primary/10 shadow-elegant">
+              <div className="p-6 border-b-2 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+                <h2 className="font-bold text-xl text-primary flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Mes Tables ({serverTables.length})
+                </h2>
               </div>
-              <div className="p-2 space-y-1 overflow-y-auto max-h-full">
+              <div className="p-3 space-y-2 overflow-y-auto max-h-full">
                 {serverTables.map((table) => (
-                  <Button
-                    key={table.table_id}
-                    variant={selectedTable?.table_id === table.table_id ? "default" : "ghost"}
-                    className={`w-full justify-between h-12 ${
+                  <Card 
+                    key={table.table_id} 
+                    className={`cursor-pointer transition-all duration-300 hover:shadow-elevate hover:scale-[1.02] ${
                       selectedTable?.table_id === table.table_id 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'hover:bg-accent'
+                        ? 'bg-gradient-to-r from-primary to-primary-dark text-primary-foreground shadow-luxury border-2 border-primary-glow' 
+                        : 'hover:bg-gradient-to-r hover:from-accent/10 hover:to-primary/10 border border-primary/20'
                     }`}
                     onClick={() => setSelectedTable(table)}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold">T{table.table_number}</span>
-                      <Badge 
-                        variant="outline" 
-                        className="text-xs"
-                        style={{
-                          backgroundColor: table.status === 'occupied' ? '#ef4444' : 
-                                         table.status === 'reserved' ? '#f59e0b' : '#10b981',
-                          color: 'white',
-                          borderColor: 'transparent'
-                        }}
-                      >
-                        {table.status}
-                      </Badge>
-                    </div>
-                    <span className="text-xs opacity-70">{table.capacity}p</span>
-                  </Button>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full animate-pulse ${
+                            table.status === 'occupied' ? 'bg-red-500' : 
+                            table.status === 'reserved' ? 'bg-amber-500' : 'bg-emerald-500'
+                          }`}></div>
+                          <span className="font-bold text-lg">TABLE {table.table_number}</span>
+                          <Badge 
+                            variant="outline" 
+                            className={`text-xs font-medium transition-colors duration-300 ${
+                              selectedTable?.table_id === table.table_id 
+                                ? 'bg-white/20 text-white border-white/30' 
+                                : ''
+                            }`}
+                            style={{
+                              backgroundColor: selectedTable?.table_id !== table.table_id ? (
+                                table.status === 'occupied' ? '#ef4444' : 
+                                table.status === 'reserved' ? '#f59e0b' : '#10b981'
+                              ) : undefined,
+                              color: selectedTable?.table_id !== table.table_id ? 'white' : undefined,
+                              borderColor: selectedTable?.table_id !== table.table_id ? 'transparent' : undefined
+                            }}
+                          >
+                            {table.status}
+                          </Badge>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-sm font-medium opacity-80">{table.capacity} pers.</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             </div>
@@ -249,149 +293,200 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
             <div className="flex-1 flex flex-col">
               {selectedTable ? (
                 <>
-                  {/* Barre de catégories style POS classique */}
-                  <div className="h-20 bg-background border-b p-2">
-                    <div className="flex gap-2 h-full overflow-x-auto">
+                  {/* Barre de catégories moderne avec animations */}
+                  <div className="h-24 bg-gradient-to-r from-background via-muted/20 to-background border-b-2 border-primary/20 p-3 shadow-soft">
+                    <div className="flex gap-3 h-full overflow-x-auto scrollbar-thin">
                       <Button
                         variant={selectedCategory === 'all' ? "default" : "outline"}
-                        className={`min-w-24 h-full flex-col justify-center text-xs font-semibold ${
-                          selectedCategory === 'all' ? 'bg-primary text-primary-foreground' : ''
+                        className={`min-w-28 h-full flex-col justify-center text-xs font-bold rounded-xl transition-all duration-300 hover:scale-105 ${
+                          selectedCategory === 'all' 
+                            ? 'bg-gradient-to-b from-primary to-primary-dark text-primary-foreground shadow-luxury border-2 border-primary-glow' 
+                            : 'hover:bg-gradient-to-b hover:from-accent/10 hover:to-primary/10 border-2 border-primary/30 hover:border-primary/50'
                         }`}
                         onClick={() => setSelectedCategory('all')}
                       >
-                        <span className="text-lg">F1</span>
-                        <span>TOUT</span>
+                        <span className="text-xl font-bold bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">F1</span>
+                        <span className="mt-1">TOUT</span>
                       </Button>
                       {categories.slice(0, 11).map((category, index) => (
                         <Button
                           key={category.id}
                           variant={selectedCategory === category.id ? "default" : "outline"}
-                          className="min-w-24 h-full flex-col justify-center text-xs font-semibold"
+                          className={`min-w-28 h-full flex-col justify-center text-xs font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-elevate ${
+                            selectedCategory === category.id ? 'shadow-luxury border-2' : 'border-2 hover:border-opacity-70'
+                          }`}
                           style={{
-                            backgroundColor: selectedCategory === category.id ? category.color : undefined,
+                            backgroundColor: selectedCategory === category.id 
+                              ? `linear-gradient(135deg, ${category.color}, ${category.color}dd)` 
+                              : undefined,
                             color: selectedCategory === category.id ? 'white' : undefined,
-                            borderColor: category.color
+                            borderColor: category.color || 'hsl(var(--primary))',
+                            background: selectedCategory === category.id 
+                              ? `linear-gradient(135deg, ${category.color}, ${category.color}dd)` 
+                              : undefined
                           }}
                           onClick={() => setSelectedCategory(category.id)}
                         >
-                          <span className="text-lg">F{index + 2}</span>
-                          <span className="text-center leading-tight">{category.name.toUpperCase()}</span>
+                          <span className="text-xl font-bold">F{index + 2}</span>
+                          <span className="text-center leading-tight mt-1">{category.name.toUpperCase()}</span>
                         </Button>
                       ))}
                     </div>
                   </div>
 
                   <div className="flex-1 flex">
-                    {/* Zone produits */}
-                    <div className="flex-1 p-4 bg-background">
-                      <div className="grid grid-cols-4 gap-3 h-full overflow-y-auto">
+                    {/* Zone produits avec design attractif */}
+                    <div className="flex-1 p-6 bg-gradient-to-br from-background to-muted/20">
+                      <div className="grid grid-cols-4 gap-4 h-full overflow-y-auto scrollbar-thin">
                         {filteredProducts.map((product) => (
-                          <Button
+                          <Card
                             key={product.id}
-                            variant="outline"
-                            className="h-24 flex-col justify-between p-3 hover:bg-accent text-foreground border-2"
+                            className="cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-luxury hover:bg-gradient-to-br hover:from-accent/5 hover:to-primary/5 group border-2 border-primary/20 hover:border-primary/50 animate-fade-in"
                             onClick={() => addToOrder(product)}
                             onDoubleClick={() => addToOrder(product, 2)}
                           >
-                            <span className="font-semibold text-sm text-center leading-tight">
-                              {product.name}
-                            </span>
-                            <span className="text-lg font-bold text-primary">
-                              {product.base_price.toLocaleString()}
-                            </span>
-                          </Button>
+                            <CardContent className="h-28 flex flex-col justify-between p-4 relative overflow-hidden">
+                              {/* Effet de brillance au survol */}
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12"></div>
+                              
+                              <span className="font-bold text-sm text-center leading-tight text-foreground relative z-10 group-hover:text-primary transition-colors duration-300">
+                                {product.name}
+                              </span>
+                              
+                              <div className="text-center relative z-10">
+                                <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent group-hover:from-accent group-hover:to-accent-light transition-all duration-300">
+                                  {product.base_price.toLocaleString()}
+                                </span>
+                                <span className="text-sm text-muted-foreground ml-1">FCFA</span>
+                              </div>
+                              
+                              {/* Indicateur de stock */}
+                              <div className="absolute top-2 right-2 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                            </CardContent>
+                          </Card>
                         ))}
                       </div>
                     </div>
 
-                    {/* Panel commande droite */}
-                    <div className="w-80 bg-muted border-l flex flex-col">
-                      {/* En-tête commande */}
-                      <div className="p-4 border-b bg-background">
-                        <h3 className="font-bold text-lg">COMMANDE EN COURS</h3>
-                        <p className="text-sm text-muted-foreground">Table {selectedTable.table_number}</p>
+                    {/* Panel commande moderne et attractif */}
+                    <div className="w-80 bg-gradient-to-b from-background to-muted/30 border-l-4 border-primary/20 flex flex-col shadow-luxury">
+                      {/* En-tête commande avec gradient */}
+                      <div className="p-6 border-b-2 border-primary/20 bg-gradient-to-r from-primary/10 to-accent/10 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent animate-pulse"></div>
+                        <h3 className="font-bold text-xl text-primary relative z-10">COMMANDE EN COURS</h3>
+                        <p className="text-sm text-muted-foreground font-medium relative z-10 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                          Table {selectedTable.table_number}
+                        </p>
                       </div>
 
-                      {/* Liste des items */}
-                      <div className="flex-1 overflow-y-auto p-2">
+                      {/* Liste des items avec animations */}
+                      <div className="flex-1 overflow-y-auto p-3 scrollbar-thin">
                         {currentOrder.length === 0 ? (
-                          <div className="text-center text-muted-foreground py-8">
-                            <Calculator className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                            <p>Aucun article</p>
+                          <div className="text-center text-muted-foreground py-12 animate-fade-in">
+                            <div className="bg-gradient-to-br from-muted to-muted/50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                              <Calculator className="h-8 w-8 opacity-50" />
+                            </div>
+                            <p className="font-medium">Aucun article ajouté</p>
+                            <p className="text-xs opacity-70 mt-1">Sélectionnez des produits</p>
                           </div>
                         ) : (
-                          <div className="space-y-1">
-                            {currentOrder.map((item) => (
-                              <Card key={item.id} className="p-3">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="font-medium text-sm">{item.product.name}</span>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0 text-destructive hover:bg-destructive/10"
-                                    onClick={() => removeFromOrder(item.id)}
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-1">
+                          <div className="space-y-2">
+                            {currentOrder.map((item, index) => (
+                              <Card 
+                                key={item.id} 
+                                className="transition-all duration-300 hover:shadow-elevate border border-primary/20 animate-scale-in"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                              >
+                                <CardContent className="p-4 relative overflow-hidden">
+                                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/2 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                                  
+                                  <div className="flex items-center justify-between mb-3 relative z-10">
+                                    <span className="font-bold text-sm leading-tight text-primary">{item.product.name}</span>
                                     <Button
-                                      variant="outline"
+                                      variant="ghost"
                                       size="sm"
-                                      className="h-7 w-7 p-0"
-                                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                      className="h-6 w-6 p-0 text-destructive hover:bg-destructive/10 hover:scale-110 transition-all duration-200 rounded-full"
+                                      onClick={() => removeFromOrder(item.id)}
                                     >
-                                      <Minus className="h-3 w-3" />
-                                    </Button>
-                                    <span className="min-w-8 text-center font-bold">{item.quantity}</span>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="h-7 w-7 p-0"
-                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                    >
-                                      <Plus className="h-3 w-3" />
+                                      <X className="h-3 w-3" />
                                     </Button>
                                   </div>
-                                  <span className="font-bold">{item.totalPrice.toLocaleString()}</span>
-                                </div>
+                                  
+                                  <div className="flex items-center justify-between relative z-10">
+                                    <div className="flex items-center gap-2 bg-muted/50 rounded-lg p-1">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-110"
+                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                      >
+                                        <Minus className="h-3 w-3" />
+                                      </Button>
+                                      <span className="min-w-8 text-center font-bold text-lg bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                                        {item.quantity}
+                                      </span>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-110"
+                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                      >
+                                        <Plus className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="font-bold text-lg bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
+                                        {item.totalPrice.toLocaleString()}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground ml-1">FCFA</span>
+                                    </div>
+                                  </div>
+                                </CardContent>
                               </Card>
                             ))}
                           </div>
                         )}
                       </div>
 
-                      {/* Total et actions */}
-                      <div className="border-t bg-background p-4 space-y-3">
-                        <div className="flex justify-between items-center text-xl font-bold">
-                          <span>TOTAL:</span>
-                          <span>{orderTotal.toLocaleString()} FCFA</span>
+                      {/* Total et actions avec design premium */}
+                      <div className="border-t-2 border-primary/20 bg-gradient-to-r from-background to-muted/30 p-6 space-y-4 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent"></div>
+                        
+                        <div className="flex justify-between items-center relative z-10">
+                          <span className="text-xl font-bold text-primary">TOTAL:</span>
+                          <div className="text-right">
+                            <span className="text-3xl font-bold bg-gradient-to-r from-accent to-accent-light bg-clip-text text-transparent">
+                              {orderTotal.toLocaleString()}
+                            </span>
+                            <span className="text-lg font-medium text-muted-foreground ml-2">FCFA</span>
+                          </div>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-3 relative z-10">
                           <Button 
                             variant="outline" 
                             onClick={clearOrder}
                             disabled={currentOrder.length === 0}
-                            className="h-12"
+                            className="h-14 font-bold border-2 border-destructive/30 text-destructive hover:bg-destructive hover:text-destructive-foreground transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
                           >
-                            <Trash2 className="h-4 w-4 mr-1" />
+                            <Trash2 className="h-5 w-5 mr-2" />
                             ANNULER
                           </Button>
                           <Button 
-                            className="h-12 bg-success hover:bg-success/90 text-success-foreground"
+                            className="h-14 font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-luxury transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
                             disabled={currentOrder.length === 0}
                           >
-                            <CreditCard className="h-4 w-4 mr-1" />
+                            <CreditCard className="h-5 w-5 mr-2" />
                             PAYER
                           </Button>
                         </div>
                         
                         <Button 
-                          className="w-full h-12 bg-warning hover:bg-warning/90 text-warning-foreground"
+                          className="w-full h-14 font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-luxury transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 relative z-10"
                           disabled={currentOrder.length === 0}
                         >
+                          <Clock className="h-5 w-5 mr-2" />
                           ENVOYER EN CUISINE
                         </Button>
                       </div>
@@ -399,11 +494,20 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
                   </div>
                 </>
               ) : (
-                <div className="flex-1 flex items-center justify-center bg-background">
-                  <div className="text-center text-muted-foreground">
-                    <Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-xl font-semibold mb-2">Sélectionnez une table</h3>
-                    <p>Choisissez une table dans la liste pour commencer une commande</p>
+                <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-muted/10 to-background">
+                  <div className="text-center text-muted-foreground animate-fade-in">
+                    <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-full w-32 h-32 mx-auto mb-6 flex items-center justify-center shadow-luxury">
+                      <Users className="h-16 w-16 text-primary/60 animate-pulse" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
+                      Sélectionnez une table
+                    </h3>
+                    <p className="text-lg opacity-80">Choisissez une table dans la liste pour commencer une commande</p>
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
                   </div>
                 </div>
               )}
