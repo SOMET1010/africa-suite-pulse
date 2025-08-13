@@ -9,7 +9,7 @@ export const usePOSOutlets = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pos_outlets")
-        .select("id, name, location, is_active, org_id, created_at")
+        .select("id, org_id, code, name, description, outlet_type, is_active, settings, created_at, updated_at")
         .eq("is_active", true)
         .order("name")
         .range(0, 99);
