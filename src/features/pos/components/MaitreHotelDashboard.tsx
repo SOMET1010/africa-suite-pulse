@@ -9,6 +9,7 @@ import { usePOSTables } from '../hooks/usePOSData';
 import { useTableAssignments, useAssignTable } from '../hooks/useTableAssignments';
 import { POSTable, POSTableAssignment } from '../types';
 import { toast } from 'sonner';
+import { PlanningDialog } from './PlanningDialog';
 
 interface MaitreHotelDashboardProps {
   outletId: string;
@@ -21,6 +22,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
   
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [showPlanningDialog, setShowPlanningDialog] = useState(false);
   const [selectedServerId, setSelectedServerId] = useState<string>('');
   
   // Mock data pour les serveurs avec de vrais UUIDs
@@ -82,7 +84,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
   };
 
   const handleShowPlanning = () => {
-    toast.info('Fonctionnalité planning à venir');
+    setShowPlanningDialog(true);
   };
 
   // Handle errors
@@ -411,6 +413,13 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Dialogue de planning */}
+      <PlanningDialog 
+        open={showPlanningDialog}
+        onOpenChange={setShowPlanningDialog}
+        outletId={outletId}
+      />
     </div>
   );
 };
