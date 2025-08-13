@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TButton } from "@/core/ui/TButton";
-import { BottomActionBar } from "@/core/layout/BottomActionBar";
+import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { ActionCard } from "@/core/ui/ActionCard";
+import { DataCard } from "@/core/ui/DataCard";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { 
   Crown, 
   Users, 
@@ -18,15 +20,18 @@ import {
   Star,
   TrendingUp,
   Phone,
-  MessageSquare
+  MessageSquare,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardProps {
   userRole?: 'receptionist' | 'housekeeper' | 'manager' | 'director';
 }
 
 export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps) {
+  const navigate = useNavigate();
   const currentTime = new Date();
   const currentHour = currentTime.getHours();
   
@@ -101,15 +106,33 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
   ];
 
   return (
-    <div className="min-h-screen bg-pearl p-4 animate-fade-in">
-      <div className="container mx-auto max-w-7xl space-y-6">
-        
-        {/* Greeting & Time */}
-        <header className="text-center">
-          <h1 className="text-2xl lg:text-3xl font-luxury font-bold text-charcoal mb-2">
-            {getGreeting()} ! 👋
-          </h1>
-          <p className="text-muted-foreground font-premium">
+    <UnifiedLayout
+      title={`${getGreeting()} !`}
+      headerAction={
+        <TButton
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate('/settings')}
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Paramètres
+        </TButton>
+      }
+      bottomActions={
+        <>
+          <TButton size="lg" asChild className="flex-1">
+            <Link to="/arrivals">Check-in Express</Link>
+          </TButton>
+          <TButton variant="default" size="lg" asChild className="flex-1">
+            <Link to="/reservations/rack">Voir Rack</Link>
+          </TButton>
+        </>
+      }
+    >
+      <div className="space-y-6">
+        {/* Date actuelle */}
+        <div className="text-center">
+          <p className="text-muted-foreground">
             {currentTime.toLocaleDateString('fr-FR', { 
               weekday: 'long', 
               year: 'numeric', 
@@ -117,12 +140,12 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
               day: 'numeric' 
             })}
           </p>
-        </header>
+        </div>
 
         {/* Priority Alerts */}
         {priorityAlerts.length > 0 && (
           <section>
-            <h2 className="text-lg font-luxury font-semibold text-charcoal mb-3 flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-warning" />
               Priorités du moment
             </h2>
@@ -130,19 +153,17 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
               {priorityAlerts.map((alert, index) => {
                 const Icon = alert.icon;
                 return (
-                  <Card key={index} className="border-l-4 border-l-warning bg-soft-warning/50">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Icon className="w-5 h-5 text-warning" />
-                          <span className="font-medium text-foreground">{alert.message}</span>
-                        </div>
-                        <TButton asChild variant="default" size="sm" className="tap-target">
-                          <Link to={alert.to}>{alert.action}</Link>
-                        </TButton>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <ActionCard
+                    key={index}
+                    title={alert.message}
+                    icon={Icon}
+                    onClick={() => navigate(alert.to)}
+                    className="border-l-4 border-l-warning bg-warning/5"
+                  >
+                    <TButton variant="default" size="sm">
+                      {alert.action}
+                    </TButton>
+                  </ActionCard>
                 );
               })}
             </div>
@@ -151,83 +172,86 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
 
         {/* Quick Stats */}
         <section>
-          <h2 className="text-lg font-luxury font-semibold text-charcoal mb-3">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             État de l'hôtel
           </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickStats.map((stat, index) => (
-              <Card key={stat.label} className={cn("border-0 shadow-soft", stat.bg)}>
-                <CardContent className="p-4 text-center">
-                  <div className={cn("text-2xl font-luxury font-bold mb-1", stat.color)}>
-                    {stat.value}
-                    {stat.total && <span className="text-sm text-muted-foreground">/{stat.total}</span>}
-                  </div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid-adaptive-1 gap-4">
+            <DataCard
+              title="Chambres occupées"
+              value={`${quickStats[0].value}/${quickStats[0].total}`}
+              subtitle="87% d'occupation"
+              icon={Bed}
+              variant="success"
+            />
+            <DataCard
+              title="Arrivées prévues"
+              value={quickStats[1].value}
+              subtitle="clients aujourd'hui"
+              icon={UserPlus}
+              variant="default"
+            />
+            <DataCard
+              title="Départs prévus"
+              value={quickStats[2].value}
+              subtitle="check-out du jour"
+              icon={Clock}
+              variant="warning"
+            />
+            <DataCard
+              title="Maintenance"
+              value={quickStats[3].value}
+              subtitle="chambres en réparation"
+              icon={AlertTriangle}
+              variant="danger"
+            />
           </div>
         </section>
 
         {/* Time-based Actions */}
         <section>
-          <h2 className="text-lg font-luxury font-semibold text-charcoal mb-3 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-brand-accent" />
+          <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-accent" />
             {timeActions.title}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid-adaptive-1 gap-4">
             {timeActions.items.map((action, index) => (
-              <Link key={action.label} to={action.to}>
-                <Card className={cn(
-                  "hover:shadow-luxury transition-elegant cursor-pointer group border-2",
-                  action.urgent ? "border-warning/30 bg-soft-warning" : "border-border bg-card"
-                )}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-luxury font-semibold">{action.label}</h3>
-                      {action.urgent && (
-                        <Badge variant="outline" className="bg-warning/20 border-warning text-warning">
-                          Urgent
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-primary">{action.count}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {action.count > 1 ? 'éléments' : 'élément'}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+              <ActionCard
+                key={action.label}
+                title={action.label}
+                description={`${action.count} ${action.count > 1 ? 'éléments' : 'élément'}`}
+                onClick={() => navigate(action.to)}
+                className={action.urgent ? "border-warning/30 bg-warning/5" : ""}
+              >
+                {action.urgent && (
+                  <Badge variant="outline" className="bg-warning/20 border-warning text-warning">
+                    Urgent
+                  </Badge>
+                )}
+              </ActionCard>
             ))}
           </div>
         </section>
 
         {/* Quick Access Modules */}
         <section>
-          <h2 className="text-lg font-luxury font-semibold text-charcoal mb-3">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             Accès rapide
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid-adaptive-2 gap-4">
             {[
-              { label: "Plan Chambres", icon: Hotel, to: "/reservations/rack", color: "text-blue-600", bg: "bg-blue-50" },
-              { label: "Mes Clients", icon: Users, to: "/guests", color: "text-green-600", bg: "bg-green-50" },
-              { label: "Check-in", icon: UserPlus, to: "/arrivals", color: "text-orange-600", bg: "bg-orange-50" },
-              { label: "Réservations", icon: Calendar, to: "/reservations", color: "text-purple-600", bg: "bg-purple-50" }
+              { label: "Plan Chambres", icon: Hotel, to: "/reservations/rack" },
+              { label: "Mes Clients", icon: Users, to: "/guests" },
+              { label: "Check-in", icon: UserPlus, to: "/arrivals" },
+              { label: "Réservations", icon: Calendar, to: "/reservations" }
             ].map((module, index) => {
               const Icon = module.icon;
               return (
-                <Link key={module.label} to={module.to}>
-                  <Card className="hover:shadow-luxury transition-elegant cursor-pointer group">
-                    <CardContent className="p-4 text-center">
-                      <div className={cn("w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center", module.bg)}>
-                        <Icon className={cn("w-6 h-6", module.color)} />
-                      </div>
-                      <h3 className="font-luxury font-semibold text-sm">{module.label}</h3>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <ActionCard
+                  key={module.label}
+                  title={module.label}
+                  icon={Icon}
+                  onClick={() => navigate(module.to)}
+                />
               );
             })}
           </div>
@@ -235,62 +259,25 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
 
         {/* Communication Center */}
         <section>
-          <h2 className="text-lg font-luxury font-semibold text-charcoal mb-3">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
             Communication
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card className="hover:shadow-luxury transition-elegant cursor-pointer">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-luxury font-semibold">Appels prioritaires</h3>
-                    <p className="text-sm text-muted-foreground">2 appels en attente</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ActionCard
+              title="Appels prioritaires"
+              description="2 appels en attente"
+              icon={Phone}
+            />
             
-            <Card className="hover:shadow-luxury transition-elegant cursor-pointer">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-luxury font-semibold">Messages équipe</h3>
-                    <p className="text-sm text-muted-foreground">5 nouveaux messages</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ActionCard
+              title="Messages équipe"
+              description="5 nouveaux messages"
+              icon={MessageSquare}
+            />
           </div>
         </section>
 
-        {/* Bottom Action Bar pour Dashboard */}
-        <BottomActionBar>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Occupés: {quickStats[0].value}/{quickStats[0].total}</span>
-            <span>•</span>
-            <span>Arrivées: {quickStats[1].value}</span>
-            <span>•</span>
-            <span>Urgent: {timeActions.items.filter(i => i.urgent).length}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <TButton asChild className="tap-target">
-              <Link to="/arrivals">Check-in Express</Link>
-            </TButton>
-            <TButton asChild variant="default" className="tap-target">
-              <Link to="/reservations/rack">Voir Rack</Link>
-            </TButton>
-            <TButton asChild variant="ghost" className="tap-target">
-              <Link to="/reports">Rapports</Link>
-            </TButton>
-          </div>
-        </BottomActionBar>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 }
