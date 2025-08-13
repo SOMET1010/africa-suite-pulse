@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +41,7 @@ const moduleCards = [
     icon: Building,
     stats: "89% d'occupation",
     color: "bg-secondary",
-    route: "/rack"
+    route: "/reservations/rack"
   },
   {
     title: "POS Terminal",
@@ -104,34 +105,44 @@ const StatCard = ({ title, value, change, suffix = "" }: {
   </Card>
 );
 
-const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: typeof moduleCards[0]) => (
-  <Card className="group hover:shadow-luxury transition-all duration-300 cursor-pointer glass-card">
-    <CardHeader className="pb-2">
-      <div className="flex items-center justify-between">
-        <div className={`p-3 rounded-lg ${color} text-white`}>
-          <Icon className="h-6 w-6" />
+const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: typeof moduleCards[0]) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(route);
+  };
+
+  return (
+    <Card className="group hover:shadow-luxury transition-all duration-300 cursor-pointer glass-card" onClick={handleClick}>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div className={`p-3 rounded-lg ${color} text-white`}>
+            <Icon className="h-6 w-6" />
+          </div>
+          <Badge variant="secondary" className="text-xs">
+            {stats}
+          </Badge>
         </div>
-        <Badge variant="secondary" className="text-xs">
-          {stats}
-        </Badge>
-      </div>
-    </CardHeader>
-    <CardContent className="space-y-2">
-      <CardTitle className="text-lg group-hover:text-primary transition-colors">
-        {title}
-      </CardTitle>
-      <p className="text-sm text-muted-foreground">
-        {description}
-      </p>
-      <Button variant="ghost" size="sm" className="w-full justify-start text-primary hover:bg-primary/10">
-        Accéder au module
-        <ArrowUpRight className="ml-auto h-4 w-4" />
-      </Button>
-    </CardContent>
-  </Card>
-);
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <CardTitle className="text-lg group-hover:text-primary transition-colors">
+          {title}
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {description}
+        </p>
+        <Button variant="ghost" size="sm" className="w-full justify-start text-primary hover:bg-primary/10">
+          Accéder au module
+          <ArrowUpRight className="ml-auto h-4 w-4" />
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function ModernDashboard() {
+  const navigate = useNavigate();
+
   return (
     <UnifiedLayout
       title="AfricaSuite"
@@ -197,15 +208,26 @@ export default function ModernDashboard() {
             <h2 className="text-xl font-semibold">Actions Rapides</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button className="h-16 justify-start bg-primary hover:bg-primary/90">
+            <Button 
+              className="h-16 justify-start bg-primary hover:bg-primary/90"
+              onClick={() => navigate('/reservations/new/quick')}
+            >
               <Calendar className="mr-3 h-5 w-5" />
               Nouvelle Réservation
             </Button>
-            <Button variant="secondary" className="h-16 justify-start">
+            <Button 
+              variant="secondary" 
+              className="h-16 justify-start"
+              onClick={() => navigate('/pos')}
+            >
               <CreditCard className="mr-3 h-5 w-5" />
               Encaisser Paiement
             </Button>
-            <Button variant="outline" className="h-16 justify-start border-accent text-accent hover:bg-accent/10">
+            <Button 
+              variant="outline" 
+              className="h-16 justify-start border-accent text-accent hover:bg-accent/10"
+              onClick={() => navigate('/reports')}
+            >
               <BarChart3 className="mr-3 h-5 w-5" />
               Générer Rapport
             </Button>
