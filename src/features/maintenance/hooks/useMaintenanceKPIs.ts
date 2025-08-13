@@ -86,7 +86,7 @@ export function useMaintenanceKPIs() {
       // Récupérer les planifications de maintenance
       const { data: schedules, error: schedulesError } = await supabase
         .from("maintenance_schedules")
-        .select("id, name, next_due_date, frequency")
+        .select("id, schedule_name, next_execution_date, frequency_type")
         .eq("is_active", true);
 
       if (schedulesError) {
@@ -139,10 +139,10 @@ export function useMaintenanceKPIs() {
 
       // Calculer les KPIs de planification
       const upcomingMaintenance = schedulesData.filter(s => 
-        s.next_due_date && s.next_due_date <= today
+        s.next_execution_date && s.next_execution_date <= today
       ).length;
       const overdueMaintenance = schedulesData.filter(s => 
-        s.next_due_date && s.next_due_date < today
+        s.next_execution_date && s.next_execution_date < today
       ).length;
       const dueMaintenances = upcomingMaintenance;
 
