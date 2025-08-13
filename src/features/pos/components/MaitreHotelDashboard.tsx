@@ -45,14 +45,18 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
 
   // Handlers pour les actions
   const handleAssignTable = async (tableId: string, serverId: string) => {
+    console.log('🔄 Tentative d\'assignation:', { tableId, serverId });
+    
     try {
       await assignTable.mutateAsync({ tableId, serverId });
+      console.log('✅ Assignation réussie');
       setShowAssignDialog(false);
       setSelectedTable(null);
       setSelectedServerId('');
       toast.success('Table assignée avec succès');
     } catch (error) {
-      toast.error('Erreur lors de l\'assignation');
+      console.error('❌ Erreur d\'assignation:', error);
+      toast.error(`Erreur lors de l'assignation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   };
 
@@ -378,7 +382,19 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
                 Annuler
               </Button>
               <Button 
-                onClick={() => selectedTable && selectedServerId && handleAssignTable(selectedTable.id, selectedServerId)}
+                onClick={() => {
+                  console.log('🔄 Clic sur Assigner:', { 
+                    selectedTable: selectedTable?.id, 
+                    selectedServerId,
+                    hasTable: !!selectedTable,
+                    hasServer: !!selectedServerId 
+                  });
+                  if (selectedTable && selectedServerId) {
+                    handleAssignTable(selectedTable.id, selectedServerId);
+                  } else {
+                    console.warn('⚠️ Données manquantes pour l\'assignation');
+                  }
+                }}
                 disabled={!selectedServerId || assignTable.isPending}
                 className="flex-1"
               >
