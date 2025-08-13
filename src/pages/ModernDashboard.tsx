@@ -23,6 +23,8 @@ import { useRealTimeKPIs } from '@/features/dashboard/hooks/useRealTimeKPIs';
 import { DashboardCharts } from '@/features/dashboard/components/DashboardChartsSimple';
 import { AlertsWidget } from '@/features/dashboard/components/AlertsWidget';
 import { QuickActionsWidget } from '@/features/dashboard/components/QuickActionsWidget';
+import { ClickableKPICard } from '@/features/dashboard/components/ClickableKPICard';
+import { useDashboardShortcuts } from '@/features/dashboard/hooks/useKeyboardShortcuts';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Fonction pour formater les devises
@@ -180,6 +182,9 @@ const ModuleCard = ({ title, description, icon: Icon, stats, color, route }: {
 export default function ModernDashboard() {
   const navigate = useNavigate();
   const { data: kpis, isLoading, error } = useRealTimeKPIs();
+  
+  // Enable keyboard shortcuts
+  useDashboardShortcuts();
 
   return (
     <UnifiedLayout
@@ -214,33 +219,37 @@ export default function ModernDashboard() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard 
+            <ClickableKPICard 
               title="Taux d'Occupation" 
               value={kpis?.occupancy?.current || 0} 
               change={kpis?.occupancy?.trend || 0}
               suffix="%" 
               isLoading={isLoading}
+              detailRoute="/reservations/rack"
             />
-            <StatCard 
+            <ClickableKPICard 
               title="Revenus du Jour" 
               value={kpis?.revenue?.today || 0} 
               change={kpis?.revenue?.trend || 0}
               suffix="XOF" 
               isLoading={isLoading}
+              detailRoute="/reports?view=revenue"
             />
-            <StatCard 
+            <ClickableKPICard 
               title="ADR (Prix Moyen)" 
               value={kpis?.adr?.current || 0} 
               change={kpis?.adr?.trend || 0}
               suffix=" XOF" 
               isLoading={isLoading}
+              detailRoute="/reports?view=pricing"
             />
-            <StatCard 
+            <ClickableKPICard 
               title="RevPAR" 
               value={kpis?.revpar?.current || 0} 
               change={kpis?.revpar?.trend || 0}
               suffix=" XOF" 
               isLoading={isLoading}
+              detailRoute="/reports?view=performance"
             />
           </div>
         </div>

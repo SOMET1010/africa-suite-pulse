@@ -9,9 +9,11 @@ import {
   Users, 
   Building, 
   Clock,
-  ArrowRight
+  ArrowRight,
+  Search
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { QuickActionModal } from './QuickActionModal';
 
 interface QuickAction {
   id: string;
@@ -24,6 +26,7 @@ interface QuickAction {
     variant: 'default' | 'destructive' | 'secondary' | 'warning';
   };
   color: string;
+  hasModal?: boolean;
 }
 
 const quickActions: QuickAction[] = [
@@ -33,7 +36,8 @@ const quickActions: QuickAction[] = [
     description: 'Créer une réservation rapide',
     icon: Calendar,
     route: '/reservations/new',
-    color: 'bg-primary hover:bg-primary/90'
+    color: 'bg-primary hover:bg-primary/90',
+    hasModal: true
   },
   {
     id: 'checkin',
@@ -42,7 +46,8 @@ const quickActions: QuickAction[] = [
     icon: Users,
     route: '/arrivals',
     badge: { text: '3 en attente', variant: 'warning' },
-    color: 'bg-secondary hover:bg-secondary/90'
+    color: 'bg-secondary hover:bg-secondary/90',
+    hasModal: true
   },
   {
     id: 'payment',
@@ -50,7 +55,8 @@ const quickActions: QuickAction[] = [
     description: 'Point de vente & facturation',
     icon: CreditCard,
     route: '/pos',
-    color: 'bg-accent hover:bg-accent/90'
+    color: 'bg-accent hover:bg-accent/90',
+    hasModal: true
   },
   {
     id: 'housekeeping',
@@ -70,12 +76,13 @@ const quickActions: QuickAction[] = [
     color: 'bg-success hover:bg-success/90'
   },
   {
-    id: 'audit',
-    title: 'Clôture Journée',
-    description: 'Night audit & bilan',
-    icon: Clock,
-    route: '/audit',
-    color: 'bg-warning hover:bg-warning/90 text-warning-foreground'
+    id: 'search',
+    title: 'Recherche Globale',
+    description: 'Trouver clients, réservations...',
+    icon: Search,
+    route: '/search',
+    color: 'bg-info hover:bg-info/90',
+    hasModal: true
   }
 ];
 
@@ -99,12 +106,11 @@ export function QuickActionsWidget() {
           {quickActions.map((action) => {
             const Icon = action.icon;
             
-            return (
+            const ActionButton = (
               <Button
-                key={action.id}
                 variant="outline"
                 className="h-auto p-4 justify-start hover:shadow-md transition-all group"
-                onClick={() => handleActionClick(action)}
+                onClick={() => !action.hasModal && handleActionClick(action)}
               >
                 <div className="flex items-start gap-3 w-full">
                   <div className={`p-2 rounded-lg ${action.color} text-white shrink-0`}>
@@ -131,6 +137,20 @@ export function QuickActionsWidget() {
                 </div>
               </Button>
             );
+
+            // Wrap with modal if needed
+            if (action.hasModal) {
+              return (
+                <QuickActionModal
+                  key={action.id}
+                  action={action.id as any}
+                  trigger={ActionButton}
+                  onComplete={() => handleActionClick(action)}
+                />
+              );
+            }
+
+            return <div key={action.id}>{ActionButton}</div>;
           })}
         </div>
       </CardContent>
