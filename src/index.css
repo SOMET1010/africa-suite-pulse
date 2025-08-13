@@ -3,6 +3,7 @@
 @import "./styles/tokens.css";
 @import "./styles/animations.css";
 @import "./styles/focus.css";
+@import "./styles/interactions.css";
 
 @tailwind base;
 @tailwind components;

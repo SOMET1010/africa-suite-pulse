@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { TButton } from "@/core/ui/TButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -278,24 +278,27 @@ export function ComprehensivePaymentDialog({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-3 gap-2">
-                    <Button
-                      variant={discountType === 'none' ? 'default' : 'outline'}
+                    <TButton
+                      variant={discountType === 'none' ? 'primary' : 'default'}
                       onClick={() => setDiscountType('none')}
+                      className="tap-target"
                     >
                       Aucune
-                    </Button>
-                    <Button
-                      variant={discountType === 'percent' ? 'default' : 'outline'}
+                    </TButton>
+                    <TButton
+                      variant={discountType === 'percent' ? 'primary' : 'default'}
                       onClick={() => setDiscountType('percent')}
+                      className="tap-target"
                     >
                       %
-                    </Button>
-                    <Button
-                      variant={discountType === 'amount' ? 'default' : 'outline'}
+                    </TButton>
+                    <TButton
+                      variant={discountType === 'amount' ? 'primary' : 'default'}
                       onClick={() => setDiscountType('amount')}
+                      className="tap-target"
                     >
                       XOF
-                    </Button>
+                    </TButton>
                   </div>
                   
                   {discountType !== 'none' && (
@@ -335,21 +338,48 @@ export function ComprehensivePaymentDialog({
                   <CardTitle>Méthode de paiement</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-2">
-                    {paymentMethods.map((method) => (
-                      <Button
-                        key={method.id}
-                        variant={selectedMethodId === method.id ? 'default' : 'outline'}
-                        onClick={() => setSelectedMethodId(method.id)}
-                        className="flex items-center gap-2 h-16"
-                      >
-                        {method.code === 'ROOM_CHARGE' ? 
-                          <Hotel className="h-5 w-5" /> : 
-                          getPaymentMethodIcon(method.kind)
-                        }
-                        <span className="text-sm">{method.label}</span>
-                      </Button>
-                    ))}
+                  {/* Mobile Money Section */}
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-muted-foreground">Mobile Money</div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {paymentMethods.filter(m => m.kind === 'mobile_money').map((method) => (
+                        <TButton
+                          key={method.id}
+                          variant={selectedMethodId === method.id ? 'primary' : 'default'}
+                          onClick={() => setSelectedMethodId(method.id)}
+                          className={`mobile-money-btn ${
+                            method.code === 'ORANGE_MONEY' ? 'mobile-money-orange' :
+                            method.code === 'MTN_MOMO' ? 'mobile-money-mtn' :
+                            method.code === 'MOOV_MONEY' ? 'mobile-money-moov' :
+                            method.code === 'WAVE' ? 'mobile-money-wave' : ''
+                          }`}
+                        >
+                          <Smartphone className="h-5 w-5" />
+                          <span className="text-xs font-medium">{method.label}</span>
+                        </TButton>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Other Payment Methods */}
+                  <div className="space-y-3">
+                    <div className="text-sm font-medium text-muted-foreground">Autres moyens</div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {paymentMethods.filter(m => m.kind !== 'mobile_money').map((method) => (
+                        <TButton
+                          key={method.id}
+                          variant={selectedMethodId === method.id ? 'primary' : 'default'}
+                          onClick={() => setSelectedMethodId(method.id)}
+                          className="tap-target flex items-center gap-2 h-16"
+                        >
+                          {method.code === 'ROOM_CHARGE' ? 
+                            <Hotel className="h-5 w-5" /> : 
+                            getPaymentMethodIcon(method.kind)
+                          }
+                          <span className="text-sm">{method.label}</span>
+                        </TButton>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Room Charge Info */}
@@ -389,13 +419,13 @@ export function ComprehensivePaymentDialog({
               </Card>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={onClose} className="flex-1">
+                <TButton variant="default" onClick={onClose} className="flex-1 tap-target">
                   Annuler
-                </Button>
-                <Button 
+                </TButton>
+                <TButton 
                   onClick={processPayment}
                   disabled={!canProcessPayment() || isProcessing}
-                  className="flex-1"
+                  className="flex-1 tap-target"
                 >
                   {isRoomChargeSelected() ? (
                     <>
@@ -408,7 +438,7 @@ export function ComprehensivePaymentDialog({
                       {isProcessing ? "Traitement..." : `Payer ${calculateFinalTotal().toLocaleString()} XOF`}
                     </>
                   )}
-                </Button>
+                </TButton>
               </div>
             </div>
           </div>

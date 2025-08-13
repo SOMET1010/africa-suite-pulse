@@ -1,0 +1,79 @@
+/* Dropdown and popover enhancements - fixing transparency issues */
+
+@layer components {
+  /* Ensure all dropdowns have solid backgrounds and proper z-index */
+  .dropdown-content-solid {
+    @apply bg-card/95 backdrop-blur-md border border-border shadow-elegant z-50;
+    @apply supports-[backdrop-filter]:bg-card/90;
+  }
+
+  .select-content-solid {
+    @apply bg-card border border-border shadow-soft z-50;
+  }
+
+  .popover-content-solid {
+    @apply bg-card border border-border shadow-soft z-50;
+  }
+
+  /* Touch-first interaction patterns */
+  .touch-tap {
+    @apply cursor-pointer transition-transform duration-150 active:scale-95;
+  }
+
+  .touch-long-press {
+    @apply cursor-pointer select-none;
+  }
+
+  .touch-swipe {
+    @apply touch-pan-x select-none;
+  }
+
+  /* Mobile Money provider buttons */
+  .mobile-money-btn {
+    @apply tap-target min-h-16 flex flex-col items-center justify-center gap-1 p-3 rounded-xl border-2 transition-all duration-200;
+    @apply hover:scale-105 active:scale-95 focus-button;
+  }
+
+  .mobile-money-orange {
+    @apply border-orange-500/30 bg-orange-50 text-orange-700 hover:border-orange-500 hover:bg-orange-100;
+  }
+
+  .mobile-money-mtn {
+    @apply border-yellow-500/30 bg-yellow-50 text-yellow-700 hover:border-yellow-500 hover:bg-yellow-100;
+  }
+
+  .mobile-money-moov {
+    @apply border-blue-500/30 bg-blue-50 text-blue-700 hover:border-blue-500 hover:bg-blue-100;
+  }
+
+  .mobile-money-wave {
+    @apply border-pink-500/30 bg-pink-50 text-pink-700 hover:border-pink-500 hover:bg-pink-100;
+  }
+
+  /* Preview panels */
+  .preview-panel {
+    @apply bg-card/95 backdrop-blur-md border border-border rounded-xl shadow-elegant p-4 z-40;
+    @apply animate-scale-in;
+  }
+
+  .conflict-badge {
+    @apply bg-warning/10 text-warning border border-warning/30 rounded-lg px-3 py-2 text-sm;
+  }
+
+  /* Improved DnD states */
+  .drag-preview {
+    @apply opacity-75 scale-95 rotate-2 shadow-glow;
+  }
+
+  .drop-zone-highlight {
+    @apply ring-2 ring-primary ring-offset-2 bg-primary/5 scale-105 transition-all duration-200;
+  }
+
+  .drop-zone-conflict {
+    @apply ring-2 ring-warning ring-offset-2 bg-warning/5;
+  }
+
+  .drop-zone-invalid {
+    @apply ring-2 ring-danger ring-offset-2 bg-danger/5;
+  }
+}
