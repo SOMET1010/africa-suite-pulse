@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import type { Json } from '@/integrations/supabase/types';
 
 export interface Profile {
   id: string;
@@ -10,7 +11,7 @@ export interface Profile {
   avatar_url: string | null;
   phone: string | null;
   bio: string | null;
-  preferences: Record<string, any>;
+  preferences: Json;
   last_seen_at: string | null;
   created_at: string;
   updated_at: string;
