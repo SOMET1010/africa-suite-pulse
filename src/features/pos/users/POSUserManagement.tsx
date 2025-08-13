@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,20 +37,32 @@ export function POSUserManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch POS users
+  // Fetch POS users - simplified without join for now
   const { data: posUsers = [], isLoading } = useQuery({
     queryKey: ["pos-users"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pos_users")
-        .select(`
-          *,
-          user_roles!inner(role)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
-      return data || [];
+      
+      // For each user, fetch their role separately
+      const usersWithRoles = await Promise.all((data || []).map(async (user) => {
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.user_id)
+          .single();
+        
+        return {
+          ...user,
+          role: roleData?.role || 'pos_server'
+        };
+      }));
+      
+      return usersWithRoles;
     }
   });
 
@@ -108,7 +121,7 @@ export function POSUserManagement() {
       (searchTerm === "" || 
        user.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
        (user.employee_code && user.employee_code.toLowerCase().includes(searchTerm.toLowerCase()))) &&
-      (roleFilter === "" || user.user_roles?.role === roleFilter)
+      (roleFilter === "" || user.role === roleFilter)
     );
   });
 
@@ -218,7 +231,7 @@ export function POSUserManagement() {
               <div>
                 <p className="text-sm text-muted-foreground">Managers</p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {posUsers.filter(u => u.user_roles?.role === 'pos_manager').length}
+                  {posUsers.filter(u => u.role === 'pos_manager').length}
                 </p>
               </div>
             </div>
@@ -291,7 +304,7 @@ export function POSUserManagement() {
                         <Badge variant="outline">{user.employee_code || 'N/A'}</Badge>
                       </TableCell>
                       <TableCell>
-                        {getRoleBadge(user.user_roles?.role || 'pos_server')}
+                        {getRoleBadge(user.role || 'pos_server')}
                       </TableCell>
                       <TableCell>
                         {user.last_login_at 

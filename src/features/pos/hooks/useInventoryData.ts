@@ -124,7 +124,7 @@ export function useInventoryData() {
     item.current_stock <= item.min_stock_level
   );
 
-  // Mutations - Fixed to return mutation functions directly
+  // Mutations - Return the mutation objects instead of just mutate function
   const addStockItemMutation = useMutation({
     mutationFn: async (itemData: any) => {
       const { data, error } = await supabase

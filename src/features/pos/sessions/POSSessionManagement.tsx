@@ -67,10 +67,16 @@ export function POSSessionManagement() {
   // Open session mutation
   const openSessionMutation = useMutation({
     mutationFn: async (data: { opening_cash: number; notes?: string }) => {
+      // Get current user and org info
+      const { data: user } = await supabase.auth.getUser();
+      const { data: orgData } = await supabase.rpc('get_current_user_org_id');
+      
       const { data: result, error } = await supabase
         .from("pos_sessions")
         .insert({
-          cashier_id: (await supabase.auth.getUser()).data.user?.id || '',
+          org_id: orgData || '',
+          session_number: `SES-${Date.now()}`, // Temporary - should use DB function
+          cashier_id: user?.user?.id || '',
           outlet_id: 'default', // Would get from context
           opening_cash: data.opening_cash,
           status: 'open',
