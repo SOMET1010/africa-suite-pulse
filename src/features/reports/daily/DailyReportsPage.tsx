@@ -3,10 +3,10 @@ import { PageLayout } from "@/core/layout/PageLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Calendar, Users, UserCheck, UserX, Building, FileText, Download } from "lucide-react";
-import { ArrivalsReport } from "./components/ArrivalsReport";
-import { DeparturesReport } from "./components/DeparturesReport";
+import { EnhancedArrivalsReport } from "./components/EnhancedArrivalsReport";
+import { EnhancedDeparturesReport } from "./components/EnhancedDeparturesReport";
 import { InHouseReport } from "./components/InHouseReport";
-import { NoShowReport } from "./components/NoShowReport";
+import { EnhancedNoShowReport } from "./components/EnhancedNoShowReport";
 import { OccupancyReport } from "./components/OccupancyReport";
 
 export default function DailyReportsPage() {
@@ -77,11 +77,11 @@ export default function DailyReportsPage() {
         </TabsList>
 
         <TabsContent value="arrivals" className="space-y-6">
-          <ArrivalsReport selectedDate={selectedDate} />
+          <EnhancedArrivalsReport selectedDate={selectedDate} />
         </TabsContent>
 
         <TabsContent value="departures" className="space-y-6">
-          <DeparturesReport selectedDate={selectedDate} />
+          <EnhancedDeparturesReport selectedDate={selectedDate} />
         </TabsContent>
 
         <TabsContent value="inhouse" className="space-y-6">
@@ -89,7 +89,7 @@ export default function DailyReportsPage() {
         </TabsContent>
 
         <TabsContent value="noshow" className="space-y-6">
-          <NoShowReport selectedDate={selectedDate} />
+          <EnhancedNoShowReport selectedDate={selectedDate} />
         </TabsContent>
 
         <TabsContent value="occupancy" className="space-y-6">
