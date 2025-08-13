@@ -11,15 +11,7 @@ export const useTableAssignments = (outletId?: string) => {
 
       const { data, error } = await supabase
         .from('table_assignments')
-        .select(`
-          *,
-          pos_tables!table_id (
-            table_number,
-            zone,
-            capacity,
-            status
-          )
-        `)
+        .select('*')
         .eq('shift_date', new Date().toISOString().split('T')[0])
         .order('assigned_at', { ascending: false });
 
