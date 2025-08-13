@@ -36,8 +36,8 @@ export async function searchActiveReservation(roomNumber: string): Promise<Activ
       room_id,
       reference,
       status,
-      guests!inner(first_name, last_name),
-      rooms!inner(number)
+      guests!guest_id(first_name, last_name),
+      rooms!room_id(number)
     `)
     .eq('rooms.number', roomNumber)
     .eq('status', 'present')
@@ -99,7 +99,7 @@ export async function processRoomCharge(
       .single();
 
     if (existingInvoice) {
-      invoiceId = existingInvoice.id;
+      invoiceId = existingInvoice.id.toString();
     } else {
       // Créer une nouvelle facture
       const { data: newInvoice, error: invoiceError } = await supabase
@@ -120,7 +120,7 @@ export async function processRoomCharge(
       if (invoiceError || !newInvoice) {
         return { success: false, error: 'Erreur lors de la création de la facture' };
       }
-      invoiceId = newInvoice.id;
+      invoiceId = newInvoice.id.toString();
     }
 
     // 4. Ajouter les items à la facture
@@ -144,7 +144,7 @@ export async function processRoomCharge(
     }
 
     // 5. Créer la transaction de paiement
-    const transactionData: CreateTransactionInput = {
+    const transactionData = {
       org_id: reservation.org_id,
       invoice_id: invoiceId,
       method_id: paymentMethod.id,
@@ -155,7 +155,7 @@ export async function processRoomCharge(
         guest_name: chargeData.guestName,
         signature: chargeData.signature,
         items_count: chargeData.orderItems.length
-      }
+      } as any
     };
 
     const { data: transaction, error: txError } = await supabase
