@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,17 +17,17 @@ import { useToast } from "@/hooks/use-toast";
 interface POSSession {
   id: string;
   session_number: string;
-  user_id: string;
+  cashier_id: string;
   outlet_id: string;
   status: string;
-  opening_amount: number;
-  expected_amount: number;
-  counted_amount?: number;
-  discrepancy?: number;
-  opened_at: string;
+  opening_cash: number;
+  closing_cash?: number;
+  total_sales: number;
+  total_transactions: number;
+  started_at: string;
   closed_at?: string;
   notes?: string;
-  user_name?: string;
+  cashier_name?: string;
   outlet_name?: string;
 }
 
@@ -34,10 +35,6 @@ export function POSSessionManagement() {
   const [showOpenSession, setShowOpenSession] = useState(false);
   const [showCloseSession, setShowCloseSession] = useState(false);
   const [selectedSession, setSelectedSession] = useState<POSSession | null>(null);
-  const [countingData, setCountingData] = useState({
-    counted_amount: 0,
-    notes: ""
-  });
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -50,16 +47,15 @@ export function POSSessionManagement() {
         .from("pos_sessions")
         .select(`
           *,
-          pos_users!inner(display_name),
           pos_outlets!inner(name)
         `)
-        .order("opened_at", { ascending: false })
+        .order("started_at", { ascending: false })
         .limit(50);
       
       if (error) throw error;
       return data?.map(session => ({
         ...session,
-        user_name: session.pos_users?.display_name,
+        cashier_name: session.cashier_id, // Simplified - would need pos_users table
         outlet_name: session.pos_outlets?.name
       })) || [];
     }
@@ -70,15 +66,17 @@ export function POSSessionManagement() {
 
   // Open session mutation
   const openSessionMutation = useMutation({
-    mutationFn: async (data: { opening_amount: number; notes?: string }) => {
+    mutationFn: async (data: { opening_cash: number; notes?: string }) => {
       const { data: result, error } = await supabase
         .from("pos_sessions")
         .insert({
-          user_id: (await supabase.auth.getUser()).data.user?.id,
+          cashier_id: (await supabase.auth.getUser()).data.user?.id || '',
           outlet_id: 'default', // Would get from context
-          opening_amount: data.opening_amount,
+          opening_cash: data.opening_cash,
           status: 'open',
-          notes: data.notes
+          notes: data.notes,
+          total_sales: 0,
+          total_transactions: 0
         })
         .select()
         .single();
@@ -105,18 +103,15 @@ export function POSSessionManagement() {
 
   // Close session mutation
   const closeSessionMutation = useMutation({
-    mutationFn: async (data: { session_id: string; counted_amount: number; notes?: string }) => {
+    mutationFn: async (data: { session_id: string; closing_cash: number; notes?: string }) => {
       const session = sessions.find(s => s.id === data.session_id);
       if (!session) throw new Error("Session introuvable");
-
-      const discrepancy = data.counted_amount - session.expected_amount;
 
       const { error } = await supabase
         .from("pos_sessions")
         .update({
           status: 'closed',
-          counted_amount: data.counted_amount,
-          discrepancy: discrepancy,
+          closing_cash: data.closing_cash,
           closed_at: new Date().toISOString(),
           notes: data.notes
         })
@@ -154,7 +149,7 @@ export function POSSessionManagement() {
   };
 
   const calculateSessionDuration = (session: POSSession) => {
-    const start = new Date(session.opened_at);
+    const start = new Date(session.started_at);
     const end = session.closed_at ? new Date(session.closed_at) : new Date();
     const diff = end.getTime() - start.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -163,11 +158,16 @@ export function POSSessionManagement() {
   };
 
   const todaySessions = sessions.filter(s => 
-    new Date(s.opened_at).toDateString() === new Date().toDateString()
+    new Date(s.started_at).toDateString() === new Date().toDateString()
   );
 
-  const totalRevenue = todaySessions.reduce((sum, s) => sum + (s.expected_amount || 0), 0);
-  const totalDiscrepancy = todaySessions.reduce((sum, s) => sum + Math.abs(s.discrepancy || 0), 0);
+  const totalRevenue = todaySessions.reduce((sum, s) => sum + (s.total_sales || 0), 0);
+  const totalDiscrepancy = todaySessions.reduce((sum, s) => {
+    if (s.closing_cash && s.opening_cash) {
+      return sum + Math.abs((s.closing_cash - s.opening_cash) - s.total_sales);
+    }
+    return sum;
+  }, 0);
 
   return (
     <div className="space-y-6">
@@ -221,7 +221,7 @@ export function POSSessionManagement() {
                 <div>
                   <p className="font-medium">Session Active</p>
                   <p className="text-sm text-muted-foreground">
-                    {currentSession.session_number} • Ouverte à {new Date(currentSession.opened_at).toLocaleTimeString('fr-FR')}
+                    {currentSession.session_number} • Ouverte à {new Date(currentSession.started_at).toLocaleTimeString('fr-FR')}
                   </p>
                 </div>
               </div>
@@ -319,7 +319,7 @@ export function POSSessionManagement() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Utilisateur:</span>
-                        <span className="font-medium">{currentSession.user_name}</span>
+                        <span className="font-medium">{currentSession.cashier_name}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Point de vente:</span>
@@ -328,7 +328,7 @@ export function POSSessionManagement() {
                       <div className="flex justify-between">
                         <span>Ouverture:</span>
                         <span className="font-medium">
-                          {new Date(currentSession.opened_at).toLocaleString('fr-FR')}
+                          {new Date(currentSession.started_at).toLocaleString('fr-FR')}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -343,17 +343,17 @@ export function POSSessionManagement() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Ouverture:</span>
-                        <span className="font-medium">{currentSession.opening_amount.toLocaleString()} FCFA</span>
+                        <span className="font-medium">{currentSession.opening_cash.toLocaleString()} FCFA</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Ventes:</span>
-                        <span className="font-medium">
-                          {(currentSession.expected_amount - currentSession.opening_amount).toLocaleString()} FCFA
-                        </span>
+                        <span className="font-medium">{currentSession.total_sales.toLocaleString()} FCFA</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Attendu:</span>
-                        <span className="font-medium">{currentSession.expected_amount.toLocaleString()} FCFA</span>
+                        <span className="font-medium">
+                          {(currentSession.opening_cash + currentSession.total_sales).toLocaleString()} FCFA
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -365,7 +365,6 @@ export function POSSessionManagement() {
                         className="w-full" 
                         variant="outline"
                         onClick={() => {
-                          // Ouvrir tiroir caisse
                           toast({
                             title: "Tiroir caisse ouvert",
                             description: "Le tiroir caisse a été ouvert"
@@ -378,9 +377,6 @@ export function POSSessionManagement() {
                       <Button 
                         className="w-full" 
                         variant="outline"
-                        onClick={() => {
-                          // Voir rapport intermédiaire
-                        }}
                       >
                         <FileText className="w-4 h-4 mr-2" />
                         Rapport Intérimaire
@@ -420,9 +416,8 @@ export function POSSessionManagement() {
                     <TableHead>Utilisateur</TableHead>
                     <TableHead>Ouverture</TableHead>
                     <TableHead>Fermeture</TableHead>
-                    <TableHead>Attendu</TableHead>
-                    <TableHead>Compté</TableHead>
-                    <TableHead>Écart</TableHead>
+                    <TableHead>Ventes</TableHead>
+                    <TableHead>Transactions</TableHead>
                     <TableHead>Statut</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -430,11 +425,11 @@ export function POSSessionManagement() {
                   {sessions.map((session) => (
                     <TableRow key={session.id} className="hover:bg-muted/50 transition-colors">
                       <TableCell className="font-mono">{session.session_number}</TableCell>
-                      <TableCell>{session.user_name}</TableCell>
+                      <TableCell>{session.cashier_name}</TableCell>
                       <TableCell>
-                        {new Date(session.opened_at).toLocaleDateString('fr-FR')} <br />
+                        {new Date(session.started_at).toLocaleDateString('fr-FR')} <br />
                         <span className="text-sm text-muted-foreground">
-                          {new Date(session.opened_at).toLocaleTimeString('fr-FR')}
+                          {new Date(session.started_at).toLocaleTimeString('fr-FR')}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -447,17 +442,8 @@ export function POSSessionManagement() {
                           </>
                         ) : 'En cours'}
                       </TableCell>
-                      <TableCell>{session.expected_amount.toLocaleString()} FCFA</TableCell>
-                      <TableCell>
-                        {session.counted_amount ? `${session.counted_amount.toLocaleString()} FCFA` : '-'}
-                      </TableCell>
-                      <TableCell>
-                        {session.discrepancy !== undefined ? (
-                          <span className={session.discrepancy === 0 ? 'text-green-600' : 'text-red-600'}>
-                            {session.discrepancy > 0 ? '+' : ''}{session.discrepancy.toLocaleString()} FCFA
-                          </span>
-                        ) : '-'}
-                      </TableCell>
+                      <TableCell>{session.total_sales.toLocaleString()} FCFA</TableCell>
+                      <TableCell>{session.total_transactions}</TableCell>
                       <TableCell>{getSessionStatus(session)}</TableCell>
                     </TableRow>
                   ))}
@@ -507,7 +493,7 @@ export function POSSessionManagement() {
 
 function OpenSessionForm({ onSubmit, onClose }: any) {
   const [formData, setFormData] = useState({
-    opening_amount: 0,
+    opening_cash: 0,
     notes: ""
   });
 
@@ -526,12 +512,12 @@ function OpenSessionForm({ onSubmit, onClose }: any) {
       </DialogHeader>
 
       <div>
-        <Label htmlFor="opening_amount">Montant d'ouverture (FCFA)</Label>
+        <Label htmlFor="opening_cash">Montant d'ouverture (FCFA)</Label>
         <Input
-          id="opening_amount"
+          id="opening_cash"
           type="number"
-          value={formData.opening_amount}
-          onChange={(e) => setFormData({...formData, opening_amount: Number(e.target.value)})}
+          value={formData.opening_cash}
+          onChange={(e) => setFormData({...formData, opening_cash: Number(e.target.value)})}
           required
         />
       </div>
@@ -559,12 +545,13 @@ function OpenSessionForm({ onSubmit, onClose }: any) {
 }
 
 function CloseSessionForm({ session, onSubmit, onClose }: any) {
+  const expectedAmount = session.opening_cash + session.total_sales;
   const [formData, setFormData] = useState({
-    counted_amount: session.expected_amount,
+    closing_cash: expectedAmount,
     notes: ""
   });
 
-  const discrepancy = formData.counted_amount - session.expected_amount;
+  const discrepancy = formData.closing_cash - expectedAmount;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -583,7 +570,7 @@ function CloseSessionForm({ session, onSubmit, onClose }: any) {
       <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
         <div>
           <p className="text-sm text-muted-foreground">Attendu</p>
-          <p className="text-lg font-semibold">{session.expected_amount.toLocaleString()} FCFA</p>
+          <p className="text-lg font-semibold">{expectedAmount.toLocaleString()} FCFA</p>
         </div>
         <div>
           <p className="text-sm text-muted-foreground">Écart</p>
@@ -594,12 +581,12 @@ function CloseSessionForm({ session, onSubmit, onClose }: any) {
       </div>
 
       <div>
-        <Label htmlFor="counted_amount">Montant compté (FCFA)</Label>
+        <Label htmlFor="closing_cash">Montant compté (FCFA)</Label>
         <Input
-          id="counted_amount"
+          id="closing_cash"
           type="number"
-          value={formData.counted_amount}
-          onChange={(e) => setFormData({...formData, counted_amount: Number(e.target.value)})}
+          value={formData.closing_cash}
+          onChange={(e) => setFormData({...formData, closing_cash: Number(e.target.value)})}
           required
         />
       </div>

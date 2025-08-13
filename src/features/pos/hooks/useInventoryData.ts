@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -123,7 +124,7 @@ export function useInventoryData() {
     item.current_stock <= item.min_stock_level
   );
 
-  // Mutations
+  // Mutations - Fixed to return mutation functions directly
   const addStockItemMutation = useMutation({
     mutationFn: async (itemData: any) => {
       const { data, error } = await supabase
