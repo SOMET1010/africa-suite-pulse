@@ -48,6 +48,7 @@ import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 import DemoPage from "@/pages/DemoPage";
 import PricingPage from "@/pages/PricingPage";
 import UXFoundationsDemo from "@/pages/UXFoundationsDemo";
+import { ReceptionistDashboard, ServerDashboard, ManagerDashboard } from "@/features/dashboards";
 
 function Layout() {
   return (
@@ -112,6 +113,10 @@ export function AppRoutes() {
         <Route path="demo" element={<DemoPage />} />
         <Route path="ux-demo" element={<UXFoundationsDemo />} />
         <Route path="pricing" element={<PricingPage />} />
+        {/* Role-based dashboards */}
+        <Route path="dashboard/receptionist" element={<ReceptionistDashboard />} />
+        <Route path="dashboard/server" element={<ServerDashboard />} />
+        <Route path="dashboard/manager" element={<ManagerDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
