@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 
 const settingsTiles = [
   {
@@ -166,72 +167,64 @@ export default function SettingsHome() {
   const pendingCount = settingsTiles.filter(tile => tile.status === 'pending').length;
 
   return (
-    <div className="min-h-screen bg-pearl">
+    <UnifiedLayout
+      title="Centre de Configuration"
+      showStatusBar={true}
+      headerAction={
+        <div className="flex flex-wrap gap-3">
+          <div className="glass-card border-success/40 px-4 py-2 rounded-full shadow-soft">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-success" />
+              <span className="font-premium font-medium text-success">
+                {configuredCount} Configurés
+              </span>
+            </div>
+          </div>
+          {partialCount > 0 && (
+            <div className="glass-card border-warning/40 px-4 py-2 rounded-full shadow-soft">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-warning" />
+                <span className="font-premium font-medium text-warning">
+                  {partialCount} En cours
+                </span>
+              </div>
+            </div>
+          )}
+          {pendingCount > 0 && (
+            <div className="glass-card border-muted/40 px-4 py-2 rounded-full shadow-soft">
+              <div className="flex items-center gap-2">
+                <Clock4 className="h-4 w-4 text-muted-foreground" />
+                <span className="font-premium font-medium text-muted-foreground">
+                  {pendingCount} À configurer
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      }
+      className="min-h-screen bg-pearl"
+      contentClassName="relative"
+    >
       {/* Luxury gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-pearl via-background to-platinum/50" />
       
-      <div className="relative container mx-auto px-6 py-12">
-        {/* Luxury Header */}
-        <div className="mb-12">
-          <nav className="text-sm text-muted-foreground mb-6 font-premium" aria-label="Breadcrumb">
-            <span>Accueil</span> 
-            <Crown className="inline mx-2 h-3 w-3 accent-gold" />
-            <span className="accent-gold font-medium">Centre de Configuration</span>
-          </nav>
-          
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 glass-card border-accent-gold shadow-luxury rounded-xl">
-                  <Settings2 className="h-8 w-8 accent-gold" />
-                </div>
-                <div>
-                  <h1 className="text-4xl lg:text-5xl font-luxury font-bold text-charcoal leading-tight">
-                    Centre de Configuration
-                  </h1>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Star className="h-4 w-4 accent-gold" />
-                    <span className="text-lg text-muted-foreground font-premium">
-                      Gestion hôtelière de prestige
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <p className="text-muted-foreground font-premium text-lg max-w-2xl leading-relaxed">
-                Orchestrez l'excellence de votre établissement grâce à notre suite de configuration avancée
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <div className="glass-card border-success/40 px-4 py-2 rounded-full shadow-soft">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-success" />
-                  <span className="font-premium font-medium text-success">
-                    {configuredCount} Configurés
-                  </span>
-                </div>
-              </div>
-              {partialCount > 0 && (
-                <div className="glass-card border-warning/40 px-4 py-2 rounded-full shadow-soft">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-warning" />
-                    <span className="font-premium font-medium text-warning">
-                      {partialCount} En cours
-                    </span>
-                  </div>
-                </div>
-              )}
-              {pendingCount > 0 && (
-                <div className="glass-card border-muted/40 px-4 py-2 rounded-full shadow-soft">
-                  <div className="flex items-center gap-2">
-                    <Clock4 className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-premium font-medium text-muted-foreground">
-                      {pendingCount} À configurer
-                    </span>
-                  </div>
-                </div>
-              )}
+      <div className="relative space-y-12">
+        {/* Introduction */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <div className="p-3 glass-card border-accent-gold shadow-luxury rounded-xl">
+              <Settings2 className="h-8 w-8 accent-gold" />
             </div>
           </div>
+          <div className="flex items-center justify-center gap-2">
+            <Star className="h-4 w-4 accent-gold" />
+            <span className="text-lg text-muted-foreground font-premium">
+              Gestion hôtelière de prestige
+            </span>
+          </div>
+          <p className="text-muted-foreground font-premium text-lg max-w-2xl mx-auto leading-relaxed">
+            Orchestrez l'excellence de votre établissement grâce à notre suite de configuration avancée
+          </p>
         </div>
 
         {/* Luxury Settings Grid */}
@@ -313,7 +306,7 @@ export default function SettingsHome() {
         </div>
 
         {/* Luxury Analytics Dashboard */}
-        <div className="mt-16 space-y-8">
+        <div className="space-y-8">
           <div className="text-center">
             <h2 className="font-luxury text-3xl font-bold text-charcoal mb-2">
               Tableau de Bord Exécutif
@@ -393,6 +386,6 @@ export default function SettingsHome() {
           </div>
         </div>
       </div>
-    </div>
+    </UnifiedLayout>
   );
 }

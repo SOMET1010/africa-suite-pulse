@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Building2, MapPin, Mail, Globe, Clock, DollarSign, Calendar, Shield } from 'lucide-react';
+import { Building2, MapPin, Mail, Globe, Clock, DollarSign, Calendar, Shield, Save } from 'lucide-react';
+import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,21 +130,30 @@ export default function HotelSettingsForm() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2 flex items-center gap-2">
-            <Building2 className="h-8 w-8 text-primary" />
-            Paramètres Hôtel
-          </h1>
-          <p className="text-muted-foreground">
-            Configuration générale de votre établissement
-          </p>
+    <UnifiedLayout
+      title="Paramètres Hôtel"
+      showStatusBar={true}
+      headerAction={
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Building2 className="h-5 w-5" />
+          <span className="text-sm">Configuration générale</span>
         </div>
+      }
+      showBottomBar={true}
+      actions={[
+        {
+          id: 'save',
+          label: 'Sauvegarder',
+          icon: <Save className="h-4 w-4" />,
+          onClick: () => form.handleSubmit(onSubmit)(),
+          variant: 'primary',
+          disabled: saving,
+        },
+      ]}
+    >
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Section Identification */}
             <Card>
               <CardHeader>
@@ -538,9 +548,8 @@ export default function HotelSettingsForm() {
                 </Button>
               </div>
             </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+        </form>
+      </Form>
+    </UnifiedLayout>
   );
 }

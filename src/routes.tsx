@@ -69,8 +69,26 @@ export function AppRoutes() {
       <Route path="ux-demo" element={<RequireAuth><UXFoundationsDemo /></RequireAuth>} />
       <Route index element={<RequireAuth><Index /></RequireAuth>} />
       
+      {/* Critical Business Pages - Migrated to UnifiedLayout */}
+      <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+      <Route path="settings" element={<RequireAuth><SettingsHome /></RequireAuth>} />
+      <Route path="settings/hotel" element={<RequireAuth><HotelSettingsForm /></RequireAuth>} />
+      <Route path="settings/rooms" element={<RequireAuth><RoomsPage /></RequireAuth>} />
+      <Route path="settings/services" element={<RequireAuth><ServicesPage /></RequireAuth>} />
+      <Route path="settings/tariffs" element={<RequireAuth><TariffsPage /></RequireAuth>} />
+      <Route path="settings/payments" element={<RequireAuth><PaymentsPage /></RequireAuth>} />
+      <Route path="settings/users" element={<RequireAuth><UsersPage /></RequireAuth>} />
+      <Route path="settings/system" element={<RequireAuth><SystemSettingsPage /></RequireAuth>} />
+      <Route path="settings/templates" element={<RequireAuth><TemplatesPage /></RequireAuth>} />
+      <Route path="settings/analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
+      <Route path="settings/security" element={<RequireAuth><SecurityPage /></RequireAuth>} />
+      
+      {/* Legacy redirects */}
+      <Route path="settings/room-types" element={<RequireAuth><RoomsPage /></RequireAuth>} />
+      <Route path="settings/rooms-catalog" element={<RequireAuth><RoomsPage /></RequireAuth>} />
+      
+      {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
-        <Route path="dashboard" element={<Dashboard />} />
         <Route path="arrivals" element={<CheckinExpressPage />} />
         <Route path="departures" element={<DeparturesPage />} />
         <Route path="reservations" element={<ReservationsPage />} />
@@ -80,21 +98,8 @@ export function AppRoutes() {
         <Route path="reservations/allotments" element={<AllotmentsPage />} />
         <Route path="reservations/rack" element={<RackGrid />} />
         <Route path="guests" element={<GuestsPage />} />
-        <Route path="settings" element={<SettingsHome />} />
-        <Route path="settings/hotel" element={<HotelSettingsForm />} />
-        <Route path="settings/rooms" element={<RoomsPage />} />
-        {/* Legacy redirects */}
-        <Route path="settings/room-types" element={<RoomsPage />} />
-        <Route path="settings/rooms-catalog" element={<RoomsPage />} />
-        <Route path="settings/services" element={<ServicesPage />} />
-        <Route path="settings/tariffs" element={<TariffsPage />} />
-        <Route path="settings/payments" element={<PaymentsPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="cardex" element={<CardexPage />} />
-        <Route path="settings/users" element={<UsersPage />} />
-        <Route path="settings/system" element={<SystemSettingsPage />} />
-        <Route path="settings/templates" element={<TemplatesPage />} />
-        <Route path="settings/analytics" element={<AnalyticsPage />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
         <Route path="analytics/advanced" element={<AdvancedAnalytics />} />
         <Route path="reports" element={<ReportsManagement />} />
@@ -112,7 +117,6 @@ export function AppRoutes() {
         <Route path="pos/settings" element={<RequirePOSAuth requiredRole="pos_manager"><POSSettingsPage /></RequirePOSAuth>} />
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
-        <Route path="settings/security" element={<SecurityPage />} />
         <Route path="demo" element={<DemoPage />} />
         <Route path="pricing" element={<PricingPage />} />
         {/* Role-based dashboards */}
