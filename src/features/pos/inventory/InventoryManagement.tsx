@@ -83,7 +83,7 @@ export function InventoryManagement() {
               <AddItemForm 
                 warehouses={warehouses}
                 onSubmit={(data: any) => {
-                  addStockItem.mutate(data);
+                  addStockItem(data);
                   setShowAddItem(false);
                 }}
                 onClose={() => setShowAddItem(false)}
@@ -102,7 +102,7 @@ export function InventoryManagement() {
               <MovementForm 
                 stockItems={stockItems}
                 onSubmit={(data: any) => {
-                  addStockMovement.mutate(data);
+                  addStockMovement(data);
                   setShowMovement(false);
                 }}
                 onClose={() => setShowMovement(false)}
