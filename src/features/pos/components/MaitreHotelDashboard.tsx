@@ -23,12 +23,12 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [selectedServerId, setSelectedServerId] = useState<string>('');
   
-  // Mock data pour les serveurs - à remplacer par une vraie requête
+  // Mock data pour les serveurs avec de vrais UUIDs
   const availableServers = [
-    { id: 'server1', name: 'Marie Dubois', zone: 'Terrasse' },
-    { id: 'server2', name: 'Jean Martin', zone: 'Salle principale' },
-    { id: 'server3', name: 'Sophie Leroy', zone: 'VIP' },
-    { id: 'server4', name: 'Pierre Bernard', zone: 'Bar' }
+    { id: '550e8400-e29b-41d4-a716-446655440001', name: 'Marie Dubois', zone: 'Terrasse' },
+    { id: '550e8400-e29b-41d4-a716-446655440002', name: 'Jean Martin', zone: 'Salle principale' },
+    { id: '550e8400-e29b-41d4-a716-446655440003', name: 'Sophie Leroy', zone: 'VIP' },
+    { id: '550e8400-e29b-41d4-a716-446655440004', name: 'Pierre Bernard', zone: 'Bar' }
   ];
 
   // Calculs des tables assignées/non assignées
