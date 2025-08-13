@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Search, Users, Bed, Package, CreditCard, Clock, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [orgId, setOrgId] = useState<string>('');
+  const navigate = useNavigate();
 
   // Get user org on mount
   useEffect(() => {
@@ -230,15 +232,15 @@ export function GlobalSearch({ className, onResultSelect }: GlobalSearchProps) {
           {/* Quick Actions */}
           {!query && (
             <CommandGroup heading="Actions Rapides">
-              <CommandItem onSelect={() => setOpen(false)}>
+              <CommandItem onSelect={() => { setOpen(false); navigate('/guests'); }}>
                 <Users className="mr-2 h-4 w-4" />
                 <span>Nouveau Client</span>
               </CommandItem>
-              <CommandItem onSelect={() => setOpen(false)}>
+              <CommandItem onSelect={() => { setOpen(false); navigate('/reservations/new/quick'); }}>
                 <Clock className="mr-2 h-4 w-4" />
                 <span>Nouvelle Réservation</span>
               </CommandItem>
-              <CommandItem onSelect={() => setOpen(false)}>
+              <CommandItem onSelect={() => { setOpen(false); navigate('/pos/terminal'); }}>
                 <Package className="mr-2 h-4 w-4" />
                 <span>Commande Restaurant</span>
               </CommandItem>

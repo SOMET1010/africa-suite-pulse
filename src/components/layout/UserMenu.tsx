@@ -1,5 +1,6 @@
 import React from "react";
 import { User, Settings, LogOut, Shield, UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -23,6 +24,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user }: UserMenuProps) {
+  const navigate = useNavigate();
   // Mock user data - in real app, this would come from auth context
   const currentUser = user || {
     name: "Administrateur",
@@ -115,12 +117,18 @@ export function UserMenu({ user }: UserMenuProps) {
         
         <DropdownMenuSeparator className="bg-accent-gold/20" />
         
-        <DropdownMenuItem className="hover:bg-soft-primary transition-elegant">
+        <DropdownMenuItem 
+          onClick={() => navigate('/settings/users')}
+          className="hover:bg-soft-primary transition-elegant"
+        >
           <UserCircle className="w-4 h-4 mr-2" />
           Mon profil
         </DropdownMenuItem>
         
-        <DropdownMenuItem className="hover:bg-soft-primary transition-elegant">
+        <DropdownMenuItem 
+          onClick={() => navigate('/settings')}
+          className="hover:bg-soft-primary transition-elegant"
+        >
           <Settings className="w-4 h-4 mr-2" />
           Préférences
         </DropdownMenuItem>

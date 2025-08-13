@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Users, Clock, Bed, Package, CreditCard, Settings, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,14 +30,14 @@ interface QuickActionsProps {
   className?: string;
 }
 
-const actionsByRole: Record<string, QuickAction[]> = {
+const getActionsByRole = (navigate: ReturnType<typeof useNavigate>): Record<string, QuickAction[]> => ({
   receptionist: [
     {
       id: 'new-reservation',
       label: 'Nouvelle Réservation',
       icon: Clock,
       shortcut: 'Ctrl+R',
-      action: () => logger.debug('New reservation action triggered'),
+      action: () => navigate('/reservations/new/quick'),
       category: 'primary'
     },
     {
@@ -45,7 +45,7 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Check-in',
       icon: Users,
       shortcut: 'Ctrl+I',
-      action: () => logger.debug('Check-in action triggered'),
+      action: () => navigate('/arrivals'),
       badge: '3',
       category: 'primary'
     },
@@ -54,14 +54,14 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Check-out',
       icon: CreditCard,
       shortcut: 'Ctrl+O',
-      action: () => logger.debug('Check-out action triggered'),
+      action: () => navigate('/departures'),
       category: 'primary'
     },
     {
       id: 'room-status',
       label: 'État des Chambres',
       icon: Bed,
-      action: () => logger.debug('Room status action triggered'),
+      action: () => navigate('/rack'),
       category: 'secondary'
     }
   ],
@@ -71,14 +71,14 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Nouvelle Commande',
       icon: Plus,
       shortcut: 'Ctrl+N',
-      action: () => logger.debug('New order action triggered'),
+      action: () => navigate('/pos/terminal'),
       category: 'primary'
     },
     {
       id: 'table-management',
       label: 'Gestion Tables',
       icon: Package,
-      action: () => logger.debug('Table management action triggered'),
+      action: () => navigate('/pos/maitre-hotel'),
       badge: '2',
       category: 'primary'
     },
@@ -87,7 +87,7 @@ const actionsByRole: Record<string, QuickAction[]> = {
       label: 'Encaissement',
       icon: CreditCard,
       shortcut: 'Ctrl+P',
-      action: () => logger.debug('Payment action triggered'),
+      action: () => navigate('/pos/terminal'),
       category: 'primary'
     }
   ],
@@ -96,21 +96,21 @@ const actionsByRole: Record<string, QuickAction[]> = {
       id: 'dashboard',
       label: 'Dashboard',
       icon: Package,
-      action: () => logger.debug('Dashboard action triggered'),
+      action: () => navigate('/dashboard'),
       category: 'primary'
     },
     {
       id: 'reports',
       label: 'Rapports',
       icon: CreditCard,
-      action: () => logger.debug('Reports action triggered'),
+      action: () => navigate('/reports'),
       category: 'secondary'
     },
     {
       id: 'settings',
       label: 'Paramètres',
       icon: Settings,
-      action: () => logger.debug('Settings action triggered'),
+      action: () => navigate('/settings'),
       category: 'admin'
     }
   ],
@@ -119,22 +119,24 @@ const actionsByRole: Record<string, QuickAction[]> = {
       id: 'system-config',
       label: 'Configuration',
       icon: Settings,
-      action: () => logger.debug('System config action triggered'),
+      action: () => navigate('/settings/system'),
       category: 'admin'
     },
     {
       id: 'user-management',
       label: 'Utilisateurs',
       icon: Users,
-      action: () => logger.debug('User management action triggered'),
+      action: () => navigate('/settings/users'),
       category: 'admin'
     }
   ]
-};
+});
 
 export function QuickActions({ userRole = 'receptionist', className }: QuickActionsProps) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
   
+  const actionsByRole = getActionsByRole(navigate);
   const actions = actionsByRole[userRole] || actionsByRole.receptionist;
   const primaryActions = actions.filter(a => a.category === 'primary');
   const secondaryActions = actions.filter(a => a.category === 'secondary');
