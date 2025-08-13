@@ -4177,6 +4177,10 @@ export type Database = {
         Args: { equipment_id_param: string }
         Returns: string
       }
+      can_access_view_data: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       complete_housekeeping_task: {
         Args: {
           task_id: string
@@ -4208,6 +4212,46 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_guest_stay_history_secure: {
+        Args: { p_guest_id?: string }
+        Returns: {
+          guest_id: string
+          reservation_id: string
+          first_name: string
+          last_name: string
+          email: string
+          phone: string
+          room_number: string
+          room_type: string
+          date_arrival: string
+          date_departure: string
+          nights_count: number
+          adults: number
+          children: number
+          rate_total: number
+          invoice_total: number
+          invoice_number: string
+          reservation_reference: string
+          reservation_status: string
+        }[]
+      }
+      get_reservations_with_details_secure: {
+        Args: { p_reservation_id?: string }
+        Returns: {
+          id: string
+          guest_id: string
+          room_id: string
+          status: string
+          date_arrival: string
+          date_departure: string
+          guest_name: string
+          guest_email: string
+          guest_phone: string
+          room_number: string
+          room_type: string
+          rate_total: number
+        }[]
       }
       get_server_tables: {
         Args: { p_server_id: string; p_org_id?: string }
