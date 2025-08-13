@@ -46,151 +46,136 @@ serve(async (req) => {
 
     const orgId = orgData.org_id;
 
-    // Get outlets
-    let outletFilter = supabase
-      .from('pos_outlets')
-      .select('*')
+    // Get POS sessions for the date
+    const sessionsQuery = supabase
+      .from('pos_sessions')
+      .select(`
+        id,
+        session_number,
+        outlet_name,
+        status,
+        opening_cash,
+        closing_cash,
+        opened_at,
+        closed_at,
+        pos_users(display_name)
+      `)
       .eq('org_id', orgId)
-      .eq('is_active', true);
+      .gte('opened_at', `${date}T00:00:00`)
+      .lte('opened_at', `${date}T23:59:59`);
 
     if (outlet_id) {
-      outletFilter = outletFilter.eq('id', outlet_id);
+      sessionsQuery.eq('outlet_id', outlet_id);
     }
 
-    const { data: outlets, error: outletsError } = await outletFilter;
-
-    if (outletsError) throw outletsError;
+    const { data: sessions, error: sessionsError } = await sessionsQuery;
+    if (sessionsError) throw sessionsError;
 
     const reports = [];
 
-    for (const outlet of outlets) {
-      // Get sessions for this outlet and date
-      const { data: sessions } = await supabase
-        .from('pos_sessions')
-        .select('*, app_users(full_name)')
-        .eq('org_id', orgId)
-        .eq('outlet_id', outlet.id)
-        .gte('started_at', `${date}T00:00:00`)
-        .lt('started_at', `${date}T23:59:59`)
-        .order('started_at', { ascending: false });
-
-      // Get orders for this outlet and date
-      const { data: orders } = await supabase
+    for (const session of sessions || []) {
+      // Get orders for this session
+      const { data: orders, error: ordersError } = await supabase
         .from('pos_orders')
         .select(`
-          *,
-          pos_order_items(*)
+          id,
+          order_number,
+          total_amount,
+          payment_method,
+          pos_order_items(
+            id,
+            quantity,
+            unit_price,
+            total_price,
+            pos_products(name, category)
+          )
         `)
         .eq('org_id', orgId)
-        .gte('created_at', `${date}T00:00:00`)
-        .lt('created_at', `${date}T23:59:59`)
-        .neq('status', 'cancelled');
+        .eq('session_id', session.id)
+        .eq('status', 'completed');
 
-      // Get payment transactions for POS orders
-      const orderIds = orders?.map(o => o.id) || [];
-      let paymentTransactions = [];
-      
-      if (orderIds.length > 0) {
-        const { data: transactions } = await supabase
-          .from('payment_transactions')
-          .select(`
-            *,
-            payment_methods(code, label)
-          `)
-          .eq('org_id', orgId)
-          .in('reference', orderIds.map(id => `POS-${id}`))
-          .gte('created_at', `${date}T00:00:00`)
-          .lt('created_at', `${date}T23:59:59`);
-        
-        paymentTransactions = transactions || [];
-      }
+      if (ordersError) throw ordersError;
 
-      // Calculate totals
-      const totalSales = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
-      const totalTransactions = orders?.length || 0;
-      const discountsTotal = orders?.reduce((sum, order) => sum + (order.discount_amount || 0), 0) || 0;
-      const taxTotal = orders?.reduce((sum, order) => sum + (order.tax_amount || 0), 0) || 0;
-
-      // Group payments by method
-      const paymentMethods = paymentTransactions.reduce((acc, transaction) => {
-        const methodCode = transaction.payment_methods?.code || 'UNKNOWN';
-        const methodName = transaction.payment_methods?.label || 'Inconnu';
-        
-        if (!acc[methodCode]) {
-          acc[methodCode] = {
-            method_code: methodCode,
-            method_name: methodName,
+      // Get payment methods summary
+      const paymentMethods = {};
+      orders?.forEach(order => {
+        const method = order.payment_method || 'cash';
+        if (!paymentMethods[method]) {
+          paymentMethods[method] = {
             amount: 0,
-            transaction_count: 0,
-            percentage: 0
+            transaction_count: 0
           };
         }
-        
-        acc[methodCode].amount += transaction.amount;
-        acc[methodCode].transaction_count += 1;
-        
-        return acc;
-      }, {} as Record<string, any>);
-
-      // Calculate percentages
-      Object.values(paymentMethods).forEach((method: any) => {
-        method.percentage = totalSales > 0 ? (method.amount / totalSales) * 100 : 0;
+        paymentMethods[method].amount += order.total_amount;
+        paymentMethods[method].transaction_count += 1;
       });
 
-      // Group products by category
-      const productCategories = {};
+      // Get product categories summary
+      const categories = {};
       orders?.forEach(order => {
         order.pos_order_items?.forEach(item => {
-          // For now, use a simple category extraction or default
-          const categoryName = item.product_name?.split(' ')[0] || 'Divers';
-          
-          if (!productCategories[categoryName]) {
-            productCategories[categoryName] = {
-              category_name: categoryName,
+          const categoryName = item.pos_products?.category || 'Autres';
+          if (!categories[categoryName]) {
+            categories[categoryName] = {
               items_sold: 0,
-              revenue: 0,
-              percentage: 0
+              revenue: 0
             };
           }
-          
-          productCategories[categoryName].items_sold += item.quantity;
-          productCategories[categoryName].revenue += item.total_price;
+          categories[categoryName].items_sold += item.quantity;
+          categories[categoryName].revenue += item.total_price;
         });
       });
 
-      // Calculate category percentages
-      Object.values(productCategories).forEach((category: any) => {
-        category.percentage = totalSales > 0 ? (category.revenue / totalSales) * 100 : 0;
-      });
+      const totalSales = orders?.reduce((sum, order) => sum + order.total_amount, 0) || 0;
+      const totalTransactions = orders?.length || 0;
 
-      // Get latest session for cash amounts
-      const latestSession = sessions?.[0];
+      // Convert to arrays with percentages
+      const paymentMethodsArray = Object.entries(paymentMethods).map(([method, data]: [string, any]) => ({
+        method_code: method,
+        method_name: method === 'cash' ? 'Espèces' : 
+                     method === 'card' ? 'Carte bancaire' : 
+                     method === 'mobile_money' ? 'Mobile Money' : method,
+        amount: data.amount,
+        transaction_count: data.transaction_count,
+        percentage: totalSales > 0 ? (data.amount / totalSales) * 100 : 0
+      }));
 
-      const report = {
-        outlet_id: outlet.id,
-        outlet_name: outlet.name,
-        session_id: latestSession?.session_number,
-        cashier_name: latestSession?.app_users?.full_name,
-        date,
-        opening_cash: latestSession?.opening_cash || 0,
-        closing_cash: latestSession?.closing_cash || 0,
+      const categoriesArray = Object.entries(categories).map(([category, data]: [string, any]) => ({
+        category_name: category,
+        items_sold: data.items_sold,
+        revenue: data.revenue,
+        percentage: totalSales > 0 ? (data.revenue / totalSales) * 100 : 0
+      }));
+
+      reports.push({
+        outlet_id: session.outlet_id || session.id,
+        outlet_name: session.outlet_name,
+        session_id: session.session_number,
+        cashier_name: session.pos_users?.display_name,
+        date: date,
+        opening_cash: session.opening_cash || 0,
+        closing_cash: session.closing_cash || 0,
         total_sales: totalSales,
         total_transactions: totalTransactions,
-        payment_methods: Object.values(paymentMethods),
-        product_categories: Object.values(productCategories),
-        discounts_total: discountsTotal,
-        tax_total: taxTotal,
-        net_sales: totalSales - discountsTotal,
-        status: latestSession?.status || 'closed'
-      };
-
-      reports.push(report);
+        payment_methods: paymentMethodsArray,
+        product_categories: categoriesArray,
+        discounts_total: 0, // TODO: implement discounts
+        tax_total: totalSales * 0.18, // 18% VAT
+        net_sales: totalSales * 0.82,
+        status: session.status
+      });
     }
 
     return new Response(
       JSON.stringify({
         success: true,
-        reports
+        reports,
+        summary: {
+          total_outlets: reports.length,
+          total_sales: reports.reduce((sum, r) => sum + r.total_sales, 0),
+          total_transactions: reports.reduce((sum, r) => sum + r.total_transactions, 0),
+          open_sessions: reports.filter(r => r.status === 'open').length
+        }
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

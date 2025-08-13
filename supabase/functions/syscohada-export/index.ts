@@ -14,25 +14,26 @@ interface SyscohadaRequest {
   export?: boolean;
 }
 
+// SYSCOHADA account mapping
 const SYSCOHADA_MAPPING = {
-  // Products
-  HEBERGEMENT: '7011',
+  // Produits
+  HEBERGEMENT: '7011', // Ventes dans la région
   RESTAURATION: '7012',
   BAR: '7013',
   DIVERS: '7018',
   
-  // VAT
-  TVA_COLLECTEE: '4432',
-  TVA_DEDUCTIBLE: '4451',
+  // TVA
+  TVA_COLLECTEE: '4432', // TVA collectée
+  TVA_DEDUCTIBLE: '4451', // TVA déductible
   
   // Clients
-  CLIENTS: '411',
-  CLIENTS_DOUTEUX: '416',
+  CLIENTS: '411', // Clients
+  CLIENTS_DOUTEUX: '416', // Clients douteux
   
-  // Cash
-  CAISSE: '571',
-  BANQUE: '521',
-  MOBILE_MONEY: '5711',
+  // Encaissements
+  CAISSE: '571', // Caisse
+  BANQUE: '521', // Banques
+  MOBILE_MONEY: '5711', // Caisse mobile money
 };
 
 serve(async (req) => {
@@ -47,7 +48,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { start_date, end_date, format = 'csv', preview = false, export: shouldExport = false }: SyscohadaRequest = await req.json();
+    const { start_date, end_date, format = 'csv', preview = false, export: doExport = false }: SyscohadaRequest = await req.json();
 
     // Get user's organization
     const authHeader = req.headers.get('Authorization')!;
@@ -70,11 +71,63 @@ serve(async (req) => {
 
     const orgId = orgData.org_id;
 
-    // Collect accounting entries
+    // Map service family to SYSCOHADA account
+    const getServiceFamily = (serviceCode: string) => {
+      const upperCode = serviceCode.toUpperCase();
+      
+      if (upperCode.includes('HEBERG') || upperCode.includes('CHAMBRE')) {
+        return 'HEBERGEMENT';
+      }
+      if (upperCode.includes('RESTAURANT') || upperCode.includes('REPAS')) {
+        return 'RESTAURATION';
+      }
+      if (upperCode.includes('BAR') || upperCode.includes('BOISSON')) {
+        return 'BAR';
+      }
+      
+      return 'DIVERS';
+    };
+
+    // Get invoice items for the period
+    const { data: invoiceItems, error: itemsError } = await supabase
+      .from('invoice_items')
+      .select(`
+        *,
+        invoices(
+          id,
+          invoice_number,
+          guest_name,
+          created_at
+        )
+      `)
+      .eq('org_id', orgId)
+      .gte('created_at', `${start_date}T00:00:00`)
+      .lte('created_at', `${end_date}T23:59:59`)
+      .order('created_at', { ascending: true });
+
+    if (itemsError) throw itemsError;
+
+    // Get payment transactions
+    const { data: payments, error: paymentsError } = await supabase
+      .from('payment_transactions')
+      .select('*')
+      .eq('org_id', orgId)
+      .eq('status', 'completed')
+      .gte('created_at', `${start_date}T00:00:00`)
+      .lte('created_at', `${end_date}T23:59:59`)
+      .order('created_at', { ascending: true });
+
+    if (paymentsError) throw paymentsError;
+
+    // Build accounting entries
     const accounts = {};
 
-    // Helper function to add entry
-    const addEntry = (accountCode: string, accountName: string, entry: any) => {
+    // Process sales (credit revenue accounts)
+    invoiceItems?.forEach((item, index) => {
+      const family = getServiceFamily(item.service_code);
+      const accountCode = SYSCOHADA_MAPPING[family];
+      const accountName = `Ventes ${family.toLowerCase()}`;
+      
       if (!accounts[accountCode]) {
         accounts[accountCode] = {
           account_code: accountCode,
@@ -85,120 +138,144 @@ serve(async (req) => {
           entries: []
         };
       }
-      
-      accounts[accountCode].debit_amount += entry.debit_amount || 0;
-      accounts[accountCode].credit_amount += entry.credit_amount || 0;
-      accounts[accountCode].balance = accounts[accountCode].debit_amount - accounts[accountCode].credit_amount;
-      accounts[accountCode].entries.push(entry);
-    };
 
-    // 1. Sales (Invoice items) - Credit sales accounts
-    const { data: invoiceItems } = await supabase
-      .from('invoice_items')
-      .select(`
-        *,
-        invoices(id, number, guest_name)
-      `)
-      .eq('org_id', orgId)
-      .gte('created_at', `${start_date}T00:00:00`)
-      .lte('created_at', `${end_date}T23:59:59`);
-
-    invoiceItems?.forEach(item => {
-      const serviceFamily = getServiceFamily(item.service_code);
-      const accountCode = SYSCOHADA_MAPPING[serviceFamily] || SYSCOHADA_MAPPING.DIVERS;
-      const vatRate = 18; // Standard VAT rate
-      
       const totalHT = item.total_price;
-      const vatAmount = (totalHT * vatRate) / 100;
-      
-      // Credit sales account (HT)
-      addEntry(accountCode, `Ventes ${serviceFamily}`, {
+      const vatAmount = totalHT * 0.18;
+      const totalTTC = totalHT + vatAmount;
+
+      // Credit revenue account (sales)
+      accounts[accountCode].credit_amount += totalHT;
+      accounts[accountCode].entries.push({
         date: item.created_at,
-        piece_number: item.invoices?.number || `INV-${item.invoice_id}`,
-        description: item.description,
+        piece_number: item.invoices?.invoice_number || `INV-${index + 1}`,
+        description: `${item.description} - ${item.invoices?.guest_name || 'Client'}`,
         debit_amount: 0,
         credit_amount: totalHT,
-        reference: item.invoices?.guest_name
+        reference: `${item.service_code}-${item.id}`
       });
-      
+
       // Credit VAT account
-      if (vatAmount > 0) {
-        addEntry(SYSCOHADA_MAPPING.TVA_COLLECTEE, 'TVA collectée', {
-          date: item.created_at,
-          piece_number: item.invoices?.number || `INV-${item.invoice_id}`,
-          description: `TVA ${vatRate}% - ${item.description}`,
+      const vatAccountCode = SYSCOHADA_MAPPING.TVA_COLLECTEE;
+      if (!accounts[vatAccountCode]) {
+        accounts[vatAccountCode] = {
+          account_code: vatAccountCode,
+          account_name: 'TVA collectée',
           debit_amount: 0,
-          credit_amount: vatAmount,
-          reference: item.invoices?.guest_name
-        });
+          credit_amount: 0,
+          balance: 0,
+          entries: []
+        };
       }
-      
-      // Debit clients account (TTC)
-      addEntry(SYSCOHADA_MAPPING.CLIENTS, 'Clients', {
+
+      accounts[vatAccountCode].credit_amount += vatAmount;
+      accounts[vatAccountCode].entries.push({
         date: item.created_at,
-        piece_number: item.invoices?.number || `INV-${item.invoice_id}`,
-        description: `Facturation ${item.invoices?.guest_name}`,
-        debit_amount: totalHT + vatAmount,
+        piece_number: item.invoices?.invoice_number || `INV-${index + 1}`,
+        description: `TVA 18% - ${item.description}`,
+        debit_amount: 0,
+        credit_amount: vatAmount,
+        reference: `TVA-${item.id}`
+      });
+
+      // Debit customer account
+      const clientAccountCode = SYSCOHADA_MAPPING.CLIENTS;
+      if (!accounts[clientAccountCode]) {
+        accounts[clientAccountCode] = {
+          account_code: clientAccountCode,
+          account_name: 'Clients',
+          debit_amount: 0,
+          credit_amount: 0,
+          balance: 0,
+          entries: []
+        };
+      }
+
+      accounts[clientAccountCode].debit_amount += totalTTC;
+      accounts[clientAccountCode].entries.push({
+        date: item.created_at,
+        piece_number: item.invoices?.invoice_number || `INV-${index + 1}`,
+        description: `Facture - ${item.invoices?.guest_name || 'Client'}`,
+        debit_amount: totalTTC,
         credit_amount: 0,
-        reference: item.invoices?.guest_name
+        reference: `CLI-${item.id}`
       });
     });
 
-    // 2. Payments - Debit cash/bank accounts, Credit clients
-    const { data: payments } = await supabase
-      .from('payment_transactions')
-      .select(`
-        *,
-        payment_methods(code, label, kind),
-        invoices(number, guest_name)
-      `)
-      .eq('org_id', orgId)
-      .gte('created_at', `${start_date}T00:00:00`)
-      .lte('created_at', `${end_date}T23:59:59`);
+    // Process payments (credit cash/bank accounts, debit clients)
+    payments?.forEach((payment, index) => {
+      let accountCode;
+      let accountName;
 
-    payments?.forEach(payment => {
-      const methodKind = payment.payment_methods?.kind;
-      let accountCode = SYSCOHADA_MAPPING.CAISSE;
-      let accountName = 'Caisse';
-      
-      if (methodKind === 'bank_transfer' || methodKind === 'card') {
-        accountCode = SYSCOHADA_MAPPING.BANQUE;
-        accountName = 'Banques';
-      } else if (methodKind === 'mobile_money') {
-        accountCode = SYSCOHADA_MAPPING.MOBILE_MONEY;
-        accountName = 'Mobile Money';
+      switch (payment.payment_method) {
+        case 'cash':
+          accountCode = SYSCOHADA_MAPPING.CAISSE;
+          accountName = 'Caisse';
+          break;
+        case 'card':
+        case 'bank_transfer':
+          accountCode = SYSCOHADA_MAPPING.BANQUE;
+          accountName = 'Banques';
+          break;
+        case 'mobile_money':
+          accountCode = SYSCOHADA_MAPPING.MOBILE_MONEY;
+          accountName = 'Caisse Mobile Money';
+          break;
+        default:
+          accountCode = SYSCOHADA_MAPPING.CAISSE;
+          accountName = 'Caisse';
       }
-      
+
+      if (!accounts[accountCode]) {
+        accounts[accountCode] = {
+          account_code: accountCode,
+          account_name: accountName,
+          debit_amount: 0,
+          credit_amount: 0,
+          balance: 0,
+          entries: []
+        };
+      }
+
       // Debit cash/bank account
-      addEntry(accountCode, accountName, {
+      accounts[accountCode].debit_amount += payment.amount;
+      accounts[accountCode].entries.push({
         date: payment.created_at,
-        piece_number: payment.reference || `PAY-${payment.id}`,
-        description: `Règlement ${payment.payment_methods?.label}`,
+        piece_number: payment.reference || `PAY-${index + 1}`,
+        description: `Encaissement ${payment.payment_method}`,
         debit_amount: payment.amount,
         credit_amount: 0,
-        reference: payment.invoices?.guest_name
+        reference: `ENC-${payment.id}`
       });
-      
-      // Credit clients account
-      addEntry(SYSCOHADA_MAPPING.CLIENTS, 'Clients', {
-        date: payment.created_at,
-        piece_number: payment.reference || `PAY-${payment.id}`,
-        description: `Règlement ${payment.invoices?.guest_name}`,
-        debit_amount: 0,
-        credit_amount: payment.amount,
-        reference: payment.invoices?.guest_name
-      });
+
+      // Credit customer account (payment received)
+      const clientAccountCode = SYSCOHADA_MAPPING.CLIENTS;
+      if (accounts[clientAccountCode]) {
+        accounts[clientAccountCode].credit_amount += payment.amount;
+        accounts[clientAccountCode].entries.push({
+          date: payment.created_at,
+          piece_number: payment.reference || `PAY-${index + 1}`,
+          description: `Règlement client`,
+          debit_amount: 0,
+          credit_amount: payment.amount,
+          reference: `REG-${payment.id}`
+        });
+      }
     });
 
-    // Calculate totals
-    const totalDebit = Object.values(accounts).reduce((sum: number, account: any) => sum + account.debit_amount, 0);
-    const totalCredit = Object.values(accounts).reduce((sum: number, account: any) => sum + account.credit_amount, 0);
+    // Calculate balances
+    Object.values(accounts).forEach((account: any) => {
+      account.balance = account.debit_amount - account.credit_amount;
+    });
+
+    const accountsArray = Object.values(accounts);
+    const totalDebit = accountsArray.reduce((sum, acc: any) => sum + acc.debit_amount, 0);
+    const totalCredit = accountsArray.reduce((sum, acc: any) => sum + acc.credit_amount, 0);
 
     const exportData = {
       org_id: orgId,
       period_start: start_date,
       period_end: end_date,
-      accounts: Object.values(accounts),
+      accounts: accountsArray,
       total_debit: totalDebit,
       total_credit: totalCredit,
       export_format: format,
@@ -218,26 +295,65 @@ serve(async (req) => {
       );
     }
 
-    if (shouldExport) {
+    if (doExport) {
       // Generate file content based on format
       let fileContent = '';
-      let fileName = `syscohada-${start_date}-${end_date}.${format}`;
-      
+      let contentType = 'text/plain';
+
       if (format === 'csv') {
-        fileContent = generateCSV(exportData);
+        contentType = 'text/csv';
+        fileContent = 'Date,Piece,Account,Description,Debit,Credit\n';
+        
+        accountsArray.forEach((account: any) => {
+          account.entries.forEach((entry: any) => {
+            fileContent += `${entry.date},${entry.piece_number},${account.account_code},${entry.description},${entry.debit_amount},${entry.credit_amount}\n`;
+          });
+        });
       } else if (format === 'xml') {
-        fileContent = generateXML(exportData);
-      } else if (format === 'txt') {
-        fileContent = generateTXT(exportData);
+        contentType = 'application/xml';
+        fileContent = '<?xml version="1.0" encoding="UTF-8"?>\n<syscohada_export>\n';
+        
+        accountsArray.forEach((account: any) => {
+          fileContent += `  <account code="${account.account_code}" name="${account.account_name}">\n`;
+          account.entries.forEach((entry: any) => {
+            fileContent += `    <entry>\n`;
+            fileContent += `      <date>${entry.date}</date>\n`;
+            fileContent += `      <piece>${entry.piece_number}</piece>\n`;
+            fileContent += `      <description>${entry.description}</description>\n`;
+            fileContent += `      <debit>${entry.debit_amount}</debit>\n`;
+            fileContent += `      <credit>${entry.credit_amount}</credit>\n`;
+            fileContent += `    </entry>\n`;
+          });
+          fileContent += `  </account>\n`;
+        });
+        
+        fileContent += '</syscohada_export>';
+      } else {
+        // TXT format
+        fileContent = `EXPORT SYSCOHADA - ${start_date} au ${end_date}\n`;
+        fileContent += `================================================\n\n`;
+        
+        accountsArray.forEach((account: any) => {
+          fileContent += `COMPTE ${account.account_code} - ${account.account_name}\n`;
+          fileContent += `Total Débit: ${account.debit_amount}\n`;
+          fileContent += `Total Crédit: ${account.credit_amount}\n`;
+          fileContent += `Solde: ${account.balance}\n\n`;
+          
+          account.entries.forEach((entry: any) => {
+            fileContent += `  ${entry.date} ${entry.piece_number} ${entry.description} ${entry.debit_amount} ${entry.credit_amount}\n`;
+          });
+          
+          fileContent += '\n';
+        });
       }
-      
-      // In a real implementation, you would upload this to storage
-      // For now, return the content directly
+
+      // In a real implementation, you would upload the file to storage and return the URL
+      // For now, we'll return the content directly
       return new Response(
         JSON.stringify({
           success: true,
-          file_url: `data:text/${format};base64,${btoa(fileContent)}`,
-          file_name: fileName
+          file_url: `data:${contentType};base64,${btoa(fileContent)}`,
+          filename: `syscohada-${start_date}-${end_date}.${format}`
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -249,7 +365,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        export: exportData
+        message: 'Specify preview=true or export=true'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -267,67 +383,3 @@ serve(async (req) => {
     );
   }
 });
-
-function getServiceFamily(serviceCode: string): string {
-  const upperCode = serviceCode.toUpperCase();
-  
-  if (upperCode.includes('HEBERG') || upperCode.includes('CHAMBRE')) {
-    return 'HEBERGEMENT';
-  }
-  if (upperCode.includes('RESTAURANT') || upperCode.includes('REPAS')) {
-    return 'RESTAURATION';
-  }
-  if (upperCode.includes('BAR') || upperCode.includes('BOISSON')) {
-    return 'BAR';
-  }
-  
-  return 'DIVERS';
-}
-
-function generateCSV(exportData: any): string {
-  let csv = 'Compte,Nom Compte,Date,Piece,Description,Debit,Credit,Reference\n';
-  
-  exportData.accounts.forEach((account: any) => {
-    account.entries.forEach((entry: any) => {
-      csv += `"${account.account_code}","${account.account_name}","${entry.date}","${entry.piece_number}","${entry.description}","${entry.debit_amount}","${entry.credit_amount}","${entry.reference || ''}"\n`;
-    });
-  });
-  
-  return csv;
-}
-
-function generateXML(exportData: any): string {
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<syscohada>\n';
-  xml += `<period start="${exportData.period_start}" end="${exportData.period_end}"/>\n`;
-  xml += '<accounts>\n';
-  
-  exportData.accounts.forEach((account: any) => {
-    xml += `<account code="${account.account_code}" name="${account.account_name}">\n`;
-    account.entries.forEach((entry: any) => {
-      xml += `<entry date="${entry.date}" piece="${entry.piece_number}" debit="${entry.debit_amount}" credit="${entry.credit_amount}" description="${entry.description}" reference="${entry.reference || ''}"/>\n`;
-    });
-    xml += '</account>\n';
-  });
-  
-  xml += '</accounts>\n</syscohada>';
-  return xml;
-}
-
-function generateTXT(exportData: any): string {
-  let txt = `EXPORT SYSCOHADA - ${exportData.period_start} au ${exportData.period_end}\n`;
-  txt += '='.repeat(60) + '\n\n';
-  
-  exportData.accounts.forEach((account: any) => {
-    txt += `${account.account_code} - ${account.account_name}\n`;
-    txt += '-'.repeat(40) + '\n';
-    
-    account.entries.forEach((entry: any) => {
-      txt += `${entry.date} | ${entry.piece_number} | ${entry.description} | D:${entry.debit_amount} | C:${entry.credit_amount}\n`;
-    });
-    
-    txt += `\nSolde: ${account.balance}\n\n`;
-  });
-  
-  txt += `TOTAUX: Débit=${exportData.total_debit} | Crédit=${exportData.total_credit}\n`;
-  return txt;
-}

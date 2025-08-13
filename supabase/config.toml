@@ -67,3 +67,12 @@ verify_jwt = false
 
 [functions.scan-document]
 verify_jwt = false
+
+[functions.pre-closure-check]
+verify_jwt = true
+
+[functions.pos-z-report]
+verify_jwt = true
+
+[functions.syscohada-export]
+verify_jwt = true
