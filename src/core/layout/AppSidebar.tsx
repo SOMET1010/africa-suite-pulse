@@ -46,8 +46,8 @@ const navigationItems = [
     url: "/reservations",
     badge: "3",
     subItems: [
-      { title: "Nouvelle réservation", url: "/reservations/new" },
-      { title: "Réservations avancées", url: "/reservations/advanced" },
+      { title: "Nouvelle réservation", url: "/reservations/new/quick" },
+      { title: "Réservations avancées", url: "/reservations/new/advanced" },
     ],
   },
   {
@@ -81,10 +81,10 @@ const navigationItems = [
     icon: ShoppingCart,
     url: "/pos",
     subItems: [
-      { title: "Restaurant", url: "/restaurant" },
-      { title: "Commandes", url: "/pos/orders" },
-      { title: "Menu", url: "/pos/menu" },
-      { title: "Caisse", url: "/pos/checkout" },
+      { title: "Terminal", url: "/pos/terminal" },
+      { title: "Cuisine", url: "/pos/kitchen" },
+      { title: "Inventaire", url: "/pos/inventory" },
+      { title: "Rapports", url: "/pos/reports" },
     ],
   },
   {
@@ -93,8 +93,8 @@ const navigationItems = [
     url: "/reports",
     subItems: [
       { title: "Analytics", url: "/analytics" },
-      { title: "Ventes", url: "/reports/sales" },
-      { title: "Occupancy", url: "/reports/occupancy" },
+      { title: "Rapports quotidiens", url: "/reports/daily" },
+      { title: "Analytics avancées", url: "/analytics/advanced" },
     ],
   },
   {
@@ -103,8 +103,13 @@ const navigationItems = [
     url: "/settings",
     subItems: [
       { title: "Général", url: "/settings" },
+      { title: "Hôtel", url: "/settings/hotel" },
+      { title: "Chambres", url: "/settings/rooms" },
+      { title: "Services", url: "/settings/services" },
       { title: "Tarifs", url: "/settings/tariffs" },
       { title: "Utilisateurs", url: "/settings/users" },
+      { title: "Système", url: "/settings/system" },
+      { title: "Sécurité", url: "/settings/security" },
     ],
   },
 ];
