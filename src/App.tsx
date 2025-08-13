@@ -1,60 +1,61 @@
 
-import { useEffect } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { BrowserRouter } from "react-router-dom";
-import { AppRoutes } from "./routes";
-import { queryClient } from "@/lib/queryClient";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { ThemeProvider } from '@/components/theme-provider';
 
-const App = () => {
-  // Configuration du temps réel pour synchronisation automatique
-  useEffect(() => {
-    let channels: any[] = [];
-    
-    // Safely import and setup realtime listeners
-    const setupRealtime = async () => {
-      try {
-        const { setupRealtimeListeners, cleanupRealtimeListeners } = await import("@/lib/realtime");
-        channels = setupRealtimeListeners() || [];
-      } catch (error) {
-        console.warn("Realtime setup failed:", error);
-      }
-    };
-    
-    setupRealtime();
-    
-    return () => {
-      // Safely cleanup realtime listeners
-      const cleanupRealtime = async () => {
-        try {
-          if (channels.length > 0) {
-            const { cleanupRealtimeListeners } = await import("@/lib/realtime");
-            cleanupRealtimeListeners(channels);
-          }
-        } catch (error) {
-          console.warn("Realtime cleanup failed:", error);
-        }
-      };
-      
-      cleanupRealtime();
-    };
-  }, []);
+// Layout
+import { MainAppLayout } from '@/core/layout/MainAppLayout';
 
+// Pages
+import Dashboard from '@/pages/Dashboard';
+import UXFoundationsDemo from '@/pages/UXFoundationsDemo';
+import RackPage from '@/pages/RackPage';
+import BillingPage from '@/pages/BillingPage';
+import SettingsPage from '@/pages/SettingsPage';
+import MaintenancePage from '@/pages/MaintenancePage';
+
+// Core auth
+import { OrgProvider } from '@/core/auth/OrgProvider';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 3,
+    },
+  },
+});
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-        <ReactQueryDevtools initialIsOpen={false} />
-      </TooltipProvider>
+      <ThemeProvider defaultTheme="light" storageKey="ui-theme">
+        <TooltipProvider>
+          <BrowserRouter>
+            <OrgProvider>
+              <MainAppLayout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/ux-demo" element={<UXFoundationsDemo />} />
+                  <Route path="/rack" element={<RackPage />} />
+                  <Route path="/billing" element={<BillingPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/maintenance" element={<MaintenancePage />} />
+                </Routes>
+              </MainAppLayout>
+              <Toaster />
+            </OrgProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
