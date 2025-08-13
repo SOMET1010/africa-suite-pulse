@@ -1,34 +1,20 @@
 
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ThemeProvider } from '@/components/theme-provider';
 
-// Layout
-import { MainAppLayout } from '@/core/layout/MainAppLayout';
-
-// Pages
-import Dashboard from '@/pages/Dashboard';
-import UXFoundationsDemo from '@/pages/UXFoundationsDemo';
-import RackPage from '@/pages/RackPage';
-import BillingPage from '@/pages/BillingPage';
-import SettingsPage from '@/pages/SettingsPage';
-import MaintenancePage from '@/pages/MaintenancePage';
+// Import the complete routing system
+import { AppRoutes } from '@/routes';
 
 // Core auth
 import { OrgProvider } from '@/core/auth/OrgProvider';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 3,
-    },
-  },
-});
+// Import the optimized query client
+import { queryClient } from '@/lib/queryClient';
 
 function App() {
   return (
@@ -37,17 +23,7 @@ function App() {
         <TooltipProvider>
           <BrowserRouter>
             <OrgProvider>
-              <MainAppLayout>
-                <Routes>
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/ux-demo" element={<UXFoundationsDemo />} />
-                  <Route path="/rack" element={<RackPage />} />
-                  <Route path="/billing" element={<BillingPage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                  <Route path="/maintenance" element={<MaintenancePage />} />
-                </Routes>
-              </MainAppLayout>
+              <AppRoutes />
               <Toaster />
             </OrgProvider>
           </BrowserRouter>
