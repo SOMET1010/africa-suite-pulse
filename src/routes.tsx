@@ -23,6 +23,7 @@ import GuestsPage from "@/features/guests/GuestsPage";
 import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
 import TemplatesPage from "@/features/settings/templates/TemplatesPage";
 import AnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
+import CardexPage from "@/features/cardex/CardexPage";
 import AnalyticsDashboard from "@/features/analytics/AnalyticsDashboard";
 import AdvancedAnalytics from "@/features/analytics/AdvancedAnalytics";
 import ReportsManagement from "@/features/reports/ReportsManagement";
@@ -84,6 +85,7 @@ export function AppRoutes() {
         <Route path="settings/tariffs" element={<TariffsPage />} />
         <Route path="settings/payments" element={<PaymentsPage />} />
         <Route path="billing" element={<BillingPage />} />
+        <Route path="cardex" element={<CardexPage />} />
         <Route path="settings/users" element={<UsersPage />} />
         <Route path="settings/system" element={<SystemSettingsPage />} />
         <Route path="settings/templates" element={<TemplatesPage />} />
