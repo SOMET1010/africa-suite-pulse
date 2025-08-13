@@ -19,7 +19,7 @@ import type {
 } from "@/types/payments";
 
 export const listPaymentMethods = (orgId: string) =>
-  supabase.from("payment_methods").select("*").eq("org_id", orgId).order("label");
+  supabase.from("payment_methods").select("id, org_id, label, code, kind, active, commission_percent, capture_mode, created_at, updated_at, expense_service_code, metadata, settlement_delay_days").eq("org_id", orgId).order("label");
 
 export const upsertPaymentMethod = (payload: any) =>
   supabase.from("payment_methods").upsert(payload).select();
@@ -28,7 +28,7 @@ export const deletePaymentMethod = (id: string) =>
   supabase.from("payment_methods").delete().eq("id", id);
 
 export const listTerminals = (orgId: string) =>
-  supabase.from("payment_terminals").select("*").eq("org_id", orgId).order("name");
+  supabase.from("payment_terminals").select("id, org_id, name, device_id, provider, active, take_commission, created_at, updated_at").eq("org_id", orgId).order("name");
 
 export const upsertTerminal = (payload: any) =>
   supabase.from("payment_terminals").upsert(payload).select();
@@ -37,7 +37,7 @@ export const deleteTerminal = (id: string) =>
   supabase.from("payment_terminals").delete().eq("id", id);
 
 export const listCurrencies = (orgId: string) =>
-  supabase.from("currencies").select("*").eq("org_id", orgId).order("is_base", { ascending: false }).order("code");
+  supabase.from("currencies").select("id, org_id, code, label, is_base, rate_to_base, active, created_at, updated_at").eq("org_id", orgId).order("is_base", { ascending: false }).order("code");
 
 export const upsertCurrency = (payload: any) =>
   supabase.from("currencies").upsert(payload).select();
@@ -59,7 +59,7 @@ export async function createPaymentTransaction(input: CreateTransactionInput): P
       reference: input.reference ?? null,
       metadata: input.metadata ?? {},
     })
-    .select('*')
+    .select('id, org_id, invoice_id, method_id, amount, currency_code, status, reference, created_at')
     .single();
 
   if (error) throw error;
@@ -70,7 +70,7 @@ export async function listInvoiceTransactions(invoiceId: string): Promise<Paymen
   const { data, error } = await (supabase as any)
     .from('payment_transactions')
     .select(`
-      *,
+      id, invoice_id, method_id, amount, currency_code, status, reference, created_at,
       payment_methods!inner (
         label,
         code

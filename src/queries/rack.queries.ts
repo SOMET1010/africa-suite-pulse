@@ -45,7 +45,7 @@ export function useRooms(orgId: string) {
     queryFn: async (): Promise<Room[]> => {
       const { data, error } = await supabase
         .from("rooms")
-        .select("*")
+        .select("id, org_id, number, type, floor, status, features, created_at, updated_at")
         .eq("org_id", orgId)
         .order("number", { ascending: true });
       
@@ -61,7 +61,7 @@ export function useReservations(orgId: string, startISO?: string, endISO?: strin
     queryFn: async (): Promise<Reservation[]> => {
       let query = supabase
         .from("reservations")
-        .select("*")
+        .select("id, org_id, room_id, reference, status, date_arrival, date_departure, adults, children, rate_total, planned_time")
         .eq("org_id", orgId)
         .order("date_arrival", { ascending: true });
 
@@ -89,12 +89,12 @@ export function useRackData(orgId: string, startISO: string, endISO: string) {
       const [roomsResult, reservationsResult] = await Promise.all([
         supabase
           .from("rooms")
-          .select("*")
+          .select("id, org_id, number, type, floor, status, features, created_at, updated_at")
           .eq("org_id", orgId)
           .order("number", { ascending: true }),
         supabase
           .from("reservations")
-          .select("*")
+          .select("id, org_id, room_id, reference, status, date_arrival, date_departure, adults, children, rate_total, planned_time")
           .eq("org_id", orgId)
           .lte("date_arrival", endISO)
           .gte("date_departure", startISO)

@@ -4,20 +4,20 @@ import { QueryClient } from '@tanstack/react-query';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Cache 5 minutes par défaut
-      staleTime: 5 * 60 * 1000,
-      // Garde en cache 10 minutes
-      gcTime: 10 * 60 * 1000,
-      // Retry une fois seulement
-      retry: 1,
-      // Refetch en cas de focus window
+      // Cache 1 minute par défaut (stale time optimisé)
+      staleTime: 60_000,
+      // Garde en cache 5 minutes (garbage collection)
+      gcTime: 300_000,
+      // Retry 2 fois (plus robuste)
+      retry: 2,
+      // Pas de refetch sur focus (performance)
       refetchOnWindowFocus: false,
       // Refetch en cas de reconnect
       refetchOnReconnect: true,
     },
     mutations: {
-      // Retry les mutations échouées
-      retry: 1,
+      // Retry les mutations échouées 2 fois
+      retry: 2,
     },
   },
 });
