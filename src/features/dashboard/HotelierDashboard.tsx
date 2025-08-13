@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { TButton } from "@/core/ui/TButton";
+import { BottomActionBar } from "@/core/layout/BottomActionBar";
 import { Badge } from "@/components/ui/badge";
 import { 
   Crown, 
@@ -136,9 +137,9 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
                           <Icon className="w-5 h-5 text-warning" />
                           <span className="font-medium text-foreground">{alert.message}</span>
                         </div>
-                        <Button asChild variant="outline" size="sm">
+                        <TButton asChild variant="default" size="sm" className="tap-target">
                           <Link to={alert.to}>{alert.action}</Link>
-                        </Button>
+                        </TButton>
                       </div>
                     </CardContent>
                   </Card>
@@ -267,6 +268,28 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
             </Card>
           </div>
         </section>
+
+        {/* Bottom Action Bar pour Dashboard */}
+        <BottomActionBar>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Occupés: {quickStats[0].value}/{quickStats[0].total}</span>
+            <span>•</span>
+            <span>Arrivées: {quickStats[1].value}</span>
+            <span>•</span>
+            <span>Urgent: {timeActions.items.filter(i => i.urgent).length}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <TButton asChild className="tap-target">
+              <Link to="/arrivals">Check-in Express</Link>
+            </TButton>
+            <TButton asChild variant="default" className="tap-target">
+              <Link to="/reservations/rack">Voir Rack</Link>
+            </TButton>
+            <TButton asChild variant="ghost" className="tap-target">
+              <Link to="/reports">Rapports</Link>
+            </TButton>
+          </div>
+        </BottomActionBar>
       </div>
     </div>
   );

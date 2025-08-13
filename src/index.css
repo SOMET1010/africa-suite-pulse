@@ -4,6 +4,7 @@
 @import "./styles/animations.css";
 @import "./styles/focus.css";
 @import "./styles/interactions.css";
+@import "./styles/mobile.css";
 
 @tailwind base;
 @tailwind components;

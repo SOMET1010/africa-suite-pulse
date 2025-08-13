@@ -1,0 +1,244 @@
+/* Mobile responsiveness and accessibility enhancements */
+
+@layer components {
+  /* Mobile-first responsive breakpoints */
+  .mobile-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .mobile-container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .mobile-container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  /* Touch-friendly spacing */
+  .touch-spacing {
+    gap: 1rem;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .touch-spacing {
+      gap: 1.5rem;
+    }
+  }
+
+  /* Responsive text sizing */
+  .responsive-text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .responsive-text-sm {
+      font-size: 0.75rem;
+      line-height: 1rem;
+    }
+  }
+
+  .responsive-text-base {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .responsive-text-base {
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+    }
+  }
+
+  .responsive-text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  @media (max-width: 640px) {
+    .responsive-text-lg {
+      font-size: 1rem;
+      line-height: 1.5rem;
+    }
+  }
+
+  /* Adaptive grid layouts */
+  .grid-adaptive-1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .grid-adaptive-1 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .grid-adaptive-1 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .grid-adaptive-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .grid-adaptive-2 {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+  }
+
+  /* Safe area insets for mobile */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  /* Accessibility improvements */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .focus-visible-only {
+    outline: none;
+  }
+
+  .focus-visible-only:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .border-adaptive {
+      border-width: 2px;
+    }
+
+    .text-adaptive {
+      font-weight: 600;
+    }
+
+    .shadow-adaptive {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-respect-motion {
+      animation: none;
+      transition: none;
+    }
+
+    .hover-lift {
+      transform: none;
+    }
+
+    .transition-elegant {
+      transition: none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .print-hidden {
+      display: none;
+    }
+
+    .print-visible {
+      display: block;
+    }
+
+    .print-page-break {
+      page-break-before: always;
+    }
+  }
+
+  /* Dark mode optimizations */
+  @media (prefers-color-scheme: dark) {
+    .image-adaptive {
+      filter: brightness(0.8) contrast(1.2);
+    }
+  }
+}
+
+/* Utility classes for mobile optimization */
+@layer utilities {
+  /* Mobile-first hiding/showing */
+  .mobile-hidden {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-hidden {
+      display: block;
+    }
+  }
+
+  .mobile-only {
+    display: block;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-only {
+      display: none;
+    }
+  }
+
+  /* Text truncation for mobile */
+  .truncate-mobile {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) {
+    .truncate-mobile {
+      white-space: normal;
+      text-overflow: clip;
+    }
+  }
+
+  /* Flexible spacing */
+  .space-mobile {
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .space-mobile {
+      margin-bottom: 1.5rem;
+    }
+  }
+}
