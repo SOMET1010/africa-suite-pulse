@@ -1,0 +1,153 @@
+# AfricaSuite Cloud Production Values
+
+# Global settings for cloud deployment
+global:
+  deploymentMode: cloud
+  environment: production
+  imageRegistry: "docker.io"
+  storageClass: ""  # Use cloud provider default
+
+# AfricaSuite application - lean for cloud (external services)
+africasuite:
+  replicaCount: 5  # Higher for cloud scalability
+  
+  image:
+    repository: africasuite/africasuite
+    tag: "latest"
+    pullPolicy: Always
+  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  # Cloud ingress with TLS
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/rate-limit: "1000"
+      nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    hosts:
+      - host: app.africasuite.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: africasuite-cloud-tls
+        hosts:
+          - app.africasuite.com
+  
+  env:
+    NODE_ENV: production
+    DEPLOYMENT_MODE: cloud
+    # Cloud-specific environment variables will be set via secrets
+
+# Disable self-hosted components for cloud
+postgresql:
+  enabled: false
+
+minio:
+  enabled: false
+
+# Keep Redis for sessions only
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    existingSecret: "redis-credentials"
+    existingSecretPasswordKey: "password"
+  
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    
+    resources:
+      limits:
+        memory: 256Mi
+        cpu: 250m
+      requests:
+        memory: 128Mi
+        cpu: 100m
+
+# Disable NATS initially (will be enabled with microservices)
+nats:
+  enabled: false
+
+# Basic monitoring for cloud
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: false  # Use cloud provider monitoring
+  
+  grafana:
+    enabled: false  # Use cloud provider dashboards
+
+# Aggressive autoscaling for cloud
+autoscaling:
+  enabled: true
+  minReplicas: 5
+  maxReplicas: 50
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
+
+# Higher availability requirements
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 3
+
+# Network policies enabled
+networkPolicy:
+  enabled: true
+
+# Production security
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Cloud-specific affinity (multiple AZs)
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+          - africasuite
+      topologyKey: topology.kubernetes.io/zone
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      preference:
+        matchExpressions:
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values:
+          - m5.large
+          - m5.xlarge
+
+# Cloud tolerations
+tolerations:
+- key: "cloud-provider"
+  operator: "Equal"
+  value: "true"
+  effect: "NoSchedule"

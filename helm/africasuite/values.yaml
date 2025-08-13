@@ -1,0 +1,221 @@
+# AfricaSuite Helm Chart Values
+
+# Global settings
+global:
+  # Deployment mode: cloud, selfhosted, hybrid
+  deploymentMode: cloud
+  
+  # Image registry
+  imageRegistry: "docker.io"
+  
+  # Storage class for persistent volumes
+  storageClass: ""
+  
+  # Environment
+  environment: production
+
+# AfricaSuite application
+africasuite:
+  # Image configuration
+  image:
+    repository: africasuite/africasuite
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  
+  # Replicas
+  replicaCount: 2
+  
+  # Resources
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  # Service configuration
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  
+  # Ingress
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: africasuite.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: africasuite-tls
+        hosts:
+          - africasuite.example.com
+  
+  # Environment variables
+  env:
+    NODE_ENV: production
+    DEPLOYMENT_MODE: cloud
+  
+  # Health checks
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: http
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
+# PostgreSQL (for self-hosted deployments)
+postgresql:
+  enabled: false  # Enable for self-hosted mode
+  auth:
+    postgresPassword: "africasuite123"
+    username: "africasuite"
+    password: "africasuite123"
+    database: "africasuite"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+    
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 500m
+      requests:
+        memory: 512Mi
+        cpu: 250m
+
+# Redis
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    
+    resources:
+      limits:
+        memory: 256Mi
+        cpu: 250m
+      requests:
+        memory: 128Mi
+        cpu: 100m
+
+# MinIO (for self-hosted file storage)
+minio:
+  enabled: false  # Enable for self-hosted mode
+  mode: standalone
+  
+  auth:
+    rootUser: "africasuite"
+    rootPassword: "africasuite123"
+  
+  persistence:
+    enabled: true
+    size: 50Gi
+  
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 250m
+    requests:
+      memory: 256Mi
+      cpu: 100m
+
+# NATS (for microservices messaging)
+nats:
+  enabled: false  # Enable when transitioning to microservices
+  
+  config:
+    jetstream:
+      enabled: true
+      fileStore:
+        pvc:
+          size: 10Gi
+  
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 250m
+    requests:
+      memory: 128Mi
+      cpu: 100m
+
+# Monitoring
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: true
+    retention: 15d
+    storage: 10Gi
+  
+  grafana:
+    enabled: true
+    adminPassword: "admin123"
+    persistence:
+      enabled: true
+      size: 5Gi
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Network Policies
+networkPolicy:
+  enabled: false
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Security Context
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

@@ -1,0 +1,222 @@
+# AfricaSuite Self-Hosted Production Values
+
+# Global settings for self-hosted deployment
+global:
+  deploymentMode: selfhosted
+  environment: production
+  imageRegistry: "docker.io"
+  storageClass: "local-path"  # Adjust based on your K8s storage
+
+# AfricaSuite application
+africasuite:
+  replicaCount: 3  # High availability
+  
+  image:
+    repository: africasuite/africasuite
+    tag: "latest"
+    pullPolicy: Always
+  
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  
+  # Self-hosted specific ingress
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    hosts:
+      - host: africasuite.local  # Change to your domain
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: africasuite-local-tls
+        hosts:
+          - africasuite.local
+  
+  env:
+    NODE_ENV: production
+    DEPLOYMENT_MODE: selfhosted
+
+# Enable PostgreSQL for self-hosted
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "changeme-postgres-password"
+    username: "africasuite"
+    password: "changeme-africasuite-password"
+    database: "africasuite"
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 50Gi
+    
+    resources:
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+      requests:
+        memory: 1Gi
+        cpu: 500m
+    
+    # High availability configuration
+    extendedConfiguration: |
+      max_connections = 200
+      shared_buffers = 256MB
+      effective_cache_size = 1GB
+      maintenance_work_mem = 64MB
+      checkpoint_completion_target = 0.9
+      wal_buffers = 16MB
+      default_statistics_target = 100
+      random_page_cost = 1.1
+      effective_io_concurrency = 200
+
+# Enable Redis for sessions and caching
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: "changeme-redis-password"
+  
+  master:
+    persistence:
+      enabled: true
+      size: 10Gi
+    
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: 500m
+      requests:
+        memory: 256Mi
+        cpu: 250m
+
+# Enable MinIO for file storage
+minio:
+  enabled: true
+  mode: standalone
+  
+  auth:
+    rootUser: "africasuite-admin"
+    rootPassword: "changeme-minio-password"
+  
+  persistence:
+    enabled: true
+    size: 100Gi
+  
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: 500m
+    requests:
+      memory: 512Mi
+      cpu: 250m
+  
+  # Create default buckets
+  defaultBuckets: "africasuite-uploads,africasuite-backups,room-photos"
+
+# Enable NATS for future microservices
+nats:
+  enabled: true
+  
+  config:
+    jetstream:
+      enabled: true
+      fileStore:
+        pvc:
+          size: 20Gi
+  
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 250m
+
+# Enable monitoring for production
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: true
+    retention: 30d
+    storage: 50Gi
+    
+    resources:
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+      requests:
+        memory: 1Gi
+        cpu: 500m
+  
+  grafana:
+    enabled: true
+    adminPassword: "changeme-grafana-password"
+    persistence:
+      enabled: true
+      size: 10Gi
+    
+    resources:
+      limits:
+        memory: 512Mi
+        cpu: 500m
+      requests:
+        memory: 256Mi
+        cpu: 250m
+
+# Enable autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Enable Pod Disruption Budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Enable Network Policies for security
+networkPolicy:
+  enabled: true
+
+# Security context for production
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+# Production node affinity (spread across nodes)
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - africasuite
+        topologyKey: kubernetes.io/hostname

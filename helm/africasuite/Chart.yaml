@@ -1,0 +1,23 @@
+apiVersion: v2
+name: africasuite
+description: A Helm chart for AfricaSuite PMS/POS System
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - hospitality
+  - pms
+  - pos
+  - hotel
+  - restaurant
+
+maintainers:
+  - name: AfricaSuite Team
+    email: support@africasuite.com
+
+sources:
+  - https://github.com/africasuite/africasuite
+
+annotations:
+  category: Business
