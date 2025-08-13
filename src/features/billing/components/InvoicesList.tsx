@@ -1,59 +1,27 @@
-import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, Euro, User } from "lucide-react";
-import { useOrgId } from "@/core/auth/useOrg";
-import { supabase } from "@/integrations/supabase/client";
-
-interface Invoice {
-  id: string;
-  number: string;
-  issue_date: string;
-  due_date: string;
-  amount: number;
-  status: 'draft' | 'pending' | 'paid' | 'overdue' | 'cancelled';
-  guest_name?: string;
-  reference?: string;
-}
+import { useInvoicesList } from "../hooks/useBilling";
+import type { BillingStatus } from "../types/billing.types";
 
 interface InvoicesListProps {
   searchTerm: string;
+  statusFilter?: BillingStatus[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }
 
-export function InvoicesList({ searchTerm, selectedId, onSelect }: InvoicesListProps) {
-  const { orgId } = useOrgId();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
+export function InvoicesList({ searchTerm, statusFilter, selectedId, onSelect }: InvoicesListProps) {
+  const filters = {
+    ...(statusFilter && { status: statusFilter }),
+    ...(searchTerm && { guest_name: searchTerm })
+  };
+  
+  const { data, isLoading } = useInvoicesList(filters);
 
-  useEffect(() => {
-    if (!orgId) return;
-    
-    const loadInvoices = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await (supabase as any)
-          .from('invoices')
-          .select('*')
-          .eq('org_id', orgId)
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (error) throw error;
-        setInvoices(data || []);
-      } catch (error) {
-        console.error('Error loading invoices:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInvoices();
-  }, [orgId]);
-
-  const filteredInvoices = invoices.filter(invoice => 
+  const filteredInvoices = (data?.invoices || []).filter(invoice => 
+    !searchTerm || 
     invoice.number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     invoice.guest_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     invoice.reference?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -81,7 +49,7 @@ export function InvoicesList({ searchTerm, selectedId, onSelect }: InvoicesListP
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="p-6 space-y-3">
         {[...Array(5)].map((_, i) => (
@@ -131,9 +99,9 @@ export function InvoicesList({ searchTerm, selectedId, onSelect }: InvoicesListP
                       {new Date(invoice.issue_date).toLocaleDateString('fr-FR')}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1 text-brand-accent font-luxury font-semibold">
+                  <div className="flex items-center gap-1 text-primary font-semibold">
                     <Euro className="h-3 w-3" />
-                    <span>{invoice.amount?.toLocaleString()} XOF</span>
+                    <span>{invoice.total_amount?.toLocaleString()} XOF</span>
                   </div>
                 </div>
               </div>
