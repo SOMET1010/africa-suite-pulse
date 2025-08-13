@@ -6,17 +6,20 @@ import {
   CalendarDays,
   Users,
   LogIn,
+  LogOut,
   Receipt,
   Bed,
   Wrench,
   ShoppingCart,
   BarChart3,
   Settings,
+  FileText,
 } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -28,89 +31,156 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 
-const navigationItems = [
+const navigationSections = [
   {
-    title: "Tableau de bord",
-    icon: LayoutDashboard,
-    url: "/",
+    title: "Vue d'ensemble",
+    items: [
+      {
+        title: "Tableau de bord",
+        icon: LayoutDashboard,
+        url: "/",
+      }
+    ]
   },
   {
-    title: "Plan des chambres",
-    icon: Building,
-    url: "/rack",
-    badge: "Live",
+    title: "Front Office",
+    items: [
+      {
+        title: "Plan des chambres",
+        icon: Building,
+        url: "/rack",
+        badge: "Live",
+      },
+      {
+        title: "Réservations",
+        icon: CalendarDays,
+        url: "/reservations",
+        badge: "3",
+        subItems: [
+          { title: "Nouvelle réservation", url: "/reservations/new/quick" },
+          { title: "Réservations avancées", url: "/reservations/new/advanced" },
+          { title: "Groupes", url: "/reservations/groups" },
+          { title: "Allotements", url: "/reservations/allotments" },
+        ],
+      },
+      {
+        title: "Arrivées",
+        icon: LogIn,
+        url: "/arrivals",
+        badge: "2",
+      },
+      {
+        title: "Départs",
+        icon: LogOut,
+        url: "/departures",
+      },
+      {
+        title: "Mes clients",
+        icon: Users,
+        url: "/guests",
+      },
+    ]
   },
   {
-    title: "Réservations",
-    icon: CalendarDays,
-    url: "/reservations",
-    badge: "3",
-    subItems: [
-      { title: "Nouvelle réservation", url: "/reservations/new/quick" },
-      { title: "Réservations avancées", url: "/reservations/new/advanced" },
-    ],
+    title: "Opérations",
+    items: [
+      {
+        title: "Ménage",
+        icon: Bed,
+        url: "/housekeeping",
+      },
+      {
+        title: "Maintenance",
+        icon: Wrench,
+        url: "/maintenance",
+      },
+      {
+        title: "Cardex",
+        icon: FileText,
+        url: "/cardex",
+      },
+    ]
   },
   {
-    title: "Mes clients",
-    icon: Users,
-    url: "/guests",
+    title: "Restaurant & POS",
+    items: [
+      {
+        title: "Point de vente",
+        icon: ShoppingCart,
+        url: "/pos",
+        subItems: [
+          { title: "Terminal", url: "/pos/terminal" },
+          { title: "Maître d'hôtel", url: "/pos/maitre-hotel" },
+          { title: "Serveur", url: "/pos/server" },
+          { title: "Cuisine", url: "/pos/kitchen" },
+          { title: "Inventaire", url: "/pos/inventory" },
+          { title: "Sessions", url: "/pos/sessions" },
+          { title: "Utilisateurs POS", url: "/pos/users" },
+          { title: "Paramètres POS", url: "/pos/settings" },
+        ],
+      },
+    ]
   },
   {
-    title: "Arrivées du jour",
-    icon: LogIn,
-    url: "/arrivals",
-    badge: "2",
+    title: "Finance",
+    items: [
+      {
+        title: "Facturation",
+        icon: Receipt,
+        url: "/billing",
+      },
+      {
+        title: "Audit de nuit",
+        icon: Receipt,
+        url: "/night-audit",
+      },
+    ]
   },
   {
-    title: "Facturation",
-    icon: Receipt,
-    url: "/billing",
+    title: "Analyse & Rapports",
+    items: [
+      {
+        title: "Analytics",
+        icon: BarChart3,
+        url: "/analytics",
+        subItems: [
+          { title: "Vue générale", url: "/analytics" },
+          { title: "Analytics avancées", url: "/analytics/advanced" },
+        ],
+      },
+      {
+        title: "Rapports",
+        icon: BarChart3,
+        url: "/reports",
+        subItems: [
+          { title: "Vue générale", url: "/reports" },
+          { title: "Rapports quotidiens", url: "/reports/daily" },
+        ],
+      },
+    ]
   },
   {
-    title: "Ménage",
-    icon: Bed,
-    url: "/housekeeping",
-  },
-  {
-    title: "Maintenance",
-    icon: Wrench,
-    url: "/maintenance",
-  },
-  {
-    title: "Point de vente",
-    icon: ShoppingCart,
-    url: "/pos",
-    subItems: [
-      { title: "Terminal", url: "/pos/terminal" },
-      { title: "Cuisine", url: "/pos/kitchen" },
-      { title: "Inventaire", url: "/pos/inventory" },
-      { title: "Rapports", url: "/pos/reports" },
-    ],
-  },
-  {
-    title: "Rapports & Analytics",
-    icon: BarChart3,
-    url: "/reports",
-    subItems: [
-      { title: "Analytics", url: "/analytics" },
-      { title: "Rapports quotidiens", url: "/reports/daily" },
-      { title: "Analytics avancées", url: "/analytics/advanced" },
-    ],
-  },
-  {
-    title: "Paramètres",
-    icon: Settings,
-    url: "/settings",
-    subItems: [
-      { title: "Général", url: "/settings" },
-      { title: "Hôtel", url: "/settings/hotel" },
-      { title: "Chambres", url: "/settings/rooms" },
-      { title: "Services", url: "/settings/services" },
-      { title: "Tarifs", url: "/settings/tariffs" },
-      { title: "Utilisateurs", url: "/settings/users" },
-      { title: "Système", url: "/settings/system" },
-      { title: "Sécurité", url: "/settings/security" },
-    ],
+    title: "Administration",
+    items: [
+      {
+        title: "Paramètres",
+        icon: Settings,
+        url: "/settings",
+        subItems: [
+          { title: "Général", url: "/settings" },
+          { title: "Hôtel", url: "/settings/hotel" },
+          { title: "Chambres", url: "/settings/rooms" },
+          { title: "Services", url: "/settings/services" },
+          { title: "Tarifs", url: "/settings/tariffs" },
+          { title: "Utilisateurs", url: "/settings/users" },
+          { title: "Paiements", url: "/settings/payments" },
+          { title: "Système", url: "/settings/system" },
+          { title: "Templates", url: "/settings/templates" },
+          { title: "Analytics", url: "/settings/analytics" },
+          { title: "Sécurité", url: "/settings/security" },
+        ],
+      },
+    ]
   },
 ];
 
@@ -155,49 +225,52 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            {navigationItems.map((item) => {
-              const hasActiveSubItem = isAnySubItemActive(item.subItems);
-              const shouldShowSubItems = !collapsed && item.subItems && (isActive(item.url) || hasActiveSubItem);
-              
-              return (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className={getNavClassName(item.url, item.subItems)}>
-                    <NavLink to={item.url} end={item.url === "/"}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                      {!collapsed && item.badge && (
-                        <SidebarMenuBadge className="ml-auto">
-                          {item.badge}
-                        </SidebarMenuBadge>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                  
-                  {shouldShowSubItems && (
-                    <SidebarMenuSub>
-                      {item.subItems!.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <NavLink 
-                              to={subItem.url} 
-                              className={({ isActive }) => 
-                                isActive ? "bg-sidebar-accent/50" : ""
-                              }
-                            >
-                              <span>{subItem.title}</span>
-                            </NavLink>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  )}
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
+        {navigationSections.map((section) => (
+          <SidebarGroup key={section.title}>
+            <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
+            <SidebarMenu>
+              {section.items.map((item) => {
+                const hasActiveSubItem = isAnySubItemActive(item.subItems);
+                const shouldShowSubItems = !collapsed && item.subItems && (isActive(item.url) || hasActiveSubItem);
+                
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild className={getNavClassName(item.url, item.subItems)}>
+                      <NavLink to={item.url} end={item.url === "/"}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                        {!collapsed && item.badge && (
+                          <SidebarMenuBadge className="ml-auto">
+                            {item.badge}
+                          </SidebarMenuBadge>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                    
+                    {shouldShowSubItems && (
+                      <SidebarMenuSub>
+                        {item.subItems!.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <NavLink 
+                                to={subItem.url} 
+                                className={({ isActive }) => 
+                                  isActive ? "bg-sidebar-accent/50" : ""
+                                }
+                              >
+                                <span>{subItem.title}</span>
+                              </NavLink>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
     </Sidebar>
   );
