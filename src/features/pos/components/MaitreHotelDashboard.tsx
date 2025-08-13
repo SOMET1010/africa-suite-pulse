@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users, Clock, AlertTriangle, CheckCircle, UserPlus, Calendar } from 'lucide-react';
 import { usePOSTables } from '../hooks/usePOSData';
-import { useTableAssignments } from '../hooks/useTableAssignments';
+import { useTableAssignments, useAssignTable } from '../hooks/useTableAssignments';
 import { POSTable, POSTableAssignment } from '../types';
 import { toast } from 'sonner';
 
@@ -15,7 +17,62 @@ interface MaitreHotelDashboardProps {
 export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outletId }) => {
   const { data: tables = [], error: tablesError } = usePOSTables(outletId);
   const { data: assignments = [], error: assignmentsError } = useTableAssignments(outletId);
+  const assignTable = useAssignTable();
+  
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [selectedServerId, setSelectedServerId] = useState<string>('');
+  
+  // Mock data pour les serveurs - à remplacer par une vraie requête
+  const availableServers = [
+    { id: 'server1', name: 'Marie Dubois', zone: 'Terrasse' },
+    { id: 'server2', name: 'Jean Martin', zone: 'Salle principale' },
+    { id: 'server3', name: 'Sophie Leroy', zone: 'VIP' },
+    { id: 'server4', name: 'Pierre Bernard', zone: 'Bar' }
+  ];
+
+  // Calculs des tables assignées/non assignées
+  const getTableAssignment = (tableId: string) => {
+    return assignments.find(assignment => 
+      assignment.table_id === tableId && 
+      assignment.status === 'active' &&
+      assignment.shift_date === new Date().toISOString().split('T')[0]
+    );
+  };
+
+  const unassignedTables = tables.filter(table => !getTableAssignment(table.id));
+  const assignedTables = tables.filter(table => getTableAssignment(table.id));
+
+  // Handlers pour les actions
+  const handleAssignTable = async (tableId: string, serverId: string) => {
+    try {
+      await assignTable.mutateAsync({ tableId, serverId });
+      setShowAssignDialog(false);
+      setSelectedTable(null);
+      setSelectedServerId('');
+      toast.success('Table assignée avec succès');
+    } catch (error) {
+      toast.error('Erreur lors de l\'assignation');
+    }
+  };
+
+  const handleOpenAssignDialog = (table?: POSTable) => {
+    if (table) {
+      setSelectedTable(table);
+    }
+    setShowAssignDialog(true);
+  };
+
+  const handleAssignAll = () => {
+    if (unassignedTables.length === 0) return;
+    // Pour simplifier, on assigne la première table
+    setSelectedTable(unassignedTables[0]);
+    setShowAssignDialog(true);
+  };
+
+  const handleShowPlanning = () => {
+    toast.info('Fonctionnalité planning à venir');
+  };
 
   // Handle errors
   React.useEffect(() => {
@@ -26,14 +83,6 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
       toast.error("Erreur lors du chargement des assignations");
     }
   }, [tablesError, assignmentsError]);
-
-  const getTableAssignment = (tableId: string) => {
-    return assignments.find(assignment => 
-      assignment.table_id === tableId && 
-      assignment.status === 'active' &&
-      assignment.shift_date === new Date().toISOString().split('T')[0]
-    );
-  };
 
   const getTableStatus = (table: POSTable) => {
     const assignment = getTableAssignment(table.id);
@@ -52,9 +101,6 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
     }
   };
 
-  const unassignedTables = tables.filter(table => !getTableAssignment(table.id));
-  const assignedTables = tables.filter(table => getTableAssignment(table.id));
-
   return (
     <div className="space-y-6 p-6">
       {/* Header avec actions */}
@@ -64,12 +110,12 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           <p className="text-muted-foreground">Gestion des tables et assignations serveurs</p>
         </div>
         <div className="flex gap-2">
-          <Button className="bg-primary">
-            <Users className="h-4 w-4 mr-2" />
+          <Button className="bg-primary" onClick={() => handleOpenAssignDialog()}>
+            <UserPlus className="h-4 w-4 mr-2" />
             Assigner Serveur
           </Button>
-          <Button variant="outline">
-            <Clock className="h-4 w-4 mr-2" />
+          <Button variant="outline" onClick={handleShowPlanning}>
+            <Calendar className="h-4 w-4 mr-2" />
             Planning
           </Button>
         </div>
@@ -139,7 +185,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
                 <p className="font-medium">{unassignedTables.length} table(s) sans serveur assigné</p>
                 <p className="text-sm text-muted-foreground">Assignez des serveurs pour optimiser le service</p>
               </div>
-              <Button>Assigner Maintenant</Button>
+              <Button onClick={() => handleOpenAssignDialog()}>Assigner Maintenant</Button>
             </div>
           </CardContent>
         </Card>
@@ -156,7 +202,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
                 Tables Non Assignées ({unassignedTables.length})
               </div>
               {unassignedTables.length > 0 && (
-                <Button size="sm" variant="outline">Assigner Tout</Button>
+                <Button size="sm" variant="outline" onClick={handleAssignAll}>Assigner Tout</Button>
               )}
             </CardTitle>
           </CardHeader>
@@ -174,7 +220,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
                     key={table.id}
                     variant="outline"
                     className="h-16 flex flex-col items-center justify-center gap-1 hover:border-primary"
-                    onClick={() => setSelectedTable(table)}
+                    onClick={() => handleOpenAssignDialog(table)}
                   >
                     <span className="font-semibold">Table {table.table_number}</span>
                     <Badge variant="secondary" className="text-xs">
@@ -283,6 +329,65 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialogue d'assignation */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assigner un serveur</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedTable && (
+              <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                <Users className="h-4 w-4" />
+                <span className="font-medium">Table {selectedTable.table_number}</span>
+                <Badge variant="outline">{selectedTable.capacity} places</Badge>
+                {selectedTable.zone && (
+                  <Badge variant="secondary">{selectedTable.zone}</Badge>
+                )}
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sélectionner un serveur</label>
+              <Select value={selectedServerId} onValueChange={setSelectedServerId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choisir un serveur..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableServers.map((server) => (
+                    <SelectItem key={server.id} value={server.id}>
+                      <div className="flex items-center gap-2">
+                        <span>{server.name}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {server.zone}
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowAssignDialog(false)}
+                className="flex-1"
+              >
+                Annuler
+              </Button>
+              <Button 
+                onClick={() => selectedTable && selectedServerId && handleAssignTable(selectedTable.id, selectedServerId)}
+                disabled={!selectedServerId || assignTable.isPending}
+                className="flex-1"
+              >
+                {assignTable.isPending ? 'Assignation...' : 'Assigner'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
