@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { queryKeys, invalidateRackQueries } from '@/lib/queryClient';
@@ -57,7 +58,7 @@ export function useRooms(orgId: string) {
 
 export function useReservations(orgId: string, startISO?: string, endISO?: string) {
   return useQuery({
-    queryKey: queryKeys.reservations(orgId, startISO, endISO),
+    queryKey: queryKeys.reservations.all(orgId, startISO, endISO),
     queryFn: async (): Promise<Reservation[]> => {
       let query = supabase
         .from("reservations")
