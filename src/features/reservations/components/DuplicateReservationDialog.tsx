@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Copy, Calendar, Users, MapPin, CreditCard, Mail, FileText, History } from "lucide-react";
+import { Copy, Calendar, Users, MapPin, CreditCard, Mail, FileText, History, MessageCircle } from "lucide-react";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -450,6 +451,49 @@ export function DuplicateReservationDialog({
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5" />
+                    Envoi WhatsApp
+                  </CardTitle>
+                  <CardDescription>
+                    Envoyez des messages WhatsApp instantanés
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <WhatsAppButton
+                    reservationId={reservation.id}
+                    action="confirmation"
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    WhatsApp confirmation
+                  </WhatsAppButton>
+                  <WhatsAppButton
+                    reservationId={reservation.id}
+                    action="modification"
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    WhatsApp modification
+                  </WhatsAppButton>
+                  <WhatsAppButton
+                    reservationId={reservation.id}
+                    action="checkin"
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    WhatsApp check-in
+                  </WhatsAppButton>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
                     Génération PDF
                   </CardTitle>
@@ -458,33 +502,35 @@ export function DuplicateReservationDialog({
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => generatePdfMutation.mutate('confirmation')}
-                    disabled={generatePdfMutation.isPending}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    PDF de confirmation
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => generatePdfMutation.mutate('modification')}
-                    disabled={generatePdfMutation.isPending}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    PDF de modification
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => generatePdfMutation.mutate('cancellation')}
-                    disabled={generatePdfMutation.isPending}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    PDF d'annulation
-                  </Button>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="justify-start"
+                      onClick={() => generatePdfMutation.mutate('confirmation')}
+                      disabled={generatePdfMutation.isPending}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      PDF confirmation
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="justify-start"
+                      onClick={() => generatePdfMutation.mutate('modification')}
+                      disabled={generatePdfMutation.isPending}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      PDF modification
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="justify-start"
+                      onClick={() => generatePdfMutation.mutate('cancellation')}
+                      disabled={generatePdfMutation.isPending}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      PDF annulation
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </div>

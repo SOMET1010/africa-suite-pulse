@@ -1,4 +1,5 @@
 import { Eye, Calendar, Users, MapPin, Phone, Mail, Edit, CheckCircle, XCircle, Clock, CreditCard } from "lucide-react";
+import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -347,6 +348,23 @@ export function ReservationDetailsSheet({ open, onOpenChange, reservation }: Res
               <Edit className="h-4 w-4" />
               Modifier la réservation
             </Button>
+
+            {/* Communication Actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Mail className="h-4 w-4" />
+                Email
+              </Button>
+              <WhatsAppButton
+                reservationId={reservation.id}
+                action={reservation.status === "confirmed" ? "checkin" : "confirmation"}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                WhatsApp
+              </WhatsAppButton>
+            </div>
 
             {reservation.status === "option" && (
               <Button variant="outline" className="w-full gap-2 text-success hover:bg-success/10">
