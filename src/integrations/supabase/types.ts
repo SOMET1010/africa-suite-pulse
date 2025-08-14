@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          description: string | null
+          entity_id: string | null
+          entity_name: string | null
+          entity_type: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          org_id: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          description?: string | null
+          entity_id?: string | null
+          entity_name?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          org_id: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string | null
+          entity_id?: string | null
+          entity_name?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          org_id?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       allotments: {
         Row: {
           code: string
@@ -595,6 +640,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      document_templates: {
+        Row: {
+          category: string | null
+          code: string
+          content: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          is_default: boolean
+          name: string
+          org_id: string
+          preview_data: Json | null
+          styles: Json | null
+          type: string
+          updated_at: string
+          variables: Json | null
+          version: number
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name: string
+          org_id: string
+          preview_data?: Json | null
+          styles?: Json | null
+          type: string
+          updated_at?: string
+          variables?: Json | null
+          version?: number
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          name?: string
+          org_id?: string
+          preview_data?: Json | null
+          styles?: Json | null
+          type?: string
+          updated_at?: string
+          variables?: Json | null
+          version?: number
+        }
+        Relationships: []
       }
       equipment: {
         Row: {
@@ -1667,6 +1772,60 @@ export type Database = {
           started_by?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          context_id: string | null
+          context_type: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_read: boolean
+          message: string
+          metadata: Json | null
+          org_id: string
+          priority: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean
+          message: string
+          metadata?: Json | null
+          org_id: string
+          priority?: string
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          context_id?: string | null
+          context_type?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          metadata?: Json | null
+          org_id?: string
+          priority?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3687,6 +3846,45 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          backup_settings: Json | null
+          created_at: string
+          general_settings: Json | null
+          id: string
+          integration_settings: Json | null
+          notification_settings: Json | null
+          org_id: string
+          performance_settings: Json | null
+          security_settings: Json | null
+          updated_at: string
+        }
+        Insert: {
+          backup_settings?: Json | null
+          created_at?: string
+          general_settings?: Json | null
+          id?: string
+          integration_settings?: Json | null
+          notification_settings?: Json | null
+          org_id: string
+          performance_settings?: Json | null
+          security_settings?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          backup_settings?: Json | null
+          created_at?: string
+          general_settings?: Json | null
+          id?: string
+          integration_settings?: Json | null
+          notification_settings?: Json | null
+          org_id?: string
+          performance_settings?: Json | null
+          security_settings?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       table_assignments: {
         Row: {
           assigned_at: string
@@ -3889,6 +4087,60 @@ export type Database = {
           read_only_until?: string | null
           two_factor_enabled?: boolean
           two_factor_method?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          dashboard_layout: Json | null
+          desktop_notifications: boolean | null
+          email_notifications: boolean | null
+          id: string
+          language: string | null
+          notification_frequency: string | null
+          notifications_enabled: boolean | null
+          org_id: string
+          preferences: Json | null
+          push_notifications: boolean | null
+          sound_notifications: boolean | null
+          theme: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dashboard_layout?: Json | null
+          desktop_notifications?: boolean | null
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          notification_frequency?: string | null
+          notifications_enabled?: boolean | null
+          org_id: string
+          preferences?: Json | null
+          push_notifications?: boolean | null
+          sound_notifications?: boolean | null
+          theme?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dashboard_layout?: Json | null
+          desktop_notifications?: boolean | null
+          email_notifications?: boolean | null
+          id?: string
+          language?: string | null
+          notification_frequency?: string | null
+          notifications_enabled?: boolean | null
+          org_id?: string
+          preferences?: Json | null
+          push_notifications?: boolean | null
+          sound_notifications?: boolean | null
+          theme?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -4270,6 +4522,21 @@ export type Database = {
         Args: { p_session_id: string }
         Returns: boolean
       }
+      create_notification: {
+        Args: {
+          p_action_url?: string
+          p_context_id?: string
+          p_context_type?: string
+          p_expires_at?: string
+          p_message: string
+          p_metadata?: Json
+          p_priority?: string
+          p_title: string
+          p_type?: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       create_pos_user: {
         Args: {
           p_display_name: string
@@ -4420,9 +4687,24 @@ export type Database = {
         Args: { p_details?: Json; p_event_type: string; p_severity?: string }
         Returns: undefined
       }
+      log_user_activity: {
+        Args: {
+          p_action: string
+          p_description?: string
+          p_entity_id?: string
+          p_entity_name?: string
+          p_entity_type: string
+          p_metadata?: Json
+        }
+        Returns: undefined
+      }
       logout_pos_session: {
         Args: { p_session_token: string }
         Returns: boolean
+      }
+      mark_notification_read: {
+        Args: { notification_id: string }
+        Returns: undefined
       }
       pms_assign_room: {
         Args: { p_res: string; p_room: string }

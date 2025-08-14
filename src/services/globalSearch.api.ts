@@ -2,7 +2,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface SearchResult {
   id: string;
-  type: 'guest' | 'reservation' | 'room' | 'product' | 'invoice';
+  type: 'guest' | 'reservation' | 'room' | 'product' | 'invoice' | 'maintenance' | 'template';
   title: string;
   subtitle: string;
   metadata?: string;
@@ -32,6 +32,64 @@ export class GlobalSearchService {
           title: `${guest.first_name} ${guest.last_name}`,
           subtitle: guest.email || guest.phone || 'Pas d\'email',
           metadata: guest.guest_type || 'Client Standard',
+          status: 'active'
+        });
+      });
+
+      // Search POS products
+      const { data: posProducts } = await supabase
+        .from('pos_stock_items')
+        .select('id, name, item_code, last_cost')
+        .eq('org_id', orgId)
+        .or(`name.ilike.${searchTerm},item_code.ilike.${searchTerm}`)
+        .limit(3);
+
+      posProducts?.forEach(product => {
+        results.push({
+          id: product.id,
+          type: 'product',
+          title: product.name,
+          subtitle: product.item_code || 'Produit POS',
+          metadata: `${product.last_cost || 0} XOF`,
+          status: 'active'
+        });
+      });
+
+      // Search maintenance requests
+      const { data: maintenance } = await supabase
+        .from('maintenance_requests')
+        .select('id, title, status, priority, request_number')
+        .eq('org_id', orgId)
+        .or(`title.ilike.${searchTerm},request_number.ilike.${searchTerm}`)
+        .limit(3);
+
+      maintenance?.forEach(request => {
+        results.push({
+          id: request.id,
+          type: 'maintenance',
+          title: request.request_number || request.title,
+          subtitle: request.title,
+          metadata: `Priorité: ${request.priority}`,
+          status: request.status
+        });
+      });
+
+      // Search document templates
+      const { data: templates } = await supabase
+        .from('document_templates')
+        .select('id, name, type, category')
+        .eq('org_id', orgId)
+        .eq('is_active', true)
+        .or(`name.ilike.${searchTerm},type.ilike.${searchTerm}`)
+        .limit(3);
+
+      templates?.forEach(template => {
+        results.push({
+          id: template.id,
+          type: 'template',
+          title: template.name,
+          subtitle: `Template ${template.type}`,
+          metadata: template.category || 'Document',
           status: 'active'
         });
       });
