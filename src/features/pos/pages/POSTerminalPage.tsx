@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { MainAppLayout } from "@/core/layout/MainAppLayout";
+import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { ArrowLeft, ShoppingCart, Plus, Minus, CreditCard, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePOSAuth } from "../auth/usePOSAuth";
@@ -55,6 +55,18 @@ export default function POSTerminalPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("1");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const headerAction = (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => navigate("/pos")}
+      className="gap-2"
+    >
+      <ArrowLeft className="w-4 h-4" />
+      Retour
+    </Button>
+  );
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesCategory = product.category_id === selectedCategory;
@@ -110,27 +122,17 @@ export default function POSTerminalPage() {
   };
 
   return (
-    <MainAppLayout>
+    <UnifiedLayout 
+      title="Terminal de Vente"
+      headerAction={headerAction}
+      showStatusBar={false}
+    >
       <div className="h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/pos")}
-              className="gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Terminal de Vente</h1>
-              <p className="text-muted-foreground">
-                Serveur: {session?.display_name}
-              </p>
-            </div>
-          </div>
+        {/* Server info */}
+        <div className="mb-6">
+          <p className="text-muted-foreground">
+            Serveur: {session?.display_name}
+          </p>
         </div>
 
         <div className="flex-1 grid grid-cols-12 gap-6 min-h-0">
@@ -270,6 +272,6 @@ export default function POSTerminalPage() {
           </div>
         </div>
       </div>
-    </MainAppLayout>
+    </UnifiedLayout>
   );
 }
