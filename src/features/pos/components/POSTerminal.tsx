@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { TButton } from "@/core/ui/TButton";
-import { BottomActionBar } from "@/core/layout/BottomActionBar";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { ProductCatalog } from "./ProductCatalog";
-import { OrderSummary } from "./OrderSummary";
+import { ModernPOSHeader } from "./ModernPOSHeader";
+import { ModernTicketPanel } from "./ModernTicketPanel";
+import { ModernProductCatalog } from "./ModernProductCatalog";
+import { ModernActionsPanel } from "./ModernActionsPanel";
 import { TableSelector } from "./TableSelector";
 import { ComprehensivePaymentDialog } from "./ComprehensivePaymentDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
 import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder, useOpenPOSSession } from "../hooks/usePOSData";
-import { ShoppingCart, CreditCard, Users, Store, Settings, Clock, Calendar } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import type { POSOutlet, POSTable, CartItem } from "../types";
 
 export function POSTerminal() {
@@ -19,11 +18,43 @@ export function POSTerminal() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [customerCount, setCustomerCount] = useState(1);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [discountApplied, setDiscountApplied] = useState({ type: 'none', value: 0 });
 
   const { data: outlets = [] } = usePOSOutlets();
   const { data: currentSession } = useCurrentPOSSession(selectedOutlet?.id);
   const createOrder = useCreatePOSOrder();
   const openSession = useOpenPOSSession();
+  const { toast } = useToast();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return;
+      
+      switch (e.key) {
+        case 'F2':
+          e.preventDefault();
+          handleSendToKitchen();
+          break;
+        case 'F4':
+          e.preventDefault();
+          handleTransferTable();
+          break;
+        case 'F6':
+          e.preventDefault();
+          handleSplitBill();
+          break;
+        case 'F10':
+          e.preventDefault();
+          handleCheckout();
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cartItems.length]);
 
   const handleAddToCart = (product: any, quantity: number = 1) => {
     const existingItem = cartItems.find(item => item.product_id === product.id);
@@ -47,8 +78,14 @@ export function POSTerminal() {
         status: 'pending',
         created_at: new Date().toISOString(),
         product,
+        fireRound: 1, // Default to first round
       };
       setCartItems([...cartItems, newItem]);
+    }
+    
+    // Touch feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
     }
   };
 
@@ -74,15 +111,107 @@ export function POSTerminal() {
     const taxRate = 18; // Default tax rate
     const serviceChargeRate = 10; // Default service charge
     
-    const serviceCharge = subtotal * (serviceChargeRate / 100);
-    const taxAmount = (subtotal + serviceCharge) * (taxRate / 100);
+    let adjustedSubtotal = subtotal;
+    
+    // Apply discount
+    if (discountApplied.type === 'percentage') {
+      adjustedSubtotal = subtotal * (1 - discountApplied.value / 100);
+    } else if (discountApplied.type === 'amount') {
+      adjustedSubtotal = Math.max(0, subtotal - discountApplied.value);
+    }
+    
+    const serviceCharge = adjustedSubtotal * (serviceChargeRate / 100);
+    const taxAmount = (adjustedSubtotal + serviceCharge) * (taxRate / 100);
     
     return {
-      subtotal,
+      subtotal: adjustedSubtotal,
       serviceCharge,
       taxAmount,
-      total: subtotal + serviceCharge + taxAmount,
+      total: adjustedSubtotal + serviceCharge + taxAmount,
+      discount: subtotal - adjustedSubtotal,
     };
+  };
+
+  // New handler functions for modern interface
+  const handleDuplicateItem = (productId: string) => {
+    const item = cartItems.find(item => item.product_id === productId);
+    if (item) {
+      handleAddToCart(item.product, 1);
+      toast({
+        title: "Article dupliqué",
+        description: `${item.product_name} ajouté au panier`,
+      });
+    }
+  };
+
+  const handleTransferItem = (productId: string) => {
+    // Implementation for transferring item to another table/order
+    toast({
+      title: "Transfert d'article",
+      description: "Fonctionnalité à implémenter",
+    });
+  };
+
+  const handleCancelItem = (productId: string, reason: string) => {
+    const item = cartItems.find(item => item.product_id === productId);
+    if (item) {
+      setCartItems(cartItems.map(item =>
+        item.product_id === productId 
+          ? { ...item, status: 'cancelled', special_instructions: `Annulé: ${reason}` }
+          : item
+      ));
+      toast({
+        title: "Article annulé",
+        description: `${item.product_name} - ${reason}`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSendToKitchen = () => {
+    if (cartItems.length === 0) return;
+    
+    setCartItems(cartItems.map(item => ({ ...item, status: 'sent' })));
+    toast({
+      title: "Commande envoyée",
+      description: "La commande a été envoyée en cuisine",
+    });
+  };
+
+  const handleSplitBill = () => {
+    toast({
+      title: "Séparation de l'addition",
+      description: "Fonctionnalité à implémenter",
+    });
+  };
+
+  const handleTransferTable = () => {
+    toast({
+      title: "Transfert de table",
+      description: "Fonctionnalité à implémenter",
+    });
+  };
+
+  const handleApplyDiscount = (type: 'percentage' | 'amount', value: number) => {
+    setDiscountApplied({ type, value });
+    toast({
+      title: "Remise appliquée",
+      description: type === 'percentage' ? `${value}% de remise` : `${value} FCFA de remise`,
+    });
+  };
+
+  const handleRoomCharge = (roomId: string) => {
+    toast({
+      title: "Room Charge",
+      description: `Facturation chambre ${roomId}`,
+    });
+  };
+
+  const handleSelectPrinter = (stationType: 'hot' | 'cold' | 'bar') => {
+    toast({
+      title: "Station sélectionnée",
+      description: `Station ${stationType} active`,
+    });
   };
 
   const handleCheckout = () => {
@@ -94,6 +223,8 @@ export function POSTerminal() {
     setCartItems([]);
     setSelectedTable(null);
     setCustomerCount(1);
+    setDiscountApplied({ type: 'none', value: 0 });
+    setSearchQuery("");
   };
 
   if (!selectedOutlet) {
@@ -131,78 +262,46 @@ export function POSTerminal() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-accent/5">
-      {/* Ultra-Modern Header with Glassmorphism */}
-      <div className="sticky top-0 z-50 glass-card shadow-elevate">
-        <div className="px-8 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl">
-                  <Store className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold tracking-tight font-luxury">{selectedOutlet.name}</h1>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {new Date().toLocaleDateString('fr-FR')}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" />
-                      {new Date().toLocaleTimeString('fr-FR', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </span>
-                    <Badge variant="outline" className="glass-card">
-                      Session: {currentSession.session_number}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3 glass-card px-4 py-3 rounded-xl">
-                <Users className="h-5 w-5 text-muted-foreground" />
-                <Input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={customerCount}
-                  onChange={(e) => setCustomerCount(parseInt(e.target.value) || 1)}
-                  className="w-20 h-9 border-0 bg-transparent text-center font-semibold"
-                />
-                <span className="text-sm text-muted-foreground font-medium">pers.</span>
-              </div>
-              
-              {selectedTable && (
-                <Badge variant="secondary" className="px-4 py-2 text-sm font-medium glass-card">
-                  Table {selectedTable.number}
-                </Badge>
-              )}
-              
-              <TButton
-                variant="ghost"
-                size="md"
-                onClick={() => setSelectedOutlet(null)}
-                className="gap-2 glass-card"
-              >
-                <Settings className="h-4 w-4" />
-                Changer
-              </TButton>
-            </div>
+      {/* Modern Header */}
+      <ModernPOSHeader
+        selectedOutlet={selectedOutlet}
+        currentSession={currentSession}
+        selectedTable={selectedTable}
+        customerCount={customerCount}
+        onCustomerCountChange={setCustomerCount}
+        onChangeOutlet={() => setSelectedOutlet(null)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
+
+      {/* Modern 3-Column Layout: 35% - 45% - 20% */}
+      <div className="grid grid-cols-12 min-h-[calc(100vh-7rem)] gap-4 p-4">
+        {/* Left Column - Ticket Panel (35%) */}
+        <div className="col-span-4">
+          <div className="h-full glass-card rounded-2xl shadow-elevate overflow-hidden">
+            <ModernTicketPanel
+              items={cartItems}
+              selectedTable={selectedTable}
+              customerCount={customerCount}
+              onUpdateQuantity={handleUpdateQuantity}
+              onRemoveItem={handleRemoveFromCart}
+              onDuplicateItem={handleDuplicateItem}
+              onTransferItem={handleTransferItem}
+              onCancelItem={handleCancelItem}
+              onSendToKitchen={handleSendToKitchen}
+              onCheckout={handleCheckout}
+              onSplitBill={handleSplitBill}
+              onTransferTable={handleTransferTable}
+              totals={totals}
+            />
           </div>
         </div>
-      </div>
 
-      {/* Modern Grid Layout - 70/30 Split */}
-      <div className="grid grid-cols-10 min-h-[calc(100vh-6rem)] gap-6 p-6">
-        {/* Product Catalog - Enhanced Left Side */}
-        <div className="col-span-7">
+        {/* Center Column - Product Navigator (45%) */}
+        <div className="col-span-5">
           <div className="h-full flex flex-col glass-card rounded-2xl shadow-elevate overflow-hidden">
             {/* Table Selector */}
-            <div className="p-8 border-b bg-gradient-to-r from-card/50 to-muted/10">
+            <div className="p-6 border-b bg-gradient-to-r from-card/50 to-muted/10">
               <TableSelector
                 outletId={selectedOutlet.id}
                 selectedTable={selectedTable}
@@ -211,99 +310,24 @@ export function POSTerminal() {
             </div>
 
             {/* Product Catalog */}
-            <div className="flex-1 p-8 overflow-hidden">
-              <ProductCatalog
+            <div className="flex-1 p-6 overflow-hidden">
+              <ModernProductCatalog
                 outletId={selectedOutlet.id}
+                searchQuery={searchQuery}
                 onAddToCart={handleAddToCart}
               />
             </div>
           </div>
         </div>
 
-        {/* Order Summary - Refined Right Side */}
+        {/* Right Column - Actions Panel (20%) */}
         <div className="col-span-3">
-          <div className="h-full flex flex-col glass-card rounded-2xl shadow-elevate overflow-hidden">
-            {/* Cart Header with Gradient */}
-            <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-accent/5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl">
-                    <ShoppingCart className="h-5 w-5 text-primary" />
-                  </div>
-                  <h2 className="text-lg font-semibold font-luxury">Commande</h2>
-                </div>
-                <Badge variant="secondary" className="bg-gradient-to-r from-primary/10 to-accent/10 text-primary border-0">
-                  {cartItems.length} {cartItems.length !== 1 ? 'articles' : 'article'}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Order Items with Scroll */}
-            <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
-              <div className="p-6">
-                <OrderSummary
-                  items={cartItems}
-                  onUpdateQuantity={handleUpdateQuantity}
-                  onRemoveItem={handleRemoveFromCart}
-                />
-              </div>
-            </div>
-
-            {/* Order Totals & Actions */}
-            <div className="p-6 border-t bg-gradient-to-br from-card to-primary/5">
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Sous-total</span>
-                  <span className="font-medium">{totals.subtotal.toLocaleString()} FCFA</span>
-                </div>
-                {totals.serviceCharge > 0 && (
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>Service (10%)</span>
-                    <span className="font-medium">{totals.serviceCharge.toLocaleString()} FCFA</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>TVA (18%)</span>
-                  <span className="font-medium">{totals.taxAmount.toLocaleString()} FCFA</span>
-                </div>
-                <div className="border-t pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold font-luxury">Total</span>
-                    <span className="text-2xl font-bold text-primary font-luxury">
-                      {totals.total.toLocaleString()} F
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <TButton
-                  onClick={handleCheckout}
-                  disabled={cartItems.length === 0}
-                  className="w-full h-14 text-lg font-semibold shadow-elevate transition-elegant hover:scale-[1.02]"
-                  size="lg"
-                >
-                  <CreditCard className="h-5 w-5 mr-3" />
-                  Encaisser {totals.total.toLocaleString()} F
-                </TButton>
-                <TButton
-                  variant="ghost"
-                  onClick={clearCart}
-                  disabled={cartItems.length === 0}
-                  className="w-full h-12 glass-card transition-elegant hover:scale-[1.02]"
-                >
-                  Vider le panier
-                </TButton>
-              </div>
-              
-              {/* Compact Action Bar */}
-              <div className="mt-6 pt-4 border-t">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Session: {currentSession.session_number}</span>
-                  <span>{cartItems.length} articles • {totals.total.toLocaleString()} F</span>
-                </div>
-              </div>
-            </div>
+          <div className="h-full glass-card rounded-2xl shadow-elevate overflow-hidden">
+            <ModernActionsPanel
+              onApplyDiscount={handleApplyDiscount}
+              onRoomCharge={handleRoomCharge}
+              onSelectPrinter={handleSelectPrinter}
+            />
           </div>
         </div>
       </div>
