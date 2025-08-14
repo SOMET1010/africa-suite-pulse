@@ -23,6 +23,7 @@ import {
 import { toast } from "sonner";
 import { CartItem } from "../types";
 import { RoomChargeDialog } from "./RoomChargeDialog";
+import { CashVisualizer } from "@/components/pos/CashVisualizer";
 
 interface PaymentMethod {
   id: string;
@@ -72,6 +73,7 @@ export function ComprehensivePaymentDialog({
   const [cashReceived, setCashReceived] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showRoomChargeDialog, setShowRoomChargeDialog] = useState(false);
+  const [useVisualCash, setUseVisualCash] = useState(true);
   
 
   useEffect(() => {
@@ -398,20 +400,56 @@ export function ComprehensivePaymentDialog({
 
                   {/* Cash input */}
                   {paymentMethods.find(m => m.id === selectedMethodId)?.kind === 'cash' && (
-                    <div>
-                      <Label htmlFor="cash_received">Montant reçu (XOF)</Label>
-                      <Input
-                        id="cash_received"
-                        type="number"
-                        min="0"
-                        value={cashReceived}
-                        onChange={(e) => setCashReceived(parseFloat(e.target.value) || 0)}
-                        placeholder={calculateFinalTotal().toLocaleString()}
-                      />
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label>Mode de saisie espèces</Label>
+                        <div className="flex gap-2">
+                          <TButton
+                            variant={useVisualCash ? 'primary' : 'default'}
+                            onClick={() => setUseVisualCash(true)}
+                            size="sm"
+                          >
+                            <Banknote className="h-4 w-4 mr-1" />
+                            Visuel
+                          </TButton>
+                          <TButton
+                            variant={!useVisualCash ? 'primary' : 'default'}
+                            onClick={() => setUseVisualCash(false)}
+                            size="sm"
+                          >
+                            <Calculator className="h-4 w-4 mr-1" />
+                            Classique
+                          </TButton>
+                        </div>
+                      </div>
+
+                      {useVisualCash ? (
+                        <CashVisualizer
+                          totalAmount={calculateFinalTotal()}
+                          onChange={(received) => setCashReceived(received)}
+                          showChangeCalculation={true}
+                          className="border rounded-lg p-4 bg-muted/50"
+                        />
+                      ) : (
+                        <div>
+                          <Label htmlFor="cash_received">Montant reçu (XOF)</Label>
+                          <Input
+                            id="cash_received"
+                            type="number"
+                            min="0"
+                            value={cashReceived}
+                            onChange={(e) => setCashReceived(parseFloat(e.target.value) || 0)}
+                            placeholder={calculateFinalTotal().toLocaleString()}
+                          />
+                        </div>
+                      )}
+
                       {getChange() > 0 && (
-                        <p className="text-lg font-semibold text-green-600 mt-2">
-                          Monnaie à rendre: {getChange().toLocaleString()} XOF
-                        </p>
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                          <p className="text-lg font-semibold text-green-700">
+                            Monnaie à rendre: {getChange().toLocaleString()} XOF
+                          </p>
+                        </div>
                       )}
                     </div>
                   )}
