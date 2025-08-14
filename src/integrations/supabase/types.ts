@@ -4917,7 +4917,9 @@ export type Database = {
         Returns: string
       }
       authenticate_pos_user: {
-        Args: { p_org_id: string; p_pin: string }
+        Args:
+          | { p_org_id: string; p_pin: string }
+          | { p_org_id?: string; p_pin: string }
         Returns: {
           display_name: string
           role_name: string
