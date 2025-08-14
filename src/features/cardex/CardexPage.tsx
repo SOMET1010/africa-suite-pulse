@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { TButton } from "@/core/ui/TButton";
 import { FilterBar } from "@/core/ui/FilterBar";
 import { DataCard } from "@/core/ui/DataCard";
@@ -52,31 +52,37 @@ export default function CardexPage() {
   };
 
   return (
-    <UnifiedLayout
-      title="Cardex"
-      headerAction={
-        <div className="flex gap-2">
-          <TButton
-            onClick={handleQuickPosting}
-            disabled={!selectedReservationId}
-            variant="primary"
-            size="sm"
-          >
-            <Plus className="h-4 w-4" />
-            Passage rapide
-          </TButton>
-          <TButton
-            onClick={() => setFilterDialogOpen(true)}
-            variant="ghost"
-            size="sm"
-          >
-            <Filter className="h-4 w-4" />
-            Filtres
-          </TButton>
-        </div>
-      }
-    >
+    <MainAppLayout>
       <div className="space-y-6">
+        {/* Header Actions */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Cardex</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Gestion complète des comptes clients
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <TButton
+              onClick={handleQuickPosting}
+              disabled={!selectedReservationId}
+              variant="primary"
+              size="sm"
+            >
+              <Plus className="h-4 w-4" />
+              Passage rapide
+            </TButton>
+            <TButton
+              onClick={() => setFilterDialogOpen(true)}
+              variant="ghost"
+              size="sm"
+            >
+              <Filter className="h-4 w-4" />
+              Filtres
+            </TButton>
+          </div>
+        </div>
+
         {/* Sélecteur de réservation */}
         <Card className="glass-card shadow-luxury">
           <CardHeader>
@@ -168,14 +174,14 @@ export default function CardexPage() {
             </CardContent>
           </Card>
         )}
-      </div>
 
-      {/* Dialogs */}
-      <QuickPostingDialog
-        open={quickPostingOpen}
-        onOpenChange={setQuickPostingOpen}
-        reservationId={selectedReservationId}
-      />
-    </UnifiedLayout>
+        {/* Dialogs */}
+        <QuickPostingDialog
+          open={quickPostingOpen}
+          onOpenChange={setQuickPostingOpen}
+          reservationId={selectedReservationId}
+        />
+      </div>
+    </MainAppLayout>
   );
 }

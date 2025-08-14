@@ -16,7 +16,7 @@ const mobileNavItems = [
   { title: "Accueil", icon: LayoutDashboard, url: "/" },
   { title: "Chambres", icon: Building, url: "/rack" },
   { title: "Réservations", icon: CalendarDays, url: "/reservations" },
-  { title: "Arrivées", icon: LogIn, url: "/arrivals" },
+  { title: "Cardex", icon: Receipt, url: "/cardex" },
   { title: "Plus", icon: Settings, url: "/settings" },
 ];
 
