@@ -70,6 +70,8 @@ export class ChannelsAPI {
     
     return data ? {
       ...data,
+      channel_type: data.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
+      sync_status: data.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
       api_credentials: data.api_credentials as Record<string, any>,
       mapping_config: data.mapping_config as Record<string, any>,
       sync_settings: data.sync_settings as Record<string, any>
@@ -112,6 +114,8 @@ export class ChannelsAPI {
     if (error) throw error;
     return {
       ...data,
+      channel_type: data.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
+      sync_status: data.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
       api_credentials: data.api_credentials as Record<string, any>,
       mapping_config: data.mapping_config as Record<string, any>,
       sync_settings: data.sync_settings as Record<string, any>
@@ -130,6 +134,8 @@ export class ChannelsAPI {
     if (error) throw error;
     return {
       ...data,
+      channel_type: data.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
+      sync_status: data.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
       api_credentials: data.api_credentials as Record<string, any>,
       mapping_config: data.mapping_config as Record<string, any>,
       sync_settings: data.sync_settings as Record<string, any>

@@ -70,6 +70,7 @@ export class WorkflowsAPI {
     
     return data ? {
       ...data,
+      trigger_type: data.trigger_type as 'manual' | 'schedule' | 'event',
       trigger_config: data.trigger_config as Record<string, any>,
       workflow_definition: data.workflow_definition as Record<string, any>
     } : null;
@@ -106,6 +107,7 @@ export class WorkflowsAPI {
     if (error) throw error;
     return {
       ...data,
+      trigger_type: data.trigger_type as 'manual' | 'schedule' | 'event',
       trigger_config: data.trigger_config as Record<string, any>,
       workflow_definition: data.workflow_definition as Record<string, any>
     };
@@ -123,6 +125,7 @@ export class WorkflowsAPI {
     if (error) throw error;
     return {
       ...data,
+      trigger_type: data.trigger_type as 'manual' | 'schedule' | 'event',
       trigger_config: data.trigger_config as Record<string, any>,
       workflow_definition: data.workflow_definition as Record<string, any>
     };
@@ -168,6 +171,7 @@ export class WorkflowsAPI {
     if (error) throw error;
     return (data || []).map(execution => ({
       ...execution,
+      status: execution.status as 'running' | 'completed' | 'failed' | 'cancelled',
       input_data: execution.input_data as Record<string, any>,
       output_data: execution.output_data as Record<string, any>,
       execution_logs: execution.execution_logs as Array<Record<string, any>>
@@ -189,6 +193,7 @@ export class WorkflowsAPI {
     
     return data ? {
       ...data,
+      status: data.status as 'running' | 'completed' | 'failed' | 'cancelled',
       input_data: data.input_data as Record<string, any>,
       output_data: data.output_data as Record<string, any>,
       execution_logs: data.execution_logs as Array<Record<string, any>>
