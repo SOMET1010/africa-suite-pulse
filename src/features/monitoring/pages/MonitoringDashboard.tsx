@@ -1,15 +1,16 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, Server, AlertTriangle, Clock, TrendingUp } from 'lucide-react';
-import { HotelHealthCard } from '../components';
-import { AlertsPanel } from '../components';
+import { HotelHealthCard, AlertsPanel, ActivateMonitoringButton, MonitoringGuide } from '../components';
 import { useHotelHealthSummary, useHotelHealthStatus, useActiveAlerts } from '../hooks/useMonitoring';
+import { useCurrentOrg } from '../hooks/useCurrentOrg';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 
 export default function MonitoringDashboard() {
   const { data: summary, isLoading: summaryLoading } = useHotelHealthSummary();
   const { data: hotelHealth, isLoading: healthLoading } = useHotelHealthStatus();
   const { data: alerts, isLoading: alertsLoading } = useActiveAlerts();
+  const { data: currentOrg } = useCurrentOrg();
 
   const stats = [
     {
@@ -95,9 +96,17 @@ export default function MonitoringDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Server className="h-12 w-12 mx-auto mb-2" />
-                    <p>Aucun hôtel surveillé pour le moment</p>
+                  <div className="space-y-6">
+                    <MonitoringGuide />
+                    <div className="grid grid-cols-1 gap-4">
+                      <ActivateMonitoringButton 
+                        currentOrgId={currentOrg?.org_id}
+                        onActivated={() => {
+                          // Optionally refresh data or show success message
+                          console.log('Monitoring activated successfully');
+                        }}
+                      />
+                    </div>
                   </div>
                 )}
               </CardContent>
