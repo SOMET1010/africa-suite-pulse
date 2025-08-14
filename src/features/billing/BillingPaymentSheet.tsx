@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Eye } from "lucide-react";
+import { CashVisualizer } from "@/components/pos/CashVisualizer";
 
 interface BillingPaymentSheetProps {
   invoiceId: string;
@@ -20,10 +22,14 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
   const [methods, setMethods] = useState<any[]>([]);
   const [methodId, setMethodId] = useState<string>("");
   const [amount, setAmount] = useState<number>(defaultAmount ?? totalDue);
+  const [visualAmount, setVisualAmount] = useState<number>(0);
+  const [useVisualMode, setUseVisualMode] = useState<boolean>(false);
   const [reference, setReference] = useState<string>("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const selected = useMemo(() => methods.find(m => m.id === methodId), [methods, methodId]);
+  const currentAmount = useVisualMode ? visualAmount : amount;
+  const isCashMethod = selected?.code === 'CASH';
 
   useEffect(() => {
     if (!orgId) return;
@@ -46,7 +52,7 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
   async function handlePay() {
     if (!orgId || !selected) return;
     
-    if (amount <= 0) {
+    if (currentAmount <= 0) {
       return toast({ 
         title: "Montant invalide", 
         description: "Le montant doit être supérieur à 0",
@@ -68,14 +74,14 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
         org_id: orgId,
         invoice_id: invoiceId,
         method_id: selected.id,
-        amount,
+        amount: currentAmount,
         reference: reference || undefined,
         metadata: needsReference ? { provider: selected.code.replace("MM_","") } : undefined,
       });
       
       toast({ 
         title: "Paiement enregistré", 
-        description: `${amount.toLocaleString()} encaissé via ${selected.label}`
+        description: `${currentAmount.toLocaleString()} encaissé via ${selected.label}`
       });
       
       onPaid?.();
@@ -91,7 +97,7 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !isProcessing && methodId && amount > 0) {
+    if (e.key === 'Enter' && !isProcessing && methodId && currentAmount > 0) {
       if (!needsReference || reference.trim()) {
         handlePay();
       }
@@ -120,20 +126,46 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
           </Select>
         </div>
 
+        {/* Cash Visual Mode Toggle */}
+        {isCashMethod && (
+          <div className="flex items-center justify-between">
+            <Label>Mode de saisie</Label>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setUseVisualMode(!useVisualMode)}
+              className="flex items-center gap-2"
+            >
+              <Eye className="h-3 w-3" />
+              {useVisualMode ? 'Mode classique' : 'Mode visuel'}
+            </Button>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label htmlFor="amount">Montant</Label>
-          <Input
-            id="amount"
-            type="number"
-            min={0}
-            step="1"
-            value={amount}
-            onChange={e => setAmount(Number(e.target.value || 0))}
-          />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Reste à payer:</span>
-            <span className="font-medium">{totalDue.toLocaleString()}</span>
-          </div>
+          {isCashMethod && useVisualMode ? (
+            <CashVisualizer
+              totalAmount={totalDue}
+              onChange={setVisualAmount}
+              showChangeCalculation={false}
+            />
+          ) : (
+            <>
+              <Input
+                id="amount"
+                type="number"
+                min={0}
+                step="1"
+                value={amount}
+                onChange={e => setAmount(Number(e.target.value || 0))}
+              />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Reste à payer:</span>
+                <span className="font-medium">{totalDue.toLocaleString()}</span>
+              </div>
+            </>
+          )}
         </div>
 
         {needsReference && (
@@ -154,7 +186,7 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
         {selected?.commission_percent && selected.commission_percent > 0 && (
           <div className="p-3 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">
-              Commission: {((amount * selected.commission_percent) / 100).toLocaleString()} 
+              Commission: {((currentAmount * selected.commission_percent) / 100).toLocaleString()} 
               ({selected.commission_percent}%)
             </p>
           </div>
@@ -163,7 +195,7 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
         <Button 
           className="w-full" 
           onClick={handlePay}
-          disabled={isProcessing || !methodId || amount <= 0 || (needsReference && !reference.trim())}
+          disabled={isProcessing || !methodId || currentAmount <= 0 || (needsReference && !reference.trim())}
         >
           {isProcessing ? "Traitement..." : "Enregistrer le paiement"}
         </Button>

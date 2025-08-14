@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { CreditCard, Banknote, Smartphone, Receipt, Calculator } from "lucide-react";
+import { CreditCard, Banknote, Smartphone, Receipt, Calculator, Eye } from "lucide-react";
+import { CashVisualizer } from "@/components/pos/CashVisualizer";
 import type { CartItem, POSTable } from "../types";
 
 interface PaymentDialogProps {
@@ -29,15 +30,17 @@ interface PaymentDialogProps {
 export function PaymentDialog({ isOpen, onClose, order, onPaymentComplete }: PaymentDialogProps) {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'mobile'>('cash');
   const [amountReceived, setAmountReceived] = useState<string>("");
+  const [receivedAmount, setReceivedAmount] = useState<number>(0);
+  const [useVisualMode, setUseVisualMode] = useState<boolean>(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
 
   const { totals } = order;
-  const receivedAmount = parseFloat(amountReceived) || 0;
-  const change = receivedAmount - totals.total;
+  const currentReceivedAmount = useVisualMode ? receivedAmount : (parseFloat(amountReceived) || 0);
+  const change = currentReceivedAmount - totals.total;
 
   const handlePayment = async () => {
-    if (paymentMethod === 'cash' && receivedAmount < totals.total) {
+    if (paymentMethod === 'cash' && currentReceivedAmount < totals.total) {
       toast({
         title: "Montant insuffisant",
         description: "Le montant reçu est inférieur au total de la commande",
@@ -73,6 +76,7 @@ export function PaymentDialog({ isOpen, onClose, order, onPaymentComplete }: Pay
 
   const resetForm = () => {
     setAmountReceived("");
+    setReceivedAmount(0);
     setPaymentMethod('cash');
   };
 
@@ -168,59 +172,85 @@ export function PaymentDialog({ isOpen, onClose, order, onPaymentComplete }: Pay
           {/* Cash Payment Details */}
           {paymentMethod === 'cash' && (
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="amount">Montant reçu</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  placeholder="0"
-                  value={amountReceived}
-                  onChange={(e) => setAmountReceived(e.target.value)}
-                  className="text-lg"
+              {/* Mode Toggle */}
+              <div className="flex items-center justify-between">
+                <Label>Mode de saisie</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setUseVisualMode(!useVisualMode)}
+                  className="flex items-center gap-2"
+                >
+                  <Eye className="h-3 w-3" />
+                  {useVisualMode ? 'Mode classique' : 'Mode visuel'}
+                </Button>
+              </div>
+
+              {useVisualMode ? (
+                /* Visual Cash Mode */
+                <CashVisualizer
+                  totalAmount={totals.total}
+                  onChange={setReceivedAmount}
+                  showChangeCalculation={true}
                 />
-              </div>
+              ) : (
+                /* Classic Input Mode */
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="amount">Montant reçu</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      placeholder="0"
+                      value={amountReceived}
+                      onChange={(e) => setAmountReceived(e.target.value)}
+                      className="text-lg"
+                    />
+                  </div>
 
-              {/* Quick Amount Buttons */}
-              <div className="space-y-2">
-                <Label>Montants rapides</Label>
-                <div className="flex gap-2">
-                  {quickAmounts.map((amount) => (
-                    <Button
-                      key={amount}
-                      variant="outline"
-                      size="sm"
-                      onClick={() => calculateQuickAmount(amount)}
-                    >
-                      {amount.toLocaleString()} F
-                    </Button>
-                  ))}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => calculateQuickAmount(totals.total)}
-                  >
-                    <Calculator className="h-3 w-3 mr-1" />
-                    Exact
-                  </Button>
-                </div>
-              </div>
-
-              {/* Change Calculation */}
-              {receivedAmount > 0 && (
-                <div className="bg-muted p-3 rounded-lg">
-                  {change >= 0 ? (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Monnaie à rendre:</span>
-                      <Badge variant="secondary" className="text-sm">
-                        {change.toFixed(0)} FCFA
-                      </Badge>
+                  {/* Quick Amount Buttons */}
+                  <div className="space-y-2">
+                    <Label>Montants rapides</Label>
+                    <div className="flex gap-2">
+                      {quickAmounts.map((amount) => (
+                        <Button
+                          key={amount}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => calculateQuickAmount(amount)}
+                        >
+                          {amount.toLocaleString()} F
+                        </Button>
+                      ))}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => calculateQuickAmount(totals.total)}
+                      >
+                        <Calculator className="h-3 w-3 mr-1" />
+                        Exact
+                      </Button>
                     </div>
-                  ) : (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-destructive">Montant manquant:</span>
-                      <Badge variant="destructive" className="text-sm">
-                        {Math.abs(change).toFixed(0)} FCFA
-                      </Badge>
+                  </div>
+
+                  {/* Change Calculation */}
+                  {currentReceivedAmount > 0 && (
+                    <div className="bg-muted p-3 rounded-lg">
+                      {change >= 0 ? (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Monnaie à rendre:</span>
+                          <Badge variant="secondary" className="text-sm">
+                            {change.toFixed(0)} FCFA
+                          </Badge>
+                        </div>
+                      ) : (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-destructive">Montant manquant:</span>
+                          <Badge variant="destructive" className="text-sm">
+                            {Math.abs(change).toFixed(0)} FCFA
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -254,7 +284,7 @@ export function PaymentDialog({ isOpen, onClose, order, onPaymentComplete }: Pay
               onClick={handlePayment}
               disabled={
                 isProcessing || 
-                (paymentMethod === 'cash' && receivedAmount < totals.total)
+                (paymentMethod === 'cash' && currentReceivedAmount < totals.total)
               }
               className="flex-1"
             >
