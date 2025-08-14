@@ -247,15 +247,15 @@ export class DataProtectionService {
    */
   static async getProtectionStatus(orgId: string, targetDate: string) {
     try {
-      const { data: hotelDate, error } = await supabase
+      const { data: hotelDateArray, error } = await supabase
         .from('hotel_dates')
         .select('current_hotel_date, mode')
         .eq('org_id', orgId)
         .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
       if (error) {
+        console.error('[DATA_PROTECTION] Erreur récupération date hôtel:', error);
         return {
           isProtected: false,
           status: 'current',
@@ -263,6 +263,16 @@ export class DataProtectionService {
         };
       }
 
+      if (!hotelDateArray || hotelDateArray.length === 0) {
+        console.warn('[DATA_PROTECTION] Aucune date hôtel configurée');
+        return {
+          isProtected: false,
+          status: 'current',
+          message: 'Aucune date hôtel configurée',
+        };
+      }
+
+      const hotelDate = hotelDateArray[0];
       const currentHotelDate = hotelDate.current_hotel_date;
       const targetDateObj = new Date(targetDate);
       const currentDateObj = new Date(currentHotelDate);
