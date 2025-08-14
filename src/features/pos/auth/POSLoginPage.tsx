@@ -67,6 +67,21 @@ export default function POSLoginPage() {
     setError(null);
 
     try {
+      // Add rate limiting check
+      const rateLimitKey = `pos_auth_${pin.slice(0, 2)}`;
+      const { data: rateLimitData, error: rateLimitError } = await supabase.rpc("check_rate_limit", {
+        p_identifier: rateLimitKey,
+        p_action: "pos_login",
+        p_max_attempts: 5,
+        p_window_minutes: 15
+      });
+
+      if (rateLimitError || !rateLimitData) {
+        setError("Trop de tentatives. Veuillez attendre 15 minutes.");
+        setPin("");
+        return;
+      }
+
       const { data, error } = await supabase.rpc("authenticate_pos_user", {
         p_org_id: orgId,
         p_pin: pin
@@ -80,15 +95,17 @@ export default function POSLoginPage() {
         return;
       }
 
-      const user = data[0] as POSUser;
+      const user = data[0] as (POSUser & { session_token: string });
       setCurrentUser(user);
 
-      // Store POS session in localStorage
-      localStorage.setItem("pos_session", JSON.stringify({
+      // Store secure POS session in sessionStorage (more secure than localStorage)
+      sessionStorage.setItem("pos_session", JSON.stringify({
         user_id: user.user_id,
         display_name: user.display_name,
         role: user.role_name,
         org_id: orgId,
+        outlet_id: '',
+        session_token: user.session_token,
         login_time: new Date().toISOString()
       }));
 
@@ -103,10 +120,24 @@ export default function POSLoginPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (currentUser) {
+      try {
+        // Get session token from storage to logout properly
+        const storedSession = sessionStorage.getItem("pos_session");
+        if (storedSession) {
+          const session = JSON.parse(storedSession);
+          await supabase.rpc("logout_pos_session", {
+            p_session_token: session.session_token
+          });
+        }
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
+    }
     setCurrentUser(null);
     setPin("");
-    localStorage.removeItem("pos_session");
+    sessionStorage.removeItem("pos_session");
   };
 
   if (currentUser) {

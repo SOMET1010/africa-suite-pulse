@@ -9,6 +9,7 @@ export interface POSSession {
   role: POSRole;
   org_id: string;
   outlet_id: string;
+  session_token: string;
   login_time: string;
 }
 
@@ -17,33 +18,66 @@ export function usePOSAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing POS session
-    const storedSession = localStorage.getItem("pos_session");
+    // Check for existing POS session using secure validation
+    const storedSession = sessionStorage.getItem("pos_session");
     if (storedSession) {
       try {
         const parsedSession = JSON.parse(storedSession) as POSSession;
-        
-        // Check if session is not too old (24 hours max)
-        const loginTime = new Date(parsedSession.login_time);
-        const now = new Date();
-        const hoursDiff = (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
-        
-        if (hoursDiff < 24) {
-          setSession(parsedSession);
-        } else {
-          localStorage.removeItem("pos_session");
-        }
+        validateStoredSession(parsedSession);
       } catch (error) {
         console.error("Error parsing POS session:", error);
-        localStorage.removeItem("pos_session");
+        clearSession();
       }
     }
     setLoading(false);
   }, []);
 
-  const logout = () => {
+  const validateStoredSession = async (storedSession: POSSession) => {
+    try {
+      const { data, error } = await supabase.rpc("validate_pos_session", {
+        p_session_token: storedSession.session_token
+      });
+
+      if (error || !data || data.length === 0) {
+        clearSession();
+        return;
+      }
+
+      const validatedData = data[0];
+      const validSession: POSSession = {
+        user_id: validatedData.user_id,
+        display_name: validatedData.display_name,
+        role: validatedData.role_name as POSRole,
+        org_id: validatedData.org_id,
+        outlet_id: storedSession.outlet_id,
+        session_token: storedSession.session_token,
+        login_time: storedSession.login_time
+      };
+      
+      setSession(validSession);
+      sessionStorage.setItem("pos_session", JSON.stringify(validSession));
+    } catch (error) {
+      console.error("Session validation error:", error);
+      clearSession();
+    }
+  };
+
+  const clearSession = () => {
     setSession(null);
-    localStorage.removeItem("pos_session");
+    sessionStorage.removeItem("pos_session");
+  };
+
+  const logout = async () => {
+    if (session?.session_token) {
+      try {
+        await supabase.rpc("logout_pos_session", {
+          p_session_token: session.session_token
+        });
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
+    }
+    clearSession();
   };
 
   const updateOutlet = async (outletId: string) => {
@@ -62,7 +96,7 @@ export function usePOSAuth() {
       org_id: outlet?.org_id || session.org_id 
     };
     setSession(updatedSession);
-    localStorage.setItem("pos_session", JSON.stringify(updatedSession));
+    sessionStorage.setItem("pos_session", JSON.stringify(updatedSession));
   };
 
   const hasRole = (requiredRole: POSRole): boolean => {
