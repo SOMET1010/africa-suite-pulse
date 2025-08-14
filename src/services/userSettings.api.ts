@@ -44,7 +44,11 @@ class UserSettingsService {
       throw error;
     }
     
-    return data;
+    return data ? {
+      ...data,
+      dashboard_layout: data.dashboard_layout as Record<string, any>,
+      preferences: data.preferences as Record<string, any>
+    } : null;
   }
 
   // Create or update user settings
@@ -72,7 +76,11 @@ class UserSettingsService {
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      dashboard_layout: data.dashboard_layout as Record<string, any>,
+      preferences: data.preferences as Record<string, any>
+    };
   }
 
   // Initialize default settings for new user
@@ -110,7 +118,11 @@ class UserSettingsService {
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      dashboard_layout: data.dashboard_layout as Record<string, any>,
+      preferences: data.preferences as Record<string, any>
+    };
   }
 }
 

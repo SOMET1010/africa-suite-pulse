@@ -55,7 +55,12 @@ class DocumentTemplatesService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(template => ({
+      ...template,
+      variables: template.variables as string[],
+      styles: template.styles as Record<string, any>,
+      preview_data: template.preview_data as Record<string, any>
+    }));
   }
 
   // Get templates by type
@@ -68,7 +73,12 @@ class DocumentTemplatesService {
       .order('name');
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(template => ({
+      ...template,
+      variables: template.variables as string[],
+      styles: template.styles as Record<string, any>,
+      preview_data: template.preview_data as Record<string, any>
+    }));
   }
 
   // Get template by ID
@@ -83,24 +93,54 @@ class DocumentTemplatesService {
       throw error;
     }
     
-    return data;
+    return data ? {
+      ...data,
+      variables: data.variables as string[],
+      styles: data.styles as Record<string, any>,
+      preview_data: data.preview_data as Record<string, any>
+    } : null;
   }
 
   // Create template
   async createTemplate(templateData: CreateTemplateData): Promise<DocumentTemplate> {
+    // Get current user's org_id
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data: appUser } = await supabase
+      .from('app_users')
+      .select('org_id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!appUser?.org_id) throw new Error('Organization not found');
+
     const { data, error } = await supabase
       .from('document_templates')
       .insert({
-        ...templateData,
+        org_id: appUser.org_id,
+        code: templateData.code,
+        name: templateData.name,
+        description: templateData.description,
+        type: templateData.type,
+        category: templateData.category,
+        content: templateData.content,
         variables: templateData.variables || [],
         styles: templateData.styles || {},
+        is_active: templateData.is_active ?? true,
+        is_default: templateData.is_default ?? false,
         preview_data: templateData.preview_data || {},
       })
       .select()
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      variables: data.variables as string[],
+      styles: data.styles as Record<string, any>,
+      preview_data: data.preview_data as Record<string, any>
+    };
   }
 
   // Update template
@@ -113,7 +153,12 @@ class DocumentTemplatesService {
       .single();
 
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      variables: data.variables as string[],
+      styles: data.styles as Record<string, any>,
+      preview_data: data.preview_data as Record<string, any>
+    };
   }
 
   // Delete template
@@ -135,7 +180,7 @@ class DocumentTemplatesService {
       code: `${original.code}_copy`,
       name: newName,
       description: `Copie de ${original.name}`,
-      type: original.type,
+      type: original.type as 'invoice' | 'confirmation' | 'contract' | 'email',
       category: original.category,
       content: original.content,
       variables: original.variables,

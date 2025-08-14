@@ -39,7 +39,10 @@ class NotificationsService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []).map(notification => ({
+      ...notification,
+      metadata: notification.metadata as Record<string, any>
+    }));
   }
 
   // Mark notification as read
