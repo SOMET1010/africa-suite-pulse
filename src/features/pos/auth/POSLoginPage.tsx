@@ -202,9 +202,9 @@ export default function POSLoginPage() {
             <Info className="h-4 w-4" />
             <AlertDescription className="text-sm">
               <strong>Codes PIN de test :</strong><br />
-              • Marie : SRV001<br />
-              • Jean : CSH001<br />
-              • Sophie : MGR001
+              • Marie : srv001<br />
+              • Jean : csh001<br />
+              • Sophie : mgr001
             </AlertDescription>
           </Alert>
 
@@ -246,7 +246,7 @@ export default function POSLoginPage() {
             
             {/* Second row: QWERTY */}
             <div className="grid grid-cols-10 gap-1">
-              {['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'].map((char) => (
+              {['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map((char) => (
                 <Button
                   key={char}
                   variant="outline"
@@ -262,7 +262,7 @@ export default function POSLoginPage() {
             
             {/* Third row: ASDF */}
             <div className="grid grid-cols-9 gap-1">
-              {['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'].map((char) => (
+              {['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map((char) => (
                 <Button
                   key={char}
                   variant="outline"
@@ -278,7 +278,7 @@ export default function POSLoginPage() {
             
             {/* Fourth row: ZXCV */}
             <div className="grid grid-cols-7 gap-1">
-              {['Z', 'X', 'C', 'V', 'B', 'N', 'M'].map((char) => (
+              {['z', 'x', 'c', 'v', 'b', 'n', 'm'].map((char) => (
                 <Button
                   key={char}
                   variant="outline"
