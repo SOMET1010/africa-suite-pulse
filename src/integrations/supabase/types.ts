@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -4143,34 +4143,34 @@ export type Database = {
     Functions: {
       add_loyalty_points: {
         Args: {
-          p_guest_id: string
-          p_program_id: string
-          p_points: number
-          p_transaction_type?: string
           p_description?: string
-          p_reservation_id?: string
+          p_guest_id: string
+          p_points: number
+          p_program_id: string
           p_reference?: string
+          p_reservation_id?: string
+          p_transaction_type?: string
         }
         Returns: undefined
       }
       assign_housekeeping_task: {
-        Args: { task_id: string; staff_id: string }
+        Args: { staff_id: string; task_id: string }
         Returns: undefined
       }
       assign_table_to_server: {
         Args: {
-          p_table_id: string
-          p_server_id: string
           p_assigned_by?: string
+          p_server_id: string
+          p_table_id: string
         }
         Returns: string
       }
       authenticate_pos_user: {
         Args: { p_org_id: string; p_pin: string }
         Returns: {
-          user_id: string
           display_name: string
           role_name: string
+          user_id: string
         }[]
       }
       calculate_next_maintenance_date: {
@@ -4183,10 +4183,10 @@ export type Database = {
       }
       complete_housekeeping_task: {
         Args: {
-          task_id: string
           actual_duration?: number
-          quality_score?: number
           quality_notes?: string
+          quality_score?: number
+          task_id: string
         }
         Returns: undefined
       }
@@ -4196,12 +4196,12 @@ export type Database = {
       }
       create_pos_user: {
         Args: {
-          p_org_id: string
-          p_user_id: string
-          p_pin: string
           p_display_name: string
-          p_role?: string
           p_employee_code?: string
+          p_org_id: string
+          p_pin: string
+          p_role?: string
+          p_user_id: string
         }
         Returns: string
       }
@@ -4216,53 +4216,53 @@ export type Database = {
       get_guest_stay_history_secure: {
         Args: { p_guest_id?: string }
         Returns: {
-          guest_id: string
-          reservation_id: string
-          first_name: string
-          last_name: string
-          email: string
-          phone: string
-          room_number: string
-          room_type: string
-          date_arrival: string
-          date_departure: string
-          nights_count: number
           adults: number
           children: number
-          rate_total: number
-          invoice_total: number
+          date_arrival: string
+          date_departure: string
+          email: string
+          first_name: string
+          guest_id: string
           invoice_number: string
+          invoice_total: number
+          last_name: string
+          nights_count: number
+          phone: string
+          rate_total: number
+          reservation_id: string
           reservation_reference: string
           reservation_status: string
+          room_number: string
+          room_type: string
         }[]
       }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }
         Returns: {
-          id: string
-          guest_id: string
-          room_id: string
-          status: string
           date_arrival: string
           date_departure: string
-          guest_name: string
           guest_email: string
+          guest_id: string
+          guest_name: string
           guest_phone: string
+          id: string
+          rate_total: number
+          room_id: string
           room_number: string
           room_type: string
-          rate_total: number
+          status: string
         }[]
       }
       get_server_tables: {
-        Args: { p_server_id: string; p_org_id?: string }
+        Args: { p_org_id?: string; p_server_id: string }
         Returns: {
+          assigned_at: string
           assignment_id: string
+          capacity: number
+          status: string
           table_id: string
           table_number: string
           zone: string
-          capacity: number
-          status: string
-          assigned_at: string
         }[]
       }
       has_permission: {
@@ -4271,8 +4271,8 @@ export type Database = {
       }
       has_role: {
         Args:
-          | { _user_id: string; _role: Database["public"]["Enums"]["app_role"] }
-          | { _user_id: string; _role: string }
+          | { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }
+          | { _role: string; _user_id: string }
         Returns: boolean
       }
       is_user_read_only: {
@@ -4326,17 +4326,17 @@ export type Database = {
       }
       pms_search_free_rooms: {
         Args: {
-          p_org: string
-          p_start: string
           p_end: string
           p_exclude_room_ids?: string[]
+          p_org: string
+          p_start: string
         }
         Returns: {
+          floor: string
           id: string
           number: string
-          type: string
-          floor: string
           status: string
+          type: string
         }[]
       }
       pms_validate_move: {
@@ -4353,9 +4353,9 @@ export type Database = {
       update_audit_checkpoint: {
         Args: {
           p_checkpoint_id: string
-          p_status: string
           p_data?: Json
           p_error_message?: string
+          p_status: string
         }
         Returns: boolean
       }
