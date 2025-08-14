@@ -330,10 +330,28 @@ export class DataProtectionService {
    */
   static async getCurrentHotelDate(orgId?: string): Promise<Date | null> {
     try {
+      // Si orgId n'est pas fourni, essayer de l'obtenir via l'utilisateur actuel
+      if (!orgId) {
+        const { data: userOrg } = await supabase
+          .from('app_users')
+          .select('org_id')
+          .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+          .maybeSingle();
+        
+        orgId = userOrg?.org_id;
+      }
+
+      if (!orgId) {
+        console.error('Aucun orgId disponible pour récupérer la date-hôtel');
+        return null;
+      }
+
       const { data, error } = await supabase
         .from('hotel_dates')
         .select('current_hotel_date')
-        .single();
+        .eq('org_id', orgId)
+        .order('created_at', { ascending: false })
+        .maybeSingle();
 
       if (error) {
         console.error('Erreur récupération date-hôtel:', error);
