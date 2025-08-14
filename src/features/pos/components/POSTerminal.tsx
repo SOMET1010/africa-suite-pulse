@@ -130,31 +130,31 @@ export function POSTerminal() {
   const totals = calculateTotal();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
-      {/* Modern POS Header */}
-      <div className="sticky top-0 z-50 bg-card/90 backdrop-blur-md border-b shadow-sm">
-        <div className="px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-accent/5">
+      {/* Ultra-Modern Header with Glassmorphism */}
+      <div className="sticky top-0 z-50 glass-card shadow-elevate">
+        <div className="px-8 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-primary/10 rounded-xl">
-                  <Store className="h-5 w-5 text-primary" />
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl">
+                  <Store className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold tracking-tight">{selectedOutlet.name}</h1>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
+                  <h1 className="text-2xl font-bold tracking-tight font-luxury">{selectedOutlet.name}</h1>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-3.5 w-3.5" />
                       {new Date().toLocaleDateString('fr-FR')}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
                       {new Date().toLocaleTimeString('fr-FR', { 
                         hour: '2-digit', 
                         minute: '2-digit' 
                       })}
                     </span>
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="glass-card">
                       Session: {currentSession.session_number}
                     </Badge>
                   </div>
@@ -162,31 +162,31 @@ export function POSTerminal() {
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-lg">
-                <Users className="h-4 w-4 text-muted-foreground" />
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3 glass-card px-4 py-3 rounded-xl">
+                <Users className="h-5 w-5 text-muted-foreground" />
                 <Input
                   type="number"
                   min="1"
                   max="20"
                   value={customerCount}
                   onChange={(e) => setCustomerCount(parseInt(e.target.value) || 1)}
-                  className="w-16 h-8 border-0 bg-transparent"
+                  className="w-20 h-9 border-0 bg-transparent text-center font-semibold"
                 />
-                <span className="text-sm text-muted-foreground">pers.</span>
+                <span className="text-sm text-muted-foreground font-medium">pers.</span>
               </div>
               
               {selectedTable && (
-                <Badge variant="secondary" className="px-3 py-1">
+                <Badge variant="secondary" className="px-4 py-2 text-sm font-medium glass-card">
                   Table {selectedTable.number}
                 </Badge>
               )}
               
               <TButton
-                variant="default"
-                size="sm"
+                variant="ghost"
+                size="md"
                 onClick={() => setSelectedOutlet(null)}
-                className="gap-2"
+                className="gap-2 glass-card"
               >
                 <Settings className="h-4 w-4" />
                 Changer
@@ -196,12 +196,13 @@ export function POSTerminal() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 min-h-[calc(100vh-5rem)]">
-        {/* Product Catalog - Left Side */}
-        <div className="col-span-8 border-r bg-background/60">
-          <div className="h-full flex flex-col">
+      {/* Modern Grid Layout - 70/30 Split */}
+      <div className="grid grid-cols-10 min-h-[calc(100vh-6rem)] gap-6 p-6">
+        {/* Product Catalog - Enhanced Left Side */}
+        <div className="col-span-7">
+          <div className="h-full flex flex-col glass-card rounded-2xl shadow-elevate overflow-hidden">
             {/* Table Selector */}
-            <div className="p-6 border-b bg-card/50">
+            <div className="p-8 border-b bg-gradient-to-r from-card/50 to-muted/10">
               <TableSelector
                 outletId={selectedOutlet.id}
                 selectedTable={selectedTable}
@@ -210,7 +211,7 @@ export function POSTerminal() {
             </div>
 
             {/* Product Catalog */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-8 overflow-hidden">
               <ProductCatalog
                 outletId={selectedOutlet.id}
                 onAddToCart={handleAddToCart}
@@ -219,55 +220,57 @@ export function POSTerminal() {
           </div>
         </div>
 
-        {/* Order Summary - Right Side */}
-        <div className="col-span-4 bg-card/80 backdrop-blur-sm">
-          <div className="h-full flex flex-col">
-            {/* Cart Header */}
-            <div className="p-6 border-b">
+        {/* Order Summary - Refined Right Side */}
+        <div className="col-span-3">
+          <div className="h-full flex flex-col glass-card rounded-2xl shadow-elevate overflow-hidden">
+            {/* Cart Header with Gradient */}
+            <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-accent/5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg">
-                    <ShoppingCart className="h-4 w-4 text-primary" />
+                  <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl">
+                    <ShoppingCart className="h-5 w-5 text-primary" />
                   </div>
-                  <h2 className="text-lg font-semibold">Commande en cours</h2>
+                  <h2 className="text-lg font-semibold font-luxury">Commande</h2>
                 </div>
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
+                <Badge variant="secondary" className="bg-gradient-to-r from-primary/10 to-accent/10 text-primary border-0">
                   {cartItems.length} {cartItems.length !== 1 ? 'articles' : 'article'}
                 </Badge>
               </div>
             </div>
 
-            {/* Order Items */}
-            <div className="flex-1 p-6 overflow-auto">
-              <OrderSummary
-                items={cartItems}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveFromCart}
-              />
+            {/* Order Items with Scroll */}
+            <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+              <div className="p-6">
+                <OrderSummary
+                  items={cartItems}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveFromCart}
+                />
+              </div>
             </div>
 
             {/* Order Totals & Actions */}
-            <div className="p-6 border-t bg-gradient-to-r from-card to-muted/20">
-              <div className="space-y-3 mb-6">
+            <div className="p-6 border-t bg-gradient-to-br from-card to-primary/5">
+              <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Sous-total</span>
-                  <span>{totals.subtotal.toLocaleString()} FCFA</span>
+                  <span className="font-medium">{totals.subtotal.toLocaleString()} FCFA</span>
                 </div>
                 {totals.serviceCharge > 0 && (
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>Service (10%)</span>
-                    <span>{totals.serviceCharge.toLocaleString()} FCFA</span>
+                    <span className="font-medium">{totals.serviceCharge.toLocaleString()} FCFA</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>TVA (18%)</span>
-                  <span>{totals.taxAmount.toLocaleString()} FCFA</span>
+                  <span className="font-medium">{totals.taxAmount.toLocaleString()} FCFA</span>
                 </div>
-                <div className="border-t pt-3">
+                <div className="border-t pt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">Total</span>
-                    <span className="text-2xl font-bold text-primary">
-                      {totals.total.toLocaleString()} FCFA
+                    <span className="text-lg font-bold font-luxury">Total</span>
+                    <span className="text-2xl font-bold text-primary font-luxury">
+                      {totals.total.toLocaleString()} F
                     </span>
                   </div>
                 </div>
@@ -277,46 +280,29 @@ export function POSTerminal() {
                 <TButton
                   onClick={handleCheckout}
                   disabled={cartItems.length === 0}
-                  className="w-full h-12 text-base font-semibold"
+                  className="w-full h-14 text-lg font-semibold shadow-elevate transition-elegant hover:scale-[1.02]"
                   size="lg"
                 >
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  Encaisser {totals.total.toLocaleString()} FCFA
+                  <CreditCard className="h-5 w-5 mr-3" />
+                  Encaisser {totals.total.toLocaleString()} F
                 </TButton>
                 <TButton
-                  variant="default"
+                  variant="ghost"
                   onClick={clearCart}
                   disabled={cartItems.length === 0}
-                  className="w-full"
+                  className="w-full h-12 glass-card transition-elegant hover:scale-[1.02]"
                 >
                   Vider le panier
                 </TButton>
               </div>
               
-              {/* Bottom Action Bar pour POS */}
-              <BottomActionBar>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              {/* Compact Action Bar */}
+              <div className="mt-6 pt-4 border-t">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Session: {currentSession.session_number}</span>
-                  <span>•</span>
-                  <span>{cartItems.length} articles</span>
-                  <span>•</span>
-                  <span>{totals.total.toLocaleString()} FCFA</span>
+                  <span>{cartItems.length} articles • {totals.total.toLocaleString()} F</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <TButton onClick={handleCheckout} disabled={cartItems.length === 0}>
-                    Encaisser
-                  </TButton>
-                  <TButton variant="default" onClick={() => console.log("Remise")}>
-                    Remise
-                  </TButton>
-                  <TButton variant="ghost" onClick={() => console.log("Annuler commande")}>
-                    Annuler
-                  </TButton>
-                  <TButton variant="ghost" onClick={() => console.log("Imprimer")}>
-                    Imprimer
-                  </TButton>
-                </div>
-              </BottomActionBar>
+              </div>
             </div>
           </div>
         </div>
