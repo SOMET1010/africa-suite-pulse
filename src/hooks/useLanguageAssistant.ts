@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useGDPRCompliance } from './useGDPRCompliance';
 
 interface PhraseTemplate {
   id: string;
@@ -33,11 +34,19 @@ export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
 
 export const useLanguageAssistant = () => {
   const { toast } = useToast();
+  const { 
+    needsConsent, 
+    canStoreConversations, 
+    canUseVoiceProcessing,
+    logDataProcessingEvent 
+  } = useGDPRCompliance();
+  
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>('en');
   const [phraseTemplates, setPhraseTemplates] = useState<PhraseTemplate[]>([]);
   const [currentSession, setCurrentSession] = useState<LanguageSession | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showGDPRModal, setShowGDPRModal] = useState(false);
 
   // Load phrase templates
   useEffect(() => {
@@ -85,6 +94,12 @@ export const useLanguageAssistant = () => {
   }, []);
 
   const openAssistant = (context?: { guestId?: string; roomNumber?: string }) => {
+    // Check GDPR compliance before opening
+    if (needsConsent) {
+      setShowGDPRModal(true);
+      return;
+    }
+    
     setIsOpen(true);
     if (context?.guestId) {
       // Create or resume session for specific guest
@@ -102,15 +117,34 @@ export const useLanguageAssistant = () => {
   const startSession = async (guestId?: string, context?: any) => {
     setLoading(true);
     try {
-      // Create mock session for development
-      setCurrentSession({
+      const sessionData = {
         id: Date.now().toString(),
         guest_id: guestId,
         target_language: selectedLanguage,
-        context_data: context || {},
+        context_data: sanitizeContextData(context || {}),
         messages: [],
-        is_active: true
+        is_active: true,
+        created_at: new Date().toISOString(),
+        gdpr_compliant: true
+      };
+
+      // Only store if consent allows
+      if (canStoreConversations()) {
+        const sessions = JSON.parse(localStorage.getItem('language-assistant-sessions') || '[]');
+        sessions.push(sessionData);
+        localStorage.setItem('language-assistant-sessions', JSON.stringify(sessions));
+      }
+
+      setCurrentSession(sessionData);
+      
+      // Log session start for audit
+      await logDataProcessingEvent('session_started', {
+        sessionId: sessionData.id,
+        guestId: guestId ? 'masked' : null,
+        language: selectedLanguage,
+        storageEnabled: canStoreConversations()
       });
+
     } catch (error) {
       console.error('Error starting session:', error);
     } finally {
@@ -143,11 +177,27 @@ export const useLanguageAssistant = () => {
 
   const speakText = async (text: string) => {
     try {
-      // For now, use browser's speech synthesis
+      // Check voice processing consent
+      if (!canUseVoiceProcessing()) {
+        toast({
+          title: "Fonctionnalité non autorisée",
+          description: "Le traitement vocal n'est pas autorisé par vos préférences RGPD",
+          variant: "destructive"
+        });
+        return;
+      }
+
       if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = new SpeechSynthesisUtterance(sanitizeTextForSpeech(text));
         utterance.lang = selectedLanguage === 'ar' ? 'ar-SA' : `${selectedLanguage}-${selectedLanguage.toUpperCase()}`;
         speechSynthesis.speak(utterance);
+
+        // Log voice processing for audit
+        await logDataProcessingEvent('voice_synthesis', {
+          textLength: text.length,
+          language: selectedLanguage,
+          sessionId: currentSession?.id
+        });
       }
     } catch (error) {
       console.error('Error speaking text:', error);
@@ -159,6 +209,26 @@ export const useLanguageAssistant = () => {
     }
   };
 
+  // Utility functions for data sanitization
+  const sanitizeContextData = (context: any) => {
+    const sanitized = { ...context };
+    // Remove sensitive personal data
+    delete sanitized.fullName;
+    delete sanitized.email;
+    delete sanitized.phone;
+    delete sanitized.documentNumber;
+    delete sanitized.taxId;
+    return sanitized;
+  };
+
+  const sanitizeTextForSpeech = (text: string) => {
+    // Remove potential PII patterns
+    return text
+      .replace(/\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b/g, '[CARD NUMBER]') // Credit cards
+      .replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, '[EMAIL]') // Emails
+      .replace(/\b\d{10,}\b/g, '[NUMBER]'); // Long numbers
+  };
+
   return {
     isOpen,
     selectedLanguage,
@@ -166,12 +236,17 @@ export const useLanguageAssistant = () => {
     phraseTemplates,
     currentSession,
     loading,
+    showGDPRModal,
+    setShowGDPRModal,
     openAssistant,
     closeAssistant,
     startSession,
     endSession,
     getPhrase,
     getPhrasesByCategory,
-    speakText
+    speakText,
+    needsConsent,
+    canStoreConversations,
+    canUseVoiceProcessing
   };
 };
