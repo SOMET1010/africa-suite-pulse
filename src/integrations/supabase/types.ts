@@ -1171,6 +1171,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "invoices_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_limited"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "invoices_reservation_id_fkey"
             columns: ["reservation_id"]
             isOneToOne: false
@@ -3222,6 +3229,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_reservations_guest_id"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_limited"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
@@ -3240,6 +3254,13 @@ export type Database = {
             columns: ["guest_id"]
             isOneToOne: false
             referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_limited"
             referencedColumns: ["id"]
           },
         ]
@@ -3946,6 +3967,75 @@ export type Database = {
         }
         Relationships: []
       }
+      guests_limited: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          document_number: string | null
+          email: string | null
+          first_name: string | null
+          guest_type: string | null
+          id: string | null
+          last_name: string | null
+          org_id: string | null
+          phone: string | null
+          postal_code: string | null
+          preferences: Json | null
+          special_requests: string | null
+          tax_id: string | null
+          updated_at: string | null
+          vip_status: boolean | null
+        }
+        Insert: {
+          address_line1?: never
+          address_line2?: never
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: never
+          document_number?: never
+          email?: string | null
+          first_name?: string | null
+          guest_type?: string | null
+          id?: string | null
+          last_name?: string | null
+          org_id?: string | null
+          phone?: string | null
+          postal_code?: never
+          preferences?: Json | null
+          special_requests?: string | null
+          tax_id?: never
+          updated_at?: string | null
+          vip_status?: boolean | null
+        }
+        Update: {
+          address_line1?: never
+          address_line2?: never
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          date_of_birth?: never
+          document_number?: never
+          email?: string | null
+          first_name?: string | null
+          guest_type?: string | null
+          id?: string | null
+          last_name?: string | null
+          org_id?: string | null
+          phone?: string | null
+          postal_code?: never
+          preferences?: Json | null
+          special_requests?: string | null
+          tax_id?: never
+          updated_at?: string | null
+          vip_status?: boolean | null
+        }
+        Relationships: []
+      }
       housekeeping_tasks_with_staff: {
         Row: {
           actual_duration: number | null
@@ -4092,6 +4182,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "fk_reservations_guest_id"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_limited"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
@@ -4110,6 +4207,13 @@ export type Database = {
             columns: ["guest_id"]
             isOneToOne: false
             referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservations_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_limited"
             referencedColumns: ["id"]
           },
         ]
@@ -4250,6 +4354,34 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_guest_details_secure: {
+        Args: { guest_id: string }
+        Returns: {
+          address_line1: string
+          address_line2: string
+          city: string
+          country: string
+          date_of_birth: string
+          document_expiry: string
+          document_number: string
+          document_type: string
+          email: string
+          first_name: string
+          guest_type: string
+          id: string
+          last_name: string
+          marketing_consent: boolean
+          nationality: string
+          notes: string
+          phone: string
+          postal_code: string
+          preferences: Json
+          special_requests: string
+          state_province: string
+          tax_id: string
+          vip_status: boolean
+        }[]
+      }
       get_guest_stay_history_secure: {
         Args: { p_guest_id?: string }
         Returns: {
@@ -4315,6 +4447,14 @@ export type Database = {
       is_user_read_only: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      log_guest_data_access: {
+        Args: {
+          access_type: string
+          guest_id: string
+          sensitive_fields?: string[]
+        }
+        Returns: undefined
       }
       logout_pos_session: {
         Args: { p_session_token: string }
@@ -4385,6 +4525,20 @@ export type Database = {
         Returns: {
           ok: boolean
           reason: string
+        }[]
+      }
+      search_guests_secure: {
+        Args: { limit_count?: number; search_term: string }
+        Returns: {
+          city: string
+          country: string
+          email: string
+          first_name: string
+          guest_type: string
+          id: string
+          last_name: string
+          masked_document: string
+          phone: string
         }[]
       }
       start_night_audit: {
