@@ -1,20 +1,13 @@
 export interface ReservationGroup {
   id: string;
   org_id: string;
-  name: string;
-  leader_name: string;
-  leader_email?: string;
-  leader_phone?: string;
-  contact_person?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  arrival_date: string;
-  departure_date: string;
-  group_type: 'tour' | 'business' | 'event' | 'wedding' | 'conference' | 'other';
-  status: 'draft' | 'confirmed' | 'cancelled' | 'completed';
+  group_name: string;
+  group_leader_name: string;
+  group_leader_email?: string;
+  group_leader_phone?: string;
   total_rooms: number;
   total_guests: number;
-  total_amount: number;
+  group_rate?: number;
   special_requests?: string;
   notes?: string;
   created_at: string;
@@ -24,55 +17,43 @@ export interface ReservationGroup {
 
 export interface ReservationGroupInsert {
   org_id: string;
-  name: string;
-  leader_name: string;
-  leader_email?: string;
-  leader_phone?: string;
-  contact_person?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  arrival_date: string;
-  departure_date: string;
-  group_type: 'tour' | 'business' | 'event' | 'wedding' | 'conference' | 'other';
-  status?: 'draft' | 'confirmed' | 'cancelled' | 'completed';
+  group_name: string;
+  group_leader_name: string;
+  group_leader_email?: string;
+  group_leader_phone?: string;
+  total_rooms?: number;
+  total_guests?: number;
+  group_rate?: number;
   special_requests?: string;
   notes?: string;
   created_by?: string;
 }
 
 export interface ReservationGroupUpdate {
-  name?: string;
-  leader_name?: string;
-  leader_email?: string;
-  leader_phone?: string;
-  contact_person?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  arrival_date?: string;
-  departure_date?: string;
-  group_type?: 'tour' | 'business' | 'event' | 'wedding' | 'conference' | 'other';
-  status?: 'draft' | 'confirmed' | 'cancelled' | 'completed';
+  group_name?: string;
+  group_leader_name?: string;
+  group_leader_email?: string;
+  group_leader_phone?: string;
+  total_rooms?: number;
+  total_guests?: number;
+  group_rate?: number;
   special_requests?: string;
   notes?: string;
 }
 
 export interface ReservationGroupFilters {
-  status?: string;
-  group_type?: string;
-  arrival_date_from?: string;
-  arrival_date_to?: string;
-  departure_date_from?: string;
-  departure_date_to?: string;
-  min_rooms?: number;
-  max_rooms?: number;
-  min_guests?: number;
-  max_guests?: number;
+  total_rooms_min?: number;
+  total_rooms_max?: number;
+  total_guests_min?: number;
+  total_guests_max?: number;
+  group_rate_min?: number;
+  group_rate_max?: number;
 }
 
 export interface ReservationGroupSearchParams {
   search?: string;
   filters?: ReservationGroupFilters;
-  sort_by?: 'name' | 'arrival_date' | 'departure_date' | 'total_rooms' | 'total_amount';
+  sort_by?: 'group_name' | 'group_leader_name' | 'total_rooms' | 'group_rate' | 'created_at';
   sort_order?: 'asc' | 'desc';
   page?: number;
   limit?: number;
@@ -94,8 +75,6 @@ export interface GroupReservation {
 
 export interface ReservationGroupStats {
   total_groups: number;
-  confirmed_groups: number;
-  draft_groups: number;
   total_rooms: number;
   total_guests: number;
   total_revenue: number;

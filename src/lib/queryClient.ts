@@ -30,8 +30,12 @@ export const queryKeys = {
   
   // Rooms & Reservations (Rack)
   rooms: (orgId: string) => ['rooms', orgId] as const,
-  reservations: (orgId: string, start?: string, end?: string) => 
-    ['reservations', orgId, start, end] as const,
+  reservations: {
+    all: (orgId: string, start?: string, end?: string) => 
+      ['reservations', orgId, start, end] as const,
+    groups: (orgId: string) => ['reservation-groups', orgId] as const,
+    groupStats: (orgId: string) => ['reservation-group-stats', orgId] as const,
+  },
   rackData: (orgId: string, start: string, end: string) => 
     ['rack', orgId, start, end] as const,
   
@@ -69,7 +73,7 @@ export const queryKeys = {
 // Helper pour invalider les queries liées au rack
 export const invalidateRackQueries = (orgId: string) => {
   queryClient.invalidateQueries({ queryKey: queryKeys.rooms(orgId) });
-  queryClient.invalidateQueries({ queryKey: queryKeys.reservations(orgId) });
+  queryClient.invalidateQueries({ queryKey: queryKeys.reservations.all(orgId) });
   queryClient.invalidateQueries({ queryKey: ['rack', orgId] });
 };
 

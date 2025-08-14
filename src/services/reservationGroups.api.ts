@@ -12,30 +12,23 @@ export const reservationGroupsApi = {
   async list(orgId: string, params: ReservationGroupSearchParams = {}) {
     let query = supabase
       .from('reservation_groups')
-      .select(`
-        *,
-        reservations:reservations(count)
-      `)
+      .select('*')
       .eq('org_id', orgId);
 
     // Apply search
     if (params.search) {
-      query = query.or(`name.ilike.%${params.search}%,leader_name.ilike.%${params.search}%,contact_person.ilike.%${params.search}%`);
+      query = query.or(`group_name.ilike.%${params.search}%,group_leader_name.ilike.%${params.search}%`);
     }
 
     // Apply filters
     if (params.filters) {
       const { filters } = params;
-      if (filters.status) query = query.eq('status', filters.status);
-      if (filters.group_type) query = query.eq('group_type', filters.group_type);
-      if (filters.arrival_date_from) query = query.gte('arrival_date', filters.arrival_date_from);
-      if (filters.arrival_date_to) query = query.lte('arrival_date', filters.arrival_date_to);
-      if (filters.departure_date_from) query = query.gte('departure_date', filters.departure_date_from);
-      if (filters.departure_date_to) query = query.lte('departure_date', filters.departure_date_to);
-      if (filters.min_rooms) query = query.gte('total_rooms', filters.min_rooms);
-      if (filters.max_rooms) query = query.lte('total_rooms', filters.max_rooms);
-      if (filters.min_guests) query = query.gte('total_guests', filters.min_guests);
-      if (filters.max_guests) query = query.lte('total_guests', filters.max_guests);
+      if (filters.total_rooms_min) query = query.gte('total_rooms', filters.total_rooms_min);
+      if (filters.total_rooms_max) query = query.lte('total_rooms', filters.total_rooms_max);
+      if (filters.total_guests_min) query = query.gte('total_guests', filters.total_guests_min);
+      if (filters.total_guests_max) query = query.lte('total_guests', filters.total_guests_max);
+      if (filters.group_rate_min) query = query.gte('group_rate', filters.group_rate_min);
+      if (filters.group_rate_max) query = query.lte('group_rate', filters.group_rate_max);
     }
 
     // Apply sorting
@@ -51,51 +44,28 @@ export const reservationGroupsApi = {
     const { data, error } = await query;
     if (error) throw error;
 
-    // Calculate totals for each group
-    return data?.map(group => ({
-      ...group,
-      total_rooms: group.reservations?.[0]?.count || 0,
-      total_guests: 0, // Will be calculated from reservations
-      total_amount: 0  // Will be calculated from reservations
-    })) as ReservationGroup[];
+    return data as ReservationGroup[];
   },
 
   async get(id: string) {
     const { data, error } = await supabase
       .from('reservation_groups')
-      .select(`
-        *,
-        reservations:reservations(
-          id, guest_id, room_id, status,
-          date_arrival, date_departure,
-          adults, children, rate_total,
-          guests:guests(first_name, last_name),
-          rooms:rooms(number, type)
-        )
-      `)
+      .select('*')
       .eq('id', id)
       .single();
 
     if (error) throw error;
-    
-    // Calculate totals from linked reservations
-    const reservations = data.reservations || [];
-    const totalRooms = reservations.length;
-    const totalGuests = reservations.reduce((sum, res) => sum + (res.adults || 0) + (res.children || 0), 0);
-    const totalAmount = reservations.reduce((sum, res) => sum + (res.rate_total || 0), 0);
-
-    return {
-      ...data,
-      total_rooms: totalRooms,
-      total_guests: totalGuests,
-      total_amount: totalAmount
-    } as ReservationGroup;
+    return data as ReservationGroup;
   },
 
   async create(group: ReservationGroupInsert) {
     const { data, error } = await supabase
       .from('reservation_groups')
-      .insert(group)
+      .insert({
+        ...group,
+        total_rooms: group.total_rooms || 0,
+        total_guests: group.total_guests || 0
+      })
       .select()
       .single();
 
@@ -127,37 +97,20 @@ export const reservationGroupsApi = {
   async getStats(orgId: string): Promise<ReservationGroupStats> {
     const { data: groups, error } = await supabase
       .from('reservation_groups')
-      .select(`
-        status,
-        reservations:reservations(adults, children, rate_total)
-      `)
+      .select('total_rooms, total_guests, group_rate')
       .eq('org_id', orgId);
 
     if (error) throw error;
 
     const totalGroups = groups?.length || 0;
-    const confirmedGroups = groups?.filter(g => g.status === 'confirmed').length || 0;
-    const draftGroups = groups?.filter(g => g.status === 'draft').length || 0;
-    
-    let totalRooms = 0;
-    let totalGuests = 0;
-    let totalRevenue = 0;
-
-    groups?.forEach(group => {
-      const reservations = group.reservations || [];
-      totalRooms += reservations.length;
-      reservations.forEach(res => {
-        totalGuests += (res.adults || 0) + (res.children || 0);
-        totalRevenue += res.rate_total || 0;
-      });
-    });
+    const totalRooms = groups?.reduce((sum, group) => sum + (group.total_rooms || 0), 0) || 0;
+    const totalGuests = groups?.reduce((sum, group) => sum + (group.total_guests || 0), 0) || 0;
+    const totalRevenue = groups?.reduce((sum, group) => sum + (group.group_rate || 0), 0) || 0;
 
     return {
       total_groups: totalGroups,
-      confirmed_groups: confirmedGroups,
-      draft_groups: draftGroups,
-      total_rooms,
-      total_guests,
+      total_rooms: totalRooms,
+      total_guests: totalGuests,
       total_revenue: totalRevenue,
       avg_group_size: totalGroups > 0 ? totalRooms / totalGroups : 0
     };
@@ -166,12 +119,7 @@ export const reservationGroupsApi = {
   async getGroupReservations(groupId: string): Promise<GroupReservation[]> {
     const { data, error } = await supabase
       .from('reservations')
-      .select(`
-        id, group_id, status, date_arrival, date_departure,
-        adults, children, rate_total,
-        guests:guests(first_name, last_name),
-        rooms:rooms(number, type)
-      `)
+      .select('id, group_id, status, date_arrival, date_departure, adults, children, rate_total')
       .eq('group_id', groupId);
 
     if (error) throw error;
@@ -179,9 +127,9 @@ export const reservationGroupsApi = {
     return data?.map(res => ({
       id: res.id,
       group_id: res.group_id,
-      guest_name: res.guests ? `${res.guests.first_name} ${res.guests.last_name}` : 'N/A',
-      room_number: res.rooms?.number,
-      room_type: res.rooms?.type,
+      guest_name: 'N/A', // Will be populated later
+      room_number: '',
+      room_type: '',
       status: res.status,
       arrival_date: res.date_arrival,
       departure_date: res.date_departure,

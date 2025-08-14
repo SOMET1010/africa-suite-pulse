@@ -12,29 +12,6 @@ interface GroupCardProps {
   onClick?: () => void;
 }
 
-const statusColors = {
-  draft: 'bg-muted text-muted-foreground',
-  confirmed: 'bg-primary/10 text-primary',
-  cancelled: 'bg-destructive/10 text-destructive',
-  completed: 'bg-success/10 text-success'
-};
-
-const statusLabels = {
-  draft: 'Brouillon',
-  confirmed: 'Confirmé',
-  cancelled: 'Annulé',
-  completed: 'Terminé'
-};
-
-const typeLabels = {
-  tour: 'Voyage organisé',
-  business: 'Affaires',
-  event: 'Événement',
-  wedding: 'Mariage',
-  conference: 'Conférence',
-  other: 'Autre'
-};
-
 export function GroupCard({ group, isSelected, onClick }: GroupCardProps) {
   return (
     <div
@@ -47,47 +24,28 @@ export function GroupCard({ group, isSelected, onClick }: GroupCardProps) {
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <h3 className="font-semibold text-foreground text-lg mb-1">{group.name}</h3>
-          <p className="text-sm text-muted-foreground mb-2">{typeLabels[group.group_type]}</p>
+          <h3 className="font-semibold text-foreground text-lg mb-1">{group.group_name}</h3>
+          <p className="text-sm text-muted-foreground mb-2">Groupe de réservation</p>
           
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>
-                {format(new Date(group.arrival_date), 'dd MMM', { locale: fr })} - {' '}
-                {format(new Date(group.departure_date), 'dd MMM yyyy', { locale: fr })}
-              </span>
-            </div>
-          </div>
-
           <div className="flex items-center gap-1 text-sm mb-2">
             <Users className="h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">Responsable:</span>
-            <span className="font-medium">{group.leader_name}</span>
+            <span className="font-medium">{group.group_leader_name}</span>
           </div>
 
-          {group.leader_email && (
+          {group.group_leader_email && (
             <div className="flex items-center gap-1 text-sm mb-1">
               <Mail className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{group.leader_email}</span>
+              <span className="text-muted-foreground">{group.group_leader_email}</span>
             </div>
           )}
 
-          {group.leader_phone && (
+          {group.group_leader_phone && (
             <div className="flex items-center gap-1 text-sm">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{group.leader_phone}</span>
+              <span className="text-muted-foreground">{group.group_leader_phone}</span>
             </div>
           )}
-        </div>
-
-        <div className="text-right">
-          <span className={cn(
-            "inline-block px-3 py-1 rounded-full text-xs font-medium mb-3",
-            statusColors[group.status]
-          )}>
-            {statusLabels[group.status]}
-          </span>
         </div>
       </div>
 
@@ -105,7 +63,7 @@ export function GroupCard({ group, isSelected, onClick }: GroupCardProps) {
         
         <div className="text-right">
           <div className="font-semibold text-lg text-foreground">
-            {formatCurrency(group.total_amount)}
+            {formatCurrency(group.group_rate || 0)}
           </div>
         </div>
       </div>

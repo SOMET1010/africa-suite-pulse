@@ -6,7 +6,6 @@ import { TButton } from '@/core/ui/TButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { reservationGroupsApi } from '@/services/reservationGroups.api';
 import { queryKeys } from '@/lib/queryClient';
@@ -20,7 +19,7 @@ interface CreateGroupDialogProps {
 
 export function CreateGroupDialog({ open, onOpenChange, orgId }: CreateGroupDialogProps) {
   const queryClient = useQueryClient();
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<ReservationGroupInsert>();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ReservationGroupInsert>();
 
   const createMutation = useMutation({
     mutationFn: (data: ReservationGroupInsert) => reservationGroupsApi.create(data),
@@ -40,7 +39,6 @@ export function CreateGroupDialog({ open, onOpenChange, orgId }: CreateGroupDial
     createMutation.mutate({
       ...data,
       org_id: orgId,
-      status: 'draft'
     });
   };
 
@@ -54,119 +52,80 @@ export function CreateGroupDialog({ open, onOpenChange, orgId }: CreateGroupDial
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nom du groupe*</Label>
+              <Label htmlFor="group_name">Nom du groupe*</Label>
               <Input
-                id="name"
-                {...register('name', { required: 'Le nom du groupe est obligatoire' })}
+                id="group_name"
+                {...register('group_name', { required: 'Le nom du groupe est obligatoire' })}
                 placeholder="Ex: Groupe ABC Tour"
               />
-              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+              {errors.group_name && <p className="text-sm text-destructive">{errors.group_name.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="group_type">Type de groupe*</Label>
-              <Select onValueChange={(value) => setValue('group_type', value as any)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner un type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tour">Voyage organisé</SelectItem>
-                  <SelectItem value="business">Affaires</SelectItem>
-                  <SelectItem value="event">Événement</SelectItem>
-                  <SelectItem value="wedding">Mariage</SelectItem>
-                  <SelectItem value="conference">Conférence</SelectItem>
-                  <SelectItem value="other">Autre</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="group_leader_name">Nom du responsable*</Label>
+              <Input
+                id="group_leader_name"
+                {...register('group_leader_name', { required: 'Le nom du responsable est obligatoire' })}
+                placeholder="Nom complet"
+              />
+              {errors.group_leader_name && <p className="text-sm text-destructive">{errors.group_leader_name.message}</p>}
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="arrival_date">Date d'arrivée*</Label>
+              <Label htmlFor="group_leader_email">Email du responsable</Label>
               <Input
-                id="arrival_date"
-                type="date"
-                {...register('arrival_date', { required: 'La date d\'arrivée est obligatoire' })}
+                id="group_leader_email"
+                type="email"
+                {...register('group_leader_email')}
+                placeholder="email@exemple.com"
               />
-              {errors.arrival_date && <p className="text-sm text-destructive">{errors.arrival_date.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="departure_date">Date de départ*</Label>
+              <Label htmlFor="group_leader_phone">Téléphone du responsable</Label>
               <Input
-                id="departure_date"
-                type="date"
-                {...register('departure_date', { required: 'La date de départ est obligatoire' })}
+                id="group_leader_phone"
+                {...register('group_leader_phone')}
+                placeholder="+225 XX XX XX XX"
               />
-              {errors.departure_date && <p className="text-sm text-destructive">{errors.departure_date.message}</p>}
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Responsable du groupe</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="leader_name">Nom du responsable*</Label>
-                <Input
-                  id="leader_name"
-                  {...register('leader_name', { required: 'Le nom du responsable est obligatoire' })}
-                  placeholder="Nom complet"
-                />
-                {errors.leader_name && <p className="text-sm text-destructive">{errors.leader_name.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="leader_email">Email du responsable</Label>
-                <Input
-                  id="leader_email"
-                  type="email"
-                  {...register('leader_email')}
-                  placeholder="email@exemple.com"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="leader_phone">Téléphone du responsable</Label>
-                <Input
-                  id="leader_phone"
-                  {...register('leader_phone')}
-                  placeholder="+225 XX XX XX XX"
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="total_rooms">Nombre de chambres</Label>
+              <Input
+                id="total_rooms"
+                type="number"
+                min="0"
+                {...register('total_rooms', { valueAsNumber: true })}
+                placeholder="0"
+              />
             </div>
-          </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Contact (optionnel)</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="contact_person">Personne de contact</Label>
-                <Input
-                  id="contact_person"
-                  {...register('contact_person')}
-                  placeholder="Nom de la personne de contact"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="total_guests">Nombre de clients</Label>
+              <Input
+                id="total_guests"
+                type="number"
+                min="0"
+                {...register('total_guests', { valueAsNumber: true })}
+                placeholder="0"
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="contact_email">Email de contact</Label>
-                <Input
-                  id="contact_email"
-                  type="email"
-                  {...register('contact_email')}
-                  placeholder="contact@exemple.com"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="contact_phone">Téléphone de contact</Label>
-                <Input
-                  id="contact_phone"
-                  {...register('contact_phone')}
-                  placeholder="+225 XX XX XX XX"
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="group_rate">Tarif groupe (XOF)</Label>
+              <Input
+                id="group_rate"
+                type="number"
+                min="0"
+                step="0.01"
+                {...register('group_rate', { valueAsNumber: true })}
+                placeholder="0"
+              />
             </div>
           </div>
 
@@ -200,7 +159,7 @@ export function CreateGroupDialog({ open, onOpenChange, orgId }: CreateGroupDial
             </TButton>
             <TButton
               type="submit"
-              loading={createMutation.isPending}
+              disabled={createMutation.isPending}
             >
               Créer le groupe
             </TButton>
