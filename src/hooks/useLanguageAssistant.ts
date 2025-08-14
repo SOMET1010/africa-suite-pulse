@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useGDPRCompliance } from './useGDPRCompliance';
@@ -229,6 +229,34 @@ export const useLanguageAssistant = () => {
       .replace(/\b\d{10,}\b/g, '[NUMBER]'); // Long numbers
   };
 
+  // Real translation using Edge Function
+  const translateText = useCallback(async (text: string, targetLanguage: string, context?: any): Promise<string> => {
+    console.log(`🔄 Translating "${text}" to ${targetLanguage}`);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('translate-text', {
+        body: {
+          text,
+          targetLanguage,
+          context: {
+            ...context,
+            category: 'reception' // Default category for language assistant
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Translation error:', error);
+        return `[${targetLanguage.toUpperCase()}] ${text}`;
+      }
+
+      return data.translatedText;
+    } catch (error) {
+      console.error('Failed to translate:', error);
+      return `[${targetLanguage.toUpperCase()}] ${text}`;
+    }
+  }, []);
+
   return {
     isOpen,
     selectedLanguage,
@@ -245,6 +273,7 @@ export const useLanguageAssistant = () => {
     getPhrase,
     getPhrasesByCategory,
     speakText,
+    translateText,
     needsConsent,
     canStoreConversations,
     canUseVoiceProcessing

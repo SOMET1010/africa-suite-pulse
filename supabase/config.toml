@@ -76,3 +76,6 @@ verify_jwt = true
 
 [functions.syscohada-export]
 verify_jwt = true
+
+[functions.translate-text]
+verify_jwt = false

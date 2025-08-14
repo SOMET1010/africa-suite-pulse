@@ -16,37 +16,21 @@ interface LiveTranslationTabProps {
 
 export const LiveTranslationTab: React.FC<LiveTranslationTabProps> = ({ context }) => {
   const { toast } = useToast();
-  const { selectedLanguage, speakText } = useLanguageAssistant();
+  const { selectedLanguage, speakText, translateText } = useLanguageAssistant();
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
 
-  // Mock translation function - to be replaced with real translation service
-  const translateText = async (text: string, fromLang: string = 'fr', toLang: string = selectedLanguage) => {
+  // Real translation using Edge Function
+  const performTranslation = async (text: string, fromLang: string = 'fr', toLang: string = selectedLanguage) => {
     setIsTranslating(true);
     try {
-      // Mock translation - in real implementation, call translation API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Simple mock translations for demo
-      const mockTranslations: Record<string, Record<string, string>> = {
-        'Bonjour, comment allez-vous ?': {
-          en: 'Hello, how are you?',
-          es: 'Hola, ¿cómo está usted?',
-          pt: 'Olá, como está?',
-          ar: 'مرحباً، كيف حالكم؟'
-        },
-        'Pouvez-vous m\'aider ?': {
-          en: 'Can you help me?',
-          es: '¿Puede ayudarme?',
-          pt: 'Pode me ajudar?',
-          ar: 'هل يمكنكم مساعدتي؟'
-        }
-      };
-
-      const translation = mockTranslations[text]?.[toLang] || `[Traduction vers ${toLang}] ${text}`;
-      setTranslatedText(translation);
+      const translatedResult = await translateText(text, toLang, {
+        ...context,
+        category: 'general'
+      });
+      setTranslatedText(translatedResult);
     } catch (error) {
       toast({
         title: "Erreur",
@@ -60,7 +44,7 @@ export const LiveTranslationTab: React.FC<LiveTranslationTabProps> = ({ context 
 
   const handleTranslate = () => {
     if (!sourceText.trim()) return;
-    translateText(sourceText);
+    performTranslation(sourceText);
   };
 
   const handleVoiceInput = () => {
@@ -87,7 +71,7 @@ export const LiveTranslationTab: React.FC<LiveTranslationTabProps> = ({ context 
     recognition.onresult = (event) => {
       const text = event.results[0][0].transcript;
       setSourceText(text);
-      translateText(text);
+      performTranslation(text);
     };
 
     recognition.onerror = () => {
@@ -244,7 +228,7 @@ export const LiveTranslationTab: React.FC<LiveTranslationTabProps> = ({ context 
                 className="justify-start text-left h-auto p-2"
                 onClick={() => {
                   setSourceText(suggestion);
-                  translateText(suggestion);
+                  performTranslation(suggestion);
                 }}
               >
                 {suggestion}
