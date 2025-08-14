@@ -60,6 +60,7 @@ import {
 } from "@/features/monitoring";
 import TestingPage from "@/pages/TestingPage";
 import TestModulePage from "@/pages/TestModulePage";
+import { DiscoveryPage } from "@/features/discovery/pages/DiscoveryPage";
 
 function Layout() {
   return (
@@ -104,6 +105,9 @@ export function AppRoutes() {
       {/* Testing Routes */}
       <Route path="testing" element={<RequireAuth><TestingPage /></RequireAuth>} />
       <Route path="testing/module/:moduleId" element={<RequireAuth><TestModulePage /></RequireAuth>} />
+      
+      {/* Discovery Guide Route */}
+      <Route path="guide" element={<RequireAuth><DiscoveryPage /></RequireAuth>} />
       
       {/* Legacy redirects */}
       <Route path="settings/room-types" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />
