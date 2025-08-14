@@ -106,13 +106,45 @@ export const cardexApi = {
 
   // Transférer des lignes entre folios
   async transferBetweenFolios(reservationId: string, transfer: FolioTransfer) {
-    // Simuler le transfert
+    console.log('🔄 Transfert entre folios:', { reservationId, transfer });
+    
+    // Validation des données
+    if (transfer.from_folio === transfer.to_folio) {
+      throw new Error('Le folio source et destination doivent être différents');
+    }
+    
+    if (transfer.amount <= 0) {
+      throw new Error('Le montant doit être positif');
+    }
+    
+    if (!transfer.line_ids || transfer.line_ids.length === 0) {
+      throw new Error('Au moins une ligne doit être sélectionnée');
+    }
+
+    // Simuler le transfert avec validation
+    const transferId = `transfer_${Date.now()}`;
+    
+    // TODO: Implémenter la vraie API quand les tables seront prêtes
+    // const { data, error } = await supabase.rpc('transfer_folio_lines', {
+    //   p_reservation_id: reservationId,
+    //   p_from_folio: transfer.from_folio,
+    //   p_to_folio: transfer.to_folio,
+    //   p_line_ids: transfer.line_ids,
+    //   p_amount: transfer.amount,
+    //   p_reason: transfer.reason
+    // });
+    
+    // Simuler un délai pour l'expérience utilisateur
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     return {
       success: true,
-      transfer_id: `transfer_${Date.now()}`,
+      transfer_id: transferId,
       from_folio: transfer.from_folio,
       to_folio: transfer.to_folio,
       amount: transfer.amount,
+      line_ids: transfer.line_ids,
+      reason: transfer.reason,
       created_at: new Date().toISOString()
     };
   },

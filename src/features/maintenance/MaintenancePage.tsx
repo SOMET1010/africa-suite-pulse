@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Plus, Wrench, Package, Calendar, AlertTriangle } from "lucide-react";
+import { Plus, Wrench, Package, Calendar } from "lucide-react";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { MaintenanceRequestsList } from "./components/MaintenanceRequestsList";
 import { EquipmentList } from "./components/EquipmentList";
 import { SparePartsList } from "./components/SparePartsList";
@@ -48,72 +47,74 @@ export default function MaintenancePage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Maintenance & Technique</h1>
-          <p className="text-muted-foreground">
-            Gestion des équipements, interventions et pièces détachées
-          </p>
+    <MainAppLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Maintenance & Technique</h1>
+            <p className="text-muted-foreground">
+              Gestion des équipements, interventions et pièces détachées
+            </p>
+          </div>
+          {getCreateButton()}
         </div>
-        {getCreateButton()}
+
+        {/* KPIs */}
+        <MaintenanceKPIs />
+
+        {/* Main Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="requests" className="gap-2">
+              <Wrench className="w-4 h-4" />
+              Demandes
+            </TabsTrigger>
+            <TabsTrigger value="equipment" className="gap-2">
+              <Package className="w-4 h-4" />
+              Équipements
+            </TabsTrigger>
+            <TabsTrigger value="parts" className="gap-2">
+              <Package className="w-4 h-4" />
+              Pièces détachées
+            </TabsTrigger>
+            <TabsTrigger value="schedules" className="gap-2">
+              <Calendar className="w-4 h-4" />
+              Planifications
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="requests" className="space-y-6">
+            <MaintenanceRequestsList />
+          </TabsContent>
+
+          <TabsContent value="equipment" className="space-y-6">
+            <EquipmentList />
+          </TabsContent>
+
+          <TabsContent value="parts" className="space-y-6">
+            <SparePartsList />
+          </TabsContent>
+
+          <TabsContent value="schedules" className="space-y-6">
+            <MaintenanceSchedules />
+          </TabsContent>
+        </Tabs>
+
+        {/* Dialogs */}
+        <CreateMaintenanceRequestDialog
+          open={showCreateRequest}
+          onOpenChange={setShowCreateRequest}
+        />
+        <CreateEquipmentDialog
+          open={showCreateEquipment}
+          onOpenChange={setShowCreateEquipment}
+        />
+        <CreateSparePartDialog
+          open={showCreateSparePart}
+          onOpenChange={setShowCreateSparePart}
+        />
       </div>
-
-      {/* KPIs */}
-      <MaintenanceKPIs />
-
-      {/* Main Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="requests" className="gap-2">
-            <Wrench className="w-4 h-4" />
-            Demandes
-          </TabsTrigger>
-          <TabsTrigger value="equipment" className="gap-2">
-            <Package className="w-4 h-4" />
-            Équipements
-          </TabsTrigger>
-          <TabsTrigger value="parts" className="gap-2">
-            <Package className="w-4 h-4" />
-            Pièces détachées
-          </TabsTrigger>
-          <TabsTrigger value="schedules" className="gap-2">
-            <Calendar className="w-4 h-4" />
-            Planifications
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="requests" className="space-y-6">
-          <MaintenanceRequestsList />
-        </TabsContent>
-
-        <TabsContent value="equipment" className="space-y-6">
-          <EquipmentList />
-        </TabsContent>
-
-        <TabsContent value="parts" className="space-y-6">
-          <SparePartsList />
-        </TabsContent>
-
-        <TabsContent value="schedules" className="space-y-6">
-          <MaintenanceSchedules />
-        </TabsContent>
-      </Tabs>
-
-      {/* Dialogs */}
-      <CreateMaintenanceRequestDialog
-        open={showCreateRequest}
-        onOpenChange={setShowCreateRequest}
-      />
-      <CreateEquipmentDialog
-        open={showCreateEquipment}
-        onOpenChange={setShowCreateEquipment}
-      />
-      <CreateSparePartDialog
-        open={showCreateSparePart}
-        onOpenChange={setShowCreateSparePart}
-      />
-    </div>
+    </MainAppLayout>
   );
 }
