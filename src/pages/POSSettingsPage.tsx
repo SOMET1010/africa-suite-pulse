@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Settings, Sliders, Database, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 
 export default function POSSettingsPage() {
   const navigate = useNavigate();
@@ -21,10 +21,9 @@ export default function POSSettingsPage() {
   );
 
   return (
-    <UnifiedLayout 
+    <POSLayout 
       title="Paramètres POS"
-      headerAction={headerAction}
-      showStatusBar={false}
+      showStatusBar={true}
     >
       {/* Settings Categories */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -90,6 +89,6 @@ export default function POSSettingsPage() {
           </div>
         </CardContent>
       </Card>
-    </UnifiedLayout>
+    </POSLayout>
   );
 }
