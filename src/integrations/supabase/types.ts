@@ -671,6 +671,33 @@ export type Database = {
         }
         Relationships: []
       }
+      guest_access_rate_limits: {
+        Row: {
+          access_count: number
+          created_at: string
+          id: string
+          org_id: string
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          access_count?: number
+          created_at?: string
+          id?: string
+          org_id: string
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          access_count?: number
+          created_at?: string
+          id?: string
+          org_id?: string
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       guests: {
         Row: {
           address_line1: string | null
@@ -1168,13 +1195,6 @@ export type Database = {
             columns: ["guest_id"]
             isOneToOne: false
             referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_limited"
             referencedColumns: ["id"]
           },
           {
@@ -3229,13 +3249,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_reservations_guest_id"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_limited"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
@@ -3254,13 +3267,6 @@ export type Database = {
             columns: ["guest_id"]
             isOneToOne: false
             referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reservations_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_limited"
             referencedColumns: ["id"]
           },
         ]
@@ -3967,75 +3973,6 @@ export type Database = {
         }
         Relationships: []
       }
-      guests_limited: {
-        Row: {
-          address_line1: string | null
-          address_line2: string | null
-          city: string | null
-          country: string | null
-          created_at: string | null
-          date_of_birth: string | null
-          document_number: string | null
-          email: string | null
-          first_name: string | null
-          guest_type: string | null
-          id: string | null
-          last_name: string | null
-          org_id: string | null
-          phone: string | null
-          postal_code: string | null
-          preferences: Json | null
-          special_requests: string | null
-          tax_id: string | null
-          updated_at: string | null
-          vip_status: boolean | null
-        }
-        Insert: {
-          address_line1?: never
-          address_line2?: never
-          city?: string | null
-          country?: string | null
-          created_at?: string | null
-          date_of_birth?: never
-          document_number?: never
-          email?: string | null
-          first_name?: string | null
-          guest_type?: string | null
-          id?: string | null
-          last_name?: string | null
-          org_id?: string | null
-          phone?: string | null
-          postal_code?: never
-          preferences?: Json | null
-          special_requests?: string | null
-          tax_id?: never
-          updated_at?: string | null
-          vip_status?: boolean | null
-        }
-        Update: {
-          address_line1?: never
-          address_line2?: never
-          city?: string | null
-          country?: string | null
-          created_at?: string | null
-          date_of_birth?: never
-          document_number?: never
-          email?: string | null
-          first_name?: string | null
-          guest_type?: string | null
-          id?: string | null
-          last_name?: string | null
-          org_id?: string | null
-          phone?: string | null
-          postal_code?: never
-          preferences?: Json | null
-          special_requests?: string | null
-          tax_id?: never
-          updated_at?: string | null
-          vip_status?: boolean | null
-        }
-        Relationships: []
-      }
       housekeeping_tasks_with_staff: {
         Row: {
           actual_duration: number | null
@@ -4182,13 +4119,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fk_reservations_guest_id"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_limited"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
@@ -4207,13 +4137,6 @@ export type Database = {
             columns: ["guest_id"]
             isOneToOne: false
             referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reservations_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_limited"
             referencedColumns: ["id"]
           },
         ]
@@ -4313,6 +4236,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      check_guest_access_rate_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       check_rate_limit: {
         Args: {
           p_action: string
@@ -4403,6 +4330,31 @@ export type Database = {
           reservation_status: string
           room_number: string
           room_type: string
+        }[]
+      }
+      get_guests_masked: {
+        Args: { limit_count?: number; offset_count?: number }
+        Returns: {
+          address_line1: string
+          address_line2: string
+          city: string
+          country: string
+          created_at: string
+          date_of_birth: string
+          document_number: string
+          email: string
+          first_name: string
+          guest_type: string
+          id: string
+          last_name: string
+          org_id: string
+          phone: string
+          postal_code: string
+          preferences: Json
+          special_requests: string
+          tax_id: string
+          updated_at: string
+          vip_status: boolean
         }[]
       }
       get_reservations_with_details_secure: {

@@ -18,13 +18,12 @@ export class GlobalSearchService {
     const searchTerm = `%${query.toLowerCase()}%`;
 
     try {
-      // Search guests
+      // Search guests using secure function
       const { data: guests } = await supabase
-        .from('guests')
-        .select('id, first_name, last_name, email, phone, vip_status')
-        .eq('org_id', orgId)
-        .or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},email.ilike.${searchTerm},phone.ilike.${searchTerm}`)
-        .limit(5);
+        .rpc('search_guests_secure', {
+          search_term: query,
+          limit_count: 5
+        });
 
       guests?.forEach(guest => {
         results.push({
@@ -32,7 +31,7 @@ export class GlobalSearchService {
           type: 'guest',
           title: `${guest.first_name} ${guest.last_name}`,
           subtitle: guest.email || guest.phone || 'Pas d\'email',
-          metadata: guest.vip_status ? 'Client VIP' : 'Client Standard',
+          metadata: guest.guest_type || 'Client Standard',
           status: 'active'
         });
       });
