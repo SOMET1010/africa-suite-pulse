@@ -85,8 +85,8 @@ export default function POSLoginPage() {
       }
 
       const { data, error } = await supabase.rpc("authenticate_pos_user", {
-        p_org_id: orgId,
-        p_pin: pin
+        p_pin: pin,
+        p_org_id: orgId
       });
 
       if (error) throw error;
