@@ -201,12 +201,12 @@ export default function POSInventoryPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-3">
-                            <div>
-                              <h3 className="font-medium">{item.name}</h3>
-                              <p className="text-sm text-muted-foreground">
-                                SKU: {item.sku} • Catégorie: {item.category}
-                              </p>
-                            </div>
+                              <div>
+                                <h3 className="font-medium">{item.name}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Code: {item.item_code} • Catégorie: {item.category}
+                                </p>
+                              </div>
                           </div>
                         </div>
                         
@@ -234,7 +234,7 @@ export default function POSInventoryPage() {
                       <div className="mt-3 pt-3 border-t grid grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Stock min:</span>
-                          <span className="ml-1 font-medium">{item.minimum_stock}</span>
+                          <span className="ml-1 font-medium">{item.min_stock_level}</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Coût unitaire:</span>
@@ -275,7 +275,7 @@ export default function POSInventoryPage() {
                           <div>
                             <h3 className="font-medium">{item.name}</h3>
                             <p className="text-sm text-muted-foreground">
-                              SKU: {item.sku}
+                              Code: {item.item_code}
                             </p>
                           </div>
                         </div>
@@ -291,7 +291,7 @@ export default function POSInventoryPage() {
                           <div className="text-right">
                             <p className="text-sm text-muted-foreground">Stock minimum</p>
                             <p className="text-lg font-bold">
-                              {item.minimum_stock} {item.unit}
+                              {item.min_stock_level} {item.unit}
                             </p>
                           </div>
                           
