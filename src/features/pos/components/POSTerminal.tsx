@@ -201,9 +201,18 @@ export function POSTerminal() {
   };
 
   const handleRoomCharge = (roomId: string) => {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Panier vide",
+        description: "Ajoutez des articles avant de facturer à la chambre",
+        variant: "destructive"
+      });
+      return;
+    }
+    setIsPaymentOpen(true);
     toast({
       title: "Room Charge",
-      description: `Facturation chambre ${roomId}`,
+      description: `Mode facturation chambre ${roomId} activé`,
     });
   };
 
