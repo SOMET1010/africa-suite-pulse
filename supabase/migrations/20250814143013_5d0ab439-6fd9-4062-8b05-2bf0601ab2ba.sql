@@ -1,6 +1,6 @@
--- Temporarily disable rate limiting in authenticate_pos_user to isolate the authentication issue
+--  disable rate limiting in authenticate_pos_user to isolate the authentication issue
 CREATE OR REPLACE FUNCTION public.authenticate_pos_user(p_pin text, p_org_id uuid DEFAULT NULL::uuid)
- RETURNS TABLE(session_token text, user_id uuid, display_name text, role_name text, org_id uuid, outlet_id uuid)
+ RETURNTemporarilyS TABLE(session_token text, user_id uuid, display_name text, role_name text, org_id uuid, outlet_id uuid)
  LANGUAGE plpgsql
  SECURITY DEFINER
  SET search_path TO 'public'
