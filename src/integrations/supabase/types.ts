@@ -2815,6 +2815,33 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action: string
+          attempts: number | null
+          created_at: string | null
+          id: string
+          identifier: string
+          window_start: string | null
+        }
+        Insert: {
+          action: string
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          identifier: string
+          window_start?: string | null
+        }
+        Update: {
+          action?: string
+          attempts?: number | null
+          created_at?: string | null
+          id?: string
+          identifier?: string
+          window_start?: string | null
+        }
+        Relationships: []
+      }
       rate_windows: {
         Row: {
           base_rate: number
@@ -4182,6 +4209,15 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      check_rate_limit: {
+        Args: {
+          p_action: string
+          p_identifier: string
+          p_max_attempts?: number
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       complete_housekeeping_task: {
         Args: {
           actual_duration?: number
@@ -4280,6 +4316,10 @@ export type Database = {
         Args: { _user_id: string }
         Returns: boolean
       }
+      logout_pos_session: {
+        Args: { p_session_token: string }
+        Returns: boolean
+      }
       pms_assign_room: {
         Args: { p_res: string; p_room: string }
         Returns: undefined
@@ -4363,6 +4403,19 @@ export type Database = {
       update_customer_loyalty_tier: {
         Args: { p_guest_id: string; p_program_id: string }
         Returns: undefined
+      }
+      validate_payment_amount: {
+        Args: { p_amount: number; p_currency_code?: string }
+        Returns: boolean
+      }
+      validate_pos_session: {
+        Args: { p_session_token: string }
+        Returns: {
+          display_name: string
+          org_id: string
+          role_name: string
+          user_id: string
+        }[]
       }
     }
     Enums: {
