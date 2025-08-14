@@ -55,6 +55,10 @@ export function DuplicateReservationDialog({
   reservation,
   onSuccess
 }: DuplicateReservationDialogProps) {
+  // Early return if no reservation provided
+  if (!reservation) {
+    return null;
+  }
   const { orgId } = useOrgId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -82,12 +86,12 @@ export function DuplicateReservationDialog({
     defaultValues: {
       date_arrival: format(addDays(new Date(), 1), "yyyy-MM-dd"),
       date_departure: format(addDays(new Date(), 2), "yyyy-MM-dd"),
-      guest_name: reservation?.guest_name || "",
-      guest_email: reservation?.guest_email || "",
-      guest_phone: reservation?.guest_phone || "",
-      adults: reservation?.adults || 2,
-      children: reservation?.children || 0,
-      special_requests: reservation?.special_requests || "",
+      guest_name: reservation.guest_name || "",
+      guest_email: reservation.guest_email || "",
+      guest_phone: reservation.guest_phone || "",
+      adults: reservation.adults || 2,
+      children: reservation.children || 0,
+      special_requests: reservation.special_requests || "",
       notes: "",
       create_as_option: true,
     },
@@ -234,7 +238,7 @@ export function DuplicateReservationDialog({
             Actions sur la réservation
           </DialogTitle>
           <DialogDescription>
-            Dupliquez, gérez et automatisez les actions sur la réservation {reservation?.reference || reservation?.id}
+            Dupliquez, gérez et automatisez les actions sur la réservation {reservation.reference || reservation.id}
           </DialogDescription>
         </DialogHeader>
 
@@ -597,45 +601,45 @@ export function DuplicateReservationDialog({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium">Référence:</span>
-                    <p className="text-muted-foreground">{reservation?.reference || reservation?.id}</p>
+                    <p className="text-muted-foreground">{reservation.reference || reservation.id}</p>
                   </div>
                   <div>
                     <span className="font-medium">Statut:</span>
-                    <p className="text-muted-foreground">{reservation?.status}</p>
+                    <p className="text-muted-foreground">{reservation.status}</p>
                   </div>
                   <div>
                     <span className="font-medium">Client:</span>
-                    <p className="text-muted-foreground">{reservation?.guest_name}</p>
+                    <p className="text-muted-foreground">{reservation.guest_name}</p>
                   </div>
                   <div>
                     <span className="font-medium">Email:</span>
-                    <p className="text-muted-foreground">{reservation?.guest_email || 'Non renseigné'}</p>
+                    <p className="text-muted-foreground">{reservation.guest_email || 'Non renseigné'}</p>
                   </div>
                   <div>
                     <span className="font-medium">Arrivée:</span>
                     <p className="text-muted-foreground">
-                      {reservation?.date_arrival ? format(new Date(reservation.date_arrival), "dd/MM/yyyy", { locale: fr }) : 'Non définie'}
+                      {reservation.date_arrival ? format(new Date(reservation.date_arrival), "dd/MM/yyyy", { locale: fr }) : 'Non définie'}
                     </p>
                   </div>
                   <div>
                     <span className="font-medium">Départ:</span>
                     <p className="text-muted-foreground">
-                      {reservation?.date_departure ? format(new Date(reservation.date_departure), "dd/MM/yyyy", { locale: fr }) : 'Non définie'}
+                      {reservation.date_departure ? format(new Date(reservation.date_departure), "dd/MM/yyyy", { locale: fr }) : 'Non définie'}
                     </p>
                   </div>
                   <div>
                     <span className="font-medium">Chambre:</span>
-                    <p className="text-muted-foreground">{reservation?.room_number ? `Ch. ${reservation.room_number}` : 'Non assignée'}</p>
+                    <p className="text-muted-foreground">{reservation.room_number ? `Ch. ${reservation.room_number}` : 'Non assignée'}</p>
                   </div>
                   <div>
                     <span className="font-medium">Tarif total:</span>
                     <p className="text-muted-foreground">
-                      {reservation?.rate_total ? `${reservation.rate_total.toLocaleString()} F CFA` : 'Non défini'}
+                      {reservation.rate_total ? `${reservation.rate_total.toLocaleString()} F CFA` : 'Non défini'}
                     </p>
                   </div>
                 </div>
 
-                {reservation?.special_requests && (
+                {reservation.special_requests && (
                   <div>
                     <span className="font-medium">Demandes spéciales:</span>
                     <p className="text-muted-foreground mt-1 p-3 bg-muted/30 rounded">
@@ -644,7 +648,7 @@ export function DuplicateReservationDialog({
                   </div>
                 )}
 
-                {reservation?.notes && (
+                {reservation.notes && (
                   <div>
                     <span className="font-medium">Notes:</span>
                     <p className="text-muted-foreground mt-1 p-3 bg-muted/30 rounded">
