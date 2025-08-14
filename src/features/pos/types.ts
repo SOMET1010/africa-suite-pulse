@@ -78,7 +78,7 @@ export interface POSOrderItem {
   total_price: number;
   variant_selection?: Record<string, any>;
   special_instructions?: string;
-  status: 'pending' | 'preparing' | 'ready' | 'served' | 'cancelled';
+  status: 'pending' | 'sent' | 'preparing' | 'ready' | 'served' | 'cancelled';
   created_at: string;
 }
 
@@ -119,6 +119,7 @@ export interface POSSession {
 
 export interface CartItem extends POSOrderItem {
   product: POSProduct;
+  fireRound?: number; // Wave/round for kitchen timing
 }
 
 export interface POSTableAssignment {
