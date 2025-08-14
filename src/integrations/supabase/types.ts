@@ -3086,35 +3086,47 @@ export type Database = {
         Row: {
           component_product_id: string
           created_at: string | null
+          gross_quantity: number
           id: string
+          net_quantity: number | null
           notes: string | null
           org_id: string
           parent_product_id: string
+          preparation_time: number | null
           quantity: number
           unit: string
           updated_at: string | null
+          waste_coefficient: number | null
         }
         Insert: {
           component_product_id: string
           created_at?: string | null
+          gross_quantity?: number
           id?: string
+          net_quantity?: number | null
           notes?: string | null
           org_id: string
           parent_product_id: string
+          preparation_time?: number | null
           quantity?: number
           unit?: string
           updated_at?: string | null
+          waste_coefficient?: number | null
         }
         Update: {
           component_product_id?: string
           created_at?: string | null
+          gross_quantity?: number
           id?: string
+          net_quantity?: number | null
           notes?: string | null
           org_id?: string
           parent_product_id?: string
+          preparation_time?: number | null
           quantity?: number
           unit?: string
           updated_at?: string | null
+          waste_coefficient?: number | null
         }
         Relationships: [
           {
@@ -5825,6 +5837,15 @@ export type Database = {
       calculate_composed_product_cost: {
         Args: { p_product_id: string }
         Returns: number
+      }
+      calculate_composed_product_cost_with_waste: {
+        Args: { p_product_id: string }
+        Returns: {
+          ingredient_count: number
+          total_cost_gross: number
+          total_cost_net: number
+          total_preparation_time: number
+        }[]
       }
       calculate_next_maintenance_date: {
         Args: { equipment_id_param: string }
