@@ -2246,6 +2246,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_auth_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          is_active: boolean
+          org_id: string
+          outlet_id: string | null
+          session_token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+          outlet_id?: string | null
+          session_token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          outlet_id?: string | null
+          session_token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pos_categories: {
         Row: {
           code: string
@@ -5147,7 +5180,7 @@ export type Database = {
       }
       logout_pos_session: {
         Args: { p_session_token: string }
-        Returns: boolean
+        Returns: undefined
       }
       mark_notification_read: {
         Args: { notification_id: string }
@@ -5260,6 +5293,7 @@ export type Database = {
         Returns: {
           display_name: string
           org_id: string
+          outlet_id: string
           role_name: string
           user_id: string
         }[]
