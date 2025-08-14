@@ -176,20 +176,33 @@ export function ComprehensivePaymentDialog({
   };
 
   const canProcessPayment = () => {
+    console.log('=== Payment Validation Debug ===');
+    console.log('selectedPaymentMode:', selectedPaymentMode);
+    console.log('selectedMethodId:', selectedMethodId);
+    console.log('calculateFinalTotal():', calculateFinalTotal());
+    console.log('cartItems length:', cartItems.length);
+    
     if (selectedPaymentMode === 'split') {
-      return Math.abs(getSplitTotal() - calculateFinalTotal()) < 0.01;
+      const canPay = Math.abs(getSplitTotal() - calculateFinalTotal()) < 0.01;
+      console.log('Split payment validation:', canPay);
+      return canPay;
     }
     
     if (!selectedMethodId || calculateFinalTotal() <= 0) {
+      console.log('Basic validation failed - methodId or total invalid');
       return false;
     }
     
     // For cash payments, ensure enough cash is received
     const selectedMethod = paymentMethods.find(m => m.id === selectedMethodId);
+    console.log('selectedMethod:', selectedMethod);
+    
     if (selectedMethod?.kind === 'cash') {
+      console.log('Cash payment - cashReceived:', cashReceived, 'vs total:', calculateFinalTotal());
       return cashReceived >= calculateFinalTotal();
     }
     
+    console.log('Payment validation passed');
     return true;
   };
 
