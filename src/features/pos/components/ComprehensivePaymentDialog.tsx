@@ -179,7 +179,18 @@ export function ComprehensivePaymentDialog({
     if (selectedPaymentMode === 'split') {
       return Math.abs(getSplitTotal() - calculateFinalTotal()) < 0.01;
     }
-    return selectedMethodId && calculateFinalTotal() > 0;
+    
+    if (!selectedMethodId || calculateFinalTotal() <= 0) {
+      return false;
+    }
+    
+    // For cash payments, ensure enough cash is received
+    const selectedMethod = paymentMethods.find(m => m.id === selectedMethodId);
+    if (selectedMethod?.kind === 'cash') {
+      return cashReceived >= calculateFinalTotal();
+    }
+    
+    return true;
   };
 
   const getChange = () => {
