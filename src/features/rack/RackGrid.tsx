@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useCallback } from "react";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { useRackDataModern } from "./useRackDataModern";
 import { useReassignReservation } from "@/queries/rack.queries";
 import { useRackState } from "./hooks/useRackState";
@@ -13,7 +13,7 @@ import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { TariffConfirmationModal } from "./components/TariffConfirmationModal";
 import { toast } from "@/hooks/use-toast";
 import { TButton } from "@/core/ui/TButton";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Plus } from "lucide-react";
 
 // Simple styles pour drag & drop
 const dragDropStyles = `
@@ -268,35 +268,38 @@ export default function RackGrid() {
   if (!data) return null;
 
   return (
-    <UnifiedLayout
-      title="Rack Hôtel"
-      showStatusBar={true}
-      headerAction={
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <span className="text-sm">Occ: {kpis.occ.toFixed(0)}%</span>
-          <span>•</span>
-          <span className="text-sm">{filteredRooms.length} chambres</span>
+    <MainAppLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Rack Hôtel</h1>
+            <div className="flex items-center gap-2 text-muted-foreground mt-1">
+              <span className="text-sm">Occ: {kpis.occ.toFixed(0)}%</span>
+              <span>•</span>
+              <span className="text-sm">{filteredRooms.length} chambres</span>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <TButton 
+              onClick={() => setDetailSheet({ open: true, room: null, dayISO: new Date().toISOString().split('T')[0], reservation: undefined })}
+              variant="primary"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Nouvelle résa
+            </TButton>
+            <TButton 
+              onClick={() => refetch()}
+              variant="ghost"
+              size="sm"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </TButton>
+          </div>
         </div>
-      }
-      showBottomBar={true}
-      actions={[
-        {
-          id: 'new-reservation',
-          label: 'Nouvelle résa',
-          icon: <div className="text-sm">+</div>,
-          onClick: () => setDetailSheet({ open: true, room: null, dayISO: new Date().toISOString().split('T')[0], reservation: undefined }),
-          variant: 'primary',
-        },
-        {
-          id: 'refresh',
-          label: 'Actualiser',
-          icon: <RefreshCw className="h-4 w-4" />,
-          onClick: () => refetch(),
-          variant: 'ghost',
-        },
-      ]}
-      contentClassName="p-0"
-    >
+
+        {/* Rack Content */}
       <div className="page-enter">
         <main className="min-h-screen bg-pearl px-2 sm:px-4 lg:px-6 pt-8 sm:pt-12 pb-20 sm:pb-12 space-y-6 sm:space-y-8 animate-fade-in">
           <div className="container mx-auto">
@@ -450,10 +453,10 @@ export default function RackGrid() {
             orgId={orgId || ''}
           />
 
-          {/* Suppression de l'ancien bottom action bar - maintenant géré par UnifiedLayout */}
           </div>
         </main>
       </div>
-    </UnifiedLayout>
+      </div>
+    </MainAppLayout>
   );
 }

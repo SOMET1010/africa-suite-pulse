@@ -1,7 +1,7 @@
 // Page principale Facturation - Refactorisée Phase 1 avec UnifiedLayout
 import { useState } from "react";
 import { Plus, FileText } from "lucide-react";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { TButton } from "@/core/ui/TButton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBillingStats } from "./hooks/useBilling";
@@ -29,11 +29,18 @@ export default function BillingPage() {
   );
 
   return (
-    <UnifiedLayout
-      title="Facturation"
-      headerAction={headerAction}
-      className="space-y-6"
-    >
+    <MainAppLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Facturation</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Gestion des factures et templates
+            </p>
+          </div>
+          {headerAction}
+        </div>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md">
           <TabsTrigger value="facturation">Facturation</TabsTrigger>
@@ -64,6 +71,7 @@ export default function BillingPage() {
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
       />
-    </UnifiedLayout>
+      </div>
+    </MainAppLayout>
   );
 }

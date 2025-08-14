@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { MainAppLayout } from '@/core/layout/MainAppLayout';
 
 const settingsTiles = [
   {
@@ -167,48 +167,49 @@ export default function SettingsHome() {
   const pendingCount = settingsTiles.filter(tile => tile.status === 'pending').length;
 
   return (
-    <UnifiedLayout
-      title="Centre de Configuration"
-      showStatusBar={true}
-      headerAction={
-        <div className="flex flex-wrap gap-3">
-          <div className="glass-card border-success/40 px-4 py-2 rounded-full shadow-soft">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-success" />
-              <span className="font-premium font-medium text-success">
-                {configuredCount} Configurés
-              </span>
-            </div>
+    <MainAppLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Centre de Configuration</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Orchestrez l'excellence de votre établissement
+            </p>
           </div>
-          {partialCount > 0 && (
-            <div className="glass-card border-warning/40 px-4 py-2 rounded-full shadow-soft">
+          <div className="flex flex-wrap gap-3">
+            <div className="glass-card border-success/40 px-4 py-2 rounded-full shadow-soft">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-warning" />
-                <span className="font-premium font-medium text-warning">
-                  {partialCount} En cours
+                <CheckCircle2 className="h-4 w-4 text-success" />
+                <span className="font-premium font-medium text-success">
+                  {configuredCount} Configurés
                 </span>
               </div>
             </div>
-          )}
-          {pendingCount > 0 && (
-            <div className="glass-card border-muted/40 px-4 py-2 rounded-full shadow-soft">
-              <div className="flex items-center gap-2">
-                <Clock4 className="h-4 w-4 text-muted-foreground" />
-                <span className="font-premium font-medium text-muted-foreground">
-                  {pendingCount} À configurer
-                </span>
+            {partialCount > 0 && (
+              <div className="glass-card border-warning/40 px-4 py-2 rounded-full shadow-soft">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-warning" />
+                  <span className="font-premium font-medium text-warning">
+                    {partialCount} En cours
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            {pendingCount > 0 && (
+              <div className="glass-card border-muted/40 px-4 py-2 rounded-full shadow-soft">
+                <div className="flex items-center gap-2">
+                  <Clock4 className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-premium font-medium text-muted-foreground">
+                    {pendingCount} À configurer
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      }
-      className="min-h-screen bg-pearl"
-      contentClassName="relative"
-    >
-      {/* Luxury gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pearl via-background to-platinum/50" />
-      
-      <div className="relative space-y-12">
+
+        {/* Content */}
         {/* Introduction */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3">
@@ -386,6 +387,6 @@ export default function SettingsHome() {
           </div>
         </div>
       </div>
-    </UnifiedLayout>
+    </MainAppLayout>
   );
 }

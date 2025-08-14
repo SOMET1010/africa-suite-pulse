@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TButton } from "@/core/ui/TButton";
 import { Badge } from "@/components/ui/badge";
@@ -56,34 +56,28 @@ export default function DeparturesPage() {
   };
 
   return (
-    <UnifiedLayout
-      title="Départs du jour"
-      showStatusBar={true}
-      headerAction={
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <LogOut className="h-5 w-5" />
-          <span className="text-sm">{departureStats.total} départs prévus</span>
-        </div>
-      }
-      showBottomBar={true}
-      actions={[
-        {
-          id: 'print',
-          label: 'Imprimer',
-          icon: <Printer className="h-4 w-4" />,
-          onClick: () => window.print(),
-          variant: 'ghost',
-        },
-        {
-          id: 'refresh',
-          label: 'Actualiser', 
-          icon: <RefreshCw className="h-4 w-4" />,
-          onClick: () => window.location.reload(),
-          variant: 'primary',
-        },
-      ]}
-    >
+    <MainAppLayout>
       <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Départs du jour</h1>
+            <div className="flex items-center gap-2 text-muted-foreground mt-1">
+              <LogOut className="h-5 w-5" />
+              <span className="text-sm">{departureStats.total} départs prévus</span>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <TButton onClick={() => window.print()} variant="ghost" size="sm">
+              <Printer className="h-4 w-4" />
+            </TButton>
+            <TButton onClick={() => window.location.reload()} variant="primary" size="sm">
+              <RefreshCw className="h-4 w-4" />
+            </TButton>
+          </div>
+        </div>
+
+        {/* Content */}
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
@@ -236,6 +230,6 @@ export default function DeparturesPage() {
           </CardContent>
         </Card>
       </div>
-    </UnifiedLayout>
+    </MainAppLayout>
   );
 }

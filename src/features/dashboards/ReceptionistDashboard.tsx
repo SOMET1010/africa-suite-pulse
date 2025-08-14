@@ -1,5 +1,5 @@
 import React from 'react';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { MainAppLayout } from '@/core/layout/MainAppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TButton } from '@/components/ui/TButton';
@@ -59,22 +59,19 @@ export function ReceptionistDashboard() {
 
   return (
     <>
-    <UnifiedLayout
-      hotelDate="2025-08-13"
-      shiftLabel="Jour"
-      orgName="AfricaSuite PMS - Réception"
-      showBottomBar={true}
-      actions={quickActions.map(action => ({
-        ...action,
-        onClick: () => {} // Will be handled by href
-      }))}
-    >
+    <MainAppLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold text-foreground">Tableau de Bord - Réception</h1>
-          <p className="text-muted-foreground">Vue d'ensemble temps réel de l'activité hôtelière</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Tableau de Bord - Réception</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Vue d'ensemble temps réel de l'activité hôtelière
+            </p>
+          </div>
         </div>
+
+        {/* Content */}
 
         {/* Quick Actions */}
         <QuickActions userRole="receptionist" className="mb-6" />
@@ -282,8 +279,8 @@ export function ReceptionistDashboard() {
             </CardContent>
           </Card>
         </div>
-        </div>
-      </UnifiedLayout>
+      </div>
+    </MainAppLayout>
       
       <LanguageAssistant 
         open={isOpen}

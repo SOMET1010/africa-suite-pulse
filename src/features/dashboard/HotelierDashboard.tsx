@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { TButton } from "@/core/ui/TButton";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { ActionCard } from "@/core/ui/ActionCard";
 import { DataCard } from "@/core/ui/DataCard";
 import { Badge } from "@/components/ui/badge";
@@ -106,30 +106,27 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
   ];
 
   return (
-    <UnifiedLayout
-      title={`${getGreeting()} !`}
-      headerAction={
-        <TButton
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/settings')}
-        >
-          <Settings className="h-4 w-4 mr-2" />
-          Paramètres
-        </TButton>
-      }
-      bottomActions={
-        <>
-          <TButton size="lg" asChild className="flex-1">
-            <Link to="/arrivals">Check-in Express</Link>
-          </TButton>
-          <TButton variant="default" size="lg" asChild className="flex-1">
-            <Link to="/reservations/rack">Voir Rack</Link>
-          </TButton>
-        </>
-      }
-    >
+    <MainAppLayout>
       <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">{getGreeting()} !</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Tableau de bord principal AfricaSuite PMS
+            </p>
+          </div>
+          <TButton
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/settings')}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Paramètres
+          </TButton>
+        </div>
+
+        {/* Dashboard Content */}
         {/* Date actuelle */}
         <div className="text-center">
           <p className="text-muted-foreground">
@@ -278,6 +275,6 @@ export function HotelierDashboard({ userRole = 'receptionist' }: DashboardProps)
         </section>
 
       </div>
-    </UnifiedLayout>
+    </MainAppLayout>
   );
 }

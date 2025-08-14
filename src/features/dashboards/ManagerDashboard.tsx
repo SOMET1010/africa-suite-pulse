@@ -1,5 +1,5 @@
 import React from 'react';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { MainAppLayout } from '@/core/layout/MainAppLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TButton } from '@/components/ui/TButton';
@@ -62,22 +62,19 @@ export function ManagerDashboard() {
   };
 
   return (
-    <UnifiedLayout
-      hotelDate="2025-08-13"
-      shiftLabel="Direction"
-      orgName="AfricaSuite PMS - Management"
-      showBottomBar={true}
-      actions={quickActions.map(action => ({
-        ...action,
-        onClick: () => {} // Will be handled by href
-      }))}
-    >
+    <MainAppLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold text-foreground">Tableau de Bord - Direction</h1>
-          <p className="text-muted-foreground">Vue exécutive de la performance hôtelière</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Tableau de Bord - Direction</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Vue exécutive de la performance hôtelière
+            </p>
+          </div>
         </div>
+
+        {/* Content */}
 
         {/* Quick Actions */}
         <QuickActions userRole="manager" className="mb-6" />
@@ -264,6 +261,6 @@ export function ManagerDashboard() {
           </Link>
         </div>
       </div>
-    </UnifiedLayout>
+    </MainAppLayout>
   );
 }

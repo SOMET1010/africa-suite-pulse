@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, Filter, Users, Crown, Building2 } from "lucide-react";
 import { TButton } from "@/core/ui/TButton";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { FilterBar } from "@/core/ui/FilterBar";
 import { DataCard } from "@/core/ui/DataCard";
 import { Input } from "@/components/ui/input";
@@ -40,28 +40,23 @@ export default function GuestsPage() {
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
 
   return (
-    <UnifiedLayout
-      title="Gestion des Clients"
-      headerAction={
-        <TButton onClick={() => setShowCreateDialog(true)} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nouveau Client
-        </TButton>
-      }
-      bottomActions={
-        <>
-          <TButton size="lg" onClick={() => setShowCreateDialog(true)} className="flex-1">
-            <Plus className="h-5 w-5 mr-2" />
+    <MainAppLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Gestion des Clients</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Base de données des clients et profils
+            </p>
+          </div>
+          <TButton onClick={() => setShowCreateDialog(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
             Nouveau Client
           </TButton>
-          <TButton variant="default" size="lg" onClick={() => setShowFilters(true)} className="flex-1">
-            <Filter className="h-5 w-5 mr-2" />
-            Filtres
-          </TButton>
-        </>
-      }
-    >
-      <div className="space-y-6">
+        </div>
+
+        {/* Content */}
         {/* Statistiques */}
         {stats && (
           <div className="grid-adaptive-1 gap-4">
@@ -151,6 +146,6 @@ export default function GuestsPage() {
           onFiltersChange={setFilters}
         />
       </div>
-    </UnifiedLayout>
+    </MainAppLayout>
   );
 }

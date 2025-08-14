@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, Filter, Calendar, Users, Crown, Building2, MapPin, Copy, Eye, Pencil, MoreHorizontal } from "lucide-react";
 import { TButton } from "@/core/ui/TButton";
-import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { FilterBar } from "@/core/ui/FilterBar";
 import { DataCard } from "@/core/ui/DataCard";
 import { Input } from "@/components/ui/input";
@@ -63,37 +63,32 @@ export default function ReservationsPage() {
   };
 
   return (
-    <UnifiedLayout
-      title="Gestion des Réservations"
-      headerAction={
-        <div className="flex gap-2">
-          <TButton onClick={() => setShowCreateDialog(true)} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nouvelle Réservation
-          </TButton>
-          <TButton 
-            variant="default"
-            onClick={() => navigate("/reservations/new/quick")}
-            className="gap-2"
-          >
-            ⚡ Express
-          </TButton>
-        </div>
-      }
-      bottomActions={
-        <>
-          <TButton size="lg" onClick={() => setShowCreateDialog(true)} className="flex-1">
-            <Plus className="h-5 w-5 mr-2" />
-            Nouvelle réservation
-          </TButton>
-          <TButton variant="default" size="lg" onClick={() => setShowFilters(true)} className="flex-1">
-            <Filter className="h-5 w-5 mr-2" />
-            Filtres
-          </TButton>
-        </>
-      }
-    >
+    <MainAppLayout>
       <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Gestion des Réservations</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Gérez toutes vos réservations clients
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <TButton onClick={() => setShowCreateDialog(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Nouvelle Réservation
+            </TButton>
+            <TButton 
+              variant="default"
+              onClick={() => navigate("/reservations/new/quick")}
+              className="gap-2"
+            >
+              ⚡ Express
+            </TButton>
+          </div>
+        </div>
+
+        {/* Content */}
         {/* Statistiques */}
         {stats && (
           <div className="grid-adaptive-1 gap-4">
@@ -217,6 +212,6 @@ export default function ReservationsPage() {
           onFiltersChange={setFilters}
         />
       </div>
-    </UnifiedLayout>
+    </MainAppLayout>
   );
 }
