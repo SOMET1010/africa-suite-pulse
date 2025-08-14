@@ -14,6 +14,10 @@ import {
   BarChart3,
   Settings,
   FileText,
+  Monitor,
+  Activity,
+  AlertTriangle,
+  Network,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -185,6 +189,23 @@ const navigationSections = [
           { title: "Templates", url: "/settings/templates" },
           { title: "Analytics", url: "/settings/analytics" },
           { title: "Sécurité", url: "/settings/security" },
+        ],
+      },
+    ]
+  },
+  {
+    title: "Monitoring",
+    items: [
+      {
+        title: "Centre de Monitoring",
+        icon: Monitor,
+        url: "/monitoring",
+        subItems: [
+          { title: "Tableau de bord", url: "/monitoring" },
+          { title: "Incidents", url: "/monitoring/incidents" },
+          { title: "Alertes", url: "/monitoring/alerts" },
+          { title: "Supervision réseau", url: "/monitoring/network" },
+          { title: "Paramètres", url: "/monitoring/settings" },
         ],
       },
     ]

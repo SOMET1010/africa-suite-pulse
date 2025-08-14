@@ -51,6 +51,13 @@ import DemoPage from "@/pages/DemoPage";
 import PricingPage from "@/pages/PricingPage";
 import UXFoundationsDemo from "@/pages/UXFoundationsDemo";
 import { ReceptionistDashboard, ServerDashboard, ManagerDashboard } from "@/features/dashboards";
+import { 
+  MonitoringDashboard, 
+  MonitoringIncidents, 
+  MonitoringAlerts, 
+  NetworkMonitoring, 
+  MonitoringSettings 
+} from "@/features/monitoring";
 
 function Layout() {
   return (
@@ -84,6 +91,13 @@ export function AppRoutes() {
       <Route path="settings/templates" element={<RequireAuth><TemplatesPage /></RequireAuth>} />
       <Route path="settings/analytics" element={<RequireAuth><SettingsAnalyticsPage /></RequireAuth>} />
       <Route path="settings/security" element={<RequireAuth><SecurityPage /></RequireAuth>} />
+      
+      {/* Monitoring Routes */}
+      <Route path="monitoring" element={<RequireAuth><MonitoringDashboard /></RequireAuth>} />
+      <Route path="monitoring/incidents" element={<RequireAuth><MonitoringIncidents /></RequireAuth>} />
+      <Route path="monitoring/alerts" element={<RequireAuth><MonitoringAlerts /></RequireAuth>} />
+      <Route path="monitoring/network" element={<RequireAuth><NetworkMonitoring /></RequireAuth>} />
+      <Route path="monitoring/settings" element={<RequireAuth><MonitoringSettings /></RequireAuth>} />
       
       {/* Legacy redirects */}
       <Route path="settings/room-types" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />

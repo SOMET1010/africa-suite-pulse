@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_definition_id: string
+          created_at: string
+          current_value: number
+          escalated: boolean | null
+          id: string
+          message: string
+          notification_sent: boolean | null
+          org_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          started_at: string
+          status: Database["public"]["Enums"]["alert_status"]
+          threshold_value: number
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_definition_id: string
+          created_at?: string
+          current_value: number
+          escalated?: boolean | null
+          id?: string
+          message: string
+          notification_sent?: boolean | null
+          org_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          started_at?: string
+          status?: Database["public"]["Enums"]["alert_status"]
+          threshold_value: number
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_definition_id?: string
+          created_at?: string
+          current_value?: number
+          escalated?: boolean | null
+          id?: string
+          message?: string
+          notification_sent?: boolean | null
+          org_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          started_at?: string
+          status?: Database["public"]["Enums"]["alert_status"]
+          threshold_value?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "active_alerts_alert_definition_id_fkey"
+            columns: ["alert_definition_id"]
+            isOneToOne: false
+            referencedRelation: "alert_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_logs: {
         Row: {
           action: string
@@ -56,6 +124,57 @@ export type Database = {
           org_id?: string
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      alert_definitions: {
+        Row: {
+          condition_operator: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          evaluation_window_minutes: number | null
+          id: string
+          is_active: boolean | null
+          metric_name: string
+          name: string
+          notification_channels: Json | null
+          org_id: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          threshold_value: number
+          updated_at: string
+        }
+        Insert: {
+          condition_operator: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          evaluation_window_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          metric_name: string
+          name: string
+          notification_channels?: Json | null
+          org_id?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          threshold_value: number
+          updated_at?: string
+        }
+        Update: {
+          condition_operator?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          evaluation_window_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          metric_name?: string
+          name?: string
+          notification_channels?: Json | null
+          org_id?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          threshold_value?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1157,6 +1276,45 @@ export type Database = {
         }
         Relationships: []
       }
+      hotel_health_status: {
+        Row: {
+          active_incidents: number | null
+          created_at: string
+          error_rate: number | null
+          id: string
+          last_check_at: string
+          org_id: string
+          response_time_ms: number | null
+          status: string
+          updated_at: string
+          uptime_percentage: number | null
+        }
+        Insert: {
+          active_incidents?: number | null
+          created_at?: string
+          error_rate?: number | null
+          id?: string
+          last_check_at?: string
+          org_id: string
+          response_time_ms?: number | null
+          status?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+        }
+        Update: {
+          active_incidents?: number | null
+          created_at?: string
+          error_rate?: number | null
+          id?: string
+          last_check_at?: string
+          org_id?: string
+          response_time_ms?: number | null
+          status?: string
+          updated_at?: string
+          uptime_percentage?: number | null
+        }
+        Relationships: []
+      }
       hotel_settings: {
         Row: {
           activation_code: string | null
@@ -1936,6 +2094,135 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      monitoring_incidents: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          estimated_resolution: string | null
+          id: string
+          impact_description: string | null
+          metadata: Json | null
+          org_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          root_cause: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          status: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          estimated_resolution?: string | null
+          id?: string
+          impact_description?: string | null
+          metadata?: Json | null
+          org_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          estimated_resolution?: string | null
+          id?: string
+          impact_description?: string | null
+          metadata?: Json | null
+          org_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      monitoring_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          metric_name: string
+          metric_type: Database["public"]["Enums"]["monitoring_metric_type"]
+          metric_unit: string | null
+          metric_value: number
+          org_id: string
+          tags: Json | null
+          timestamp: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric_name: string
+          metric_type: Database["public"]["Enums"]["monitoring_metric_type"]
+          metric_unit?: string | null
+          metric_value: number
+          org_id: string
+          tags?: Json | null
+          timestamp?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric_name?: string
+          metric_type?: Database["public"]["Enums"]["monitoring_metric_type"]
+          metric_unit?: string | null
+          metric_value?: number
+          org_id?: string
+          tags?: Json | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
+      network_monitoring: {
+        Row: {
+          checked_at: string
+          created_at: string
+          endpoint_url: string
+          error_message: string | null
+          id: string
+          is_available: boolean | null
+          org_id: string
+          response_time_ms: number | null
+          status_code: number | null
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          endpoint_url: string
+          error_message?: string | null
+          id?: string
+          is_available?: boolean | null
+          org_id: string
+          response_time_ms?: number | null
+          status_code?: number | null
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          endpoint_url?: string
+          error_message?: string | null
+          id?: string
+          is_available?: boolean | null
+          org_id?: string
+          response_time_ms?: number | null
+          status_code?: number | null
+        }
+        Relationships: []
       }
       night_audit_sessions: {
         Row: {
@@ -4140,6 +4427,51 @@ export type Database = {
         }
         Relationships: []
       }
+      system_performance: {
+        Row: {
+          active_connections: number | null
+          avg_response_time: number | null
+          cpu_usage: number | null
+          created_at: string
+          database_connections: number | null
+          disk_usage: number | null
+          error_rate: number | null
+          id: string
+          memory_usage: number | null
+          org_id: string
+          request_rate: number | null
+          timestamp: string
+        }
+        Insert: {
+          active_connections?: number | null
+          avg_response_time?: number | null
+          cpu_usage?: number | null
+          created_at?: string
+          database_connections?: number | null
+          disk_usage?: number | null
+          error_rate?: number | null
+          id?: string
+          memory_usage?: number | null
+          org_id: string
+          request_rate?: number | null
+          timestamp?: string
+        }
+        Update: {
+          active_connections?: number | null
+          avg_response_time?: number | null
+          cpu_usage?: number | null
+          created_at?: string
+          database_connections?: number | null
+          disk_usage?: number | null
+          error_rate?: number | null
+          id?: string
+          memory_usage?: number | null
+          org_id?: string
+          request_rate?: number | null
+          timestamp?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           backup_settings: Json | null
@@ -5112,6 +5444,17 @@ export type Database = {
           vip_status: boolean
         }[]
       }
+      get_hotel_health_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_response_time: number
+          avg_uptime: number
+          degraded_hotels: number
+          down_hotels: number
+          healthy_hotels: number
+          total_hotels: number
+        }[]
+      }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }
         Returns: {
@@ -5300,6 +5643,8 @@ export type Database = {
       }
     }
     Enums: {
+      alert_severity: "info" | "warning" | "error" | "critical"
+      alert_status: "active" | "acknowledged" | "resolved" | "muted"
       app_role:
         | "admin"
         | "manager"
@@ -5313,6 +5658,13 @@ export type Database = {
         | "pos_cashier"
         | "pos_manager"
         | "pos_hostess"
+      incident_status: "open" | "investigating" | "monitoring" | "resolved"
+      monitoring_metric_type:
+        | "system"
+        | "application"
+        | "network"
+        | "business"
+        | "database"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5440,6 +5792,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      alert_severity: ["info", "warning", "error", "critical"],
+      alert_status: ["active", "acknowledged", "resolved", "muted"],
       app_role: [
         "admin",
         "manager",
@@ -5453,6 +5807,14 @@ export const Constants = {
         "pos_cashier",
         "pos_manager",
         "pos_hostess",
+      ],
+      incident_status: ["open", "investigating", "monitoring", "resolved"],
+      monitoring_metric_type: [
+        "system",
+        "application",
+        "network",
+        "business",
+        "database",
       ],
     },
   },
