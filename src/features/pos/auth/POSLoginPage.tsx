@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrgId } from "@/core/auth/useOrg";
-import { User, KeyRound, Loader2 } from "lucide-react";
+import { User, KeyRound, Loader2, Info } from "lucide-react";
+import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
 
-type POSRole = "pos_server" | "pos_cashier" | "pos_manager";
+type POSRole = "pos_hostess" | "pos_server" | "pos_cashier" | "pos_manager";
 
 interface POSUser {
   user_id: string;
@@ -18,12 +18,14 @@ interface POSUser {
 }
 
 const roleLabels: Record<POSRole, string> = {
+  pos_hostess: "Hôtesse",
   pos_server: "Serveur",
   pos_cashier: "Caissier", 
   pos_manager: "Manager"
 };
 
 const roleBadgeVariants: Record<POSRole, "default" | "secondary" | "destructive" | "outline"> = {
+  pos_hostess: "outline",
   pos_server: "default",
   pos_cashier: "secondary",
   pos_manager: "outline"
@@ -142,12 +144,13 @@ export default function POSLoginPage() {
 
   if (currentUser) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <UnifiedLayout
+        title="Session POS Active"
+        showStatusBar={false}
+        contentClassName="flex items-center justify-center p-4"
+      >
         <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Session POS Active</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6 pt-6">
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-8 h-8 text-primary" />
@@ -168,12 +171,16 @@ export default function POSLoginPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </UnifiedLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <UnifiedLayout
+      title="Connexion POS"
+      showStatusBar={false}
+      contentClassName="flex items-center justify-center p-4"
+    >
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -189,6 +196,17 @@ export default function POSLoginPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+
+          {/* Test Users Info */}
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              <strong>Utilisateurs de test :</strong><br />
+              • Marie (SRV001) - Serveur<br />
+              • Jean (CSH001) - Caissier<br />
+              • Sophie (MGR001) - Manager
+            </AlertDescription>
+          </Alert>
 
           {/* PIN Display */}
           <div className="text-center">
@@ -271,6 +289,6 @@ export default function POSLoginPage() {
           </Button>
         </CardContent>
       </Card>
-    </div>
+    </UnifiedLayout>
   );
 }

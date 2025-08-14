@@ -49,7 +49,7 @@ export function usePOSAuth() {
         display_name: validatedData.display_name,
         role: validatedData.role_name as POSRole,
         org_id: validatedData.org_id,
-        outlet_id: storedSession.outlet_id,
+        outlet_id: storedSession.outlet_id || '',
         session_token: storedSession.session_token,
         login_time: storedSession.login_time
       };
