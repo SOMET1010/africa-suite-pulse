@@ -6,9 +6,11 @@ import { TButton } from '@/components/ui/TButton';
 import { Link } from 'react-router-dom';
 import { 
   Hotel, UserCheck, UserX, FileText, Users, Clock, 
-  BedDouble, Calendar, Phone, MapPin, AlertCircle
+  BedDouble, Calendar, Phone, MapPin, AlertCircle, Languages
 } from 'lucide-react';
 import { QuickActions } from '@/core/navigation/RoleBasedNavigation';
+import { useLanguageAssistant } from '@/hooks/useLanguageAssistant';
+import { LanguageAssistant } from '@/components/language-assistant/LanguageAssistant';
 
 // Mock data - En production, utiliser des hooks/API
 const receptionistData = {
@@ -43,6 +45,7 @@ const receptionistData = {
 };
 
 export function ReceptionistDashboard() {
+  const { isOpen, openAssistant, closeAssistant } = useLanguageAssistant();
   const { kpis, upcomingArrivals, upcomingDepartures, alerts, roomStatus } = receptionistData;
   const occupancyRate = Math.round((kpis.occupiedRooms / kpis.totalRooms) * 100);
 
@@ -50,10 +53,12 @@ export function ReceptionistDashboard() {
     { id: "checkin", label: "Check-in", variant: "primary" as const, href: "/arrivals", icon: <UserCheck size={18} /> },
     { id: "checkout", label: "Check-out", variant: "accent" as const, href: "/departures", icon: <UserX size={18} /> },
     { id: "rack", label: "Rack", variant: "ghost" as const, href: "/reservations/rack", icon: <Hotel size={18} /> },
+    { id: "language", label: "Assistance Linguistique", variant: "ghost" as const, icon: <Languages size={18} />, onClick: () => openAssistant() },
     { id: "reservation", label: "Nouvelle Résa", variant: "ghost" as const, href: "/reservations/new/quick", icon: <FileText size={18} /> },
   ];
 
   return (
+    <>
     <UnifiedLayout
       hotelDate="2025-08-13"
       shiftLabel="Jour"
@@ -277,7 +282,13 @@ export function ReceptionistDashboard() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </UnifiedLayout>
+        </div>
+      </UnifiedLayout>
+      
+      <LanguageAssistant 
+        open={isOpen}
+        onClose={closeAssistant}
+      />
+    </>
   );
 }
