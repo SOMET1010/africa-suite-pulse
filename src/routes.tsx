@@ -58,6 +58,8 @@ import {
   NetworkMonitoring, 
   MonitoringSettings 
 } from "@/features/monitoring";
+import TestingPage from "@/pages/TestingPage";
+import TestModulePage from "@/pages/TestModulePage";
 
 function Layout() {
   return (
@@ -98,6 +100,10 @@ export function AppRoutes() {
       <Route path="monitoring/alerts" element={<RequireAuth><MonitoringAlerts /></RequireAuth>} />
       <Route path="monitoring/network" element={<RequireAuth><NetworkMonitoring /></RequireAuth>} />
       <Route path="monitoring/settings" element={<RequireAuth><MonitoringSettings /></RequireAuth>} />
+      
+      {/* Testing Routes */}
+      <Route path="testing" element={<RequireAuth><TestingPage /></RequireAuth>} />
+      <Route path="testing/module/:moduleId" element={<RequireAuth><TestModulePage /></RequireAuth>} />
       
       {/* Legacy redirects */}
       <Route path="settings/room-types" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />

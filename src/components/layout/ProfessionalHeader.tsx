@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard, ChevronDown, Wrench, TrendingUp, LogIn, LogOut, LayoutDashboard, Plus, Package, Sparkles } from "lucide-react";
+import { Crown, Search, Bell, Settings, User, Users, Clock, Calendar, Wifi, Database, BarChart3, FileText, UserPlus, Hotel, CreditCard, ChevronDown, Wrench, TrendingUp, LogIn, LogOut, LayoutDashboard, Plus, Package, Sparkles, FlaskConical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { RealtimeClock } from "./RealtimeClock";
 import { HotelDateWidget } from "./HotelDateWidget";
@@ -61,6 +61,7 @@ export function ProfessionalHeader({
     },
     { to: "/maintenance", label: "Maintenance", icon: Wrench },
     { to: "/housekeeping", label: "Gouvernante", icon: Sparkles },
+    { to: "/testing", label: "Tests", icon: FlaskConical },
     { to: "/settings", label: "Paramètres", icon: Settings },
   ];
 
