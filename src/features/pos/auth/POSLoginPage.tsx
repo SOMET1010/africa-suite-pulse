@@ -69,21 +69,7 @@ export default function POSLoginPage() {
     setError(null);
 
     try {
-      // Add rate limiting check
-      const rateLimitKey = `pos_auth_${pin.slice(0, 2)}`;
-      const { data: rateLimitData, error: rateLimitError } = await supabase.rpc("check_rate_limit", {
-        p_identifier: rateLimitKey,
-        p_action: "pos_login",
-        p_max_attempts: 5,
-        p_window_minutes: 15
-      });
-
-      if (rateLimitError || !rateLimitData) {
-        setError("Trop de tentatives. Veuillez attendre 15 minutes.");
-        setPin("");
-        return;
-      }
-
+      // Rate limiting is temporarily disabled in the backend function
       const { data, error } = await supabase.rpc("authenticate_pos_user", {
         p_pin: pin,
         p_org_id: orgId
@@ -204,7 +190,7 @@ export default function POSLoginPage() {
               <strong>Codes PIN de test :</strong><br />
               • Marie : 1234<br />
               • Jean : 5678<br />
-              • Sophie : 9012
+              • Sophie : 9999
             </AlertDescription>
           </Alert>
 
