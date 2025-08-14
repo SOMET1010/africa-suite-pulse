@@ -199,13 +199,6 @@ export function ReservationSelector({ selectedId, onSelect }: ReservationSelecto
         )}
       </div>
 
-      {selectedId && (
-        <div className="pt-4 border-t">
-          <TButton onClick={() => {}} className="w-full">
-            Accéder au cardex complet
-          </TButton>
-        </div>
-      )}
     </div>
   );
 }
