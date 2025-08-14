@@ -1,9 +1,9 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-export interface SecureInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface SecureTextareaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   sanitize?: boolean;
   allowedChars?: RegExp;
   maxLength?: number;
@@ -22,18 +22,17 @@ const sanitizeInput = (value: string): string => {
     .trim();
 };
 
-const SecureInput = React.forwardRef<HTMLInputElement, SecureInputProps>(
+const SecureTextarea = React.forwardRef<HTMLTextAreaElement, SecureTextareaProps>(
   ({ 
     className, 
-    type = "text", 
     sanitize = true, 
     allowedChars, 
-    maxLength = 500, 
+    maxLength = 2000, 
     preventXSS = true, 
     onChange, 
     ...props 
   }, ref) => {
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       let value = event.target.value;
 
       // Apply character restrictions
@@ -51,7 +50,7 @@ const SecureInput = React.forwardRef<HTMLInputElement, SecureInputProps>(
         value = sanitizeInput(value);
       }
 
-      // Update the input value
+      // Update the textarea value
       event.target.value = value;
 
       // Call original onChange
@@ -61,8 +60,7 @@ const SecureInput = React.forwardRef<HTMLInputElement, SecureInputProps>(
     };
 
     return (
-      <Input
-        type={type}
+      <Textarea
         className={cn(className)}
         ref={ref}
         onChange={handleChange}
@@ -73,6 +71,6 @@ const SecureInput = React.forwardRef<HTMLInputElement, SecureInputProps>(
   }
 );
 
-SecureInput.displayName = "SecureInput";
+SecureTextarea.displayName = "SecureTextarea";
 
-export { SecureInput };
+export { SecureTextarea };

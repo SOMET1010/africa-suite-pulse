@@ -4249,6 +4249,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_security_rate_limit: {
+        Args: {
+          p_action: string
+          p_max_attempts?: number
+          p_window_minutes?: number
+        }
+        Returns: boolean
+      }
       complete_housekeeping_task: {
         Args: {
           actual_duration?: number
@@ -4406,6 +4414,10 @@ export type Database = {
           guest_id: string
           sensitive_fields?: string[]
         }
+        Returns: undefined
+      }
+      log_security_event: {
+        Args: { p_details?: Json; p_event_type: string; p_severity?: string }
         Returns: undefined
       }
       logout_pos_session: {
