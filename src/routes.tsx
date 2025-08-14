@@ -44,6 +44,7 @@ import POSUsersPage from "@/pages/POSUsersPage";
 import POSSettingsPage from "@/pages/POSSettingsPage";
 import POSMaitreHotelPage from "@/pages/POSMaitreHotelPage";
 import POSServerPage from "@/pages/POSServerPage";
+import POSCustomersPage from "@/pages/POSCustomersPage";
 import POSKitchen from "@/pages/POSKitchen";
 import POSReports from "@/pages/POSReports";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
@@ -142,6 +143,7 @@ export function AppRoutes() {
         <Route path="pos/maitre-hotel" element={<RequirePOSAuth requiredRole="pos_hostess"><POSMaitreHotelPage /></RequirePOSAuth>} />
         <Route path="pos/server" element={<RequirePOSAuth requiredRole="pos_server"><POSServerPage /></RequirePOSAuth>} />
         <Route path="pos/terminal" element={<RequirePOSAuth><POSTerminalPage /></RequirePOSAuth>} />
+        <Route path="pos/customers" element={<RequirePOSAuth requiredRole="pos_server"><POSCustomersPage /></RequirePOSAuth>} />
         <Route path="pos/inventory" element={<RequirePOSAuth requiredRole="pos_cashier"><POSInventoryPage /></RequirePOSAuth>} />
         <Route path="pos/sessions" element={<RequirePOSAuth requiredRole="pos_cashier"><POSSessionsPage /></RequirePOSAuth>} />
         <Route path="pos/users" element={<RequirePOSAuth requiredRole="pos_manager"><POSUsersPage /></RequirePOSAuth>} />

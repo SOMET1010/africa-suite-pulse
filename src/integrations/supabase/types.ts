@@ -2619,6 +2619,253 @@ export type Database = {
           },
         ]
       }
+      pos_customer_accounts: {
+        Row: {
+          account_status: string
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          created_at: string
+          created_by: string | null
+          credit_limit: number | null
+          credit_limit_type: string
+          current_balance: number | null
+          customer_code: string
+          email: string | null
+          id: string
+          loyalty_card_number: string | null
+          name: string
+          notes: string | null
+          org_id: string
+          phone: string | null
+          postal_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_status?: string
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          credit_limit?: number | null
+          credit_limit_type?: string
+          current_balance?: number | null
+          customer_code: string
+          email?: string | null
+          id?: string
+          loyalty_card_number?: string | null
+          name: string
+          notes?: string | null
+          org_id: string
+          phone?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_status?: string
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          credit_limit?: number | null
+          credit_limit_type?: string
+          current_balance?: number | null
+          customer_code?: string
+          email?: string | null
+          id?: string
+          loyalty_card_number?: string | null
+          name?: string
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pos_customer_invoices: {
+        Row: {
+          created_at: string
+          customer_account_id: string
+          due_date: string | null
+          id: string
+          invoice_date: string
+          invoice_number: string
+          order_data: Json
+          org_id: string
+          paid_amount: number
+          remaining_amount: number
+          server_id: string | null
+          session_id: string | null
+          status: string
+          table_number: string | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_account_id: string
+          due_date?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number: string
+          order_data?: Json
+          org_id: string
+          paid_amount?: number
+          remaining_amount?: number
+          server_id?: string | null
+          session_id?: string | null
+          status?: string
+          table_number?: string | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_account_id?: string
+          due_date?: string | null
+          id?: string
+          invoice_date?: string
+          invoice_number?: string
+          order_data?: Json
+          org_id?: string
+          paid_amount?: number
+          remaining_amount?: number
+          server_id?: string | null
+          session_id?: string | null
+          status?: string
+          table_number?: string | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer_invoices_account"
+            columns: ["customer_account_id"]
+            isOneToOne: false
+            referencedRelation: "pos_customer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_customer_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          customer_account_id: string
+          id: string
+          invoice_id: string | null
+          is_partial: boolean | null
+          notes: string | null
+          org_id: string
+          payment_date: string
+          payment_method: string
+          payment_reference: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          customer_account_id: string
+          id?: string
+          invoice_id?: string | null
+          is_partial?: boolean | null
+          notes?: string | null
+          org_id: string
+          payment_date?: string
+          payment_method: string
+          payment_reference: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          customer_account_id?: string
+          id?: string
+          invoice_id?: string | null
+          is_partial?: boolean | null
+          notes?: string | null
+          org_id?: string
+          payment_date?: string
+          payment_method?: string
+          payment_reference?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer_payments_account"
+            columns: ["customer_account_id"]
+            isOneToOne: false
+            referencedRelation: "pos_customer_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_customer_payments_invoice"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "pos_customer_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_customer_statements: {
+        Row: {
+          closing_balance: number
+          created_at: string
+          created_by: string | null
+          customer_account_id: string
+          id: string
+          opening_balance: number
+          org_id: string
+          period_end: string
+          period_start: string
+          statement_data: Json
+          statement_date: string
+          total_invoices: number
+          total_payments: number
+        }
+        Insert: {
+          closing_balance?: number
+          created_at?: string
+          created_by?: string | null
+          customer_account_id: string
+          id?: string
+          opening_balance?: number
+          org_id: string
+          period_end: string
+          period_start: string
+          statement_data?: Json
+          statement_date: string
+          total_invoices?: number
+          total_payments?: number
+        }
+        Update: {
+          closing_balance?: number
+          created_at?: string
+          created_by?: string | null
+          customer_account_id?: string
+          id?: string
+          opening_balance?: number
+          org_id?: string
+          period_end?: string
+          period_start?: string
+          statement_data?: Json
+          statement_date?: string
+          total_invoices?: number
+          total_payments?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer_statements_account"
+            columns: ["customer_account_id"]
+            isOneToOne: false
+            referencedRelation: "pos_customer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pos_order_items: {
         Row: {
           created_at: string

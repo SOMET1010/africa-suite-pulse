@@ -47,6 +47,15 @@ const menuItems = [
     requiredRole: "pos_server"
   },
   {
+    id: "customers",
+    title: "Gestion Débiteurs",
+    description: "Comptes clients et règlements",
+    icon: CreditCard,
+    path: "/pos/customers",
+    color: "bg-indigo-600",
+    requiredRole: "pos_server"
+  },
+  {
     id: "kitchen",
     title: "Affichage cuisine",
     description: "Voir les commandes en cours",
