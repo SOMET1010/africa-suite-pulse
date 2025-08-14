@@ -14,6 +14,10 @@ interface Composition {
   id?: string;
   component_product_id: string;
   quantity: number;
+  gross_quantity: number;
+  net_quantity?: number;
+  waste_coefficient: number;
+  preparation_time: number;
   unit: string;
   notes?: string;
   component_product?: {
@@ -44,6 +48,10 @@ export default function ProductCompositionDialog({
   const [newComposition, setNewComposition] = useState<Composition>({
     component_product_id: '',
     quantity: 1,
+    gross_quantity: 1,
+    net_quantity: undefined,
+    waste_coefficient: 1.0,
+    preparation_time: 0,
     unit: 'unité',
     notes: ''
   });
@@ -100,6 +108,9 @@ export default function ProductCompositionDialog({
           parent_product_id: product.id,
           component_product_id: newComposition.component_product_id,
           quantity: newComposition.quantity,
+          gross_quantity: newComposition.gross_quantity,
+          waste_coefficient: newComposition.waste_coefficient,
+          preparation_time: newComposition.preparation_time,
           unit: newComposition.unit,
           notes: newComposition.notes,
           org_id: product.org_id
@@ -115,6 +126,10 @@ export default function ProductCompositionDialog({
       setNewComposition({
         component_product_id: '',
         quantity: 1,
+        gross_quantity: 1,
+        net_quantity: undefined,
+        waste_coefficient: 1.0,
+        preparation_time: 0,
         unit: 'unité',
         notes: ''
       });
@@ -167,6 +182,62 @@ export default function ProductCompositionDialog({
     }, 0);
   };
 
+  const calculateAdvancedCosts = () => {
+    const grossCost = compositions.reduce((total, comp) => {
+      const componentProduct = comp.component_product;
+      if (componentProduct?.price_ht) {
+        return total + ((comp.gross_quantity || comp.quantity) * componentProduct.price_ht);
+      }
+      return total;
+    }, 0);
+
+    const netCost = compositions.reduce((total, comp) => {
+      const componentProduct = comp.component_product;
+      if (componentProduct?.price_ht) {
+        const netQty = comp.net_quantity || comp.quantity;
+        return total + (netQty * componentProduct.price_ht);
+      }
+      return total;
+    }, 0);
+
+    const totalPrepTime = compositions.reduce((total, comp) => {
+      return total + (comp.preparation_time || 0);
+    }, 0);
+
+    return { grossCost, netCost, totalPrepTime };
+  };
+
+  const transformToTechnicalSheet = async () => {
+    if (!product?.id) return;
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('pos_products')
+        .update({ 
+          is_composed: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', product.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Article transformé",
+        description: "L'article a été transformé en fiche technique",
+      });
+    } catch (error) {
+      console.error('Error transforming product:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de transformer l'article",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const selectedProduct = availableProducts.find(p => p.id === newComposition.component_product_id);
 
   if (!product) return null;
@@ -177,7 +248,12 @@ export default function ProductCompositionDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator className="w-5 h-5" />
-            Fiche Technique - {product.name}
+            {product.is_composed ? 'Fiche Technique' : 'Composition'} - {product.name}
+            {product.is_composed && (
+              <Badge variant="secondary" className="ml-2 bg-primary/10 text-primary">
+                Activée
+              </Badge>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -188,8 +264,8 @@ export default function ProductCompositionDialog({
               <CardTitle>Ajouter un composant</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                <div className="space-y-2 md:col-span-2">
                   <Label>Produit</Label>
                   <Select
                     value={newComposition.component_product_id}
@@ -209,24 +285,51 @@ export default function ProductCompositionDialog({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Quantité</Label>
+                  <Label>Qté Brute</Label>
                   <Input
                     type="number"
                     step="0.001"
-                    value={newComposition.quantity}
-                    onChange={(e) => setNewComposition(prev => ({ 
-                      ...prev, 
-                      quantity: parseFloat(e.target.value) || 1 
-                    }))}
+                    value={newComposition.gross_quantity}
+                    onChange={(e) => {
+                      const grossQty = parseFloat(e.target.value) || 0;
+                      setNewComposition(prev => ({ 
+                        ...prev, 
+                        gross_quantity: grossQty,
+                        quantity: grossQty,
+                        net_quantity: grossQty / prev.waste_coefficient
+                      }));
+                    }}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Unité</Label>
+                  <Label>Coefficient</Label>
                   <Input
-                    value={newComposition.unit}
-                    onChange={(e) => setNewComposition(prev => ({ ...prev, unit: e.target.value }))}
-                    placeholder={selectedProduct?.unit_usage || 'unité'}
+                    type="number"
+                    step="0.1"
+                    min="1"
+                    value={newComposition.waste_coefficient}
+                    onChange={(e) => {
+                      const coefficient = parseFloat(e.target.value) || 1;
+                      setNewComposition(prev => ({ 
+                        ...prev, 
+                        waste_coefficient: coefficient,
+                        net_quantity: prev.gross_quantity / coefficient
+                      }));
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Temps (min)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={newComposition.preparation_time}
+                    onChange={(e) => setNewComposition(prev => ({ 
+                      ...prev, 
+                      preparation_time: parseInt(e.target.value) || 0 
+                    }))}
                   />
                 </div>
 
@@ -239,6 +342,26 @@ export default function ProductCompositionDialog({
                     <Plus className="w-4 h-4 mr-2" />
                     Ajouter
                   </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="space-y-2">
+                  <Label>Unité</Label>
+                  <Input
+                    value={newComposition.unit}
+                    onChange={(e) => setNewComposition(prev => ({ ...prev, unit: e.target.value }))}
+                    placeholder={selectedProduct?.unit_usage || 'unité'}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Input
+                    value={newComposition.notes || ''}
+                    onChange={(e) => setNewComposition(prev => ({ ...prev, notes: e.target.value }))}
+                    placeholder="Notes sur l'ingrédient..."
+                  />
                 </div>
               </div>
 
@@ -276,18 +399,29 @@ export default function ProductCompositionDialog({
                       className="flex items-center justify-between p-3 border rounded-lg"
                     >
                       <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <h4 className="font-medium">{comp.component_product?.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {comp.quantity} {comp.unit}
-                              {comp.component_product?.code && ` • Code: ${comp.component_product.code}`}
-                            </p>
-                            {comp.notes && (
-                              <p className="text-xs text-muted-foreground mt-1">{comp.notes}</p>
-                            )}
-                          </div>
-                        </div>
+                         <div className="flex items-center gap-3">
+                           <div>
+                             <h4 className="font-medium">{comp.component_product?.name}</h4>
+                             <div className="text-sm text-muted-foreground space-y-1">
+                               <p>
+                                 Brut: {comp.gross_quantity || comp.quantity} {comp.unit}
+                                 {comp.net_quantity && ` • Net: ${comp.net_quantity.toFixed(3)} ${comp.unit}`}
+                               </p>
+                               <p className="flex items-center gap-2">
+                                 <span>Coeff: {comp.waste_coefficient || 1.0}</span>
+                                 {comp.preparation_time > 0 && (
+                                   <span>• Temps: {comp.preparation_time}min</span>
+                                 )}
+                               </p>
+                               {comp.component_product?.code && (
+                                 <p>Code: {comp.component_product.code}</p>
+                               )}
+                             </div>
+                             {comp.notes && (
+                               <p className="text-xs text-muted-foreground mt-1 italic">{comp.notes}</p>
+                             )}
+                           </div>
+                         </div>
                       </div>
 
                       <div className="flex items-center gap-4">
@@ -314,32 +448,69 @@ export default function ProductCompositionDialog({
                     </div>
                   ))}
 
-                  {/* Total cost */}
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="font-semibold">Coût total des composants:</span>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-primary">
-                          {calculateTotalCost().toFixed(2)} F
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {product.price_ht && (
-                            `Marge: ${((product.price_ht - calculateTotalCost()) / product.price_ht * 100).toFixed(1)}%`
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Advanced cost analysis */}
+                   <div className="border-t pt-4 space-y-3">
+                     {(() => {
+                       const { grossCost, netCost, totalPrepTime } = calculateAdvancedCosts();
+                       return (
+                         <>
+                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                             <div className="text-center p-3 bg-muted/50 rounded">
+                               <p className="text-muted-foreground">Coût Brut (avec déchets)</p>
+                               <p className="font-bold text-lg">{grossCost.toFixed(2)} F</p>
+                             </div>
+                             <div className="text-center p-3 bg-success/10 rounded">
+                               <p className="text-muted-foreground">Coût Net (sans déchets)</p>
+                               <p className="font-bold text-lg text-green-600">{netCost.toFixed(2)} F</p>
+                             </div>
+                             <div className="text-center p-3 bg-primary/10 rounded">
+                               <p className="text-muted-foreground">Temps total</p>
+                               <p className="font-bold text-lg text-primary">{totalPrepTime} min</p>
+                             </div>
+                           </div>
+                           
+                           <div className="flex justify-between items-center">
+                             <span className="font-semibold">Prix de revient recommandé:</span>
+                             <div className="text-right">
+                               <p className="text-lg font-bold text-primary">
+                                 {grossCost.toFixed(2)} F
+                               </p>
+                               {product.price_ht && (
+                                 <div className="text-xs text-muted-foreground space-y-1">
+                                   <p>Marge brute: {((product.price_ht - grossCost) / product.price_ht * 100).toFixed(1)}%</p>
+                                   <p>Économie déchets: {(grossCost - netCost).toFixed(2)} F</p>
+                                 </div>
+                               )}
+                             </div>
+                           </div>
+                         </>
+                       );
+                     })()}
+                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Actions */}
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
-              Fermer
-            </Button>
+          <div className="flex justify-between items-center">
+            <div>
+              {!product.is_composed && compositions.length > 0 && (
+                <Button 
+                  onClick={transformToTechnicalSheet}
+                  disabled={isLoading}
+                  className="bg-gradient-to-r from-primary to-primary-variant"
+                >
+                  <Calculator className="w-4 h-4 mr-2" />
+                  Transformer en Fiche Technique
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>
+                Fermer
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
