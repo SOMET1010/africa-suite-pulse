@@ -101,21 +101,35 @@ export function CashVisualizer({
                 key={denomination.value}
                 className="border rounded-lg p-3 space-y-2 bg-local-warm/5 hover:bg-local-warm/10 transition-colors"
               >
-                <div 
-                  className="h-16 rounded border-2 border-dashed flex items-center justify-center text-xs font-medium"
-                  style={{ 
-                    backgroundColor: `${denomination.color}20`,
-                    borderColor: `${denomination.color}40`,
-                    color: denomination.color 
-                  }}
-                >
-                  {formatCurrencyValue(denomination.value)}
+                <div className="relative h-16 rounded border-2 overflow-hidden group">
+                  <img
+                    src={denomination.imagePath}
+                    alt={`Billet BCEAO ${denomination.description}`}
+                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                    onError={(e) => {
+                      // Fallback to colored rectangle if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                  <div 
+                    className="hidden w-full h-full items-center justify-center text-xs font-medium border-dashed border-2"
+                    style={{ 
+                      backgroundColor: `${denomination.color}20`,
+                      borderColor: `${denomination.color}40`,
+                      color: denomination.color 
+                    }}
+                  >
+                    {formatCurrencyValue(denomination.value)}
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-7 w-7 p-0"
+                    className="h-7 w-7 p-0 transition-all duration-150 active:scale-95"
                     onClick={() => decrementCount(denomination.value)}
                     disabled={count === 0}
                   >
@@ -127,7 +141,7 @@ export function CashVisualizer({
                   <Button
                     variant="outline"
                     size="sm" 
-                    className="h-7 w-7 p-0"
+                    className="h-7 w-7 p-0 transition-all duration-150 active:scale-95"
                     onClick={() => incrementCount(denomination.value)}
                   >
                     <Plus className="h-3 w-3" />
@@ -153,21 +167,35 @@ export function CashVisualizer({
                 key={denomination.value}
                 className="border rounded-lg p-2 space-y-2 bg-local-warm/5 hover:bg-local-warm/10 transition-colors"
               >
-                <div 
-                  className="h-8 w-8 mx-auto rounded-full border-2 flex items-center justify-center text-xs font-medium"
-                  style={{ 
-                    backgroundColor: `${denomination.color}20`,
-                    borderColor: `${denomination.color}40`,
-                    color: denomination.color 
-                  }}
-                >
-                  {denomination.value}
+                <div className="relative h-8 w-8 mx-auto rounded-full border-2 overflow-hidden group">
+                  <img
+                    src={denomination.imagePath}
+                    alt={`Pièce BCEAO ${denomination.description}`}
+                    className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110"
+                    onError={(e) => {
+                      // Fallback to colored circle if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const fallback = target.nextElementSibling as HTMLElement;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                  <div 
+                    className="hidden w-full h-full rounded-full items-center justify-center text-xs font-medium border-2"
+                    style={{ 
+                      backgroundColor: `${denomination.color}20`,
+                      borderColor: `${denomination.color}40`,
+                      color: denomination.color 
+                    }}
+                  >
+                    {denomination.value}
+                  </div>
                 </div>
                 <div className="flex items-center justify-between">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-6 w-6 p-0"
+                    className="h-6 w-6 p-0 transition-all duration-150 active:scale-95"
                     onClick={() => decrementCount(denomination.value)}
                     disabled={count === 0}
                   >
@@ -179,7 +207,7 @@ export function CashVisualizer({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-6 w-6 p-0"
+                    className="h-6 w-6 p-0 transition-all duration-150 active:scale-95"
                     onClick={() => incrementCount(denomination.value)}
                   >
                     <Plus className="h-2 w-2" />
