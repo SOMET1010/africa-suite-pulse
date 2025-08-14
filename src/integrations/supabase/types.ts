@@ -3082,6 +3082,57 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_product_compositions: {
+        Row: {
+          component_product_id: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          org_id: string
+          parent_product_id: string
+          quantity: number
+          unit: string
+          updated_at: string | null
+        }
+        Insert: {
+          component_product_id: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          org_id: string
+          parent_product_id: string
+          quantity?: number
+          unit?: string
+          updated_at?: string | null
+        }
+        Update: {
+          component_product_id?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          org_id?: string
+          parent_product_id?: string
+          quantity?: number
+          unit?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_product_compositions_component_product_id_fkey"
+            columns: ["component_product_id"]
+            isOneToOne: false
+            referencedRelation: "pos_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_product_compositions_parent_product_id_fkey"
+            columns: ["parent_product_id"]
+            isOneToOne: false
+            referencedRelation: "pos_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pos_products: {
         Row: {
           allergens: Json | null
@@ -3089,6 +3140,8 @@ export type Database = {
           base_price: number
           category_id: string | null
           code: string
+          conversion_factor_storage: number | null
+          conversion_factor_usage: number | null
           cost_price: number | null
           created_at: string
           current_stock: number | null
@@ -3096,16 +3149,24 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean
+          is_composed: boolean | null
+          is_for_sale: boolean | null
+          is_stock_managed: boolean | null
           kitchen_notes: string | null
           min_stock_level: number | null
           name: string
           org_id: string
           outlet_id: string | null
           preparation_time: number | null
+          price_ht: number | null
           service_id: string | null
           sort_order: number | null
+          storage_location: string | null
           tax_rate: number | null
           track_stock: boolean | null
+          unit_sale: string | null
+          unit_storage: string | null
+          unit_usage: string | null
           updated_at: string
           variants: Json | null
         }
@@ -3115,6 +3176,8 @@ export type Database = {
           base_price?: number
           category_id?: string | null
           code: string
+          conversion_factor_storage?: number | null
+          conversion_factor_usage?: number | null
           cost_price?: number | null
           created_at?: string
           current_stock?: number | null
@@ -3122,16 +3185,24 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_composed?: boolean | null
+          is_for_sale?: boolean | null
+          is_stock_managed?: boolean | null
           kitchen_notes?: string | null
           min_stock_level?: number | null
           name: string
           org_id: string
           outlet_id?: string | null
           preparation_time?: number | null
+          price_ht?: number | null
           service_id?: string | null
           sort_order?: number | null
+          storage_location?: string | null
           tax_rate?: number | null
           track_stock?: boolean | null
+          unit_sale?: string | null
+          unit_storage?: string | null
+          unit_usage?: string | null
           updated_at?: string
           variants?: Json | null
         }
@@ -3141,6 +3212,8 @@ export type Database = {
           base_price?: number
           category_id?: string | null
           code?: string
+          conversion_factor_storage?: number | null
+          conversion_factor_usage?: number | null
           cost_price?: number | null
           created_at?: string
           current_stock?: number | null
@@ -3148,16 +3221,24 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean
+          is_composed?: boolean | null
+          is_for_sale?: boolean | null
+          is_stock_managed?: boolean | null
           kitchen_notes?: string | null
           min_stock_level?: number | null
           name?: string
           org_id?: string
           outlet_id?: string | null
           preparation_time?: number | null
+          price_ht?: number | null
           service_id?: string | null
           sort_order?: number | null
+          storage_location?: string | null
           tax_rate?: number | null
           track_stock?: boolean | null
+          unit_sale?: string | null
+          unit_storage?: string | null
+          unit_usage?: string | null
           updated_at?: string
           variants?: Json | null
         }
@@ -5740,6 +5821,10 @@ export type Database = {
           session_token: string
           user_id: string
         }[]
+      }
+      calculate_composed_product_cost: {
+        Args: { p_product_id: string }
+        Returns: number
       }
       calculate_next_maintenance_date: {
         Args: { equipment_id_param: string }

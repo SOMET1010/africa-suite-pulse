@@ -4,6 +4,7 @@ import { Package, AlertTriangle, TrendingUp, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { InventoryManagement } from "@/features/pos/inventory/InventoryManagement";
+import EnhancedProductManagement from "@/features/pos/components/EnhancedProductManagement";
 
 export default function POSInventoryPage() {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ export default function POSInventoryPage() {
         </Card>
       </div>
 
-      <InventoryManagement />
+      <EnhancedProductManagement outletId="default" />
     </UnifiedLayout>
   );
 }

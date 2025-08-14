@@ -36,6 +36,7 @@ export interface POSProduct {
   is_active: boolean;
   current_stock?: number;
   min_stock?: number;
+  max_stock?: number;
   barcode?: string;
   image_url?: string;
   preparation_time?: number;
@@ -43,6 +44,19 @@ export interface POSProduct {
   variants?: any;
   created_at: string;
   updated_at: string;
+  // Enhanced Elyx-like features
+  is_for_sale?: boolean;
+  is_stock_managed?: boolean;
+  unit_sale?: string;
+  unit_usage?: string;
+  unit_storage?: string;
+  conversion_factor_usage?: number;
+  conversion_factor_storage?: number;
+  price_ht?: number;
+  tax_rate?: number;
+  storage_location?: string;
+  is_composed?: boolean;
+  org_id?: string;
 }
 
 export interface POSOrder {
