@@ -1,5 +1,5 @@
 import React from 'react';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { GlobalNavigationLayout } from '@/core/layout/GlobalNavigationLayout';
 import { TButton } from '@/components/ui/TButton';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, Wifi, KeyRound, MapPin, MessageSquare } from 'lucide-react';
@@ -13,7 +13,9 @@ export default function UXFoundationsDemo() {
   ];
 
   return (
-    <UnifiedLayout
+    <GlobalNavigationLayout
+      title="Sprint 1 - Fondations UX"
+      showStatusBar={true}
       hotelDate="2025-08-13"
       shiftLabel="Jour"
       orgName="AfricaSuite PMS - Sprint 1"
@@ -23,7 +25,6 @@ export default function UXFoundationsDemo() {
       <div className="space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold text-foreground">Sprint 1 - Fondations UX</h1>
           <p className="text-muted-foreground">Design system hôtelier tactile-first avec tokens AA+</p>
         </div>
 
@@ -132,6 +133,6 @@ export default function UXFoundationsDemo() {
           </div>
         </div>
       </div>
-    </UnifiedLayout>
+    </GlobalNavigationLayout>
   );
 }

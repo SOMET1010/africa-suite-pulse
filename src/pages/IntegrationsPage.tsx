@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { GlobalNavigationLayout } from '@/core/layout/GlobalNavigationLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -75,7 +76,7 @@ export default function IntegrationsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
+      <GlobalNavigationLayout title="Intégrations">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/4"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -84,21 +85,12 @@ export default function IntegrationsPage() {
             ))}
           </div>
         </div>
-      </div>
+      </GlobalNavigationLayout>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Intégrations</h1>
-          <p className="text-muted-foreground">
-            Gérez vos intégrations, webhooks et automatisations
-          </p>
-        </div>
-      </div>
-
+    <GlobalNavigationLayout title="Intégrations">
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
@@ -457,12 +449,12 @@ export default function IntegrationsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-center py-8 text-muted-foreground">
-                Aucun token d'API configuré
+                Aucun token configuré. Créez votre premier token d'API.
               </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+    </GlobalNavigationLayout>
   );
 }
