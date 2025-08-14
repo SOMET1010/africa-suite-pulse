@@ -1,10 +1,10 @@
 import { POSTerminal } from "@/features/pos/components/POSTerminal";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 
 export default function POSTerminalPage() {
   return (
-    <UnifiedLayout title="Terminal POS" showStatusBar={false}>
+    <POSLayout title="Terminal POS" showStatusBar={true}>
       <POSTerminal />
-    </UnifiedLayout>
+    </POSLayout>
   );
 }

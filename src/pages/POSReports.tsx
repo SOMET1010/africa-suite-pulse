@@ -1,10 +1,10 @@
 import { POSReportsPage } from "@/features/pos/components/POSReportsPage";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 
 export default function POSReports() {
   return (
-    <UnifiedLayout title="Rapports POS" showStatusBar={false}>
+    <POSLayout title="Rapports POS" showStatusBar={true}>
       <POSReportsPage />
-    </UnifiedLayout>
+    </POSLayout>
   );
 }

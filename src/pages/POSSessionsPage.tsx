@@ -1,10 +1,10 @@
 import { POSSessionManagement } from "@/features/pos/sessions/POSSessionManagement";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 
 export default function POSSessionsPage() {
   return (
-    <UnifiedLayout title="Sessions POS" showStatusBar={false}>
+    <POSLayout title="Sessions POS" showStatusBar={true}>
       <POSSessionManagement />
-    </UnifiedLayout>
+    </POSLayout>
   );
 }

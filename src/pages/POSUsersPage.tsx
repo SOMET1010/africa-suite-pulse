@@ -1,10 +1,10 @@
 import { POSUserManagement } from "@/features/pos/users/POSUserManagement";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 
 export default function POSUsersPage() {
   return (
-    <UnifiedLayout title="Utilisateurs POS" showStatusBar={false}>
+    <POSLayout title="Utilisateurs POS" showStatusBar={true}>
       <POSUserManagement />
-    </UnifiedLayout>
+    </POSLayout>
   );
 }

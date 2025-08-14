@@ -1,10 +1,10 @@
 import { KitchenDisplay } from "@/features/pos/components/KitchenDisplay";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 
 export default function POSKitchen() {
   return (
-    <UnifiedLayout title="Cuisine" showStatusBar={false}>
+    <POSLayout title="Cuisine" showStatusBar={true}>
       <KitchenDisplay />
-    </UnifiedLayout>
+    </POSLayout>
   );
 }

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { POSLayout } from '@/core/layout/POSLayout';
 import { ArrowLeft, ShoppingCart, Plus, Minus, CreditCard, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePOSAuth } from "../auth/usePOSAuth";
@@ -56,17 +56,6 @@ export default function POSTerminalPage() {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const headerAction = (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => navigate("/pos")}
-      className="gap-2"
-    >
-      <ArrowLeft className="w-4 h-4" />
-      Retour
-    </Button>
-  );
 
   const filteredProducts = mockProducts.filter(product => {
     const matchesCategory = product.category_id === selectedCategory;
@@ -122,10 +111,9 @@ export default function POSTerminalPage() {
   };
 
   return (
-    <UnifiedLayout 
+    <POSLayout 
       title="Terminal de Vente"
-      headerAction={headerAction}
-      showStatusBar={false}
+      showStatusBar={true}
     >
       <div className="h-full flex flex-col">
         {/* Server info */}
@@ -272,6 +260,6 @@ export default function POSTerminalPage() {
           </div>
         </div>
       </div>
-    </UnifiedLayout>
+    </POSLayout>
   );
 }
