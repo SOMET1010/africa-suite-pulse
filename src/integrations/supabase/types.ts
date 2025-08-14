@@ -4170,6 +4170,7 @@ export type Database = {
         Returns: {
           display_name: string
           role_name: string
+          session_token: string
           user_id: string
         }[]
       }
