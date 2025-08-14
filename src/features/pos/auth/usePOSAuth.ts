@@ -18,27 +18,46 @@ export function usePOSAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[POS_AUTH] Initialisation de l'authentification...");
+    
     // Check for existing POS session using secure validation
     const storedSession = sessionStorage.getItem("pos_session");
     if (storedSession) {
+      console.log("[POS_AUTH] Session trouvée dans sessionStorage");
       try {
         const parsedSession = JSON.parse(storedSession) as POSSession;
         validateStoredSession(parsedSession);
       } catch (error) {
-        console.error("Error parsing POS session:", error);
+        console.error("[POS_AUTH] Erreur parsing session:", error);
         clearSession();
+        setLoading(false);
       }
+    } else {
+      console.log("[POS_AUTH] Aucune session trouvée");
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const validateStoredSession = async (storedSession: POSSession) => {
+    console.log("[POS_AUTH] Validation de la session en cours...", {
+      user_id: storedSession.user_id,
+      role: storedSession.role
+    });
+
     try {
-      const { data, error } = await supabase.rpc("validate_pos_session", {
+      // Créer un timeout de 10 secondes pour la validation
+      const validationPromise = supabase.rpc("validate_pos_session", {
         p_session_token: storedSession.session_token
       });
 
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout de validation")), 10000)
+      );
+
+      const { data, error } = await Promise.race([validationPromise, timeoutPromise]) as any;
+
       if (error || !data || data.length === 0) {
+        console.log("[POS_AUTH] Session invalide ou expirée");
         clearSession();
         return;
       }
@@ -54,11 +73,18 @@ export function usePOSAuth() {
         login_time: storedSession.login_time
       };
       
+      console.log("[POS_AUTH] Session validée avec succès", {
+        display_name: validSession.display_name,
+        role: validSession.role
+      });
+      
       setSession(validSession);
       sessionStorage.setItem("pos_session", JSON.stringify(validSession));
     } catch (error) {
-      console.error("Session validation error:", error);
+      console.error("[POS_AUTH] Erreur validation session:", error);
       clearSession();
+    } finally {
+      setLoading(false);
     }
   };
 
