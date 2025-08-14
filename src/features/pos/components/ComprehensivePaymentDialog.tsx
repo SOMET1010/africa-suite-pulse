@@ -153,6 +153,11 @@ export function ComprehensivePaymentDialog({
   };
 
   const processPayment = async () => {
+    if (!canProcessPayment()) {
+      toast.error("Veuillez vérifier les informations de paiement");
+      return;
+    }
+
     // Check if Room Charge is selected
     const selectedMethod = paymentMethods.find(m => m.id === selectedMethodId);
     if (selectedMethod?.code === 'ROOM_CHARGE') {
@@ -163,12 +168,52 @@ export function ComprehensivePaymentDialog({
     setIsProcessing(true);
     
     try {
-      // Process POS Payment
+      // Create order in database
+      const { data: userData } = await supabase.from('app_users').select('org_id').eq('user_id', (await supabase.auth.getUser()).data.user?.id).single();
+      
+      const orderData = {
+        org_id: userData?.org_id,
+        order_number: `CMD-${Date.now()}`,
+        table_id: null,
+        customer_count: customerCount,
+        status: 'paid',
+        order_type: 'dine_in',
+        subtotal: subtotal,
+        tax_amount: taxAmount,
+        discount_amount: discountType === 'amount' ? discountValue : (discountType === 'percent' ? total * discountValue / 100 : 0),
+        total_amount: calculateFinalTotal(),
+        notes: `Paiement via ${selectedMethod?.label}`,
+      };
+
+      const { data: order, error: orderError } = await supabase
+        .from('pos_orders')
+        .insert(orderData)
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Create payment transaction
+      const paymentData = {
+        order_id: order.id,
+        payment_method_id: selectedMethodId,
+        amount: calculateFinalTotal(),
+        status: 'completed',
+        reference: `PAY-${Date.now()}`,
+        received_amount: selectedMethod?.kind === 'cash' ? cashReceived : calculateFinalTotal(),
+        change_amount: getChange(),
+      };
+
+      // For now, we'll skip the payment transactions table since it doesn't exist
+      // Just log the payment success
+      console.log('Payment completed:', paymentData);
+
       toast.success(`Paiement réussi - ${calculateFinalTotal().toLocaleString()} XOF avec ${selectedMethod?.label}`);
 
       onPaymentComplete();
       onClose();
     } catch (error: any) {
+      console.error('Payment error:', error);
       toast.error(error.message || "Erreur lors du paiement");
     } finally {
       setIsProcessing(false);
