@@ -40,7 +40,7 @@ export default function POSLoginPage() {
   const navigate = useNavigate();
 
   const handlePinInput = (char: string) => {
-    if (pin.length < 8) {
+    if (pin.length < 6) {
       setPin(prev => prev + char);
     }
   };
@@ -55,8 +55,8 @@ export default function POSLoginPage() {
   };
 
   const handleLogin = async () => {
-    if (!pin || pin.length < 3) {
-      setError("Veuillez saisir un code PIN valide (minimum 3 caractères)");
+    if (!pin || pin.length < 4) {
+      setError("Veuillez saisir un code PIN valide (minimum 4 chiffres)");
       return;
     }
 
@@ -202,19 +202,19 @@ export default function POSLoginPage() {
             <Info className="h-4 w-4" />
             <AlertDescription className="text-sm">
               <strong>Codes PIN de test :</strong><br />
-              • Marie : srv001<br />
-              • Jean : csh001<br />
-              • Sophie : mgr001
+              • Marie : 1234<br />
+              • Jean : 5678<br />
+              • Sophie : 9012
             </AlertDescription>
           </Alert>
 
           {/* PIN Display */}
           <div className="text-center">
             <div className="flex justify-center gap-2 mb-4">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="w-10 h-10 border-2 rounded-lg flex items-center justify-center text-lg font-bold"
+                  className="w-12 h-12 border-2 rounded-lg flex items-center justify-center text-xl font-bold"
                   style={{
                     borderColor: i < pin.length ? "hsl(var(--primary))" : "hsl(var(--border))",
                     backgroundColor: i < pin.length ? "hsl(var(--primary) / 0.1)" : "transparent"
@@ -226,92 +226,86 @@ export default function POSLoginPage() {
             </div>
           </div>
 
-          {/* Alphanuméric Keyboard */}
-          <div className="space-y-3">
-            {/* First row: Numbers */}
-            <div className="grid grid-cols-10 gap-1">
-              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map((char) => (
+          {/* Numeric Keypad */}
+          <div className="space-y-4">
+            {/* Numbers 1-3 */}
+            <div className="grid grid-cols-3 gap-4">
+              {['1', '2', '3'].map((num) => (
                 <Button
-                  key={char}
+                  key={num}
                   variant="outline"
-                  size="sm"
-                  className="h-10 text-sm font-semibold"
-                  onClick={() => handlePinInput(char)}
+                  size="lg"
+                  className="h-16 text-2xl font-bold"
+                  onClick={() => handlePinInput(num)}
                   disabled={loading}
                 >
-                  {char}
+                  {num}
                 </Button>
               ))}
             </div>
             
-            {/* Second row: QWERTY */}
-            <div className="grid grid-cols-10 gap-1">
-              {['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'].map((char) => (
+            {/* Numbers 4-6 */}
+            <div className="grid grid-cols-3 gap-4">
+              {['4', '5', '6'].map((num) => (
                 <Button
-                  key={char}
+                  key={num}
                   variant="outline"
-                  size="sm"
-                  className="h-10 text-sm font-semibold"
-                  onClick={() => handlePinInput(char)}
+                  size="lg"
+                  className="h-16 text-2xl font-bold"
+                  onClick={() => handlePinInput(num)}
                   disabled={loading}
                 >
-                  {char}
+                  {num}
                 </Button>
               ))}
             </div>
             
-            {/* Third row: ASDF */}
-            <div className="grid grid-cols-9 gap-1">
-              {['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'].map((char) => (
+            {/* Numbers 7-9 */}
+            <div className="grid grid-cols-3 gap-4">
+              {['7', '8', '9'].map((num) => (
                 <Button
-                  key={char}
+                  key={num}
                   variant="outline"
-                  size="sm"
-                  className="h-10 text-sm font-semibold"
-                  onClick={() => handlePinInput(char)}
+                  size="lg"
+                  className="h-16 text-2xl font-bold"
+                  onClick={() => handlePinInput(num)}
                   disabled={loading}
                 >
-                  {char}
+                  {num}
                 </Button>
               ))}
             </div>
             
-            {/* Fourth row: ZXCV */}
-            <div className="grid grid-cols-7 gap-1">
-              {['z', 'x', 'c', 'v', 'b', 'n', 'm'].map((char) => (
-                <Button
-                  key={char}
-                  variant="outline"
-                  size="sm"
-                  className="h-10 text-sm font-semibold"
-                  onClick={() => handlePinInput(char)}
-                  disabled={loading}
-                >
-                  {char}
-                </Button>
-              ))}
-            </div>
-            
-            {/* Control buttons */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Last row: Clear, 0, Backspace */}
+            <div className="grid grid-cols-3 gap-4">
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12"
+                className="h-16 text-lg font-bold"
                 onClick={handleClear}
                 disabled={loading}
               >
-                Effacer tout
+                Effacer
               </Button>
               
               <Button
                 variant="outline"
                 size="lg"
-                className="h-12"
+                className="h-16 text-2xl font-bold"
+                onClick={() => handlePinInput('0')}
+                disabled={loading}
+              >
+                0
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-16 text-lg font-bold"
                 onClick={handleBackspace}
                 disabled={loading}
               >
-                ⌫ Supprimer
+                ⌫
               </Button>
             </div>
           </div>
@@ -320,7 +314,7 @@ export default function POSLoginPage() {
           <Button 
             className="w-full h-12 text-lg" 
             onClick={handleLogin}
-            disabled={loading || pin.length < 3}
+            disabled={loading || pin.length < 4}
           >
             {loading ? (
               <>
