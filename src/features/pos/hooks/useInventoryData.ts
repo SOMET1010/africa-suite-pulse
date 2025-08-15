@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+// Real-time subscription setup
+
 interface Warehouse {
   id: string;
   org_id: string;
@@ -65,6 +67,59 @@ interface StockMovement {
 export function useInventoryData() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Setup real-time subscriptions
+  useEffect(() => {
+    const stockItemsChannel = supabase
+      .channel('pos-stock-items-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pos_stock_items'
+        },
+        (payload) => {
+          console.log('Stock items change:', payload);
+          queryClient.invalidateQueries({ queryKey: ["pos-stock-items"] });
+          
+          // Show notification for low stock
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            const item = payload.new as any;
+            if (item.current_stock <= item.min_stock_level && item.current_stock > 0) {
+              toast({
+                title: "Alerte stock faible",
+                description: `${item.name} : Stock faible (${item.current_stock} restant)`,
+                variant: "destructive",
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    const stockMovementsChannel = supabase
+      .channel('pos-stock-movements-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'pos_stock_movements'
+        },
+        (payload) => {
+          console.log('Stock movement added:', payload);
+          queryClient.invalidateQueries({ queryKey: ["pos-stock-movements"] });
+          queryClient.invalidateQueries({ queryKey: ["pos-stock-items"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(stockItemsChannel);
+      supabase.removeChannel(stockMovementsChannel);
+    };
+  }, [queryClient, toast]);
 
   // Fetch warehouses
   const { data: warehouses = [] } = useQuery<Warehouse[]>({

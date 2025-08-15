@@ -9,13 +9,15 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertTriangle, Package, Plus, Search, TrendingDown, TrendingUp, Warehouse, Edit, Trash2, History, ShoppingCart } from "lucide-react";
+import { AlertTriangle, Package, Plus, Search, TrendingDown, TrendingUp, Warehouse, Edit, Trash2, History, ShoppingCart, Calendar, FileSpreadsheet } from "lucide-react";
 import { useInventoryData } from "../hooks/useInventoryData";
 import { useToast } from "@/hooks/use-toast";
 import { RestockManagementDialog } from "./components/RestockManagementDialog";
 import { EnhancedStockMovementDialog } from "./components/EnhancedStockMovementDialog";
 import { InventoryNotifications } from "./components/InventoryNotifications";
 import { StockAnalytics } from "./components/StockAnalytics";
+import { ExpiryManagementDialog } from "./components/ExpiryManagementDialog";
+import { ImportExportDialog } from "./components/ImportExportDialog";
 
 export function InventoryManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +27,8 @@ export function InventoryManagement() {
   const [showMovement, setShowMovement] = useState(false);
   const [showEnhancedMovement, setShowEnhancedMovement] = useState(false);
   const [showRestock, setShowRestock] = useState(false);
+  const [showExpiry, setShowExpiry] = useState(false);
+  const [showImportExport, setShowImportExport] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [selectedMovementItem, setSelectedMovementItem] = useState<any>(null);
 
@@ -115,6 +119,24 @@ export function InventoryManagement() {
           >
             <ShoppingCart className="w-4 h-4 mr-2" />
             Réapprovisionner
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white"
+            onClick={() => setShowExpiry(true)}
+          >
+            <Calendar className="w-4 h-4 mr-2" />
+            Expiration
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="border-green-500 text-green-600 hover:bg-green-500 hover:text-white"
+            onClick={() => setShowImportExport(true)}
+          >
+            <FileSpreadsheet className="w-4 h-4 mr-2" />
+            Import/Export
           </Button>
         </div>
       </div>
@@ -422,6 +444,16 @@ export function InventoryManagement() {
         lowStockItems={lowStockItems}
         warehouses={warehouses}
         onRefresh={() => window.location.reload()}
+      />
+      
+      <ExpiryManagementDialog
+        open={showExpiry}
+        onOpenChange={setShowExpiry}
+      />
+      
+      <ImportExportDialog
+        open={showImportExport}
+        onOpenChange={setShowImportExport}
       />
     </div>
   );
