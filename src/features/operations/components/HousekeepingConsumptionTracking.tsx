@@ -190,8 +190,6 @@ export function HousekeepingConsumptionTracking({
       // Mock stock movement creation for demo
       console.log('Stock movements would be created:', stockMovements);
 
-      if (movementError) throw movementError;
-
       // Update housekeeping task
       const consumptionData = {
         products_used: data.consumedProducts.map(p => ({

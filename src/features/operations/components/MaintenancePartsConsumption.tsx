@@ -125,8 +125,6 @@ export function MaintenancePartsConsumption({
       // Mock stock movement creation for demo
       console.log('Stock movements would be created:', stockMovements);
 
-      if (movementError) throw movementError;
-
       // Update maintenance request with costs and parts used
       const partsUsed = data.consumedParts.map(part => ({
         part_id: part.partId,
