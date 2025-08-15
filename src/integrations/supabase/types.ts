@@ -3235,7 +3235,22 @@ export type Database = {
           menu_section_id?: string
           product_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_pos_menu_items_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "pos_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_pos_menu_items_section_id"
+            columns: ["menu_section_id"]
+            isOneToOne: false
+            referencedRelation: "pos_menu_sections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pos_menu_sections: {
         Row: {
@@ -3268,7 +3283,15 @@ export type Database = {
           name?: string
           section_config?: Json | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_pos_menu_sections_menu_id"
+            columns: ["menu_id"]
+            isOneToOne: false
+            referencedRelation: "pos_menus"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pos_menus: {
         Row: {
@@ -3589,7 +3612,15 @@ export type Database = {
           settings?: Json | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_pos_outlets_fiscal_jurisdiction"
+            columns: ["fiscal_jurisdiction_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_jurisdictions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pos_product_compositions: {
         Row: {
@@ -4260,7 +4291,29 @@ export type Database = {
           transferred_at?: string
           transferred_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_pos_table_transfers_from_table_id"
+            columns: ["from_table_id"]
+            isOneToOne: false
+            referencedRelation: "pos_tables"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_pos_table_transfers_order_id"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "pos_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_pos_table_transfers_to_table_id"
+            columns: ["to_table_id"]
+            isOneToOne: false
+            referencedRelation: "pos_tables"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pos_tables: {
         Row: {

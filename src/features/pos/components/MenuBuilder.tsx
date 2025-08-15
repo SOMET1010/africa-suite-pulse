@@ -340,7 +340,7 @@ export function MenuBuilder({ outletId }: MenuBuilderProps) {
                     <Droppable droppableId="sections">
                       {(provided) => (
                         <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                          {selectedMenu && Array.isArray(selectedMenu.sections) ? 
+                          {selectedMenu && selectedMenu.sections && Array.isArray(selectedMenu.sections) ? 
                             selectedMenu.sections.map((section: any, index: number) => (
                               <Draggable key={section.id} draggableId={section.id} index={index}>
                                 {(provided) => (

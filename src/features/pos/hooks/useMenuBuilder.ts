@@ -96,23 +96,32 @@ export function useMenu(menuId?: string) {
     queryFn: async () => {
       if (!menuId) return null;
       
-      const { data, error } = await supabase
-        .from('pos_menus')
-        .select(`
-          *,
-          sections:pos_menu_sections(
+      try {
+        const { data, error } = await supabase
+          .from('pos_menus')
+          .select(`
             *,
-            items:pos_menu_items(
+            sections:pos_menu_sections!fk_pos_menu_sections_menu_id(
               *,
-              product:pos_products(*)
+              items:pos_menu_items!fk_pos_menu_items_section_id(
+                *,
+                product:pos_products(*)
+              )
             )
-          )
-        `)
-        .eq('id', menuId)
-        .single();
+          `)
+          .eq('id', menuId)
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) {
+          console.error('Menu query error:', error);
+          return null;
+        }
+        
+        return data;
+      } catch (err) {
+        console.error('Menu fetch error:', err);
+        return null;
+      }
     },
     enabled: !!menuId
   });
