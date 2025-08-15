@@ -2389,6 +2389,59 @@ export type Database = {
         }
         Relationships: []
       }
+      organization_subscriptions: {
+        Row: {
+          billing_cycle: string
+          created_at: string
+          current_period_end: string
+          current_period_start: string
+          id: string
+          metadata: Json | null
+          org_id: string
+          plan_id: string
+          setup_fee_paid: boolean
+          status: string
+          trial_end: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle?: string
+          created_at?: string
+          current_period_end: string
+          current_period_start?: string
+          id?: string
+          metadata?: Json | null
+          org_id: string
+          plan_id: string
+          setup_fee_paid?: boolean
+          status?: string
+          trial_end?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle?: string
+          created_at?: string
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          metadata?: Json | null
+          org_id?: string
+          plan_id?: string
+          setup_fee_paid?: boolean
+          status?: string
+          trial_end?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_methods: {
         Row: {
           active: boolean | null
@@ -4766,6 +4819,101 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          currency_code: string
+          description: string | null
+          features: Json
+          id: string
+          is_active: boolean
+          max_rooms: number | null
+          max_users: number | null
+          name: string
+          price_monthly: number
+          price_yearly: number | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency_code?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          max_rooms?: number | null
+          max_users?: number | null
+          name: string
+          price_monthly: number
+          price_yearly?: number | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency_code?: string
+          description?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          max_rooms?: number | null
+          max_users?: number | null
+          name?: string
+          price_monthly?: number
+          price_yearly?: number | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscription_usage: {
+        Row: {
+          created_at: string
+          id: string
+          metric_name: string
+          metric_value: number
+          org_id: string
+          period_end: string
+          period_start: string
+          subscription_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric_name: string
+          metric_value?: number
+          org_id: string
+          period_end: string
+          period_start: string
+          subscription_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric_name?: string
+          metric_value?: number
+          org_id?: string
+          period_end?: string
+          period_start?: string
+          subscription_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_usage_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "organization_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_performance: {
         Row: {

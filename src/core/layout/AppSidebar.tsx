@@ -8,6 +8,7 @@ import {
   LogIn,
   LogOut,
   Receipt,
+  CreditCard,
   Bed,
   Wrench,
   ShoppingCart,
@@ -139,6 +140,11 @@ const navigationSections = [
         title: "Facturation",
         icon: Receipt,
         url: "/billing",
+      },
+      {
+        title: "Abonnements",
+        icon: CreditCard,
+        url: "/subscriptions",
       },
       {
         title: "Audit de nuit",
