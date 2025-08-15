@@ -3394,6 +3394,7 @@ export type Database = {
           created_at: string
           current_stock: number | null
           description: string | null
+          happy_hour_price: number | null
           id: string
           image_url: string | null
           is_active: boolean
@@ -3401,12 +3402,18 @@ export type Database = {
           is_for_sale: boolean | null
           is_stock_managed: boolean | null
           kitchen_notes: string | null
+          max_price: number | null
+          min_price: number | null
           min_stock_level: number | null
           name: string
           org_id: string
           outlet_id: string | null
           preparation_time: number | null
           price_ht: number | null
+          price_level_1: number | null
+          price_level_2: number | null
+          price_level_3: number | null
+          promotion_eligible: boolean | null
           service_id: string | null
           sort_order: number | null
           storage_location: string | null
@@ -3430,6 +3437,7 @@ export type Database = {
           created_at?: string
           current_stock?: number | null
           description?: string | null
+          happy_hour_price?: number | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -3437,12 +3445,18 @@ export type Database = {
           is_for_sale?: boolean | null
           is_stock_managed?: boolean | null
           kitchen_notes?: string | null
+          max_price?: number | null
+          min_price?: number | null
           min_stock_level?: number | null
           name: string
           org_id: string
           outlet_id?: string | null
           preparation_time?: number | null
           price_ht?: number | null
+          price_level_1?: number | null
+          price_level_2?: number | null
+          price_level_3?: number | null
+          promotion_eligible?: boolean | null
           service_id?: string | null
           sort_order?: number | null
           storage_location?: string | null
@@ -3466,6 +3480,7 @@ export type Database = {
           created_at?: string
           current_stock?: number | null
           description?: string | null
+          happy_hour_price?: number | null
           id?: string
           image_url?: string | null
           is_active?: boolean
@@ -3473,12 +3488,18 @@ export type Database = {
           is_for_sale?: boolean | null
           is_stock_managed?: boolean | null
           kitchen_notes?: string | null
+          max_price?: number | null
+          min_price?: number | null
           min_stock_level?: number | null
           name?: string
           org_id?: string
           outlet_id?: string | null
           preparation_time?: number | null
           price_ht?: number | null
+          price_level_1?: number | null
+          price_level_2?: number | null
+          price_level_3?: number | null
+          promotion_eligible?: boolean | null
           service_id?: string | null
           sort_order?: number | null
           storage_location?: string | null
@@ -3988,6 +4009,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_shifts: {
+        Row: {
+          applicable_days: number[]
+          created_at: string
+          description: string | null
+          end_time: string
+          id: string
+          is_active: boolean
+          name: string
+          org_id: string
+          outlet_id: string | null
+          price_level: number
+          priority: number
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          applicable_days?: number[]
+          created_at?: string
+          description?: string | null
+          end_time: string
+          id?: string
+          is_active?: boolean
+          name: string
+          org_id: string
+          outlet_id?: string | null
+          price_level: number
+          priority?: number
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          applicable_days?: number[]
+          created_at?: string
+          description?: string | null
+          end_time?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          org_id?: string
+          outlet_id?: string | null
+          price_level?: number
+          priority?: number
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profile_permissions: {
         Row: {
           allowed: boolean
@@ -4052,6 +4121,125 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      promotional_periods: {
+        Row: {
+          applicable_categories: string[] | null
+          applicable_days: number[]
+          applicable_products: string[] | null
+          created_at: string
+          created_by: string | null
+          customer_types: string[] | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          end_date: string
+          end_time: string | null
+          id: string
+          is_active: boolean
+          max_discount_amount: number | null
+          min_purchase_amount: number | null
+          name: string
+          org_id: string
+          priority: number
+          start_date: string
+          start_time: string | null
+          updated_at: string
+          usage_count: number
+          usage_limit: number | null
+        }
+        Insert: {
+          applicable_categories?: string[] | null
+          applicable_days?: number[]
+          applicable_products?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          customer_types?: string[] | null
+          description?: string | null
+          discount_type: string
+          discount_value?: number
+          end_date: string
+          end_time?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount_amount?: number | null
+          min_purchase_amount?: number | null
+          name: string
+          org_id: string
+          priority?: number
+          start_date: string
+          start_time?: string | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+        }
+        Update: {
+          applicable_categories?: string[] | null
+          applicable_days?: number[]
+          applicable_products?: string[] | null
+          created_at?: string
+          created_by?: string | null
+          customer_types?: string[] | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          end_date?: string
+          end_time?: string | null
+          id?: string
+          is_active?: boolean
+          max_discount_amount?: number | null
+          min_purchase_amount?: number | null
+          name?: string
+          org_id?: string
+          priority?: number
+          start_date?: string
+          start_time?: string | null
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      promotional_rules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          org_id: string
+          promotional_period_id: string
+          rule_action: Json
+          rule_conditions: Json
+          rule_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+          promotional_period_id: string
+          rule_action?: Json
+          rule_conditions?: Json
+          rule_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          promotional_period_id?: string
+          rule_action?: Json
+          rule_conditions?: Json
+          rule_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotional_rules_promotional_period_id_fkey"
+            columns: ["promotional_period_id"]
+            isOneToOne: false
+            referencedRelation: "promotional_periods"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promotions: {
         Row: {
@@ -6200,6 +6388,15 @@ export type Database = {
           total_setup_fees: number
         }[]
       }
+      calculate_promotional_price: {
+        Args: {
+          p_base_price: number
+          p_customer_type?: string
+          p_product_id: string
+          p_quantity?: number
+        }
+        Returns: Json
+      }
       can_access_view_data: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -6263,6 +6460,10 @@ export type Database = {
           p_user_id: string
         }
         Returns: string
+      }
+      get_current_pricing_level: {
+        Args: { p_outlet_id: string }
+        Returns: number
       }
       get_current_user_org_id: {
         Args: Record<PropertyKey, never>

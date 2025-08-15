@@ -49,7 +49,11 @@ export const usePOSProducts = (outletId?: string, categoryId?: string) => {
       
       let query = supabase
         .from("pos_products")
-        .select("id, name, code, category_id, outlet_id, base_price, is_active, description")
+        .select(`
+          id, name, code, category_id, outlet_id, base_price, is_active, description,
+          price_level_1, price_level_2, price_level_3, min_price, max_price, 
+          happy_hour_price, promotion_eligible, is_stock_managed, current_stock
+        `)
         .eq("outlet_id", outletId)
         .eq("is_active", true);
 
