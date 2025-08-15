@@ -12,6 +12,7 @@ import { CreateMaintenanceRequestDialog } from "./components/CreateMaintenanceRe
 import { CreateEquipmentDialog } from "./components/CreateEquipmentDialog";
 import { CreateSparePartDialog } from "./components/CreateSparePartDialog";
 import { MaintenanceNotifications } from "./components/MaintenanceNotifications";
+import { OperationsWorkflowEngine } from "@/features/operations/components/OperationsWorkflowEngine";
 
 export default function MaintenancePage() {
   const [activeTab, setActiveTab] = useState("requests");
@@ -66,6 +67,9 @@ export default function MaintenancePage() {
 
         {/* Notifications */}
         <MaintenanceNotifications />
+
+        {/* Operations Workflow Engine */}
+        <OperationsWorkflowEngine />
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

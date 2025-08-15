@@ -52,6 +52,9 @@ import { TaskPerformanceStats } from "./components/TaskPerformanceStats";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { RealTimeAlerts } from "./components/RealTimeAlerts";
 import { TeamPerformanceReports } from "./components/TeamPerformanceReports";
+import { MaintenanceRequestFromHousekeeping } from "@/features/operations/components/MaintenanceRequestFromHousekeeping";
+import { HousekeepingConsumptionTracking } from "@/features/operations/components/HousekeepingConsumptionTracking";
+import { OperationsWorkflowEngine } from "@/features/operations/components/OperationsWorkflowEngine";
 import { HousekeepingTask, RoomStatus, RecoucheWorkflow } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -77,6 +80,10 @@ export default function HousekeepingPage() {
   const [selectedTask, setSelectedTask] = useState<HousekeepingTask | null>(null);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [showMaintenanceRequest, setShowMaintenanceRequest] = useState(false);
+  const [showConsumptionTracking, setShowConsumptionTracking] = useState(false);
+  const [selectedTaskForMaintenance, setSelectedTaskForMaintenance] = useState<HousekeepingTask | null>(null);
+  const [selectedTaskForConsumption, setSelectedTaskForConsumption] = useState<HousekeepingTask | null>(null);
 
   // Utiliser les vrais hooks pour les données
   const { data: tasks = [], isLoading: tasksLoading } = useHousekeepingTasks();
@@ -388,6 +395,18 @@ export default function HousekeepingPage() {
     // Ici on peut implémenter les actions spécifiques selon le type d'alerte
   };
 
+  // Handler pour créer une demande de maintenance depuis une tâche
+  const handleCreateMaintenanceRequest = (task: HousekeepingTask) => {
+    setSelectedTaskForMaintenance(task);
+    setShowMaintenanceRequest(true);
+  };
+
+  // Handler pour suivre la consommation
+  const handleTrackConsumption = (task: HousekeepingTask) => {
+    setSelectedTaskForConsumption(task);
+    setShowConsumptionTracking(true);
+  };
+
   return (
     <PageLayout title="Gouvernante - Housekeeping">
       <div className="space-y-6">
@@ -445,6 +464,9 @@ export default function HousekeepingPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Operations Workflow Engine */}
+        <OperationsWorkflowEngine />
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="tasks" className="space-y-4">
@@ -590,14 +612,33 @@ export default function HousekeepingPage() {
                               </Button>
                             )}
                             {task.status === 'in_progress' && (
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleTaskAction(task.id, 'complete')}
-                              >
-                                Terminer
-                              </Button>
+                              <>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleTrackConsumption(task)}
+                                >
+                                  <Package className="h-3 w-3 mr-1" />
+                                  Consommation
+                                </Button>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleTaskAction(task.id, 'complete')}
+                                >
+                                  Terminer
+                                </Button>
+                              </>
                             )}
+                            
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => handleCreateMaintenanceRequest(task)}
+                            >
+                              <Wrench className="h-3 w-3 mr-1" />
+                              Maintenance
+                            </Button>
                           </div>
                         </div>
                       </div>
@@ -1223,6 +1264,20 @@ export default function HousekeepingPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Maintenance Request Dialog */}
+      <MaintenanceRequestFromHousekeeping
+        housekeepingTask={selectedTaskForMaintenance}
+        open={showMaintenanceRequest}
+        onOpenChange={setShowMaintenanceRequest}
+      />
+
+      {/* Consumption Tracking Dialog */}
+      <HousekeepingConsumptionTracking
+        housekeepingTask={selectedTaskForConsumption}
+        open={showConsumptionTracking}
+        onOpenChange={setShowConsumptionTracking}
+      />
     </PageLayout>
   );
 }

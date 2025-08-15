@@ -16,12 +16,14 @@ import {
   Play, 
   CheckCircle,
   X,
-  MessageSquare
+  MessageSquare,
+  Package
 } from "lucide-react";
 import { useUpdateMaintenanceRequest } from "../hooks/useMaintenanceRequests";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { toast } from "sonner";
+import { MaintenancePartsConsumption } from "@/features/operations/components/MaintenancePartsConsumption";
 
 interface MaintenanceRequestDetailsProps {
   request: any;
@@ -33,6 +35,7 @@ export function MaintenanceRequestDetails({ request, open, onOpenChange }: Maint
   const [status, setStatus] = useState(request?.status || "pending");
   const [notes, setNotes] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showPartsConsumption, setShowPartsConsumption] = useState(false);
   
   const updateMutation = useUpdateMaintenanceRequest();
 
@@ -174,6 +177,17 @@ export function MaintenanceRequestDetails({ request, open, onOpenChange }: Maint
               </div>
 
               <div className="flex gap-2">
+                {request.status === 'in_progress' && (
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowPartsConsumption(true)}
+                    className="flex-1"
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    Consommation pièces
+                  </Button>
+                )}
+                
                 <Button 
                   onClick={handleStatusUpdate}
                   disabled={isUpdating}
@@ -211,6 +225,13 @@ export function MaintenanceRequestDetails({ request, open, onOpenChange }: Maint
             </Card>
           )}
         </div>
+
+        {/* Parts Consumption Dialog */}
+        <MaintenancePartsConsumption
+          maintenanceRequest={request}
+          open={showPartsConsumption}
+          onOpenChange={setShowPartsConsumption}
+        />
       </DialogContent>
     </Dialog>
   );
