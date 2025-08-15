@@ -976,6 +976,39 @@ export type Database = {
         }
         Relationships: []
       }
+      deployment_types: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price_modifier: number
+          setup_fee: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price_modifier?: number
+          setup_fee?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_modifier?: number
+          setup_fee?: number | null
+        }
+        Relationships: []
+      }
       document_templates: {
         Row: {
           category: string | null
@@ -2095,6 +2128,99 @@ export type Database = {
           },
         ]
       }
+      module_packages: {
+        Row: {
+          base_price_monthly: number
+          code: string
+          created_at: string
+          description: string | null
+          discount_percentage: number | null
+          id: string
+          is_active: boolean
+          is_featured: boolean | null
+          module_ids: string[]
+          name: string
+          target_audience: string | null
+          updated_at: string
+        }
+        Insert: {
+          base_price_monthly: number
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean | null
+          module_ids: string[]
+          name: string
+          target_audience?: string | null
+          updated_at?: string
+        }
+        Update: {
+          base_price_monthly?: number
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean | null
+          module_ids?: string[]
+          name?: string
+          target_audience?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          base_price_monthly: number
+          category: string
+          code: string
+          created_at: string
+          dependencies: string[] | null
+          description: string | null
+          features: Json | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          is_core: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          base_price_monthly?: number
+          category: string
+          code: string
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string | null
+          features?: Json | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          is_core?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          base_price_monthly?: number
+          category?: string
+          code?: string
+          created_at?: string
+          dependencies?: string[] | null
+          description?: string | null
+          features?: Json | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          is_core?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       monitoring_incidents: {
         Row: {
           assigned_to: string | null
@@ -2388,6 +2514,63 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      organization_modules: {
+        Row: {
+          activated_at: string
+          created_at: string
+          custom_price: number | null
+          deactivated_at: string | null
+          deployment_type_id: string
+          id: string
+          is_active: boolean
+          module_id: string
+          org_id: string
+          trial_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          activated_at?: string
+          created_at?: string
+          custom_price?: number | null
+          deactivated_at?: string | null
+          deployment_type_id: string
+          id?: string
+          is_active?: boolean
+          module_id: string
+          org_id: string
+          trial_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activated_at?: string
+          created_at?: string
+          custom_price?: number | null
+          deactivated_at?: string | null
+          deployment_type_id?: string
+          id?: string
+          is_active?: boolean
+          module_id?: string
+          org_id?: string
+          trial_until?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_modules_deployment_type_id_fkey"
+            columns: ["deployment_type_id"]
+            isOneToOne: false
+            referencedRelation: "deployment_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_modules_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organization_subscriptions: {
         Row: {
@@ -5947,6 +6130,15 @@ export type Database = {
       }
     }
     Functions: {
+      activate_organization_module: {
+        Args: {
+          p_deployment_type_code: string
+          p_module_code: string
+          p_org_id: string
+          p_trial_days?: number
+        }
+        Returns: string
+      }
       add_loyalty_points: {
         Args: {
           p_description?: string
@@ -5998,6 +6190,15 @@ export type Database = {
       calculate_next_maintenance_date: {
         Args: { equipment_id_param: string }
         Returns: string
+      }
+      calculate_organization_module_cost: {
+        Args: { p_org_id: string }
+        Returns: {
+          active_modules: Json
+          module_count: number
+          total_monthly_cost: number
+          total_setup_fees: number
+        }[]
       }
       can_access_view_data: {
         Args: Record<PropertyKey, never>
