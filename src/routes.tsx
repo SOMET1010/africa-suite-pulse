@@ -33,6 +33,7 @@ import AdvancedAnalytics from "@/features/analytics/AdvancedAnalytics";
 import ReportsPage from "@/pages/ReportsPage";
 import DailyReportsPage from "@/features/reports/daily/DailyReportsPage";
 import SecurityPage from "@/features/settings/security/SecurityPage";
+import OperationsPage from "@/pages/OperationsPage";
 import MaintenancePage from "@/pages/MaintenancePage";
 import HousekeepingPage from "@/pages/HousekeepingPage";
 import { NightAuditPage } from "@/features/night-audit";
@@ -132,6 +133,7 @@ export function AppRoutes() {
       <Route path="guests" element={<RequireAuth><GuestsPage /></RequireAuth>} />
       <Route path="analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
       <Route path="reports" element={<RequireAuth><ReportsPage /></RequireAuth>} />
+      <Route path="operations" element={<RequireAuth><OperationsPage /></RequireAuth>} />
       <Route path="maintenance" element={<RequireAuth><MaintenancePage /></RequireAuth>} />
       <Route path="housekeeping" element={<RequireAuth><HousekeepingPage /></RequireAuth>} />
       
