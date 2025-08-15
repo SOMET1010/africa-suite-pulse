@@ -9,9 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertTriangle, Package, Plus, Search, TrendingDown, TrendingUp, Warehouse, Edit, Trash2, History } from "lucide-react";
+import { AlertTriangle, Package, Plus, Search, TrendingDown, TrendingUp, Warehouse, Edit, Trash2, History, ShoppingCart } from "lucide-react";
 import { useInventoryData } from "../hooks/useInventoryData";
 import { useToast } from "@/hooks/use-toast";
+import { RestockManagementDialog } from "./components/RestockManagementDialog";
+import { EnhancedStockMovementDialog } from "./components/EnhancedStockMovementDialog";
+import { InventoryNotifications } from "./components/InventoryNotifications";
+import { StockAnalytics } from "./components/StockAnalytics";
 
 export function InventoryManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +23,10 @@ export function InventoryManagement() {
   const [warehouseFilter, setWarehouseFilter] = useState<string>("all");
   const [showAddItem, setShowAddItem] = useState(false);
   const [showMovement, setShowMovement] = useState(false);
+  const [showEnhancedMovement, setShowEnhancedMovement] = useState(false);
+  const [showRestock, setShowRestock] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [selectedMovementItem, setSelectedMovementItem] = useState<any>(null);
 
   const {
     stockItems,
@@ -91,24 +98,24 @@ export function InventoryManagement() {
             </DialogContent>
           </Dialog>
 
-          <Dialog open={showMovement} onOpenChange={setShowMovement}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                <Package className="w-4 h-4 mr-2" />
-                Mouvement de Stock
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <MovementForm 
-                stockItems={stockItems}
-                onSubmit={(data: any) => {
-                  addStockMovement(data);
-                  setShowMovement(false);
-                }}
-                onClose={() => setShowMovement(false)}
-              />
-            </DialogContent>
-          </Dialog>
+          <Button 
+            variant="outline" 
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            onClick={() => setShowEnhancedMovement(true)}
+          >
+            <Package className="w-4 h-4 mr-2" />
+            Mouvement Détaillé
+          </Button>
+
+          <Button 
+            variant="outline" 
+            className="border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white"
+            onClick={() => setShowRestock(true)}
+            disabled={lowStockItems.length === 0}
+          >
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Réapprovisionner
+          </Button>
         </div>
       </div>
 
@@ -177,12 +184,18 @@ export function InventoryManagement() {
         </Card>
       </div>
 
+      {/* Notifications Section */}
+      <div className="mb-6">
+        <InventoryNotifications onRestockClick={() => setShowRestock(true)} />
+      </div>
+
       <Tabs defaultValue="inventory" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="inventory">Inventaire</TabsTrigger>
           <TabsTrigger value="movements">Mouvements</TabsTrigger>
           <TabsTrigger value="warehouses">Entrepôts</TabsTrigger>
           <TabsTrigger value="alerts">Alertes</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         <TabsContent value="inventory" className="space-y-4">
@@ -272,7 +285,8 @@ export function InventoryManagement() {
                               size="sm" 
                               variant="outline"
                               onClick={() => {
-                                setShowMovement(true);
+                                setSelectedMovementItem(item);
+                                setShowEnhancedMovement(true);
                               }}
                             >
                               <History className="w-3 h-3" />
@@ -386,7 +400,29 @@ export function InventoryManagement() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-4">
+          <StockAnalytics />
+        </TabsContent>
       </Tabs>
+      
+      {/* Enhanced Dialogs */}
+      <EnhancedStockMovementDialog
+        open={showEnhancedMovement}
+        onOpenChange={setShowEnhancedMovement}
+        stockItems={stockItems}
+        warehouses={warehouses}
+        onRefresh={() => window.location.reload()}
+        selectedItem={selectedMovementItem}
+      />
+      
+      <RestockManagementDialog
+        open={showRestock}
+        onOpenChange={setShowRestock}
+        lowStockItems={lowStockItems}
+        warehouses={warehouses}
+        onRefresh={() => window.location.reload()}
+      />
     </div>
   );
 }

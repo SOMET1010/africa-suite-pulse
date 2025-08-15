@@ -5,9 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { InventoryManagement } from "@/features/pos/inventory/InventoryManagement";
 import EnhancedProductManagement from "@/features/pos/components/EnhancedProductManagement";
+import { InventoryNotifications } from "@/features/pos/inventory/components/InventoryNotifications";
+import { StockAnalytics } from "@/features/pos/inventory/components/StockAnalytics";
+import { useInventoryData } from "@/features/pos/hooks/useInventoryData";
 
 export default function POSInventoryPage() {
   const navigate = useNavigate();
+  const { stockItems, lowStockItems } = useInventoryData();
 
   const headerAction = (
     <Button 
@@ -37,7 +41,7 @@ export default function POSInventoryPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Produits</p>
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{stockItems.length}</p>
               </div>
             </div>
           </CardContent>
@@ -51,7 +55,7 @@ export default function POSInventoryPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Stock Faible</p>
-                <p className="text-2xl font-bold">0</p>
+                <p className="text-2xl font-bold">{lowStockItems.length}</p>
               </div>
             </div>
           </CardContent>
@@ -65,7 +69,9 @@ export default function POSInventoryPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Valeur Stock</p>
-                <p className="text-2xl font-bold">0 FCFA</p>
+                <p className="text-2xl font-bold">
+                  {stockItems.reduce((sum, item) => sum + (item.current_stock * (item.unit_cost || 0)), 0).toLocaleString()} FCFA
+                </p>
               </div>
             </div>
           </CardContent>
@@ -84,6 +90,16 @@ export default function POSInventoryPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Notifications and Analytics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-1">
+          <InventoryNotifications />
+        </div>
+        <div className="lg:col-span-2">
+          <StockAnalytics />
+        </div>
       </div>
 
       <EnhancedProductManagement outletId="default" />
