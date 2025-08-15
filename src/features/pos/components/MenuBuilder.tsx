@@ -340,14 +340,15 @@ export function MenuBuilder({ outletId }: MenuBuilderProps) {
                     <Droppable droppableId="sections">
                       {(provided) => (
                         <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                          {(selectedMenu.sections || []).map((section: any, index: number) => (
-                            <Draggable key={section.id} draggableId={section.id} index={index}>
-                              {(provided) => (
-                                <Card
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className="border-l-4"
-                                  style={{
+                          {selectedMenu && Array.isArray(selectedMenu.sections) ? 
+                            selectedMenu.sections.map((section: any, index: number) => (
+                              <Draggable key={section.id} draggableId={section.id} index={index}>
+                                {(provided) => (
+                                  <Card
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    className="border-l-4"
+                                    style={{
                                     borderLeftColor: section.section_config?.color || '#3b82f6',
                                     ...provided.draggableProps.style
                                   }}
@@ -392,9 +393,14 @@ export function MenuBuilder({ outletId }: MenuBuilderProps) {
                                     )}
                                   </CardContent>
                                 </Card>
-                              )}
-                            </Draggable>
-                          ))}
+                                )}
+                              </Draggable>
+                            )) : (
+                              <div className="text-center py-8 text-muted-foreground">
+                                {selectedMenu ? 'Aucune section trouvée' : 'Erreur de chargement'}
+                              </div>
+                            )
+                          }
                           {provided.placeholder}
                         </div>
                       )}
