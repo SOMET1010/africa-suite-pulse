@@ -1144,6 +1144,51 @@ export type Database = {
         }
         Relationships: []
       }
+      fiscal_jurisdictions: {
+        Row: {
+          code: string
+          country_code: string
+          created_at: string
+          currency_code: string
+          fiscal_rules: Json | null
+          id: string
+          is_active: boolean
+          name: string
+          org_id: string
+          region: string | null
+          tax_rates: Json
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          country_code: string
+          created_at?: string
+          currency_code?: string
+          fiscal_rules?: Json | null
+          id?: string
+          is_active?: boolean
+          name: string
+          org_id: string
+          region?: string | null
+          tax_rates?: Json
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          country_code?: string
+          created_at?: string
+          currency_code?: string
+          fiscal_rules?: Json | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          org_id?: string
+          region?: string | null
+          tax_rates?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guest_access_rate_limits: {
         Row: {
           access_count: number
@@ -2720,6 +2765,7 @@ export type Database = {
           method_id: string
           org_id: string
           reference: string | null
+          split_bill_id: string | null
           status: string
           updated_at: string
         }
@@ -2733,6 +2779,7 @@ export type Database = {
           method_id: string
           org_id: string
           reference?: string | null
+          split_bill_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -2746,6 +2793,7 @@ export type Database = {
           method_id?: string
           org_id?: string
           reference?: string | null
+          split_bill_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -2766,6 +2814,54 @@ export type Database = {
           category?: string
           key?: string
           label?: string
+        }
+        Relationships: []
+      }
+      pos_action_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          org_id: string
+          reason: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          org_id: string
+          reason?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          org_id?: string
+          reason?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -3102,6 +3198,177 @@ export type Database = {
           },
         ]
       }
+      pos_menu_items: {
+        Row: {
+          created_at: string
+          custom_description: string | null
+          custom_name: string | null
+          custom_price: number | null
+          display_order: number | null
+          id: string
+          is_available: boolean
+          is_featured: boolean | null
+          menu_section_id: string
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_description?: string | null
+          custom_name?: string | null
+          custom_price?: number | null
+          display_order?: number | null
+          id?: string
+          is_available?: boolean
+          is_featured?: boolean | null
+          menu_section_id: string
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_description?: string | null
+          custom_name?: string | null
+          custom_price?: number | null
+          display_order?: number | null
+          id?: string
+          is_available?: boolean
+          is_featured?: boolean | null
+          menu_section_id?: string
+          product_id?: string
+        }
+        Relationships: []
+      }
+      pos_menu_sections: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_visible: boolean
+          menu_id: string
+          name: string
+          section_config: Json | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_visible?: boolean
+          menu_id: string
+          name: string
+          section_config?: Json | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_visible?: boolean
+          menu_id?: string
+          name?: string
+          section_config?: Json | null
+        }
+        Relationships: []
+      }
+      pos_menus: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          layout_config: Json
+          name: string
+          org_id: string
+          outlet_id: string
+          time_slots: Json | null
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          layout_config?: Json
+          name: string
+          org_id: string
+          outlet_id: string
+          time_slots?: Json | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          layout_config?: Json
+          name?: string
+          org_id?: string
+          outlet_id?: string
+          time_slots?: Json | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
+      pos_mobile_money_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency_code: string
+          external_reference: string | null
+          id: string
+          order_id: string
+          org_id: string
+          payment_method_id: string
+          phone_number: string
+          provider: string
+          provider_response: Json | null
+          status: string
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency_code?: string
+          external_reference?: string | null
+          id?: string
+          order_id: string
+          org_id: string
+          payment_method_id: string
+          phone_number: string
+          provider: string
+          provider_response?: Json | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency_code?: string
+          external_reference?: string | null
+          id?: string
+          order_id?: string
+          org_id?: string
+          payment_method_id?: string
+          phone_number?: string
+          provider?: string
+          provider_response?: Json | null
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pos_order_items: {
         Row: {
           created_at: string
@@ -3112,6 +3379,7 @@ export type Database = {
           product_id: string | null
           quantity: number
           ready_at: string | null
+          selected_garnishes: Json | null
           sent_to_kitchen_at: string | null
           special_instructions: string | null
           status: string | null
@@ -3130,6 +3398,7 @@ export type Database = {
           product_id?: string | null
           quantity?: number
           ready_at?: string | null
+          selected_garnishes?: Json | null
           sent_to_kitchen_at?: string | null
           special_instructions?: string | null
           status?: string | null
@@ -3148,6 +3417,7 @@ export type Database = {
           product_id?: string | null
           quantity?: number
           ready_at?: string | null
+          selected_garnishes?: Json | null
           sent_to_kitchen_at?: string | null
           special_instructions?: string | null
           status?: string | null
@@ -3284,6 +3554,7 @@ export type Database = {
           code: string
           created_at: string
           description: string | null
+          fiscal_jurisdiction_id: string | null
           id: string
           is_active: boolean
           name: string
@@ -3296,6 +3567,7 @@ export type Database = {
           code: string
           created_at?: string
           description?: string | null
+          fiscal_jurisdiction_id?: string | null
           id?: string
           is_active?: boolean
           name: string
@@ -3308,6 +3580,7 @@ export type Database = {
           code?: string
           created_at?: string
           description?: string | null
+          fiscal_jurisdiction_id?: string | null
           id?: string
           is_active?: boolean
           name?: string
@@ -3380,6 +3653,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pos_product_garnishes: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          is_active: boolean
+          is_required: boolean
+          max_selections: number | null
+          name: string
+          org_id: string
+          outlet_id: string
+          parent_product_id: string
+          price_addon: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          max_selections?: number | null
+          name: string
+          org_id: string
+          outlet_id: string
+          parent_product_id: string
+          price_addon?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          max_selections?: number | null
+          name?: string
+          org_id?: string
+          outlet_id?: string
+          parent_product_id?: string
+          price_addon?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       pos_products: {
         Row: {
@@ -3659,6 +3980,51 @@ export type Database = {
           },
         ]
       }
+      pos_split_bills: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          org_id: string
+          original_order_id: string
+          payment_status: string
+          split_amount: number
+          split_items: Json | null
+          split_number: number
+          split_type: string
+          total_splits: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          org_id: string
+          original_order_id: string
+          payment_status?: string
+          split_amount: number
+          split_items?: Json | null
+          split_number: number
+          split_type: string
+          total_splits: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          org_id?: string
+          original_order_id?: string
+          payment_status?: string
+          split_amount?: number
+          split_items?: Json | null
+          split_number?: number
+          split_type?: string
+          total_splits?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pos_stock_items: {
         Row: {
           average_cost: number | null
@@ -3860,6 +4226,39 @@ export type Database = {
           setting_value?: Json
           updated_at?: string
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      pos_table_transfers: {
+        Row: {
+          from_table_id: string | null
+          id: string
+          order_id: string
+          org_id: string
+          to_table_id: string | null
+          transfer_reason: string | null
+          transferred_at: string
+          transferred_by: string | null
+        }
+        Insert: {
+          from_table_id?: string | null
+          id?: string
+          order_id: string
+          org_id: string
+          to_table_id?: string | null
+          transfer_reason?: string | null
+          transferred_at?: string
+          transferred_by?: string | null
+        }
+        Update: {
+          from_table_id?: string | null
+          id?: string
+          order_id?: string
+          org_id?: string
+          to_table_id?: string | null
+          transfer_reason?: string | null
+          transferred_at?: string
+          transferred_by?: string | null
         }
         Relationships: []
       }
