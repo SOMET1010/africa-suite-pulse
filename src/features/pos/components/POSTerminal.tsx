@@ -7,6 +7,8 @@ import { ModernProductCatalog } from "./ModernProductCatalog";
 import { ModernActionsPanel } from "./ModernActionsPanel";
 import { TableSelector } from "./TableSelector";
 import { ComprehensivePaymentDialog } from "./ComprehensivePaymentDialog";
+import { SplitBillDialog } from "./SplitBillDialog";
+import { TableTransferDialog } from "./TableTransferDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
 import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder, useOpenPOSSession } from "../hooks/usePOSData";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +20,9 @@ export function POSTerminal() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [customerCount, setCustomerCount] = useState(1);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isSplitBillOpen, setIsSplitBillOpen] = useState(false);
+  const [isTableTransferOpen, setIsTableTransferOpen] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [discountApplied, setDiscountApplied] = useState({ type: 'none', value: 0 });
 
@@ -179,17 +184,47 @@ export function POSTerminal() {
   };
 
   const handleSplitBill = () => {
-    toast({
-      title: "Séparation de l'addition",
-      description: "Fonctionnalité à implémenter",
-    });
+    if (cartItems.length === 0) {
+      toast({
+        title: "Panier vide",
+        description: "Ajoutez des articles avant de séparer l'addition",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!selectedTable) {
+      toast({
+        title: "Table requise",
+        description: "Sélectionnez une table avant de séparer l'addition",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSplitBillOpen(true);
   };
 
   const handleTransferTable = () => {
-    toast({
-      title: "Transfert de table",
-      description: "Fonctionnalité à implémenter",
-    });
+    if (cartItems.length === 0) {
+      toast({
+        title: "Panier vide",
+        description: "Ajoutez des articles avant de transférer",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!selectedTable) {
+      toast({
+        title: "Table requise",
+        description: "Sélectionnez une table avant le transfert",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsTableTransferOpen(true);
   };
 
   const handleApplyDiscount = (type: 'percentage' | 'amount', value: number) => {
@@ -352,6 +387,28 @@ export function POSTerminal() {
         onPaymentComplete={clearCart}
         tableNumber={selectedTable?.table_number}
         customerCount={customerCount}
+      />
+
+      <SplitBillDialog
+        open={isSplitBillOpen}
+        onOpenChange={setIsSplitBillOpen}
+        orderId={currentOrderId}
+        orderItems={cartItems.map(item => ({
+          id: item.id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          total_price: item.total_price
+        }))}
+        orderTotal={totals.total}
+      />
+
+      <TableTransferDialog
+        open={isTableTransferOpen}
+        onOpenChange={setIsTableTransferOpen}
+        orderId={currentOrderId}
+        currentTableId={selectedTable?.id}
+        outletId={selectedOutlet.id}
       />
     </div>
   );
