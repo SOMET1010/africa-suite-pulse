@@ -102,7 +102,7 @@ export async function getInvoiceById(invoiceId: string): Promise<BillingApiRespo
           *,
           invoice_items (*)
         `)
-        .eq('id', parseInt(invoiceId))
+        .eq('id', invoiceId)
         .single();
 
       if (error) throw error;
@@ -196,7 +196,7 @@ export async function updateInvoice(
           ...updates,
           updated_at: new Date().toISOString()
         })
-        .eq('id', parseInt(invoiceId))
+        .eq('id', invoiceId)
         .select()
         .single();
 
@@ -217,13 +217,13 @@ export async function deleteInvoice(invoiceId: string): Promise<BillingApiRespon
       await (supabase as any)
         .from('invoice_items')
         .delete()
-        .eq('invoice_id', parseInt(invoiceId));
+        .eq('invoice_id', invoiceId);
 
       // Then delete invoice
       const { error } = await (supabase as any)
         .from('invoices')
         .delete()
-        .eq('id', parseInt(invoiceId));
+        .eq('id', invoiceId);
 
       if (error) throw error;
       
