@@ -57,20 +57,20 @@ export function InvoiceDetails({ invoiceId, onEdit }: InvoiceDetailsProps) {
             </Badge>
           </div>
           <div className="flex gap-2">
-            <TButton variant="outline" size="sm" onClick={handlePrint}>
+            <TButton variant="ghost" size="sm" onClick={handlePrint}>
               <Printer className="w-4 h-4" />
             </TButton>
-            <TButton variant="outline" size="sm" onClick={handleEmail}>
+            <TButton variant="ghost" size="sm" onClick={handleEmail}>
               <Mail className="w-4 h-4" />
             </TButton>
             {onEdit && (
-              <TButton variant="outline" size="sm" onClick={onEdit}>
+              <TButton variant="ghost" size="sm" onClick={onEdit}>
                 <Edit className="w-4 h-4" />
               </TButton>
             )}
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
               <AlertDialogTrigger asChild>
-                <TButton variant="outline" size="sm">
+                <TButton variant="ghost" size="sm">
                   <Trash2 className="w-4 h-4" />
                 </TButton>
               </AlertDialogTrigger>
