@@ -8,6 +8,8 @@ import { POSLayout } from '@/core/layout/POSLayout';
 import { ArrowLeft, ShoppingCart, Plus, Minus, CreditCard, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePOSAuth } from "../auth/usePOSAuth";
+import { logger } from "@/lib/logger";
+import { useToast } from "@/hooks/use-toast";
 
 interface OrderItem {
   id: string;
@@ -52,6 +54,7 @@ const mockProducts: Product[] = [
 export default function POSTerminalPage() {
   const navigate = useNavigate();
   const { session } = usePOSAuth();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("1");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,8 +109,19 @@ export default function POSTerminalPage() {
   };
 
   const handleCheckout = () => {
-    // TODO: Implement checkout logic
-    console.log("Checkout:", orderItems);
+    // Implement checkout logic with proper validation
+    logger.info("POS Checkout initiated", { itemCount: orderItems.length });
+    
+    if (orderItems.length === 0) {
+      toast({
+        title: "Erreur",
+        description: "Aucun article à commander",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // TODO: Create order and redirect to payment
   };
 
   return (

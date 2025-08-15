@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 export type POSRole = "pos_hostess" | "pos_server" | "pos_cashier" | "pos_manager";
 
@@ -18,28 +19,28 @@ export function usePOSAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("[POS_AUTH] Initialisation de l'authentification...");
+    logger.debug("POS auth initialization started");
     
     // Check for existing POS session using secure validation
     const storedSession = sessionStorage.getItem("pos_session");
     if (storedSession) {
-      console.log("[POS_AUTH] Session trouvée dans sessionStorage");
+      logger.debug("POS session found in storage");
       try {
         const parsedSession = JSON.parse(storedSession) as POSSession;
         validateStoredSession(parsedSession);
       } catch (error) {
-        console.error("[POS_AUTH] Erreur parsing session:", error);
+        logger.error("Error parsing POS session", error);
         clearSession();
         setLoading(false);
       }
     } else {
-      console.log("[POS_AUTH] Aucune session trouvée");
+      logger.debug("No POS session found");
       setLoading(false);
     }
   }, []);
 
   const validateStoredSession = async (storedSession: POSSession) => {
-    console.log("[POS_AUTH] Validation de la session en cours...", {
+    logger.debug("POS session validation started", {
       user_id: storedSession.user_id,
       role: storedSession.role
     });
@@ -57,7 +58,7 @@ export function usePOSAuth() {
       const { data, error } = await Promise.race([validationPromise, timeoutPromise]) as any;
 
       if (error || !data || data.length === 0) {
-        console.log("[POS_AUTH] Session invalide ou expirée");
+        logger.warn("POS session invalid or expired");
         clearSession();
         return;
       }
@@ -73,7 +74,7 @@ export function usePOSAuth() {
         login_time: storedSession.login_time
       };
       
-      console.log("[POS_AUTH] Session validée avec succès", {
+      logger.audit("POS session validated successfully", {
         display_name: validSession.display_name,
         role: validSession.role
       });
@@ -81,7 +82,7 @@ export function usePOSAuth() {
       setSession(validSession);
       sessionStorage.setItem("pos_session", JSON.stringify(validSession));
     } catch (error) {
-      console.error("[POS_AUTH] Erreur validation session:", error);
+      logger.error("POS session validation failed", error);
       clearSession();
     } finally {
       setLoading(false);
@@ -100,7 +101,7 @@ export function usePOSAuth() {
           p_session_token: session.session_token
         });
       } catch (error) {
-        console.error("Logout error:", error);
+        logger.error("POS logout error", error);
       }
     }
     clearSession();
