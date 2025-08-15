@@ -2,7 +2,7 @@ import React from 'react';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
 import { Button } from '@/components/ui/button';
 
-export default function NotFound() {
+export default function NotFoundPage() {
   return (
     <UnifiedLayout title="Page non trouvée">
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
