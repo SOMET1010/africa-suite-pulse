@@ -10,7 +10,7 @@ import { ComprehensivePaymentDialog } from "./ComprehensivePaymentDialog";
 import { SplitBillDialog } from "./SplitBillDialog";
 import { TableTransferDialog } from "./TableTransferDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
-import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder, useOpenPOSSession } from "../hooks/usePOSData";
+import { usePOSOutlets, useCurrentPOSSession, useCreatePOSOrder, useOpenPOSSession, useAddToCart } from "../hooks/usePOSData";
 import { useToast } from "@/hooks/use-toast";
 import type { POSOutlet, POSTable, CartItem } from "../types";
 
@@ -30,6 +30,7 @@ export function POSTerminal() {
   const { data: currentSession } = useCurrentPOSSession(selectedOutlet?.id);
   const createOrder = useCreatePOSOrder();
   const openSession = useOpenPOSSession();
+  const addToCart = useAddToCart();
   const { toast } = useToast();
 
   // Keyboard shortcuts
@@ -61,36 +62,59 @@ export function POSTerminal() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [cartItems.length]);
 
-  const handleAddToCart = (product: any, quantity: number = 1) => {
-    const existingItem = cartItems.find(item => item.product_id === product.id);
-    
-    if (existingItem) {
-      setCartItems(cartItems.map(item =>
-        item.product_id === product.id
-          ? { ...item, quantity: item.quantity + quantity, total_price: (item.quantity + quantity) * item.unit_price }
-          : item
-      ));
-    } else {
-      const newItem: CartItem = {
-        id: crypto.randomUUID(),
-        order_id: '',
-        product_id: product.id,
-        product_name: product.name,
-        product_code: product.code,
-        quantity,
-        unit_price: product.base_price,
-        total_price: product.base_price * quantity,
-        status: 'pending',
-        created_at: new Date().toISOString(),
-        product,
-        fireRound: 1, // Default to first round
-      };
-      setCartItems([...cartItems, newItem]);
-    }
-    
-    // Touch feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(50);
+  const handleAddToCart = async (product: any, quantity: number = 1) => {
+    try {
+      // Create order if it doesn't exist yet
+      if (!currentOrderId && selectedOutlet && selectedTable) {
+        const newOrder = await createOrder.mutateAsync({
+          outletId: selectedOutlet.id,
+          tableId: selectedTable.id,
+          customerCount
+        });
+        setCurrentOrderId(newOrder.id);
+      }
+
+      const existingItem = cartItems.find(item => item.product_id === product.id);
+      
+      if (existingItem) {
+        setCartItems(cartItems.map(item =>
+          item.product_id === product.id
+            ? { ...item, quantity: item.quantity + quantity, total_price: (item.quantity + quantity) * item.unit_price }
+            : item
+        ));
+      } else {
+        const newItem: CartItem = {
+          id: crypto.randomUUID(),
+          order_id: currentOrderId || '',
+          product_id: product.id,
+          product_name: product.name,
+          product_code: product.code,
+          quantity,
+          unit_price: product.base_price,
+          total_price: product.base_price * quantity,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          product,
+          fireRound: 1, // Default to first round
+        };
+        setCartItems([...cartItems, newItem]);
+      }
+      
+      // Touch feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+
+      toast({
+        title: "Article ajouté",
+        description: `${product.name} ajouté au panier`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter l'article au panier",
+        variant: "destructive"
+      });
     }
   };
 
@@ -173,14 +197,53 @@ export function POSTerminal() {
     }
   };
 
-  const handleSendToKitchen = () => {
-    if (cartItems.length === 0) return;
-    
-    setCartItems(cartItems.map(item => ({ ...item, status: 'sent' })));
-    toast({
-      title: "Commande envoyée",
-      description: "La commande a été envoyée en cuisine",
-    });
+  const handleSendToKitchen = async () => {
+    if (cartItems.length === 0) {
+      toast({
+        title: "Panier vide",
+        description: "Ajoutez des articles avant d'envoyer en cuisine",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Create order if it doesn't exist
+      let orderId = currentOrderId;
+      if (!orderId && selectedOutlet && selectedTable) {
+        const newOrder = await createOrder.mutateAsync({
+          outletId: selectedOutlet.id,
+          tableId: selectedTable.id,
+          customerCount
+        });
+        orderId = newOrder.id;
+        setCurrentOrderId(orderId);
+      }
+
+      // Add cart items to database if order exists
+      if (orderId) {
+        for (const item of cartItems) {
+          await addToCart.mutateAsync({
+            orderId,
+            productId: item.product_id,
+            quantity: item.quantity,
+            specialInstructions: item.special_instructions
+          });
+        }
+      }
+
+      setCartItems(cartItems.map(item => ({ ...item, status: 'sent' })));
+      toast({
+        title: "Commande envoyée",
+        description: "La commande a été envoyée en cuisine",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer en cuisine",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSplitBill = () => {
@@ -265,6 +328,7 @@ export function POSTerminal() {
 
   const clearCart = () => {
     setCartItems([]);
+    setCurrentOrderId("");
     setSelectedTable(null);
     setCustomerCount(1);
     setDiscountApplied({ type: 'none', value: 0 });
@@ -408,7 +472,7 @@ export function POSTerminal() {
         onOpenChange={setIsTableTransferOpen}
         orderId={currentOrderId}
         currentTableId={selectedTable?.id}
-        outletId={selectedOutlet.id}
+        outletId={selectedOutlet?.id || ""}
       />
     </div>
   );
