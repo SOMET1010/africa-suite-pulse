@@ -16,6 +16,7 @@ import TariffsSettingsPage from "@/pages/TariffsSettingsPage";
 import PaymentsPage from "@/features/payments/PaymentsPage";
 import BillingPageWrapper from "@/pages/BillingPageWrapper";
 import SubscriptionsPage from "@/pages/SubscriptionsPage";
+import ModuleMarketplacePage from "@/pages/ModuleMarketplacePage";
 import UsersPage from "@/features/users/UsersPage";
 import ReservationsPage from "@/pages/ReservationsPage";
 import QuickReservationPage from "@/pages/QuickReservationPage";
@@ -125,6 +126,7 @@ export function AppRoutes() {
       
       <Route path="billing" element={<RequireAuth><BillingPageWrapper /></RequireAuth>} />
       <Route path="subscriptions" element={<RequireAuth><SubscriptionsPage /></RequireAuth>} />
+      <Route path="modules" element={<RequireAuth><ModuleMarketplacePage /></RequireAuth>} />
       
       <Route path="arrivals" element={<RequireAuth><ArrivalsPage /></RequireAuth>} />
       <Route path="guests" element={<RequireAuth><GuestsPage /></RequireAuth>} />

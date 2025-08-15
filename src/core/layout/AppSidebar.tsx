@@ -147,6 +147,11 @@ const navigationSections = [
         url: "/subscriptions",
       },
       {
+        title: "Marketplace",
+        icon: Network,
+        url: "/modules",
+      },
+      {
         title: "Audit de nuit",
         icon: Receipt,
         url: "/night-audit",

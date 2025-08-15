@@ -130,6 +130,17 @@ export type SearchFilter = {
   fields?: string[];
 };
 
+// === TYPES MODULES ===
+export type {
+  Module,
+  DeploymentType,
+  OrganizationModule,
+  ModulePackage,
+  ModuleCostBreakdown,
+  ActivateModuleRequest,
+  ModuleCategory
+} from '@/types/modules';
+
 // === TYPES COMMON ===
 export type ApiResponse<T> = {
   data: T | null;
