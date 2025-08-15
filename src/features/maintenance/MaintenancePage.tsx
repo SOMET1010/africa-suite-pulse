@@ -11,6 +11,7 @@ import { MaintenanceKPIs } from "./components/MaintenanceKPIs";
 import { CreateMaintenanceRequestDialog } from "./components/CreateMaintenanceRequestDialog";
 import { CreateEquipmentDialog } from "./components/CreateEquipmentDialog";
 import { CreateSparePartDialog } from "./components/CreateSparePartDialog";
+import { MaintenanceNotifications } from "./components/MaintenanceNotifications";
 
 export default function MaintenancePage() {
   const [activeTab, setActiveTab] = useState("requests");
@@ -62,6 +63,9 @@ export default function MaintenancePage() {
 
         {/* KPIs */}
         <MaintenanceKPIs />
+
+        {/* Notifications */}
+        <MaintenanceNotifications />
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

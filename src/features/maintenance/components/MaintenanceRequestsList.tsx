@@ -25,6 +25,7 @@ import {
   Play
 } from "lucide-react";
 import { useMaintenanceRequests } from "../hooks/useMaintenanceRequests";
+import { MaintenanceRequestDetails } from "./MaintenanceRequestDetails";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -62,6 +63,7 @@ export function MaintenanceRequestsList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
   
   const { data: requests, isLoading, error } = useMaintenanceRequests({
     search: searchTerm,
@@ -223,7 +225,11 @@ export function MaintenanceRequestsList() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSelectedRequest(request)}
+                      >
                         <Eye className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
@@ -245,6 +251,13 @@ export function MaintenanceRequestsList() {
           </Table>
         )}
       </CardContent>
+
+      {/* Details Dialog */}
+      <MaintenanceRequestDetails
+        request={selectedRequest}
+        open={!!selectedRequest}
+        onOpenChange={(open) => !open && setSelectedRequest(null)}
+      />
     </Card>
   );
 }

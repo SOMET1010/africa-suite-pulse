@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Search, Eye, Edit, Wrench, AlertTriangle, CheckCircle, Settings } from "lucide-react";
 import { useEquipment } from "../hooks/useEquipment";
+import { EquipmentDetails } from "./EquipmentDetails";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -47,6 +48,7 @@ export function EquipmentList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedEquipment, setSelectedEquipment] = useState<any>(null);
   
   const { data: equipment, isLoading, error } = useEquipment({
     search: searchTerm,
@@ -234,7 +236,11 @@ export function EquipmentList() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setSelectedEquipment(item)}
+                        >
                           <Eye className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="sm">
@@ -257,6 +263,13 @@ export function EquipmentList() {
           </Table>
         )}
       </CardContent>
+
+      {/* Equipment Details Dialog */}
+      <EquipmentDetails
+        equipment={selectedEquipment}
+        open={!!selectedEquipment}
+        onOpenChange={(open) => !open && setSelectedEquipment(null)}
+      />
     </Card>
   );
 }

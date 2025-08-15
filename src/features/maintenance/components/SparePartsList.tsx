@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Search, Eye, Edit, AlertTriangle, Package, TrendingUp, TrendingDown } from "lucide-react";
 import { useSpareParts } from "../hooks/useSpareParts";
+import { StockMovementDialog } from "./StockMovementDialog";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -30,6 +31,7 @@ export function SparePartsList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [stockFilter, setStockFilter] = useState("all");
+  const [selectedPart, setSelectedPart] = useState<any>(null);
   
   const { data: spareParts, isLoading, error } = useSpareParts({
     search: searchTerm,
@@ -193,8 +195,12 @@ export function SparePartsList() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="w-4 h-4" />
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setSelectedPart(part)}
+                        >
+                          <Package className="w-4 h-4" />
                         </Button>
                         <Button variant="ghost" size="sm">
                           <Edit className="w-4 h-4" />
@@ -216,6 +222,13 @@ export function SparePartsList() {
           </Table>
         )}
       </CardContent>
+
+      {/* Stock Movement Dialog */}
+      <StockMovementDialog
+        sparePart={selectedPart}
+        open={!!selectedPart}
+        onOpenChange={(open) => !open && setSelectedPart(null)}
+      />
     </Card>
   );
 }
