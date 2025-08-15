@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import type { Database } from '@/integrations/supabase/types';
 
 type RateWindowRow = Database['public']['Tables']['rate_windows']['Row'];
@@ -46,7 +47,7 @@ export class RateCalculationService {
   static async calculateRate(params: RateCalculationParams): Promise<RateCalculationResult> {
     const { orgId, roomType, arrivalDate, departureDate, adults, children } = params;
     
-    console.log('🔄 Calculating rate for:', params);
+    logger.debug('Calculating rate for', { params });
     
     // Get all applicable rate windows
     const rateWindows = await this.getApplicableRateWindows(orgId, roomType, arrivalDate, departureDate);
@@ -63,17 +64,24 @@ export class RateCalculationService {
     // Calculate totals
     const totalAmount = dailyRates.reduce((sum, rate) => sum + rate.adjustedRate, 0);
     
+    // Note: tax_rate column doesn't exist yet, using default
+    const taxRate = 0.18; // Default VAT rate for Ivory Coast
+    
+    // Calculate taxes and extras
+    const taxes = Math.round(totalAmount * taxRate * 100) / 100;
+    const extras = 0; // No extras for base calculation
+    
     const result: RateCalculationResult = {
-      totalAmount,
+      totalAmount: totalAmount + taxes + extras,
       dailyRates,
       breakdown: {
         accommodation: totalAmount,
-        extras: 0, // TODO: Add extras calculation
-        taxes: 0,  // TODO: Add tax calculation
+        extras,
+        taxes,
       },
     };
     
-    console.log('✅ Rate calculation result:', result);
+    logger.debug('Rate calculation result', { result });
     return result;
   }
   
@@ -108,7 +116,7 @@ export class RateCalculationService {
     const { data, error } = await query;
     
     if (error) {
-      console.error('❌ Error fetching rate windows:', error);
+      logger.error('Error fetching rate windows', error);
       throw error;
     }
     

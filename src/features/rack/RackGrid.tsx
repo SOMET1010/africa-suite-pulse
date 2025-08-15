@@ -13,6 +13,7 @@ import { ManualRelodgeDialog } from "./components/ManualRelodgeDialog";
 import { TariffConfirmationModal } from "./components/TariffConfirmationModal";
 import { toast } from "@/hooks/use-toast";
 import { TButton } from "@/core/ui/TButton";
+import { logger } from "@/lib/logger";
 import { RefreshCw, Plus } from "lucide-react";
 
 // Simple styles pour drag & drop
@@ -86,7 +87,7 @@ export default function RackGrid() {
 
   // 🆕 GESTION MODERNISÉE DU DÉPLACEMENT AVEC REACT QUERY ET VALIDATION + DEBUG
   const handleReservationMove = useCallback(async (reservationId: string, targetRoomId: string, targetDay: string) => {
-    console.log('🎯 handleReservationMove appelé:', {
+    logger.debug('handleReservationMove appelé', {
       reservationId,
       targetRoomId,
       targetDay,
@@ -96,13 +97,13 @@ export default function RackGrid() {
 
     // 🔍 VALIDATION AVANT DÉPLACEMENT
     const reservation = data?.reservations.find(r => r.id === reservationId);
-    console.log('🔍 Réservation trouvée:', reservation);
+    logger.debug('Réservation trouvée', { reservation });
     
     const validation = validateMove(reservation, targetRoomId);
-    console.log('🔍 Résultat validation:', validation);
+    logger.debug('Résultat validation', { validation });
     
     if (!validation.isValid) {
-      console.log('❌ Validation échouée:', validation.reason);
+      logger.warn('Validation échouée', { reason: validation.reason });
       toast({ 
         title: "❌ Déplacement impossible", 
         description: validation.reason,
@@ -111,19 +112,19 @@ export default function RackGrid() {
       return;
     }
 
-    console.log('✅ Validation réussie, lancement de la mutation...');
+    logger.info('Validation réussie, lancement de la mutation');
     try {
-      console.log('🚀 Avant mutation:', { reservationId, roomId: targetRoomId });
+      logger.debug('Avant mutation', { reservationId, roomId: targetRoomId });
       await reassignMutation.mutateAsync({ reservationId, roomId: targetRoomId });
-      console.log('✅ Mutation réussie, invalidation des queries...');
+      logger.info('Mutation réussie, invalidation des queries');
       
       // 🔄 INVALIDATION DES QUERIES POUR FORCER LA MISE À JOUR
       if (orgId) {
-        console.log('🔄 Invalidation avec orgId:', orgId);
+        logger.debug('Invalidation avec orgId', { orgId });
         invalidateRackQueries(orgId);
-        console.log('✅ Queries invalidées');
+        logger.debug('Queries invalidées');
       } else {
-        console.log('❌ Pas d\'orgId pour l\'invalidation');
+        logger.warn('Pas d\'orgId pour l\'invalidation');
       }
       
       toast({ 
@@ -131,7 +132,7 @@ export default function RackGrid() {
         description: `Chambre ${targetRoomId}`,
       });
     } catch (error: any) {
-      console.log('❌ Erreur mutation:', error);
+      logger.error('Erreur mutation', error);
       
       // Afficher un message utilisateur convivial basé sur le type d'erreur
       let userMessage = "Impossible de déplacer la réservation";
@@ -159,7 +160,7 @@ export default function RackGrid() {
 
   // 🧪 DEBUG: Vérifications supplémentaires
   useEffect(() => {
-    console.log('📊 Données rack changées:', {
+    logger.debug('Données rack changées', {
       reservationsCount: data?.reservations.length,
       loading,
       isRefetching,
@@ -221,7 +222,7 @@ export default function RackGrid() {
     const testReservationId = "R-1003"; // Utilisez un ID réel de vos données
     const testTargetRoomId = "102"; // Utilisez un room ID différent de l'actuel
     
-    console.log('🧪 Test manuel de handleReservationMove');
+    logger.debug('Test manuel de handleReservationMove');
     handleReservationMove(testReservationId, testTargetRoomId, 'current');
   };
 

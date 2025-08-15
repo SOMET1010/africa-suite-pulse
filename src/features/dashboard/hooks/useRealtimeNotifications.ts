@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useDashboardPreferences } from './useDashboardPreferences';
+import { logger } from '@/lib/logger';
 
 export interface NotificationData {
   id: string;
@@ -36,9 +37,9 @@ export function useRealtimeNotifications() {
     try {
       const audio = new Audio(NOTIFICATION_SOUNDS[priority]);
       audio.volume = 0.6;
-      audio.play().catch(console.error);
+      audio.play().catch(error => logger.error('Audio play failed', error));
     } catch (error) {
-      console.error('Error playing notification sound:', error);
+      logger.error('Error playing notification sound', error);
     }
   }, [preferences.notifications.sound]);
 
@@ -84,9 +85,9 @@ export function useRealtimeNotifications() {
       const cachedNotifications = JSON.parse(stored);
       cachedNotifications.unshift(notification);
       localStorage.setItem('notifications_cache', JSON.stringify(cachedNotifications.slice(0, 100)));
-    } catch (error) {
-      console.error('Error caching notification:', error);
-    }
+      } catch (error) {
+        logger.error('Error caching notification', error);
+      }
 
     // Check if notification type is enabled
     const isEnabled = preferences.notifications[notification.type as keyof typeof preferences.notifications];
@@ -138,7 +139,7 @@ export function useRealtimeNotifications() {
         setUnreadCount(cachedNotifications.filter((n: NotificationData) => !n.read).length);
       }
     } catch (error) {
-      console.error('Error loading cached notifications:', error);
+      logger.error('Error loading cached notifications', error);
     }
   }, []);
 
@@ -148,7 +149,7 @@ export function useRealtimeNotifications() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-    console.log('🔔 Setting up realtime notification listeners');
+    logger.info('Setting up realtime notification listeners');
 
     // Listen to reservations for booking notifications
     const reservationsChannel = supabase
@@ -226,7 +227,7 @@ export function useRealtimeNotifications() {
       .subscribe();
 
       return () => {
-        console.log('🔔 Cleaning up notification listeners');
+        logger.info('Cleaning up notification listeners');
         supabase.removeChannel(reservationsChannel);
         supabase.removeChannel(paymentsChannel);
       };

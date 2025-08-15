@@ -21,6 +21,7 @@ import {
   Hotel
 } from "lucide-react";
 import { toast } from "sonner";
+import { logger } from "@/lib/logger";
 import { CartItem } from "../types";
 import { RoomChargeDialog } from "./RoomChargeDialog";
 import { CashVisualizer } from "@/components/pos/CashVisualizer";
@@ -206,14 +207,14 @@ export function ComprehensivePaymentDialog({
 
       // For now, we'll skip the payment transactions table since it doesn't exist
       // Just log the payment success
-      console.log('Payment completed:', paymentData);
+      logger.info('Payment completed', { paymentData });
 
       toast.success(`Paiement réussi - ${calculateFinalTotal().toLocaleString()} XOF avec ${selectedMethod?.label}`);
 
       onPaymentComplete();
       onClose();
     } catch (error: any) {
-      console.error('Payment error:', error);
+      logger.error('Payment error', error);
       toast.error(error.message || "Erreur lors du paiement");
     } finally {
       setIsProcessing(false);
@@ -221,33 +222,38 @@ export function ComprehensivePaymentDialog({
   };
 
   const canProcessPayment = () => {
-    console.log('=== Payment Validation Debug ===');
-    console.log('selectedPaymentMode:', selectedPaymentMode);
-    console.log('selectedMethodId:', selectedMethodId);
-    console.log('calculateFinalTotal():', calculateFinalTotal());
-    console.log('cartItems length:', cartItems.length);
+    logger.debug('Payment Validation Debug', {
+      selectedPaymentMode,
+      selectedMethodId,
+      finalTotal: calculateFinalTotal(),
+      cartItemsLength: cartItems.length
+    });
     
     if (selectedPaymentMode === 'split') {
       const canPay = Math.abs(getSplitTotal() - calculateFinalTotal()) < 0.01;
-      console.log('Split payment validation:', canPay);
+      logger.debug('Split payment validation', { canPay });
       return canPay;
     }
     
     if (!selectedMethodId || calculateFinalTotal() <= 0) {
-      console.log('Basic validation failed - methodId or total invalid');
+      logger.debug('Basic validation failed - methodId or total invalid');
       return false;
     }
     
     // For cash payments, ensure enough cash is received
     const selectedMethod = paymentMethods.find(m => m.id === selectedMethodId);
-    console.log('selectedMethod:', selectedMethod);
+    logger.debug('Selected payment method', { selectedMethod });
     
     if (selectedMethod?.kind === 'cash') {
-      console.log('Cash payment - cashReceived:', cashReceived, 'vs total:', calculateFinalTotal());
+      logger.debug('Cash payment validation', { 
+        cashReceived, 
+        total: calculateFinalTotal(),
+        sufficient: cashReceived >= calculateFinalTotal()
+      });
       return cashReceived >= calculateFinalTotal();
     }
     
-    console.log('Payment validation passed');
+    logger.debug('Payment validation passed');
     return true;
   };
 

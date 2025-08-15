@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { logger } from "@/lib/logger";
 import {
   Select,
   SelectContent,
@@ -305,7 +306,7 @@ export default function HousekeepingPage() {
 
   // Handler pour les changements de linge
   const handleLinenChange = (roomId: string, details: any) => {
-    console.log('Changement de linge pour la chambre', roomId, details);
+    logger.info('Changement de linge pour la chambre', { roomId, details });
     // TODO: Ajouter API pour mettre à jour le statut de chambre
   };
 
@@ -368,22 +369,22 @@ export default function HousekeepingPage() {
   // Functions for recouche workflow
   const startTask = (roomId: string, taskType: 'cleaning' | 'inspection') => {
     // TODO: Implement start task logic
-    console.log('Starting task:', roomId, taskType);
+    logger.info('Starting task', { roomId, taskType });
   };
 
   const completeTask = (roomId: string, taskType: 'cleaning' | 'inspection') => {
     // TODO: Implement complete task logic
-    console.log('Completing task:', roomId, taskType);
+    logger.info('Completing task', { roomId, taskType });
   };
 
   const assignStaff = (roomId: string, staffId: string, role: 'cleaner' | 'inspector') => {
     // TODO: Implement staff assignment logic
-    console.log('Assigning staff:', roomId, staffId, role);
+    logger.info('Assigning staff', { roomId, staffId, role });
   };
 
   // Handler pour les actions d'alertes
   const handleAlertAction = (alertId: string, action: string) => {
-    console.log('Action alerte:', alertId, action);
+    logger.info('Action alerte', { alertId, action });
     // Ici on peut implémenter les actions spécifiques selon le type d'alerte
   };
 

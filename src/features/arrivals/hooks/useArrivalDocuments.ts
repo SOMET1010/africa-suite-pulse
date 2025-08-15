@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface DocumentGenerationOptions {
   reservationId: string;
@@ -25,7 +26,7 @@ interface EmailDocumentOptions {
 export function useGeneratePoliceForm() {
   return useMutation({
     mutationFn: async (options: DocumentGenerationOptions) => {
-      console.log('🔄 Generating police form...', options);
+      logger.info('Generating police form', { options });
       
       const { data, error } = await supabase.functions.invoke('generate-police-form', {
         body: options
@@ -35,14 +36,14 @@ export function useGeneratePoliceForm() {
       return data;
     },
     onSuccess: (data) => {
-      console.log('✅ Police form generated successfully');
+      logger.info('Police form generated successfully');
       toast({
         title: "Fiche de police générée",
         description: "La fiche de police a été générée avec succès",
       });
     },
     onError: (error: any) => {
-      console.error('❌ Error generating police form:', error);
+      logger.error('Error generating police form', error);
       toast({
         title: "Erreur",
         description: error.message || "Erreur lors de la génération de la fiche de police",
@@ -55,7 +56,7 @@ export function useGeneratePoliceForm() {
 export function useGenerateRoomCard() {
   return useMutation({
     mutationFn: async (options: RoomCardOptions) => {
-      console.log('🔄 Generating room card...', options);
+      logger.info('Generating room card', { options });
       
       const { data, error } = await supabase.functions.invoke('generate-room-card', {
         body: options
@@ -65,14 +66,14 @@ export function useGenerateRoomCard() {
       return data;
     },
     onSuccess: (data) => {
-      console.log('✅ Room card generated successfully');
+      logger.info('Room card generated successfully');
       toast({
         title: "Carte de chambre générée",
         description: `Carte de chambre ${data.card_type} générée avec succès`,
       });
     },
     onError: (error: any) => {
-      console.error('❌ Error generating room card:', error);
+      logger.error('Error generating room card', error);
       toast({
         title: "Erreur",
         description: error.message || "Erreur lors de la génération de la carte de chambre",
@@ -85,7 +86,7 @@ export function useGenerateRoomCard() {
 export function useGenerateStayProgram() {
   return useMutation({
     mutationFn: async (options: StayProgramOptions) => {
-      console.log('🔄 Generating stay program...', options);
+      logger.info('Generating stay program', { options });
       
       const { data, error } = await supabase.functions.invoke('generate-stay-program', {
         body: options
@@ -95,14 +96,14 @@ export function useGenerateStayProgram() {
       return data;
     },
     onSuccess: (data) => {
-      console.log('✅ Stay program generated successfully');
+      logger.info('Stay program generated successfully');
       toast({
         title: "Programme de séjour généré",
         description: `Programme généré avec ${data.services_count} services inclus`,
       });
     },
     onError: (error: any) => {
-      console.error('❌ Error generating stay program:', error);
+      logger.error('Error generating stay program', error);
       toast({
         title: "Erreur",
         description: error.message || "Erreur lors de la génération du programme de séjour",
@@ -115,7 +116,7 @@ export function useGenerateStayProgram() {
 export function useEmailDocument() {
   return useMutation({
     mutationFn: async (options: EmailDocumentOptions) => {
-      console.log('🔄 Sending document by email...', options);
+      logger.info('Sending document by email', { options });
       
       // First generate the document
       let documentData;
@@ -179,14 +180,14 @@ export function useEmailDocument() {
       return { ...data, documentData };
     },
     onSuccess: (data) => {
-      console.log('✅ Document sent by email successfully');
+      logger.info('Document sent by email successfully');
       toast({
         title: "Document envoyé",
         description: "Le document a été envoyé par email avec succès",
       });
     },
     onError: (error: any) => {
-      console.error('❌ Error sending document:', error);
+      logger.error('Error sending document', error);
       toast({
         title: "Erreur d'envoi",
         description: error.message || "Erreur lors de l'envoi du document par email",

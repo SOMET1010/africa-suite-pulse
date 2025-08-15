@@ -194,7 +194,7 @@ export function useDepartures(selectedDate: string) {
           guestName: reservation.guest_name,
           roomNumber: reservation.rooms?.number || '',
           roomType: reservation.rooms?.type || '',
-          checkoutTime: '', // TODO: Add checkout_time field
+          checkoutTime: reservation.date_departure || '',
           totalAmount,
           paidAmount,
           balanceDue: totalAmount - paidAmount,

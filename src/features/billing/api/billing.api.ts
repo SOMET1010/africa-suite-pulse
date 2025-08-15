@@ -24,7 +24,8 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<BillingA
       // Calculate totals
       const subtotal = input.items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
       // Calculate tax based on hotel settings (default 18% VAT for Ivory Coast)
-      const tax_rate = 0.18; // TODO: Get from hotel_settings.tax_rate
+      // Note: tax_rate column doesn't exist yet, using default
+      const tax_rate = 0.18; // Default VAT rate for Ivory Coast
       const tax_amount = Math.round(subtotal * tax_rate * 100) / 100;
       const total_amount = subtotal + tax_amount;
 
