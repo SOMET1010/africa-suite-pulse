@@ -5,6 +5,8 @@ import { SmartAlert } from "../types/advanced";
 import { AlertTriangle, TrendingDown, TrendingUp, CheckCircle, Clock, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { logger } from "@/lib/logger";
+import { useState } from "react";
 
 interface AlertsPanelProps {
   data: SmartAlert[];
@@ -12,6 +14,7 @@ interface AlertsPanelProps {
 }
 
 export function AlertsPanel({ data, isLoading }: AlertsPanelProps) {
+  const [alerts, setAlerts] = useState(data);
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical': return 'destructive';
@@ -68,13 +71,13 @@ export function AlertsPanel({ data, isLoading }: AlertsPanelProps) {
   };
 
   const handleResolveAlert = (alertId: string) => {
-    console.log('Resolving alert:', alertId);
-    // TODO: Implement alert resolution
+    logger.info('Resolving security alert', { alertId });
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
   };
 
   const handleDismissAlert = (alertId: string) => {
-    console.log('Dismissing alert:', alertId);
-    // TODO: Implement alert dismissal
+    logger.info('Dismissing security alert', { alertId });
+    setAlerts(prev => prev.filter(alert => alert.id !== alertId));
   };
 
   if (isLoading) {

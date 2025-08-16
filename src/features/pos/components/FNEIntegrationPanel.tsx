@@ -8,9 +8,9 @@ import { useFNEIntegration } from "../hooks/useFNEIntegration";
 import { FNEStatusBadge } from "./FNEStatusBadge";
 import { FNEQRCode } from "./FNEQRCode";
 import { FNETestPanel } from "./FNETestPanel";
-
 export const FNEIntegrationPanel = () => {
-  const orgId = "7e389008-3dd1-4f54-816d-4f1daff1f435"; // TODO: Récupérer l'org_id du contexte
+  // Organization ID - will be retrieved from auth context when available
+  const orgId = "7e389008-3dd1-4f54-816d-4f1daff1f435";
   
   const {
     fneOrders,

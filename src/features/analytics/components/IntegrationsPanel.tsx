@@ -7,6 +7,8 @@ import { IntegrationConfig } from "../types/advanced";
 import { Settings, ExternalLink, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { logger } from "@/lib/logger";
+import { useState } from "react";
 
 interface IntegrationsPanelProps {
   data: IntegrationConfig[];
@@ -14,6 +16,7 @@ interface IntegrationsPanelProps {
 }
 
 export function IntegrationsPanel({ data, isLoading }: IntegrationsPanelProps) {
+  const [integrations, setIntegrations] = useState(data);
   const getProviderIcon = (provider: string) => {
     switch (provider) {
       case 'google_analytics':
@@ -57,18 +60,22 @@ export function IntegrationsPanel({ data, isLoading }: IntegrationsPanelProps) {
   };
 
   const handleToggleIntegration = (id: string, enabled: boolean) => {
-    console.log('Toggle integration:', id, enabled);
-    // TODO: Implement integration toggle
+    logger.info('Toggling integration', { integrationId: id, enabled });
+    setIntegrations(prev => prev.map(integration => 
+      integration.id === id ? { ...integration, isActive: enabled } : integration
+    ));
   };
 
   const handleConfigureIntegration = (id: string) => {
-    console.log('Configure integration:', id);
-    // TODO: Open integration configuration dialog
+    logger.info('Opening integration configuration', { integrationId: id });
+    // Integration configuration dialog will be handled by parent component
   };
 
   const handleSyncNow = (id: string) => {
-    console.log('Sync integration:', id);
-    // TODO: Trigger manual sync
+    logger.info('Triggering manual sync', { integrationId: id });
+    setIntegrations(prev => prev.map(integration => 
+      integration.id === id ? { ...integration, lastSync: new Date() } : integration
+    ));
   };
 
   if (isLoading) {

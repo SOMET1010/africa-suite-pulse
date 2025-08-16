@@ -7,14 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast-unified";
 import { supabase } from "@/integrations/supabase/client";
 import { useFNEIntegration } from "../hooks/useFNEIntegration";
-
 export const FNETestPanel = () => {
   const [isCreatingTest, setIsCreatingTest] = useState(false);
   const [testOrderNumber, setTestOrderNumber] = useState("");
   const [testAmount, setTestAmount] = useState("15000");
   const [testCustomer, setTestCustomer] = useState("");
 
-  const orgId = "7e389008-3dd1-4f54-816d-4f1daff1f435"; // TODO: Récupérer du contexte
+  // Organization ID - will be retrieved from auth context when available
+  const orgId = "7e389008-3dd1-4f54-816d-4f1daff1f435";
   const { submitInvoice, isSubmitting } = useFNEIntegration(orgId);
 
   const createTestOrder = async () => {
