@@ -42,8 +42,9 @@ export function DirectSaleInterface({ staff, onBack }: DirectSaleInterfaceProps)
     capacity: 1,
     org_id: 'mock',
     outlet_id: 'direct-outlet',
-    table_number: ticketNumber,
+    table_number: ticketNumber.toString(),
     status: 'available' as const,
+    is_active: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
