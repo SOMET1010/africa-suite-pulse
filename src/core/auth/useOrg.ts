@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-async function createProfileForUser(userId: string, email?: string) {
+async function createProfileForUser(userId: string, email?: string): Promise<void> {
   // D'abord, s'assurer qu'il y a au moins une organisation
-  const { data: orgs } = await (supabase as any)
+  const { data: orgs } = await supabase
     .from("hotel_settings")
     .select("org_id")
     .limit(1);
@@ -12,7 +12,7 @@ async function createProfileForUser(userId: string, email?: string) {
   
   if (!orgs || orgs.length === 0) {
     // Créer une organisation par défaut
-    const { data: newOrg } = await (supabase as any)
+    const { data: newOrg } = await supabase
       .from("hotel_settings")
       .insert({
         name: "Mon Hôtel",
@@ -27,12 +27,14 @@ async function createProfileForUser(userId: string, email?: string) {
   }
   
   // Créer le profil utilisateur - SECURITY: Role assignment moved to database trigger
-  await (supabase as any)
+  await supabase
     .from("app_users")
     .insert({
       user_id: userId,
       org_id: orgId,
-      email: email
+      email: email || '',
+      full_name: email?.split('@')[0] || 'Utilisateur',
+      login: email || `user_${userId.slice(0, 8)}`
       // Role assignment now handled by handle_new_user trigger in database
     });
 }
@@ -81,7 +83,7 @@ export function useOrgId(): UseOrgIdResult {
         return;
       }
 
-      const { data, error: dbErr } = await (supabase as any)
+      const { data, error: dbErr } = await supabase
         .from("app_users")
         .select("org_id")
         .eq("user_id", user.id)
@@ -94,7 +96,7 @@ export function useOrgId(): UseOrgIdResult {
       if (!data) {
         await createProfileForUser(user.id, user.email);
         // Retry after creating profile
-        const { data: retryData, error: retryErr } = await (supabase as any)
+        const { data: retryData, error: retryErr } = await supabase
           .from("app_users")
           .select("org_id")
           .eq("user_id", user.id)

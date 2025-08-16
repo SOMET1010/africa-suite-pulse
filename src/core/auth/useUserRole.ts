@@ -21,7 +21,7 @@ export function useUserRole() {
         }
 
         // SECURITY: Use new secure function to get user role
-        const { data, error } = await (supabase as any).rpc("get_current_user_role");
+        const { data, error } = await supabase.rpc("get_current_user_role");
         
         if (error) {
           // Silently handle error - user role fetch failed
@@ -68,7 +68,7 @@ export function useUserRole() {
 
   const hasPermission = async (permission: string): Promise<boolean> => {
     try {
-      const { data, error } = await (supabase as any).rpc("has_permission", { 
+      const { data, error } = await supabase.rpc("has_permission", { 
         p_permission: permission 
       });
       
