@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ModernProductCatalog } from './ModernProductCatalog';
+import { MarketTilesCatalog } from './MarketTilesCatalog';
 import { ModernPaymentDialog } from './ModernPaymentDialog';
 import { Receipt, ArrowLeft, ShoppingCart } from 'lucide-react';
 import { usePOSOrderState } from '../hooks/usePOSOrderState';
@@ -23,6 +23,7 @@ interface DirectSaleInterfaceProps {
 export function DirectSaleInterface({ staff, onBack }: DirectSaleInterfaceProps) {
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [ticketNumber, setTicketNumber] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Use a mock outlet and table for direct sales
   const mockOutlet = { 
@@ -143,9 +144,10 @@ export function DirectSaleInterface({ staff, onBack }: DirectSaleInterfaceProps)
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Product Catalog */}
           <div className="lg:col-span-2">
-            <ModernProductCatalog
+            <MarketTilesCatalog
               outletId={selectedOutlet.id}
-              searchQuery=""
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
               onAddToCart={(product, quantity = 1) => {
                 orderState.actions.addItem(product, quantity);
               }}
