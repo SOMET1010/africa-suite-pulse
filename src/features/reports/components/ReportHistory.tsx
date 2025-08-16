@@ -5,6 +5,7 @@ import { useReportHistory } from "../hooks/useReportTemplates";
 import { Download, Eye, RefreshCw, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { logger } from "@/lib/logger";
 
 export function ReportHistory() {
   const { data: generations, isLoading, refetch } = useReportHistory();
@@ -52,12 +53,12 @@ export function ReportHistory() {
 
   const handleDownload = (filePath: string) => {
     // TODO: Implement download functionality
-    console.log('Downloading:', filePath);
+    logger.info('Downloading report', { filePath });
+    // TODO: Implement file download
   };
 
   const handlePreview = (filePath: string) => {
-    // TODO: Implement preview functionality
-    console.log('Previewing:', filePath);
+    logger.info('Previewing report', { filePath });
   };
 
   if (isLoading) {

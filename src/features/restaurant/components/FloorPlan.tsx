@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/core/utils/cn';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from "@/lib/logger";
 
 interface Table {
   id: string;
@@ -106,7 +107,7 @@ export function FloorPlan({ onTableSelect, onOrderCreate }: FloorPlanProps) {
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
     // Pour l'instant, on ne peut pas mettre à jour les positions en base
-    console.log('Position mise à jour pour table:', draggedTable, { x, y });
+    logger.info('Position mise à jour pour table', { tableId: draggedTable, position: { x, y } });
     
     setDraggedTable(null);
   }, [draggedTable]);

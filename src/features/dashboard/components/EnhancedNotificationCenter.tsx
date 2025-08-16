@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useRealtimeNotifications, NotificationData } from '../hooks/useRealtimeNotifications';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const NOTIFICATION_ICONS = {
   reservation: Info,
@@ -145,7 +146,7 @@ export function EnhancedNotificationCenter() {
         window.location.href = '/maintenance';
         break;
       default:
-        console.log('No default action for notification type:', notification.type);
+        logger.warn('No default action for notification type', { type: notification.type });
     }
   };
 

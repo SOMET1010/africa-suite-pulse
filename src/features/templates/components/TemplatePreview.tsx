@@ -5,6 +5,7 @@ import { TButton } from '@/core/ui/TButton';
 import { Card } from '@/components/ui/card';
 import { TemplateRenderer } from './TemplateRenderer';
 import type { DocumentTemplate } from '@/types/templates';
+import { logger } from "@/lib/logger";
 
 interface TemplatePreviewProps {
   template: DocumentTemplate;
@@ -19,7 +20,7 @@ export function TemplatePreview({ template, onClose, isPreview = false }: Templa
 
   const handleDownload = () => {
     // Implementation for PDF download
-    console.log('Download PDF for template:', template.id);
+    logger.info('Download PDF for template', { templateId: template.id });
   };
 
   const headerAction = (

@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Play, Pause, Settings } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 export function ReportScheduler() {
   const mockSchedules = [
@@ -53,7 +54,7 @@ export function ReportScheduler() {
   };
 
   const toggleSchedule = (id: string, active: boolean) => {
-    console.log('Toggle schedule:', id, active);
+    logger.info('Toggle schedule', { id, active });
     // TODO: Implement schedule toggle
   };
 

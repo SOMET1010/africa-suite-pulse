@@ -6,6 +6,7 @@ import { guestsApi } from "@/services/guests.api";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { UIReservation } from "../rack.types";
+import { logger } from '@/lib/logger';
 
 function pillStatusClass(s: UIReservation["status"]) {
   if (s==="present") return "status-present";
@@ -25,7 +26,7 @@ export default function BookingPill({ r }:{ r: UIReservation }) {
   const [showGuestDetails, setShowGuestDetails] = useState(false);
 
   const handleDragStart = (e: React.DragEvent) => {
-    console.log(`🟢 Starting drag for reservation ${r.id}`);
+    logger.debug('Starting drag for reservation', { reservationId: r.id });
     setDragData(e, r.id);
     e.dataTransfer.effectAllowed = "move";
   };

@@ -7,6 +7,7 @@ import { ArrowLeft, Clock, ChefHat, CheckCircle, AlertCircle } from "lucide-reac
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 interface KitchenOrder {
   id: string;
@@ -96,18 +97,19 @@ export default function POSKitchenPage() {
   const updateOrderStatus = async (orderId: string, newStatus: KitchenOrder["status"]) => {
     try {
       // Simulation - en réalité cela mettrait à jour Supabase
-      console.log('Updating order status:', orderId, newStatus);
+      logger.info('Updating order status', { orderId, newStatus });
+      // TODO: Implement actual order status update
     } catch (error) {
-      console.error('Erreur mise à jour commande:', error);
+      logger.error('Failed to update order status', error);
     }
   };
 
-  const updateItemStatus = async (orderId: string, itemId: string, newStatus: KitchenItem["status"]) => {
+  const updateItemStatus = (orderId: string, itemId: string, newStatus: string) => {
     try {
-      // Simulation - en réalité cela mettrait à jour Supabase
-      console.log('Updating item status:', orderId, itemId, newStatus);
+      logger.info('Updating item status', { orderId, itemId, newStatus });
+      // TODO: Implement actual item status update
     } catch (error) {
-      console.error('Erreur mise à jour item:', error);
+      logger.error('Failed to update item status', error);
     }
   };
 

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { logger } from '@/lib/logger';
 import { Separator } from '@/components/ui/separator';
 import { Store, Package, Settings, CreditCard, TrendingUp } from 'lucide-react';
 import { ModuleCard } from './components/ModuleCard';
@@ -153,7 +154,7 @@ export function ModuleMarketplacePage() {
               <PackageCard
                 key={pkg.id}
                 package={pkg}
-                onSelect={() => console.log('Package selected:', pkg.code)}
+                onSelect={() => logger.info('Package selected', { code: pkg.code })}
                 isLoading={false}
               />
             ))}

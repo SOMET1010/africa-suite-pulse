@@ -17,7 +17,21 @@ import { POSAuthProvider } from '@/features/pos/auth/POSAuthProvider';
 // Import the optimized query client
 import { queryClient } from '@/lib/queryClient';
 
+// Production optimizations
+import { useProductionOptimizations } from '@/hooks/useProductionOptimizations';
+import { logger } from '@/lib/logger';
+
 function App() {
+  // Initialize production optimizations
+  useProductionOptimizations();
+
+  React.useEffect(() => {
+    logger.audit('Application initialized', {
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString()
+    });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="ui-theme">

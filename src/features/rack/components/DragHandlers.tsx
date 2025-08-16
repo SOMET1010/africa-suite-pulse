@@ -2,6 +2,7 @@ import { getDragData } from "../rack.dnd";
 import { isBlockedRoom } from "../rack.dnd";
 import { validateDrop } from "../conflictValidation";
 import type { UIReservation } from "../rack.types";
+import { logger } from "@/lib/logger";
 
 export function useDragHandlers(
   room: any,
@@ -12,9 +13,9 @@ export function useDragHandlers(
 ) {
   
   function handleDragOver(e: React.DragEvent) {
-    console.log(`🟡 Drag over room ${room.number}`);
+    logger.debug('Drag over room', { roomNumber: room.number });
     if (isBlockedRoom(room.status)) { 
-      console.log(`❌ Room ${room.number} is blocked: ${room.status}`);
+      logger.debug('Room is blocked', { roomNumber: room.number, status: room.status });
       setOver("bad"); 
       return; 
     }
@@ -24,11 +25,18 @@ export function useDragHandlers(
     if (resId) {
       const dragged = reservations.find(r => r.id === resId);
       if (dragged) {
-        console.log(`🔍 DRAG OVER DEBUG: dragged.roomId=${dragged.roomId}, room.id=${room.id}, room.number=${room.number}`);
+         logger.debug('Drag over debug', { 
+           draggedRoomId: dragged.roomId, 
+           targetRoomId: room.id, 
+           targetRoomNumber: room.number 
+         });
         
         // CRITIQUE : Empêcher complètement le drag sur la même chambre
         if (dragged.roomId === room.id) {
-          console.log(`🚫 BLOCKED: Same room drag for ${dragged.guestName} on room ${room.number}`);
+          logger.debug('Blocked: same room drag', { 
+            guestName: dragged.guestName, 
+            roomNumber: room.number 
+          });
           setOver("bad");
           e.preventDefault();
           return;
@@ -41,7 +49,7 @@ export function useDragHandlers(
           room.id,
           today
         );
-        console.log(`🔍 Drag validation for ${room.number}:`, validation);
+        logger.debug('Drag validation result', { roomNumber: room.number, validation });
         if (!validation.ok && "reason" in validation) {
           if (validation.reason === "CONFLICT" || validation.reason === "FUTURE_CONFLICT") {
             setOver("conflict");
@@ -64,40 +72,48 @@ export function useDragHandlers(
 
   async function handleDrop(e: React.DragEvent) {
     e.preventDefault();
-    console.log(`🔵 Drop event triggered on room ${room.number} (${room.id})`);
+    logger.debug('Drop event triggered', { roomNumber: room.number, roomId: room.id });
     
     const resId = getDragData(e);
-    console.log(`📍 Drop event on room ${room.id}: resId=${resId}`);
+    logger.debug('Drop event details', { roomId: room.id, resId });
     
     setOver(null);
     
     if (!resId) {
-      console.warn("❌ No reservation ID found in drop data");
+      logger.warn('No reservation ID found in drop data');
       return;
     }
     
     if (isBlockedRoom(room.status)) { 
-      console.warn(`❌ Cannot drop on blocked room ${room.number} (${room.status})`);
+      logger.warn('Cannot drop on blocked room', { roomNumber: room.number, status: room.status });
       alert("Chambre indisponible (HS/Maintenance)"); 
       return; 
     }
     
     const dragged = reservations.find(r => r.id === resId);
     if (!dragged) {
-      console.warn(`❌ Dragged reservation not found: ${resId}`);
+      logger.warn('Dragged reservation not found', { resId });
       return;
     }
 
-    console.log(`🔍 DROP DEBUG: dragged.roomId=${dragged.roomId}, room.id=${room.id}, room.number=${room.number}`);
+    logger.debug('Drop validation', { 
+      draggedRoomId: dragged.roomId, 
+      targetRoomId: room.id, 
+      targetRoomNumber: room.number 
+    });
 
     // CRITIQUE : Empêcher complètement le drop sur la même chambre
     if (dragged.roomId === room.id) {
-      console.log(`🚫 BLOCKED: Cannot drop ${dragged.guestName} on same room ${room.number}`);
+      logger.debug('Blocked: same room drop', { guestName: dragged.guestName, roomNumber: room.number });
       alert(`⚠️ La réservation de ${dragged.guestName} est déjà dans la chambre ${room.number}`);
       return;
     }
 
-    console.log(`🔍 Validating drop for reservation ${dragged.guestName} (${dragged.start} → ${dragged.end}) on room ${room.number}`);
+    logger.debug('Validating drop for reservation', { 
+      guestName: dragged.guestName, 
+      period: `${dragged.start} → ${dragged.end}`,
+      roomNumber: room.number 
+    });
 
     // Valide sur l'ensemble de la période de la résa avec la nouvelle logique
     const today = new Date().toISOString().split('T')[0];
@@ -108,29 +124,29 @@ export function useDragHandlers(
       today
     );
 
-    console.log(`📊 Drop validation result:`, validation);
+    logger.debug('Drop validation result', { validation });
 
     if (validation.ok) {
-      console.log(`✅ No conflict, calling onDropReservation directly`);
+      logger.debug('No conflict, calling onDropReservation directly');
       await onDropReservation(resId, room.id);
       return;
     }
 
     if (!validation.ok && "reason" in validation) {
       if (validation.reason === "BLOCKED") {
-        console.log(`🚫 Room blocked`);
+        logger.debug('Room blocked');
         alert("Chambre indisponible (HS/Maintenance).");
         return;
       }
 
       if (validation.reason === "CONFLICT" && validation.conflicts) {
-        console.log(`⚠️ CONFLICT detected, opening conflict dialog with ${validation.conflicts.length} conflicts`);
+        logger.debug('Conflict detected', { conflictCount: validation.conflicts.length });
         onConflict({ draggedId: resId, targetRoomId: room.id, conflicts: validation.conflicts });
         return;
       }
       
       if (validation.reason === "FUTURE_CONFLICT" && validation.conflicts) {
-        console.log(`🔮 FUTURE_CONFLICT detected, opening conflict dialog`);
+        logger.debug('Future conflict detected');
         onConflict({ draggedId: resId, targetRoomId: room.id, conflicts: validation.conflicts });
         return;
       }
