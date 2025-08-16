@@ -7,6 +7,7 @@ import { RefreshCw, AlertTriangle, CheckCircle, Clock, QrCode } from "lucide-rea
 import { useFNEIntegration } from "../hooks/useFNEIntegration";
 import { FNEStatusBadge } from "./FNEStatusBadge";
 import { FNEQRCode } from "./FNEQRCode";
+import { FNETestPanel } from "./FNETestPanel";
 
 export const FNEIntegrationPanel = () => {
   const orgId = "7e389008-3dd1-4f54-816d-4f1daff1f435"; // TODO: Récupérer l'org_id du contexte
@@ -91,12 +92,18 @@ export const FNEIntegrationPanel = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="orders" className="space-y-4">
+      <Tabs defaultValue="test" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="test">Tests</TabsTrigger>
           <TabsTrigger value="orders">Factures FNE</TabsTrigger>
           <TabsTrigger value="pending">Queue Offline</TabsTrigger>
           <TabsTrigger value="logs">Logs API</TabsTrigger>
         </TabsList>
+
+        {/* Panel de tests */}
+        <TabsContent value="test">
+          <FNETestPanel />
+        </TabsContent>
 
         {/* Factures FNE */}
         <TabsContent value="orders">
