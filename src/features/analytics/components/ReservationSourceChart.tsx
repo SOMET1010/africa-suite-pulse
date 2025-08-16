@@ -38,7 +38,10 @@ export function ReservationSourceChart({ data, isLoading }: ReservationSourceCha
   }
 
   const RADIAN = Math.PI / 180;
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const renderCustomizedLabel = (props: Record<string, unknown>) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props as {
+      cx: number; cy: number; midAngle: number; innerRadius: number; outerRadius: number; percent: number;
+    };
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -94,10 +97,10 @@ export function ReservationSourceChart({ data, isLoading }: ReservationSourceCha
                       </Pie>
                       <ChartTooltip 
                         content={ChartTooltipContent}
-                        formatter={(value: any, name: any) => [
-                          Number(value).toString(),
-                          'Réservations'
-                        ]}
+                         formatter={(value: number | string, name: string) => [
+                           Number(value).toString(),
+                           'Réservations'
+                         ]}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -149,10 +152,10 @@ export function ReservationSourceChart({ data, isLoading }: ReservationSourceCha
                   />
                   <ChartTooltip 
                     content={ChartTooltipContent}
-                    formatter={(value: any, name: any) => [
-                      Number(value).toString(),
-                      name === 'count' ? 'Réservations' : 'Revenus'
-                    ]}
+                     formatter={(value: number | string, name: string) => [
+                       Number(value).toString(),
+                       name === 'count' ? 'Réservations' : 'Revenus'
+                     ]}
                   />
                   <Bar
                     dataKey="count"

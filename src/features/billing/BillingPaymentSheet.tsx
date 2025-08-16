@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { listPaymentMethods, createPaymentTransaction } from "@/features/payments/payments.api";
+import type { PaymentMethod } from "@/types";
 import { useOrgId } from "@/core/auth/useOrg";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye } from "lucide-react";
 import { CashVisualizer } from "@/components/pos/CashVisualizer";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 interface BillingPaymentSheetProps {
   invoiceId: string;
@@ -19,7 +21,7 @@ interface BillingPaymentSheetProps {
 
 export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defaultAmount }: BillingPaymentSheetProps) {
   const { orgId } = useOrgId();
-  const [methods, setMethods] = useState<any[]>([]);
+  const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [methodId, setMethodId] = useState<string>("");
   const [amount, setAmount] = useState<number>(defaultAmount ?? totalDue);
   const [visualAmount, setVisualAmount] = useState<number>(0);
@@ -85,10 +87,10 @@ export default function BillingPaymentSheet({ invoiceId, totalDue, onPaid, defau
       });
       
       onPaid?.();
-    } catch (e: any) {
+    } catch (e: unknown) {
       toast({ 
         title: "Erreur d'encaissement", 
-        description: e.message, 
+        description: getErrorMessage(e), 
         variant: "destructive" 
       });
     } finally {

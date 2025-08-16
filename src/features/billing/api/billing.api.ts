@@ -272,21 +272,21 @@ export async function getBillingStats(orgId: string): Promise<BillingApiResponse
       const stats: BillingStats = {
         today: {
           invoices_count: todayInvoices.length,
-          total_amount: todayInvoices.reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0),
+          total_amount: todayInvoices.reduce((sum: number, inv: {total_amount?: number; status?: string}) => sum + (inv.total_amount || 0), 0),
           paid_amount: todayInvoices
-            .filter((inv: any) => inv.status === 'paid')
-            .reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0),
-          pending_count: todayInvoices.filter((inv: any) => inv.status === 'pending').length
+            .filter((inv: {status?: string}) => inv.status === 'paid')
+            .reduce((sum: number, inv: {total_amount?: number}) => sum + (inv.total_amount || 0), 0),
+          pending_count: todayInvoices.filter((inv: {status?: string}) => inv.status === 'pending').length
         },
         overdue: {
           invoices_count: overdueInvoices.length,
-          total_amount: overdueInvoices.reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0)
+          total_amount: overdueInvoices.reduce((sum: number, inv: {total_amount?: number}) => sum + (inv.total_amount || 0), 0)
         },
         this_month: {
           invoices_count: monthInvoices.length,
-          total_amount: monthInvoices.reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0),
+          total_amount: monthInvoices.reduce((sum: number, inv: {total_amount?: number}) => sum + (inv.total_amount || 0), 0),
           avg_invoice_amount: monthInvoices.length > 0 
-            ? monthInvoices.reduce((sum: number, inv: any) => sum + (inv.total_amount || 0), 0) / monthInvoices.length
+            ? monthInvoices.reduce((sum: number, inv: {total_amount?: number}) => sum + (inv.total_amount || 0), 0) / monthInvoices.length
             : 0
         }
       };

@@ -78,7 +78,7 @@ export function RevenueChart({ data, isLoading, showComparison }: RevenueChartPr
                   <ChartTooltip 
                     content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
-                    formatter={(value: any) => [
+                    formatter={(value: number | string) => [
                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
                       'Revenus'
                     ]}
@@ -115,10 +115,10 @@ export function RevenueChart({ data, isLoading, showComparison }: RevenueChartPr
                   <ChartTooltip 
                     content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
-                    formatter={(value: any) => [
-                      Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
-                      'ADR (Tarif moyen)'
-                    ]}
+                     formatter={(value: number | string) => [
+                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
+                       'ADR (Tarif moyen)'
+                     ]}
                   />
                   <Line
                     type="monotone"
@@ -155,10 +155,10 @@ export function RevenueChart({ data, isLoading, showComparison }: RevenueChartPr
                   <ChartTooltip 
                     content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
-                    formatter={(value: any) => [
-                      Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
-                      'RevPAR'
-                    ]}
+                     formatter={(value: number | string) => [
+                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
+                       'RevPAR'
+                     ]}
                   />
                   <Line
                     type="monotone"

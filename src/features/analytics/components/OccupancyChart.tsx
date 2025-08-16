@@ -73,7 +73,7 @@ export function OccupancyChart({ data, isLoading, showComparison }: OccupancyCha
                   month: 'long',
                   day: 'numeric'
                 })}
-                formatter={(value: any, name: any) => [
+                formatter={(value: number | string, name: string) => [
                   `${Number(value).toFixed(1)}%`,
                   chartConfig[name as keyof typeof chartConfig]?.label || name
                 ]}

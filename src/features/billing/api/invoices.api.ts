@@ -106,7 +106,7 @@ export async function createInvoice(input: CreateInvoiceInput) {
   const { error: itemsError } = await (supabase as any)
     .from('invoice_items')
     .insert(
-      input.items.map((item: any) => ({
+      input.items.map((item) => ({
         invoice_id: invoice.id,
         description: item.description,
         quantity: item.quantity,

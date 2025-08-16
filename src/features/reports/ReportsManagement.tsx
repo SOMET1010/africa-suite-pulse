@@ -9,6 +9,7 @@ import { useReportGeneration, useReportTemplates } from "./hooks/useReportTempla
 import { Plus, FileText, Clock, History, Send, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ClosurePanel } from "./components/ClosurePanel";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 export default function ReportsManagement() {
   const [activeTab, setActiveTab] = useState("daily");
@@ -27,8 +28,8 @@ export default function ReportsManagement() {
       generateReport({ templateId, manual: true });
       toast({ title: "Génération lancée", description: "Le rapport est en cours de génération." });
       setActiveTab("history");
-    } catch (e: any) {
-      toast({ title: "Erreur", description: e.message || "Impossible de lancer la génération", variant: "destructive" });
+    } catch (e: unknown) {
+      toast({ title: "Erreur", description: getErrorMessage(e) || "Impossible de lancer la génération", variant: "destructive" });
     }
   };
 

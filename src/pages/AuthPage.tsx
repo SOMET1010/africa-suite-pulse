@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 export default function AuthPage() {
   const nav = useNavigate();
@@ -60,9 +61,9 @@ export default function AuthPage() {
         
         console.log('Signup successful');
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Auth error:', e);
-      setErr(e.message || "Une erreur s'est produite lors de l'authentification");
+      setErr(getErrorMessage(e) || "Une erreur s'est produite lors de l'authentification");
     } finally {
       setBusy(false);
     }
