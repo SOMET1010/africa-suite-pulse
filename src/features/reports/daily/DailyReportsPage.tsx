@@ -43,10 +43,14 @@ export default function DailyReportsPage() {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="px-3 py-2 bg-white/5 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-elegant"
             />
-            <Button variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Exporter tout
-            </Button>
+            <ExportButton
+              filename="rapports-journaliers"
+              formats={['pdf', 'csv', 'excel']}
+              data={[]} // TODO: Ajouter les vraies données
+              columns={[]} // TODO: Définir les colonnes
+              variant="outline"
+              className="gap-2"
+            />
           </div>
         </div>
       </div>
