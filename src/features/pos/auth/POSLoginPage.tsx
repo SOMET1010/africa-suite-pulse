@@ -16,6 +16,8 @@ interface POSUser {
   user_id: string;
   display_name: string;
   role_name: POSRole;
+  pos_user_id?: string;
+  employee_code?: string;
 }
 
 const roleLabels: Record<POSRole, string> = {
@@ -84,7 +86,15 @@ export default function POSLoginPage() {
         return;
       }
 
-      const user = data[0] as (POSUser & { session_token: string });
+      const authResponse = data[0];
+      const user: POSUser & { session_token: string } = {
+        user_id: '', // Will be set from session
+        pos_user_id: authResponse.pos_user_id,
+        display_name: authResponse.display_name,
+        employee_code: authResponse.employee_code,
+        role_name: authResponse.role_name as POSRole,
+        session_token: '' // Will be generated
+      };
       setCurrentUser(user);
 
       // Store secure POS session in sessionStorage (more secure than localStorage)

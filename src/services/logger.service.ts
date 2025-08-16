@@ -26,14 +26,18 @@ class LoggerService {
    * Info logs - all environments
    */
   info(message: string, context?: LogContext): void {
-    console.info(`[INFO] ${message}`, context || '');
+    if (this.isDevelopment) {
+      console.info(`[INFO] ${message}`, context || '');
+    }
   }
 
   /**
    * Warning logs - all environments
    */
   warn(message: string, context?: LogContext): void {
-    console.warn(`[WARN] ${message}`, context || '');
+    if (this.isDevelopment) {
+      console.warn(`[WARN] ${message}`, context || '');
+    }
   }
 
   /**

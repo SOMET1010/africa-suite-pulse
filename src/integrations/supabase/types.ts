@@ -8064,14 +8064,14 @@ export type Database = {
         Returns: string
       }
       authenticate_pos_user: {
-        Args: { p_org_id?: string; p_pin: string }
+        Args:
+          | { p_org_id: string; p_pin: string; p_user_id: string }
+          | { p_org_id?: string; p_pin: string }
         Returns: {
           display_name: string
-          org_id: string
-          outlet_id: string
+          employee_code: string
+          pos_user_id: string
           role_name: string
-          session_token: string
-          user_id: string
         }[]
       }
       auto_assign_all_tables_to_server: {
@@ -8129,11 +8129,19 @@ export type Database = {
         }
         Returns: number
       }
+      can_access_sensitive_guest_data: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       can_access_view_data: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
       check_guest_access_rate_limit: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      check_guest_export_rate_limit: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
@@ -8456,6 +8464,14 @@ export type Database = {
       }
       log_security_event: {
         Args: { p_details?: Json; p_event_type: string; p_severity?: string }
+        Returns: undefined
+      }
+      log_sensitive_guest_access: {
+        Args: {
+          p_access_type: string
+          p_fields_accessed?: string[]
+          p_guest_id: string
+        }
         Returns: undefined
       }
       log_user_activity: {
