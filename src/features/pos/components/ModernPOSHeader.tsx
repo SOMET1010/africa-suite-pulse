@@ -76,7 +76,7 @@ export function ModernPOSHeader({
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 glass-card shadow-elevate border-b">
+    <div className="sticky top-0 z-[var(--z-header)] glass-card shadow-elevate border-b">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between gap-6">
           {/* Zone Gauche - Point de vente + Info */}
