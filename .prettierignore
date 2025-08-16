@@ -1,0 +1,11 @@
+dist
+node_modules
+build
+coverage
+*.min.js
+*.min.css
+public
+.env*
+*.lock
+package-lock.json
+bun.lockb
