@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { usePaymentMethods, useCreatePaymentTransaction } from '@/queries/payments.queries';
 import type { CartItem } from '../types';
 import { logger } from '@/services/logger.service';
+import { getErrorMessage } from '@/utils/errorHandling';
 
 interface PaymentState {
   selectedMethodId: string;
@@ -116,12 +117,12 @@ export function usePOSPayment(orgId: string) {
 
       return { invoice, success: true };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Payment processing failed', { error, orderId: input.orderId });
       
       toast({
         title: "Erreur de paiement",
-        description: error.message || "Impossible de traiter le paiement",
+        description: getErrorMessage(error) || "Impossible de traiter le paiement",
         variant: "destructive",
       });
 

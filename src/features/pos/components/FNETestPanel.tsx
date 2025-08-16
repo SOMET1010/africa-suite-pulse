@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast-unified";
 import { supabase } from "@/integrations/supabase/client";
 import { useFNEIntegration } from "../hooks/useFNEIntegration";
+import { getErrorMessage } from "@/utils/errorHandling";
 export const FNETestPanel = () => {
   const [isCreatingTest, setIsCreatingTest] = useState(false);
   const [testOrderNumber, setTestOrderNumber] = useState("");
@@ -72,10 +73,10 @@ export const FNETestPanel = () => {
       setTestOrderNumber("");
       setTestCustomer("");
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de test",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -114,10 +115,10 @@ export const FNETestPanel = () => {
         variant: data.success ? "success" : "destructive",
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur Edge Function",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -139,10 +140,10 @@ export const FNETestPanel = () => {
         variant: "success",
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur Queue",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

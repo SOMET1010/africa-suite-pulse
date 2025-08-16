@@ -129,7 +129,7 @@ export default function POSUsersManagement() {
       });
 
       fetchPOSUsers();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Error creating demo users", error);
       toast({
         title: "Erreur",

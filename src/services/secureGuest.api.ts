@@ -1,10 +1,12 @@
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { getErrorMessage } from '@/utils/errorHandling';
+import type { Json } from '@/integrations/supabase/types';
 
 interface SecureGuestAccess {
-  searchGuests: (searchTerm: string, limit?: number) => Promise<any[]>;
-  getGuestDetails: (guestId: string) => Promise<any>;
-  getGuestsList: (limit?: number, offset?: number) => Promise<any[]>;
+  searchGuests: (searchTerm: string, limit?: number) => Promise<Json[]>;
+  getGuestDetails: (guestId: string) => Promise<Json>;
+  getGuestsList: (limit?: number, offset?: number) => Promise<Json[]>;
   checkRateLimit: () => Promise<boolean>;
 }
 
@@ -23,7 +25,7 @@ export const secureGuestService: SecureGuestAccess = {
       }
 
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Secure guest search error:', error);
       throw error;
     }
@@ -42,7 +44,7 @@ export const secureGuestService: SecureGuestAccess = {
       }
 
       return data?.[0] || null;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Secure guest details error:', error);
       throw error;
     }
@@ -62,7 +64,7 @@ export const secureGuestService: SecureGuestAccess = {
       }
 
       return data || [];
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Secure guests list error:', error);
       throw error;
     }
@@ -79,7 +81,7 @@ export const secureGuestService: SecureGuestAccess = {
       }
 
       return data === true;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Rate limit error:', error);
       return false;
     }
@@ -107,15 +109,16 @@ export const useSecureGuestAccess = () => {
       }
 
       return await operation();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Secure operation error:', error);
+      const errorMsg = getErrorMessage(error);
       
-      if (error.message?.includes('Rate limit exceeded')) {
+      if (errorMsg.includes('Rate limit exceeded')) {
         // Already handled above
         return null;
       }
       
-      if (error.message?.includes('Unauthorized')) {
+      if (errorMsg.includes('Unauthorized')) {
         toast({
           title: "Accès non autorisé",
           description: "Vous n'avez pas les permissions nécessaires pour cette action.",

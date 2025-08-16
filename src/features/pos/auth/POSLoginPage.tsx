@@ -100,9 +100,9 @@ export default function POSLoginPage() {
 
       // Navigate to POS
       navigate("/pos");
-    } catch (err: any) {
+    } catch (err: unknown) {
       logger.security("POS authentication failed", { error: err, pin: pin.length > 0 ? "[REDACTED]" : "empty" });
-      setError(err.message || "Erreur lors de la connexion");
+      setError(err instanceof Error ? err.message : "Erreur lors de la connexion");
       setPin("");
     } finally {
       setLoading(false);

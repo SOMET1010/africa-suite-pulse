@@ -22,6 +22,7 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 interface HeldOrderItem {
   id: string;
@@ -187,10 +188,10 @@ export function OrderHoldManager({
       onHoldOrder();
       fetchHeldOrders();
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de mettre la commande en attente",
+        description: getErrorMessage(error) || "Impossible de mettre la commande en attente",
         variant: "destructive"
       });
     }
@@ -214,10 +215,10 @@ export function OrderHoldManager({
         description: `Commande ${order.order_number} remise en cours`
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de reprendre la commande",
+        description: getErrorMessage(error) || "Impossible de reprendre la commande",
         variant: "destructive"
       });
     }
@@ -239,10 +240,10 @@ export function OrderHoldManager({
         description: "La commande en attente a été supprimée"
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: error.message || "Impossible de supprimer la commande",
+        description: getErrorMessage(error) || "Impossible de supprimer la commande",
         variant: "destructive"
       });
     }

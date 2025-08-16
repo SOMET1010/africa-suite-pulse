@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/utils/errorHandling';
 
 interface DocumentGenerationOptions {
   reservationId: string;
@@ -20,7 +21,7 @@ interface EmailDocumentOptions {
   reservationId: string;
   documentType: 'police_form' | 'room_card' | 'stay_program';
   email?: string;
-  additionalOptions?: any;
+  additionalOptions?: Record<string, unknown>;
 }
 
 export function useGeneratePoliceForm() {
@@ -42,11 +43,11 @@ export function useGeneratePoliceForm() {
         description: "La fiche de police a été générée avec succès",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error('Error generating police form', error);
       toast({
         title: "Erreur",
-        description: error.message || "Erreur lors de la génération de la fiche de police",
+        description: getErrorMessage(error) || "Erreur lors de la génération de la fiche de police",
         variant: "destructive",
       });
     }
@@ -72,11 +73,11 @@ export function useGenerateRoomCard() {
         description: `Carte de chambre ${data.card_type} générée avec succès`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error('Error generating room card', error);
       toast({
         title: "Erreur",
-        description: error.message || "Erreur lors de la génération de la carte de chambre",
+        description: getErrorMessage(error) || "Erreur lors de la génération de la carte de chambre",
         variant: "destructive",
       });
     }
@@ -102,11 +103,11 @@ export function useGenerateStayProgram() {
         description: `Programme généré avec ${data.services_count} services inclus`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error('Error generating stay program', error);
       toast({
         title: "Erreur",
-        description: error.message || "Erreur lors de la génération du programme de séjour",
+        description: getErrorMessage(error) || "Erreur lors de la génération du programme de séjour",
         variant: "destructive",
       });
     }
@@ -186,11 +187,11 @@ export function useEmailDocument() {
         description: "Le document a été envoyé par email avec succès",
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error('Error sending document', error);
       toast({
         title: "Erreur d'envoi",
-        description: error.message || "Erreur lors de l'envoi du document par email",
+        description: getErrorMessage(error) || "Erreur lors de l'envoi du document par email",
         variant: "destructive",
       });
     }
