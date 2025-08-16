@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/services/logger.service";
 
 // Real-time subscription setup
 
@@ -80,13 +81,18 @@ export function useInventoryData() {
           table: 'pos_stock_items'
         },
         (payload) => {
-          console.log('Stock items change:', payload);
+          logger.debug('Stock items change detected', { eventType: payload.eventType, table: 'pos_stock_items' });
           queryClient.invalidateQueries({ queryKey: ["pos-stock-items"] });
           
           // Show notification for low stock
           if (payload.eventType === 'UPDATE' && payload.new) {
             const item = payload.new as any;
             if (item.current_stock <= item.min_stock_level && item.current_stock > 0) {
+              logger.warn('Low stock alert triggered', { 
+                itemName: item.name, 
+                currentStock: item.current_stock, 
+                minLevel: item.min_stock_level 
+              });
               toast({
                 title: "Alerte stock faible",
                 description: `${item.name} : Stock faible (${item.current_stock} restant)`,
@@ -108,7 +114,7 @@ export function useInventoryData() {
           table: 'pos_stock_movements'
         },
         (payload) => {
-          console.log('Stock movement added:', payload);
+          logger.debug('Stock movement added', { eventType: payload.eventType, table: 'pos_stock_movements' });
           queryClient.invalidateQueries({ queryKey: ["pos-stock-movements"] });
           queryClient.invalidateQueries({ queryKey: ["pos-stock-items"] });
         }

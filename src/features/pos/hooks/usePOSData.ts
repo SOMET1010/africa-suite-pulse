@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/toast-unified";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/services/logger.service";
 import type { POSOutlet, POSCategory, POSProduct, POSOrder, POSTable, POSSession, CartItem } from "../types";
 
 export const usePOSOutlets = () => {
@@ -75,11 +76,11 @@ export const usePOSTables = (outletId?: string, orgId?: string) => {
   return useQuery({
     queryKey: ["pos-tables", outletId, orgId],
     queryFn: async () => {
-      console.log("🗃️ usePOSTables query STARTING:", { outletId, orgId });
+      logger.debug("POS Tables query starting", { outletId, orgId });
       
       // First try with outlet_id if provided
       if (outletId) {
-        console.log("🔍 Trying with outlet_id:", outletId);
+        logger.debug("Querying tables by outlet_id", { outletId });
         const { data: outletData, error: outletError } = await supabase
           .from("pos_tables")
           .select("id, table_number, zone, capacity, status, outlet_id, org_id")
@@ -87,7 +88,7 @@ export const usePOSTables = (outletId?: string, orgId?: string) => {
           .order("table_number")
           .range(0, 99);
 
-        console.log("🗃️ Tables by outlet_id:", { outletId, count: outletData?.length, data: outletData });
+        logger.debug("Tables by outlet_id result", { outletId, count: outletData?.length, hasData: !!outletData });
         
         if (!outletError && outletData && outletData.length > 0) {
           return outletData.map(table => ({
@@ -99,7 +100,7 @@ export const usePOSTables = (outletId?: string, orgId?: string) => {
       
       // Fallback: try with org_id only
       if (orgId) {
-        console.log("🔄 Fallback: querying tables by org_id only:", orgId);
+        logger.debug("Fallback: querying tables by org_id", { orgId });
         const { data: orgData, error: orgError } = await supabase
           .from("pos_tables")
           .select("id, table_number, zone, capacity, status, outlet_id, org_id")
@@ -107,7 +108,7 @@ export const usePOSTables = (outletId?: string, orgId?: string) => {
           .order("table_number")
           .range(0, 99);
 
-        console.log("🗃️ Tables by org_id:", { orgId, count: orgData?.length, data: orgData });
+        logger.debug("Tables by org_id result", { orgId, count: orgData?.length, hasData: !!orgData });
 
         if (orgError) throw orgError;
         return orgData?.map(table => ({

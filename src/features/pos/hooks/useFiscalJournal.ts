@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/services/logger.service";
 
 // Types pour les événements fiscaux
 export interface FiscalEvent {
@@ -125,7 +126,7 @@ export function useCreateFiscalEvent() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fiscal-events"] });
-      console.log("Événement fiscal créé avec succès");
+      logger.audit("Fiscal event created successfully", { eventCreated: true });
     },
     onError: (error: any) => {
       toast({

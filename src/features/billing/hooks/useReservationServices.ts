@@ -91,7 +91,7 @@ export function useReservationServices(reservationId: string) {
         .single();
 
       if (error) {
-        console.error('Error adding reservation service:', error);
+        logger.error('Error adding reservation service', { error, reservationId });
         toast({
           title: "Erreur",
           description: "Impossible d'ajouter la prestation",
@@ -106,7 +106,7 @@ export function useReservationServices(reservationId: string) {
         description: "Prestation ajoutée avec succès",
       });
     } catch (error) {
-      console.error('Error adding reservation service:', error);
+      logger.error('Error adding reservation service (catch)', { error, reservationId });
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'ajout",
@@ -130,7 +130,7 @@ export function useReservationServices(reservationId: string) {
         .eq('id', id);
 
       if (error) {
-        console.error('Error updating reservation service:', error);
+        logger.error('Error updating reservation service', { error, serviceId: id });
         toast({
           title: "Erreur",
           description: "Impossible de modifier la prestation",
@@ -145,7 +145,7 @@ export function useReservationServices(reservationId: string) {
         description: "Prestation modifiée avec succès",
       });
     } catch (error) {
-      console.error('Error updating reservation service:', error);
+      logger.error('Error updating reservation service (catch)', { error, serviceId: id });
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la modification",
@@ -162,7 +162,7 @@ export function useReservationServices(reservationId: string) {
         .eq('id', id);
 
       if (error) {
-        console.error('Error removing reservation service:', error);
+        logger.error('Error removing reservation service', { error, serviceId: id });
         toast({
           title: "Erreur",
           description: "Impossible de supprimer la prestation",
@@ -177,7 +177,7 @@ export function useReservationServices(reservationId: string) {
         description: "Prestation supprimée avec succès",
       });
     } catch (error) {
-      console.error('Error removing reservation service:', error);
+      logger.error('Error removing reservation service (catch)', { error, serviceId: id });
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la suppression",
@@ -194,7 +194,7 @@ export function useReservationServices(reservationId: string) {
         .in('id', serviceIds);
 
       if (error) {
-        console.error('Error applying services:', error);
+        logger.error('Error applying services', { error, serviceIds });
         toast({
           title: "Erreur",
           description: "Impossible d'appliquer les prestations",
@@ -209,7 +209,7 @@ export function useReservationServices(reservationId: string) {
         description: "Prestations appliquées avec succès",
       });
     } catch (error) {
-      console.error('Error applying services:', error);
+      logger.error('Error applying services (catch)', { error, serviceIds });
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'application",
