@@ -16,6 +16,9 @@ import { CategoryDialog, type CategoryFormData } from "../components/CategoryDia
 import { OutletSelector } from "../components/OutletSelector";
 import { DraggableCategoryList } from "../components/DraggableCategoryList";
 import { ImportExportDialog } from "../components/ImportExportDialog";
+import { FamilyManagement } from "../components/FamilyManagement";
+import { KeyboardManager } from "../components/KeyboardManager";
+import EnhancedProductManagement from "../components/EnhancedProductManagement";
 import type { POSCategory } from "../types";
 
 export function POSSettings() {
@@ -311,32 +314,23 @@ export function POSSettings() {
                 Gestion des Produits
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">Produits et Articles</h3>
-                  <p className="text-sm text-muted-foreground">Gérer les produits de votre menu</p>
-                </div>
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Nouveau Produit
-                </Button>
-              </div>
-              
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Package className="w-4 h-4" />
-                    <span className="font-medium">Liste des Produits</span>
-                  </div>
-                  <Badge variant="outline">0 produits</Badge>
-                </div>
-                <div className="text-center py-8 text-muted-foreground">
+            <CardContent className="space-y-6">
+              <OutletSelector
+                value={selectedOutlet}
+                onValueChange={setSelectedOutlet}
+                label="Point de vente"
+                placeholder="Sélectionner un point de vente pour gérer les produits"
+              />
+
+              {selectedOutlet ? (
+                <EnhancedProductManagement outletId={selectedOutlet} />
+              ) : (
+                <div className="border rounded-lg p-8 text-center text-muted-foreground">
                   <Package className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                  <p>Aucun produit configuré</p>
-                  <p className="text-sm">Cliquez sur "Nouveau Produit" pour commencer</p>
+                  <p>Sélectionnez un point de vente</p>
+                  <p className="text-sm">Choisissez un point de vente pour gérer ses produits</p>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -360,15 +354,16 @@ export function POSSettings() {
 
               {selectedOutlet && (
                 <>
-                  {/* Categories Management */}
-                    <div>
-                      <div className="flex justify-between items-center mb-4">
-                        <div>
-                          <h3 className="font-medium">Catégories</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Organisez vos produits par catégories
-                          </p>
-                        </div>
+                  <FamilyManagement selectedOutlet={selectedOutlet} />
+                  
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h3 className="font-medium">Catégories</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Organisez vos produits par catégories
+                        </p>
+                      </div>
                         <div className="flex gap-2">
                           <Button
                             variant="outline"
@@ -406,9 +401,9 @@ export function POSSettings() {
                           <p className="text-sm">Cliquez sur "Nouvelle Catégorie" pour commencer</p>
                         </div>
                       )}
-                  </div>
-                </>
-              )}
+                      </div>
+                    </>
+                  )}
 
               {!selectedOutlet && (
                 <div className="border rounded-lg p-8 text-center text-muted-foreground">
@@ -446,7 +441,36 @@ export function POSSettings() {
                 Claviers Tactiles
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
+              <OutletSelector
+                value={selectedOutlet}
+                onValueChange={setSelectedOutlet}
+                label="Point de vente"
+                placeholder="Sélectionner un point de vente pour gérer les claviers"
+              />
+
+              {selectedOutlet ? (
+                <KeyboardManager selectedOutlet={selectedOutlet} />
+              ) : (
+                <div className="border rounded-lg p-8 text-center text-muted-foreground">
+                  <Keyboard className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>Sélectionnez un point de vente</p>
+                  <p className="text-sm">Choisissez un point de vente pour gérer ses claviers</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="payment" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                Méthodes de Paiement
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-medium">Configuration des Claviers</h3>

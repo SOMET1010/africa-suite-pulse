@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/toast-unified";
+import { useToast } from "@/hooks/use-toast";
 import type { POSOutlet, POSCategory, POSProduct, POSOrder, POSTable, POSSession, CartItem } from "../types";
 
 export const usePOSOutlets = () => {
@@ -497,7 +498,7 @@ export const useDuplicatePOSCategory = () => {
 
 export const useReorderPOSCategories = () => {
   const queryClient = useQueryClient();
-
+  
   return useMutation({
     mutationFn: async (updates: { id: string; sort_order: number }[]) => {
       const promises = updates.map(({ id, sort_order }) =>
@@ -525,6 +526,345 @@ export const useReorderPOSCategories = () => {
       toast({
         title: "Erreur",
         description: error.message || "Impossible de réorganiser les catégories",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// ============= FAMILIES HOOKS =============
+export function usePOSFamilies(outletId?: string) {
+  return useQuery({
+    queryKey: ['pos-families', outletId],
+    queryFn: async () => {
+      let query = supabase
+        .from('pos_families')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (outletId) {
+        query = query.eq('outlet_id', outletId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: true,
+  });
+}
+
+export function usePOSSubfamilies(familyId?: string) {
+  return useQuery({
+    queryKey: ['pos-subfamilies', familyId],
+    queryFn: async () => {
+      let query = supabase
+        .from('pos_subfamilies')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (familyId) {
+        query = query.eq('family_id', familyId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: true,
+  });
+}
+
+export function useCreatePOSFamily() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (data: {
+      outletId?: string;
+      name: string;
+      description?: string;
+      color?: string;
+      icon?: string;
+      sortOrder?: number;
+    }) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('User not authenticated');
+
+      const { data: orgData } = await supabase.rpc('get_current_user_org_id');
+
+      const insertData = {
+        org_id: orgData,
+        outlet_id: data.outletId || null,
+        name: data.name,
+        description: data.description || '',
+        color: data.color || '#6366f1',
+        icon: data.icon || 'folder',
+        sort_order: data.sortOrder || 0,
+        created_by: user.user.id,
+      };
+
+      const { data: result, error } = await supabase
+        .from('pos_families')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-families'] });
+      toast({
+        title: "Famille créée",
+        description: "La famille a été créée avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de créer la famille: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useUpdatePOSFamily() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (data: {
+      id: string;
+      name?: string;
+      description?: string;
+      color?: string;
+      icon?: string;
+      sortOrder?: number;
+    }) => {
+      const updateData = {
+        ...(data.name && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.color && { color: data.color }),
+        ...(data.icon && { icon: data.icon }),
+        ...(data.sortOrder !== undefined && { sort_order: data.sortOrder }),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data: result, error } = await supabase
+        .from('pos_families')
+        .update(updateData)
+        .eq('id', data.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-families'] });
+      toast({
+        title: "Famille modifiée",
+        description: "La famille a été modifiée avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de modifier la famille: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDeletePOSFamily() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (familyId: string) => {
+      const { error } = await supabase
+        .from('pos_families')
+        .update({ is_active: false })
+        .eq('id', familyId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-families'] });
+      toast({
+        title: "Famille supprimée",
+        description: "La famille a été supprimée avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de supprimer la famille: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// ============= KEYBOARDS HOOKS =============
+export function usePOSKeyboards(outletId?: string) {
+  return useQuery({
+    queryKey: ['pos-keyboards', outletId],
+    queryFn: async () => {
+      let query = supabase
+        .from('pos_keyboards')
+        .select(`
+          *,
+          pos_keyboard_buttons(*)
+        `)
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (outletId) {
+        query = query.eq('outlet_id', outletId);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: true,
+  });
+}
+
+export function useCreatePOSKeyboard() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (data: {
+      outletId?: string;
+      name: string;
+      description?: string;
+      layoutType: string;
+      templateType?: string;
+      isDefault?: boolean;
+    }) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('User not authenticated');
+
+      const { data: orgData } = await supabase.rpc('get_current_user_org_id');
+
+      const insertData = {
+        org_id: orgData,
+        outlet_id: data.outletId || null,
+        name: data.name,
+        description: data.description || '',
+        layout_type: data.layoutType,
+        template_type: data.templateType || 'custom',
+        is_default: data.isDefault || false,
+        created_by: user.user.id,
+      };
+
+      const { data: result, error } = await supabase
+        .from('pos_keyboards')
+        .insert(insertData)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-keyboards'] });
+      toast({
+        title: "Clavier créé",
+        description: "Le clavier a été créé avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de créer le clavier: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useUpdatePOSKeyboard() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (data: {
+      id: string;
+      name?: string;
+      description?: string;
+      layoutType?: string;
+      templateType?: string;
+      isDefault?: boolean;
+    }) => {
+      const updateData = {
+        ...(data.name && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.layoutType && { layout_type: data.layoutType }),
+        ...(data.templateType && { template_type: data.templateType }),
+        ...(data.isDefault !== undefined && { is_default: data.isDefault }),
+        updated_at: new Date().toISOString(),
+      };
+
+      const { data: result, error } = await supabase
+        .from('pos_keyboards')
+        .update(updateData)
+        .eq('id', data.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-keyboards'] });
+      toast({
+        title: "Clavier modifié",
+        description: "Le clavier a été modifié avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de modifier le clavier: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useDeletePOSKeyboard() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (keyboardId: string) => {
+      const { error } = await supabase
+        .from('pos_keyboards')
+        .update({ is_active: false })
+        .eq('id', keyboardId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pos-keyboards'] });
+      toast({
+        title: "Clavier supprimé",
+        description: "Le clavier a été supprimé avec succès.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: `Impossible de supprimer le clavier: ${error.message}`,
         variant: "destructive",
       });
     },

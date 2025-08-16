@@ -3277,6 +3277,7 @@ export type Database = {
           color: string | null
           created_at: string
           description: string | null
+          family_id: string | null
           icon: string | null
           id: string
           is_active: boolean
@@ -3284,6 +3285,7 @@ export type Database = {
           org_id: string
           outlet_id: string | null
           sort_order: number | null
+          subfamily_id: string | null
           updated_at: string
         }
         Insert: {
@@ -3291,6 +3293,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           description?: string | null
+          family_id?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean
@@ -3298,6 +3301,7 @@ export type Database = {
           org_id: string
           outlet_id?: string | null
           sort_order?: number | null
+          subfamily_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -3305,6 +3309,7 @@ export type Database = {
           color?: string | null
           created_at?: string
           description?: string | null
+          family_id?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean
@@ -3312,14 +3317,29 @@ export type Database = {
           org_id?: string
           outlet_id?: string | null
           sort_order?: number | null
+          subfamily_id?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "pos_categories_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "pos_families"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "pos_categories_outlet_id_fkey"
             columns: ["outlet_id"]
             isOneToOne: false
             referencedRelation: "pos_outlets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_categories_subfamily_id_fkey"
+            columns: ["subfamily_id"]
+            isOneToOne: false
+            referencedRelation: "pos_subfamilies"
             referencedColumns: ["id"]
           },
         ]
@@ -3570,6 +3590,159 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pos_families: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          org_id: string
+          outlet_id: string | null
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          org_id: string
+          outlet_id?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          org_id?: string
+          outlet_id?: string | null
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pos_keyboard_buttons: {
+        Row: {
+          button_color: string | null
+          button_text: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          keyboard_id: string
+          org_id: string
+          position_x: number
+          position_y: number
+          product_id: string | null
+          text_color: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          button_color?: string | null
+          button_text?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          keyboard_id: string
+          org_id: string
+          position_x: number
+          position_y: number
+          product_id?: string | null
+          text_color?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          button_color?: string | null
+          button_text?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          keyboard_id?: string
+          org_id?: string
+          position_x?: number
+          position_y?: number
+          product_id?: string | null
+          text_color?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_keyboard_buttons_keyboard_id_fkey"
+            columns: ["keyboard_id"]
+            isOneToOne: false
+            referencedRelation: "pos_keyboards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pos_keyboard_buttons_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "pos_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_keyboards: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          layout_type: string
+          name: string
+          org_id: string
+          outlet_id: string | null
+          template_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          layout_type?: string
+          name: string
+          org_id: string
+          outlet_id?: string | null
+          template_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          layout_type?: string
+          name?: string
+          org_id?: string
+          outlet_id?: string | null
+          template_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       pos_kitchen_messages: {
         Row: {
@@ -4728,6 +4901,59 @@ export type Database = {
             columns: ["warehouse_id"]
             isOneToOne: false
             referencedRelation: "pos_warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_subfamilies: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          family_id: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          org_id: string
+          sort_order: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          family_id: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          org_id: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          family_id?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          org_id?: string
+          sort_order?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_subfamilies_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "pos_families"
             referencedColumns: ["id"]
           },
         ]
