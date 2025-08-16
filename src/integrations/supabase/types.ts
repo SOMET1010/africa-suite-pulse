@@ -8349,7 +8349,7 @@ export type Database = {
         Returns: number
       }
       get_operational_metrics: {
-        Args: { p_from_date?: string; p_org_id?: string; p_to_date?: string }
+        Args: { p_from_date: string; p_org_id: string; p_to_date: string }
         Returns: {
           current_value: number
           last_updated: string
