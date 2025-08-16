@@ -110,7 +110,11 @@ export function SubscriptionManagement() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <CurrentPlanOverview subscription={subscription} usage={usage || []} />
+          <CurrentPlanOverview 
+            subscription={subscription} 
+            usage={usage || []} 
+            formatSubscriptionPrice={formatSubscriptionPrice}
+          />
         </TabsContent>
 
         <TabsContent value="usage" className="space-y-6">
@@ -135,11 +139,15 @@ export function SubscriptionManagement() {
   );
 }
 
-function CurrentPlanOverview({ subscription, usage }: { 
+function CurrentPlanOverview({ 
+  subscription, 
+  usage,
+  formatSubscriptionPrice 
+}: { 
   subscription: any; 
-  usage: any[] 
+  usage: any[];
+  formatSubscriptionPrice: (amount: number, cycle: 'monthly' | 'yearly') => string;
 }) {
-  const { formatSubscriptionPrice } = useCurrency();
   const plan = subscription.plan;
   const currentPrice = calculateSubscriptionPrice(plan, subscription.billing_cycle);
   

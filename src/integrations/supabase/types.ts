@@ -8421,6 +8421,18 @@ export type Database = {
         Args: { p_org_id: string }
         Returns: number
       }
+      get_organization_settings: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          category: string
+          description: string
+          id: string
+          is_active: boolean
+          org_id: string
+          setting_key: string
+          setting_value: Json
+        }[]
+      }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }
         Returns: {
@@ -8600,6 +8612,10 @@ export type Database = {
       update_customer_loyalty_tier: {
         Args: { p_guest_id: string; p_program_id: string }
         Returns: undefined
+      }
+      upsert_organization_setting: {
+        Args: { setting_key: string; setting_value: Json }
+        Returns: Json
       }
       validate_payment_amount: {
         Args: { p_amount: number; p_currency_code?: string }
