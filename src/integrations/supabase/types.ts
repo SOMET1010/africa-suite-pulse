@@ -6611,6 +6611,33 @@ export type Database = {
         }
         Relationships: []
       }
+      security_policy_notes: {
+        Row: {
+          approved_by: string | null
+          created_at: string | null
+          description: string
+          id: string
+          justification: string
+          policy_type: string
+        }
+        Insert: {
+          approved_by?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          justification: string
+          policy_type: string
+        }
+        Update: {
+          approved_by?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          justification?: string
+          policy_type?: string
+        }
+        Relationships: []
+      }
       server_assignments: {
         Row: {
           assigned_by: string | null
@@ -8675,6 +8702,14 @@ export type Database = {
           role_name: string
           user_id: string
         }[]
+      }
+      validate_table_function_access: {
+        Args: {
+          p_function_name: string
+          p_org_id?: string
+          p_required_role?: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
