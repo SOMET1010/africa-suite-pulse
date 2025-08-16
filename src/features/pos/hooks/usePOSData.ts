@@ -71,26 +71,53 @@ export const usePOSProducts = (outletId?: string, categoryId?: string) => {
   });
 };
 
-export const usePOSTables = (outletId?: string) => {
+export const usePOSTables = (outletId?: string, orgId?: string) => {
   return useQuery({
-    queryKey: ["pos-tables", outletId],
+    queryKey: ["pos-tables", outletId, orgId],
     queryFn: async () => {
-      if (!outletId) return [];
+      console.log("🗃️ usePOSTables query:", { outletId, orgId });
       
-      const { data, error } = await supabase
-        .from("pos_tables")
-        .select("id, table_number, zone, capacity, status, outlet_id")
-        .eq("outlet_id", outletId)
-        .order("table_number")
-        .range(0, 99);
+      // First try with outlet_id if provided
+      if (outletId) {
+        const { data: outletData, error: outletError } = await supabase
+          .from("pos_tables")
+          .select("id, table_number, zone, capacity, status, outlet_id, org_id")
+          .eq("outlet_id", outletId)
+          .order("table_number")
+          .range(0, 99);
 
-      if (error) throw error;
-      return data.map(table => ({
-        ...table,
-        number: table.table_number
-      })) as unknown as POSTable[];
+        console.log("🗃️ Tables by outlet_id:", { outletId, count: outletData?.length, data: outletData });
+        
+        if (!outletError && outletData && outletData.length > 0) {
+          return outletData.map(table => ({
+            ...table,
+            number: table.table_number
+          })) as unknown as POSTable[];
+        }
+      }
+      
+      // Fallback: try with org_id only
+      if (orgId) {
+        console.log("🔄 Fallback: querying tables by org_id only:", orgId);
+        const { data: orgData, error: orgError } = await supabase
+          .from("pos_tables")
+          .select("id, table_number, zone, capacity, status, outlet_id, org_id")
+          .eq("org_id", orgId)
+          .order("table_number")
+          .range(0, 99);
+
+        console.log("🗃️ Tables by org_id:", { orgId, count: orgData?.length, data: orgData });
+
+        if (orgError) throw orgError;
+        return orgData?.map(table => ({
+          ...table,
+          number: table.table_number
+        })) as unknown as POSTable[] || [];
+      }
+      
+      return [];
     },
-    enabled: !!outletId,
+    enabled: !!(outletId || orgId),
   });
 };
 

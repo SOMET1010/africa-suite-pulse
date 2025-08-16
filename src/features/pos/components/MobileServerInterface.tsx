@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { usePOSAuth } from '../auth/usePOSAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { usePOSTables } from '@/features/pos/hooks/usePOSData';
 
 interface POSTable {
   id: string;
@@ -93,63 +94,84 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     serverId
   });
 
-  // Utiliser de vraies données depuis Supabase
+  // Fetch real tables from database with fallback strategy
+  const { data: realTables = [], isLoading: realTablesLoading } = usePOSTables(session?.outlet_id, session?.org_id);
+  
   const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
-    queryKey: ['pos-tables', session?.org_id],
+    queryKey: ['pos-tables-processed', session?.org_id, session?.outlet_id, realTables],
     queryFn: async (): Promise<POSTable[]> => {
-      console.log("📊 Fetching tables for org_id:", session?.org_id);
-      
-      if (!session?.org_id) {
-        console.log("❌ No org_id found, returning empty array");
-        return [];
+      console.log("🔍 Processing tables for session:", {
+        org_id: session?.org_id,
+        outlet_id: session?.outlet_id,
+        user_id: session?.user_id,
+        realTablesCount: realTables.length,
+        realTables: realTables
+      });
+
+      // If we have real tables from database, use them
+      if (realTables && realTables.length > 0) {
+        const processedTables: POSTable[] = realTables.map(table => ({
+          id: table.id,
+          number: table.number || table.table_number,
+          status: (table.status as any) || 'libre',
+          customer_count: 0, // Would come from current orders
+          server_id: serverId || session?.user_id,
+          order_total: 0, // Would come from current orders
+          time_occupied: '',
+          last_activity: '',
+          has_pending_orders: false,
+          needs_attention: false,
+        }));
+        
+        console.log("✅ Using real tables from database:", processedTables);
+        return processedTables;
       }
-      
-      // Utiliser des données simulées pour l'instant
+
+      // Fallback: show demo tables if no real tables found
+      console.log("⚠️ No real tables found, using demo tables");
       const mockTables = [
         {
-          id: '1',
-          table_number: '1',
-          status: 'libre',
+          id: 'demo-1',
+          number: '1',
+          status: 'libre' as const,
           customer_count: 0,
-          order_total: 0
+          server_id: serverId || session?.user_id,
+          order_total: 0,
+          time_occupied: '',
+          last_activity: '',
+          has_pending_orders: false,
+          needs_attention: false,
         },
         {
-          id: '2',
-          table_number: '2', 
-          status: 'occupee',
+          id: 'demo-2',
+          number: '2', 
+          status: 'occupee' as const,
           customer_count: 4,
+          server_id: serverId || session?.user_id,
           order_total: 85.50,
           time_occupied: '45 min',
-          last_activity: '10 min'
+          last_activity: '10 min',
+          has_pending_orders: false,
+          needs_attention: false,
         },
         {
-          id: '3',
-          table_number: '3',
-          status: 'a_debarrasser',
+          id: 'demo-3',
+          number: '3',
+          status: 'a_debarrasser' as const,
           customer_count: 0,
+          server_id: serverId || session?.user_id,
           order_total: 0,
-          needs_attention: true
+          time_occupied: '',
+          last_activity: '',
+          has_pending_orders: false,
+          needs_attention: true,
         }
       ];
-      
-      const mappedTables = mockTables.map(table => ({
-        id: table.id,
-        number: table.table_number,
-        status: table.status as POSTable['status'],
-        customer_count: table.customer_count || 0,
-        server_id: serverId,
-        order_total: table.order_total || 0,
-        time_occupied: table.time_occupied || '',
-        last_activity: table.last_activity || '',
-        has_pending_orders: false,
-        needs_attention: table.needs_attention || false,
-      }));
-      
-      console.log("✅ Tables mapped successfully:", mappedTables);
-      return mappedTables;
+
+      return mockTables;
     },
     enabled: !!session?.org_id && !authLoading,
-    staleTime: 30000, // 30 seconds
+    staleTime: 30000,
     refetchOnWindowFocus: false
   });
 
