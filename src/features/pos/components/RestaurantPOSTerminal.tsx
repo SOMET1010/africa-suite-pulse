@@ -35,10 +35,19 @@ export function RestaurantPOSTerminal() {
   const [searchQuery, setSearchQuery] = useState("");
   const [discountApplied, setDiscountApplied] = useState({ type: 'none', value: 0 });
   
-  // New state for workflow management
-  const [serviceMode, setServiceMode] = useState<'direct' | 'table' | null>(null);
-  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
-  const [currentStep, setCurrentStep] = useState<'mode' | 'staff' | 'pos'>('mode');
+  // New state for workflow management with localStorage persistence
+  const [serviceMode, setServiceMode] = useState<'direct' | 'table' | null>(() => {
+    return localStorage.getItem('pos-service-mode') as 'direct' | 'table' | null;
+  });
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(() => {
+    const stored = localStorage.getItem('pos-selected-staff');
+    return stored ? JSON.parse(stored) : null;
+  });
+  const [currentStep, setCurrentStep] = useState<'mode' | 'staff' | 'pos'>(() => {
+    if (serviceMode && selectedStaff) return 'pos';
+    if (serviceMode) return 'staff';
+    return 'mode';
+  });
 
   const { data: outlets = [] } = usePOSOutlets();
   const { data: currentSession } = useCurrentPOSSession(selectedOutlet?.id);
@@ -48,26 +57,44 @@ export function RestaurantPOSTerminal() {
   // État centralisé des commandes
   const orderState = usePOSOrderState({ selectedOutlet, selectedTable });
 
-  // Workflow handlers
+  // Workflow handlers with localStorage persistence
   const handleModeSelect = (mode: 'direct' | 'table') => {
     setServiceMode(mode);
+    localStorage.setItem('pos-service-mode', mode);
     setCurrentStep('staff');
   };
 
   const handleStaffSelect = (staff: Staff) => {
     setSelectedStaff(staff);
+    localStorage.setItem('pos-selected-staff', JSON.stringify(staff));
     setCurrentStep('pos');
   };
 
   const handleBackToMode = () => {
     setServiceMode(null);
     setSelectedStaff(null);
+    localStorage.removeItem('pos-service-mode');
+    localStorage.removeItem('pos-selected-staff');
     setCurrentStep('mode');
   };
 
   const handleBackToStaff = () => {
     setSelectedStaff(null);
+    localStorage.removeItem('pos-selected-staff');
     setCurrentStep('staff');
+  };
+
+  // Quick change handlers for continuous service
+  const handleQuickChangeMode = () => {
+    setCurrentStep('mode');
+  };
+
+  const handleQuickChangeStaff = () => {
+    setCurrentStep('staff');
+  };
+
+  const handleQuickChangeTable = () => {
+    setSelectedTable(null);
   };
 
   // Reset state when switching outlets
@@ -77,10 +104,14 @@ export function RestaurantPOSTerminal() {
       setCustomerCount(1);
       setDiscountApplied({ type: 'none', value: 0 });
       setSearchQuery('');
-      // Reset workflow when changing outlet
-      setServiceMode(null);
-      setSelectedStaff(null);
-      setCurrentStep('mode');
+      // Only reset workflow when changing outlet, not when continuing service
+      if (!serviceMode || !selectedStaff) {
+        setServiceMode(null);
+        setSelectedStaff(null);
+        localStorage.removeItem('pos-service-mode');
+        localStorage.removeItem('pos-selected-staff');
+        setCurrentStep('mode');
+      }
     }
   }, [selectedOutlet]);
 
@@ -98,12 +129,21 @@ export function RestaurantPOSTerminal() {
           e.preventDefault();
           handleSendToKitchen();
           break;
-        case 'F3': // Rechercher produit
+        case 'F3': // Changer table rapidement
           e.preventDefault();
+          handleQuickChangeTable();
           break;
         case 'F4': // Transférer table
           e.preventDefault();
           handleTransferTable();
+          break;
+        case 'F11': // Changer mode service
+          e.preventDefault();
+          handleQuickChangeMode();
+          break;
+        case 'F12': // Changer vendeur
+          e.preventDefault();
+          handleQuickChangeStaff();
           break;
         case 'F5': // Actualiser
           e.preventDefault();
@@ -414,6 +454,11 @@ export function RestaurantPOSTerminal() {
         customerCount={customerCount}
         onCustomerCountChange={setCustomerCount}
         onChangeOutlet={handleBackToStaff}
+        onQuickChangeMode={handleQuickChangeMode}
+        onQuickChangeStaff={handleQuickChangeStaff}
+        onQuickChangeTable={handleQuickChangeTable}
+        serviceMode={serviceMode}
+        selectedStaff={selectedStaff}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
@@ -498,6 +543,8 @@ export function RestaurantPOSTerminal() {
           onPaymentComplete={() => {
             setIsPaymentOpen(false);
             orderState.actions.clearOrder();
+            // Keep table selected for continuous service
+            // Don't reset selectedTable here!
             setSelectedTable(null);
           }}
         />

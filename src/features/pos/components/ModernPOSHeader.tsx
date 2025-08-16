@@ -19,6 +19,13 @@ import {
 } from "lucide-react";
 import type { POSOutlet, POSTable } from "../types";
 
+interface Staff {
+  id: string;
+  name: string;
+  role: 'cashier' | 'server';
+  initials: string;
+}
+
 interface ModernPOSHeaderProps {
   selectedOutlet: POSOutlet;
   currentSession: any;
@@ -28,6 +35,11 @@ interface ModernPOSHeaderProps {
   onChangeOutlet: () => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onQuickChangeMode?: () => void;
+  onQuickChangeStaff?: () => void;
+  onQuickChangeTable?: () => void;
+  serviceMode?: 'direct' | 'table' | null;
+  selectedStaff?: Staff | null;
 }
 
 export function ModernPOSHeader({
@@ -38,7 +50,12 @@ export function ModernPOSHeader({
   onCustomerCountChange,
   onChangeOutlet,
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  onQuickChangeMode,
+  onQuickChangeStaff,
+  onQuickChangeTable,
+  serviceMode,
+  selectedStaff
 }: ModernPOSHeaderProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -84,12 +101,16 @@ export function ModernPOSHeader({
                       minute: '2-digit' 
                     })}
                   </span>
-                  <Badge variant="outline" className="glass-card border-0 bg-gradient-to-r from-primary/10 to-accent/10">
-                    Serveur: Admin
-                  </Badge>
-                  <Badge variant="outline" className="glass-card border-0 bg-gradient-to-r from-secondary/10 to-accent/10">
-                    Shift: Jour
-                  </Badge>
+                   {selectedStaff && (
+                     <Badge variant="outline" className="glass-card border-0 bg-gradient-to-r from-primary/10 to-accent/10">
+                       {selectedStaff.name} ({selectedStaff.role})
+                     </Badge>
+                   )}
+                   {serviceMode && (
+                     <Badge variant="outline" className="glass-card border-0 bg-gradient-to-r from-secondary/10 to-accent/10">
+                       Mode: {serviceMode === 'direct' ? 'Vente Directe' : 'Table Service'}
+                     </Badge>
+                   )}
                 </div>
               </div>
             </div>
@@ -131,11 +152,41 @@ export function ModernPOSHeader({
               <span className="text-sm text-muted-foreground font-medium">pers.</span>
             </div>
             
-            {/* Table sélectionnée */}
-            {selectedTable && (
-              <Badge variant="secondary" className="px-4 py-2 text-sm font-medium glass-card border-0 bg-gradient-to-r from-primary/10 to-accent/10">
-                Table {selectedTable.number}
-              </Badge>
+            {/* Table sélectionnée avec action de changement rapide */}
+            {selectedTable && serviceMode === 'table' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onQuickChangeTable}
+                className="px-4 py-2 text-sm font-medium glass-card border-0 bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20"
+              >
+                Table {selectedTable.table_number}
+              </Button>
+            )}
+            
+            {/* Boutons de changement rapide */}
+            {serviceMode && onQuickChangeMode && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onQuickChangeMode}
+                className="glass-card px-3 py-2 h-10 rounded-xl text-xs"
+                title="F11 - Changer mode"
+              >
+                Mode
+              </Button>
+            )}
+            
+            {selectedStaff && onQuickChangeStaff && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onQuickChangeStaff}
+                className="glass-card px-3 py-2 h-10 rounded-xl text-xs"
+                title="F12 - Changer vendeur"
+              >
+                Vendeur
+              </Button>
             )}
 
             {/* État réseau */}

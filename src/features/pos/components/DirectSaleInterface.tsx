@@ -89,9 +89,13 @@ export function DirectSaleInterface({ staff, onBack }: DirectSaleInterfaceProps)
 
   const handlePaymentComplete = () => {
     setShowPaymentDialog(false);
-    // Generate next ticket number
+    // Generate next ticket number for continuous service
     setTicketNumber(prev => prev + 1);
     orderState.actions.clearOrder();
+    // Automatically create new order for next sale
+    setTimeout(() => {
+      orderState.actions.createOrder(1);
+    }, 100);
   };
 
   if (orderState.isLoading) {
