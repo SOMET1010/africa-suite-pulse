@@ -20,6 +20,7 @@ import { usePOSAuth } from '../auth/usePOSAuth';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePOSTables } from '@/features/pos/hooks/usePOSData';
+import { useServerTables } from '@/features/pos/hooks/useTableAssignments';
 
 interface POSTable {
   id: string;
@@ -96,28 +97,33 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
     should_match: session?.outlet_id === "9a32d161-7606-4270-9115-6b1ef719f716"
   });
 
-  // Fetch real tables from database with fallback strategy
-  const { data: realTables = [], isLoading: realTablesLoading } = usePOSTables(session?.outlet_id, session?.org_id);
+  // Fetch assigned tables for the server first
+  const { data: assignedTables = [], isLoading: assignedTablesLoading } = useServerTables(session?.user_id, session?.org_id);
+  
+  // Fetch all tables as fallback
+  const { data: allTables = [], isLoading: allTablesLoading } = usePOSTables(session?.outlet_id, session?.org_id);
   
   const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
-    queryKey: ['pos-tables-processed', session?.org_id, session?.outlet_id, realTables],
+    queryKey: ['pos-tables-processed', session?.org_id, session?.outlet_id, session?.user_id, assignedTables, allTables],
     queryFn: async (): Promise<POSTable[]> => {
-      console.log("🔍 Processing tables for session:", {
+      console.log("🔍 Processing tables for server:", {
         org_id: session?.org_id,
         outlet_id: session?.outlet_id,
         user_id: session?.user_id,
-        realTablesCount: realTables.length,
-        realTables: realTables
+        assignedTablesCount: assignedTables.length,
+        allTablesCount: allTables.length,
+        assignedTables,
+        allTables
       });
 
-      // If we have real tables from database, use them
-      if (realTables && realTables.length > 0) {
-        const processedTables: POSTable[] = realTables.map(table => ({
-          id: table.id,
-          number: table.number || table.table_number,
-          status: (table.status as any) || 'libre',
+      // Priority 1: Use assigned tables if available
+      if (assignedTables && assignedTables.length > 0) {
+        const processedTables: POSTable[] = assignedTables.map(assignment => ({
+          id: assignment.table_id,
+          number: assignment.table_number,
+          status: (assignment.status as any) || 'libre',
           customer_count: 0, // Would come from current orders
-          server_id: serverId || session?.user_id,
+          server_id: session?.user_id,
           order_total: 0, // Would come from current orders
           time_occupied: '',
           last_activity: '',
@@ -125,54 +131,34 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
           needs_attention: false,
         }));
         
-        console.log("✅ Using real tables from database:", processedTables);
+        console.log("✅ Using assigned tables from server assignments:", processedTables);
         return processedTables;
       }
 
-      // Fallback: show demo tables if no real tables found
-      console.log("⚠️ No real tables found, using demo tables");
-      const mockTables = [
-        {
-          id: 'demo-1',
-          number: '1',
-          status: 'libre' as const,
+      // Priority 2: Fallback to all tables in organization if no assignments
+      if (allTables && allTables.length > 0) {
+        const processedTables: POSTable[] = allTables.map(table => ({
+          id: table.id,
+          number: table.number || table.table_number,
+          status: (table.status as any) || 'libre',
           customer_count: 0,
-          server_id: serverId || session?.user_id,
+          server_id: session?.user_id,
           order_total: 0,
           time_occupied: '',
           last_activity: '',
           has_pending_orders: false,
           needs_attention: false,
-        },
-        {
-          id: 'demo-2',
-          number: '2', 
-          status: 'occupee' as const,
-          customer_count: 4,
-          server_id: serverId || session?.user_id,
-          order_total: 85.50,
-          time_occupied: '45 min',
-          last_activity: '10 min',
-          has_pending_orders: false,
-          needs_attention: false,
-        },
-        {
-          id: 'demo-3',
-          number: '3',
-          status: 'a_debarrasser' as const,
-          customer_count: 0,
-          server_id: serverId || session?.user_id,
-          order_total: 0,
-          time_occupied: '',
-          last_activity: '',
-          has_pending_orders: false,
-          needs_attention: true,
-        }
-      ];
+        }));
+        
+        console.log("⚠️ Using all organization tables (no assignments found):", processedTables);
+        return processedTables;
+      }
 
-      return mockTables;
+      // Priority 3: Demo tables as last resort
+      console.log("⚠️ No tables found, using demo tables");
+      return [];
     },
-    enabled: !!session?.org_id && !authLoading,
+    enabled: !!session?.org_id && !authLoading && (!assignedTablesLoading && !allTablesLoading),
     staleTime: 30000,
     refetchOnWindowFocus: false
   });
@@ -180,11 +166,16 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   // More debug logs
   console.log("🔍 Query state:", {
     isLoading,
+    assignedTablesLoading,
+    allTablesLoading,
     error,
     tables: tables.length,
-    enabled: !!session?.org_id && !authLoading,
+    assignedTables: assignedTables.length,
+    allTables: allTables.length,
+    enabled: !!session?.org_id && !authLoading && (!assignedTablesLoading && !allTablesLoading),
     authLoading,
-    sessionOrgId: session?.org_id
+    sessionOrgId: session?.org_id,
+    sessionUserId: session?.user_id
   });
 
   // Trier les tables par priorité (urgence d'attention)
@@ -243,7 +234,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
     );
   }
 
-  if (isLoading) {
+  if (isLoading || assignedTablesLoading || allTablesLoading) {
     return <div className="flex justify-center p-4">Chargement des tables...</div>;
   }
 
@@ -265,11 +256,23 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   if (tables.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Aucune table trouvée</h2>
-        <p className="text-muted-foreground mb-4">Aucune table n'est assignée à ce serveur pour l'organisation {session.org_id}.</p>
+        <h2 className="text-xl font-semibold mb-2">Aucune table assignée</h2>
+        <p className="text-muted-foreground mb-4">
+          Aucune table n'est assignée au serveur {session.display_name} (ID: {session.user_id}) 
+          pour aujourd'hui dans l'organisation {session.org_id}.
+        </p>
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <p>Vérifiez que :</p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Des tables sont créées dans le système POS</li>
+            <li>Le serveur a des assignations pour aujourd'hui</li>
+            <li>L'outlet_id est correctement configuré</li>
+          </ul>
+        </div>
         <TButton 
           onClick={() => window.location.reload()}
           variant="ghost"
+          className="mt-4"
         >
           Actualiser
         </TButton>
