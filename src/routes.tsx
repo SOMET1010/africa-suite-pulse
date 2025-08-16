@@ -21,48 +21,55 @@ import UsersPage from "@/features/users/UsersPage";
 import ReservationsPage from "@/pages/ReservationsPage";
 import QuickReservationPage from "@/pages/QuickReservationPage";
 import AdvancedReservationPage from "@/pages/AdvancedReservationPage";
-import GroupsManagementPage from "@/features/reservations/GroupsManagementPage";
-import AllotmentsPage from "@/features/reservations/AllotmentsPage";
+// Groups and allotments now lazy loaded
 import GuestsPage from "@/pages/GuestsPage";
-import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
-import TemplatesPage from "@/features/templates/components/TemplatesPage";
 import SettingsAnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
-import CardexPage from "@/features/cardex/CardexPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
-import AdvancedAnalytics from "@/features/analytics/AdvancedAnalytics";
 import ReportsPage from "@/pages/ReportsPage";
-import DailyReportsPage from "@/features/reports/daily/DailyReportsPage";
-import SecurityPage from "@/features/settings/security/SecurityPage";
 import OperationsPage from "@/pages/OperationsPage";
 import MaintenancePage from "@/pages/MaintenancePage";
 import HousekeepingPage from "@/pages/HousekeepingPage";
-import { NightAuditPage } from "@/features/night-audit";
-import POSPage from "@/features/pos/POSPage";
+// Night audit now lazy loaded
 import POSLoginPage from "@/features/pos/auth/POSLoginPage";
 import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
-import POSTerminalPage from "@/pages/POSTerminalPage";
-import POSInventoryPage from "@/pages/POSInventoryPage";
-import POSSessionsPage from "@/pages/POSSessionsPage";
-import POSUsersPage from "@/pages/POSUsersPage";
-import POSSettingsPage from "@/pages/POSSettingsPage";
-import POSMaitreHotelPage from "@/pages/POSMaitreHotelPage";
-import POSServerPage from "@/pages/POSServerPage";
-import POSCustomersPage from "@/pages/POSCustomersPage";
-import POSKitchen from "@/pages/POSKitchen";
-import POSReports from "@/pages/POSReports";
-import POSMobileServerPage from "@/pages/POSMobileServerPage";
+// Import lazy-loaded components for performance
+import {
+  POSPage,
+  POSTerminalPage,
+  POSInventoryPage,
+  POSSessionsPage,
+  POSUsersPage,
+  POSSettingsPage,
+  POSMaitreHotelPage,
+  POSServerPage,
+  POSCustomersPage,
+  POSKitchen,
+  POSReports,
+  POSMobileServerPage,
+  DailyReportsPage,
+  AdvancedAnalytics,
+  SystemSettingsPage,
+  SecurityPage,
+  TemplatesPage,
+  MonitoringDashboard,
+  MonitoringIncidents,
+  MonitoringAlerts,
+  NetworkMonitoring,
+  CardexPage,
+  NightAuditPage,
+  GroupsManagementPage,
+  AllotmentsPage,
+  ManagerDashboard,
+  ReceptionistDashboard,
+  ServerDashboard
+} from "@/routes.lazy";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 import DemoPage from "@/pages/DemoPage";
 import PricingPage from "@/pages/PricingPage";
 import UXFoundationsDemo from "@/pages/UXFoundationsDemo";
-import { ReceptionistDashboard, ServerDashboard, ManagerDashboard } from "@/features/dashboards";
-import { 
-  MonitoringDashboard, 
-  MonitoringIncidents, 
-  MonitoringAlerts, 
-  NetworkMonitoring, 
-  MonitoringSettings 
-} from "@/features/monitoring";
+// Dashboards now lazy loaded
+import { MonitoringSettings } from "@/features/monitoring";
+// Other monitoring components now lazy loaded
 import TestingPage from "@/pages/TestingPage";
 import TestModulePage from "@/pages/TestModulePage";
 import { DiscoveryPage } from "@/features/discovery/pages/DiscoveryPage";

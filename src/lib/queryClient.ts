@@ -1,23 +1,33 @@
 import { QueryClient } from '@tanstack/react-query';
 
-// Configuration globale React Query pour AfricaSuite PMS
+// Configuration globale React Query pour AfricaSuite PMS - Optimisée Phase 2C
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Cache 1 minute par défaut (stale time optimisé)
-      staleTime: 60_000,
-      // Garde en cache 5 minutes (garbage collection)
-      gcTime: 300_000,
-      // Retry 2 fois (plus robuste)
-      retry: 2,
-      // Pas de refetch sur focus (performance)
+      // Cache 5 minutes par défaut (stale time optimisé pour performance)
+      staleTime: 5 * 60 * 1000,
+      // Garde en cache 10 minutes (garbage collection optimisé)
+      gcTime: 10 * 60 * 1000,
+      // Retry 1 seule fois en production pour éviter les surcharges
+      retry: (failureCount, error: any) => {
+        // Ne pas retry les erreurs 4xx (bad request, unauthorized, etc.)
+        if (error?.status >= 400 && error?.status < 500) return false;
+        return failureCount < 1;
+      },
+      // Pas de refetch sur focus (performance critique)
       refetchOnWindowFocus: false,
-      // Refetch en cas de reconnect
-      refetchOnReconnect: true,
+      // Refetch en cas de reconnect avec throttling
+      refetchOnReconnect: 'always',
+      // Background refetch pour les données critiques
+      refetchInterval: false, // Désactivé par défaut, activé par query
+      // Stale-while-revalidate pour UX optimale
+      refetchOnMount: 'always',
     },
     mutations: {
-      // Retry les mutations échouées 2 fois
-      retry: 2,
+      // Retry les mutations échouées 1 fois seulement
+      retry: 1,
+      // Timeout optimisé pour les mutations
+      networkMode: 'online',
     },
   },
 });

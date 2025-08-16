@@ -36,27 +36,41 @@ export function useFinalOptimizations() {
       });
     }
 
-    // Optimisation des performances
+    // Optimisation des performances Phase 2C
     if (typeof window !== 'undefined') {
-      // Précharger les ressources critiques
+      // Précharger les ressources critiques SEULEMENT
       const criticalResources = [
-        '/fonts/inter-var.woff2',
-        '/api/health'
+        '/fonts/inter-var.woff2'
       ];
 
-      criticalResources.forEach(resource => {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = resource;
-        document.head.appendChild(link);
-      });
+      // Utiliser requestIdleCallback pour précharger sans bloquer
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(() => {
+          criticalResources.forEach(resource => {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = resource;
+            document.head.appendChild(link);
+          });
+        });
+      } else {
+        // Fallback pour les navigateurs sans requestIdleCallback
+        setTimeout(() => {
+          criticalResources.forEach(resource => {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = resource;
+            document.head.appendChild(link);
+          });
+        }, 1000);
+      }
 
-      // Optimiser le garbage collection
+      // Garbage collection optimisé (moins fréquent)
       const cleanupInterval = setInterval(() => {
         if ('gc' in window && typeof window.gc === 'function') {
           window.gc();
         }
-      }, 30000); // Toutes les 30 secondes
+      }, 60000); // Toutes les 60 secondes au lieu de 30
 
       return () => {
         clearInterval(cleanupInterval);

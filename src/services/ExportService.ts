@@ -5,8 +5,9 @@
  * pour éviter la duplication de code et les bugs.
  */
 
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+// Lazy load des dépendances lourdes pour optimiser le bundle initial
+const html2canvas = () => import('html2canvas').then(m => m.default);
+const jsPDF = () => import('jspdf').then(m => m.default);
 import { toast } from '@/components/ui/toast-unified';
 
 export type ExportFormat = 'pdf' | 'csv' | 'excel' | 'image' | 'json';
@@ -89,7 +90,7 @@ class ExportServiceClass {
   }
 
   /**
-   * Export d'un élément DOM en PDF
+   * Export d'un élément DOM en PDF - Optimisé avec lazy loading
    */
   private async exportElementToPDF(elementId: string, options: ExportOptions): Promise<void> {
     const element = document.getElementById(elementId);
@@ -97,14 +98,18 @@ class ExportServiceClass {
       throw new Error(`Élément non trouvé: ${elementId}`);
     }
 
-    const canvas = await html2canvas(element, {
+    // Lazy load html2canvas seulement quand nécessaire
+    const html2canvasModule = await html2canvas();
+    const canvas = await html2canvasModule(element, {
       scale: 2,
       useCORS: true,
       backgroundColor: '#ffffff',
       logging: false
     });
 
-    const pdf = new jsPDF({
+    // Lazy load jsPDF seulement quand nécessaire
+    const jsPDFModule = await jsPDF();
+    const pdf = new jsPDFModule({
       orientation: options.orientation || 'portrait',
       unit: 'mm',
       format: options.pageSize || 'a4'
@@ -133,10 +138,12 @@ class ExportServiceClass {
   }
 
   /**
-   * Export de données en PDF (tableau)
+   * Export de données en PDF (tableau) - Optimisé avec lazy loading
    */
   private async exportDataToPDF(options: ExportOptions): Promise<void> {
-    const pdf = new jsPDF({
+    // Lazy load jsPDF seulement quand nécessaire
+    const jsPDFModule = await jsPDF();
+    const pdf = new jsPDFModule({
       orientation: options.orientation || 'portrait',
       unit: 'mm',
       format: options.pageSize || 'a4'
@@ -236,7 +243,7 @@ class ExportServiceClass {
   }
 
   /**
-   * Export Image
+   * Export Image - Optimisé avec lazy loading
    */
   private async exportToImage(options: ExportOptions): Promise<void> {
     if (!options.elementId) {
@@ -248,7 +255,9 @@ class ExportServiceClass {
       throw new Error(`Élément non trouvé: ${options.elementId}`);
     }
 
-    const canvas = await html2canvas(element, {
+    // Lazy load html2canvas seulement quand nécessaire
+    const html2canvasModule = await html2canvas();
+    const canvas = await html2canvasModule(element, {
       scale: options.quality || 2,
       useCORS: true,
       backgroundColor: '#ffffff',
@@ -283,14 +292,16 @@ class ExportServiceClass {
   }
 
   /**
-   * Génère une URL de prévisualisation pour un élément
+   * Génère une URL de prévisualisation pour un élément - Optimisé avec lazy loading
    */
   async generatePreviewURL(elementId: string): Promise<string | null> {
     try {
       const element = document.getElementById(elementId);
       if (!element) return null;
 
-      const canvas = await html2canvas(element, {
+      // Lazy load html2canvas seulement quand nécessaire
+      const html2canvasModule = await html2canvas();
+      const canvas = await html2canvasModule(element, {
         scale: 1,
         useCORS: true,
         backgroundColor: '#ffffff',
