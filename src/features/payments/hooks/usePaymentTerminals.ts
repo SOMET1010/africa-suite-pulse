@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/components/ui/toast-unified";
 import { useDebouncedCallback } from "use-debounce";
+import { getErrorMessage } from "@/utils/errorHandling";
 import type { PaymentTerminal, PaymentTerminalInsert } from "@/types/payments";
 import {
   listTerminals,
@@ -20,10 +21,10 @@ export function usePaymentTerminals(orgId: string) {
       const { data, error } = await listTerminals(orgId);
       if (error) throw error;
       setTerminals(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de chargement",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -54,10 +55,10 @@ export function usePaymentTerminals(orgId: string) {
           title: "Enregistré",
           description: "Terminal sauvegardé",
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         toast({
           title: "Erreur de sauvegarde",
-          description: error.message,
+          description: getErrorMessage(error),
           variant: "destructive",
         });
       } finally {
@@ -98,10 +99,10 @@ export function usePaymentTerminals(orgId: string) {
         title: "Supprimé",
         description: "Terminal supprimé",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de suppression",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

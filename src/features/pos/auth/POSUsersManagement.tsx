@@ -67,7 +67,7 @@ export default function POSUsersManagement() {
       })) || [];
 
       setUsers(formattedUsers);
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Error fetching POS users", error);
       toast({
         title: "Erreur",

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/utils/errorHandling";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrgId } from "@/core/auth/useOrg";
 import { Plus, Users, Edit, Trash2 } from "lucide-react";
@@ -65,10 +66,10 @@ export default function POSUserManagement() {
         role: "pos_server"
       });
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Erreur",
-        description: err.message,
+        description: getErrorMessage(err),
         variant: "destructive"
       });
     } finally {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/utils/errorHandling';
 import type { 
   DocumentTemplate, 
   DocumentTemplateInsert, 
@@ -44,10 +45,10 @@ export function useDocumentTemplates(type?: TemplateType) {
         title: 'Template créé',
         description: 'Le template de document a été créé avec succès.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: `Impossible de créer le template: ${error.message}`,
+        description: `Impossible de créer le template: ${getErrorMessage(error)}`,
         variant: 'destructive',
       });
     } finally {
@@ -64,10 +65,10 @@ export function useDocumentTemplates(type?: TemplateType) {
         title: 'Template modifié',
         description: 'Le template de document a été modifié avec succès.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: `Impossible de modifier le template: ${error.message}`,
+        description: `Impossible de modifier le template: ${getErrorMessage(error)}`,
         variant: 'destructive',
       });
     } finally {
@@ -84,10 +85,10 @@ export function useDocumentTemplates(type?: TemplateType) {
         title: 'Template supprimé',
         description: 'Le template de document a été supprimé avec succès.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: `Impossible de supprimer le template: ${error.message}`,
+        description: `Impossible de supprimer le template: ${getErrorMessage(error)}`,
         variant: 'destructive',
       });
     } finally {
@@ -107,10 +108,10 @@ export function useDocumentTemplates(type?: TemplateType) {
         title: 'Template par défaut défini',
         description: 'Ce template est maintenant le template par défaut.',
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: 'Erreur',
-        description: `Impossible de définir le template par défaut: ${error.message}`,
+        description: `Impossible de définir le template par défaut: ${getErrorMessage(error)}`,
         variant: 'destructive',
       });
     } finally {

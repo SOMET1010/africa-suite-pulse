@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiHelpers, throwIfError } from './api.core';
+import { getErrorMessage } from '@/utils/errorHandling';
+import type { Json } from '@/integrations/supabase/types';
 
 // Types
 export interface AnalyticsPrediction {
@@ -9,7 +11,7 @@ export interface AnalyticsPrediction {
   target_date: string;
   predicted_value: number;
   confidence_score: number;
-  input_features: Record<string, any>;
+  input_features: Record<string, unknown>;
   model_version: string;
   created_at: string;
   created_by?: string;
@@ -21,8 +23,8 @@ export interface CustomDashboard {
   user_id?: string;
   name: string;
   description?: string;
-  layout: Record<string, any>;
-  filters: Record<string, any>;
+  layout: Json;
+  filters: Json;
   is_public: boolean;
   is_default: boolean;
   created_at: string;
@@ -32,8 +34,8 @@ export interface CustomDashboard {
 export interface CreateDashboardData {
   name: string;
   description?: string;
-  layout: Record<string, any>;
-  filters?: Record<string, any>;
+  layout: Json;
+  filters?: Json;
   is_public?: boolean;
   is_default?: boolean;
 }
@@ -67,7 +69,7 @@ export class AnalyticsAPI {
     return (data || []).map(prediction => ({
       ...prediction,
       prediction_type: prediction.prediction_type as 'occupancy' | 'revenue' | 'demand',
-      input_features: prediction.input_features as Record<string, any>
+      input_features: prediction.input_features as Record<string, unknown>
     }));
   }
 
@@ -81,10 +83,10 @@ export class AnalyticsAPI {
       if (error) throw error;
       return {
         ...data,
-        input_features: data.input_features as Record<string, any>
+        input_features: data.input_features as Record<string, unknown>
       };
-    } catch (error: any) {
-      throw new Error(`Failed to generate prediction: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Failed to generate prediction: ${getErrorMessage(error)}`);
     }
   }
 
@@ -128,8 +130,8 @@ export class AnalyticsAPI {
     if (error) throw error;
     return (data || []).map(dashboard => ({
       ...dashboard,
-      layout: dashboard.layout as Record<string, any>,
-      filters: dashboard.filters as Record<string, any>
+      layout: dashboard.layout as Json,
+      filters: dashboard.filters as Json
     }));
   }
 
@@ -147,8 +149,8 @@ export class AnalyticsAPI {
     
     return data ? {
       ...data,
-      layout: data.layout as Record<string, any>,
-      filters: data.filters as Record<string, any>
+      layout: data.layout as Json,
+      filters: data.filters as Json
     } : null;
   }
 
@@ -183,8 +185,8 @@ export class AnalyticsAPI {
     if (error) throw error;
     return {
       ...data,
-      layout: data.layout as Record<string, any>,
-      filters: data.filters as Record<string, any>
+      layout: data.layout as Json,
+      filters: data.filters as Json
     };
   }
 
@@ -199,8 +201,8 @@ export class AnalyticsAPI {
     if (error) throw error;
     return {
       ...data,
-      layout: data.layout as Record<string, any>,
-      filters: data.filters as Record<string, any>
+      layout: data.layout as Json,
+      filters: data.filters as Json
     };
   }
 
@@ -227,8 +229,8 @@ export class AnalyticsAPI {
 
       if (error) throw error;
       return data;
-    } catch (error: any) {
-      throw new Error(`Failed to get revenue optimization: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Failed to get revenue optimization: ${getErrorMessage(error)}`);
     }
   }
 
@@ -245,8 +247,8 @@ export class AnalyticsAPI {
 
       if (error) throw error;
       return data;
-    } catch (error: any) {
-      throw new Error(`Failed to get market analysis: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Failed to get market analysis: ${getErrorMessage(error)}`);
     }
   }
 
@@ -264,8 +266,8 @@ export class AnalyticsAPI {
 
       if (error) throw error;
       return data;
-    } catch (error: any) {
-      throw new Error(`Failed to schedule report: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Failed to schedule report: ${getErrorMessage(error)}`);
     }
   }
 }

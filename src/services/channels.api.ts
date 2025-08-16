@@ -1,5 +1,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiHelpers, throwIfError } from './api.core';
+import { getErrorMessage } from '@/utils/errorHandling';
+import type { Json } from '@/integrations/supabase/types';
 
 // Types
 export interface ChannelIntegration {
@@ -7,9 +9,9 @@ export interface ChannelIntegration {
   org_id: string;
   channel_name: string;
   channel_type: 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other';
-  api_credentials: Record<string, any>;
-  mapping_config: Record<string, any>;
-  sync_settings: Record<string, any>;
+  api_credentials: Json;
+  mapping_config: Json;
+  sync_settings: Json;
   last_sync_at?: string;
   sync_status: 'inactive' | 'syncing' | 'error' | 'success';
   is_active: boolean;
@@ -20,9 +22,9 @@ export interface ChannelIntegration {
 export interface CreateChannelData {
   channel_name: string;
   channel_type: 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other';
-  api_credentials: Record<string, any>;
-  mapping_config?: Record<string, any>;
-  sync_settings?: Record<string, any>;
+  api_credentials: Json;
+  mapping_config?: Json;
+  sync_settings?: Json;
 }
 
 export interface SyncResult {
@@ -49,9 +51,9 @@ export class ChannelsAPI {
       ...channel,
       channel_type: channel.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
       sync_status: channel.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
-      api_credentials: channel.api_credentials as Record<string, any>,
-      mapping_config: channel.mapping_config as Record<string, any>,
-      sync_settings: channel.sync_settings as Record<string, any>
+      api_credentials: channel.api_credentials as Json,
+      mapping_config: channel.mapping_config as Json,
+      sync_settings: channel.sync_settings as Json
     }));
   }
 
@@ -72,9 +74,9 @@ export class ChannelsAPI {
       ...data,
       channel_type: data.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
       sync_status: data.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
-      api_credentials: data.api_credentials as Record<string, any>,
-      mapping_config: data.mapping_config as Record<string, any>,
-      sync_settings: data.sync_settings as Record<string, any>
+      api_credentials: data.api_credentials as Json,
+      mapping_config: data.mapping_config as Json,
+      sync_settings: data.sync_settings as Json
     } : null;
   }
 
@@ -116,9 +118,9 @@ export class ChannelsAPI {
       ...data,
       channel_type: data.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
       sync_status: data.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
-      api_credentials: data.api_credentials as Record<string, any>,
-      mapping_config: data.mapping_config as Record<string, any>,
-      sync_settings: data.sync_settings as Record<string, any>
+      api_credentials: data.api_credentials as Json,
+      mapping_config: data.mapping_config as Json,
+      sync_settings: data.sync_settings as Json
     };
   }
 
@@ -136,9 +138,9 @@ export class ChannelsAPI {
       ...data,
       channel_type: data.channel_type as 'booking_com' | 'expedia' | 'airbnb' | 'agoda' | 'hotels_com' | 'other',
       sync_status: data.sync_status as 'inactive' | 'syncing' | 'error' | 'success',
-      api_credentials: data.api_credentials as Record<string, any>,
-      mapping_config: data.mapping_config as Record<string, any>,
-      sync_settings: data.sync_settings as Record<string, any>
+      api_credentials: data.api_credentials as Json,
+      mapping_config: data.mapping_config as Json,
+      sync_settings: data.sync_settings as Json
     };
   }
 
@@ -161,8 +163,8 @@ export class ChannelsAPI {
 
       if (error) throw error;
       return data;
-    } catch (error: any) {
-      return { success: false, message: error.message };
+    } catch (error: unknown) {
+      return { success: false, message: getErrorMessage(error) };
     }
   }
 
@@ -178,10 +180,10 @@ export class ChannelsAPI {
 
       if (error) throw error;
       return data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { 
         success: false, 
-        message: error.message,
+        message: getErrorMessage(error),
         stats: { reservations_synced: 0, rates_updated: 0, availability_updated: 0, errors: 1 }
       };
     }

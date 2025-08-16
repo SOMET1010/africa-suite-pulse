@@ -21,6 +21,7 @@ import {
   Hotel
 } from "lucide-react";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/errorHandling";
 import { logger } from "@/lib/logger";
 import { CartItem } from "../types";
 import { RoomChargeDialog } from "./RoomChargeDialog";
@@ -213,9 +214,9 @@ export function ComprehensivePaymentDialog({
 
       onPaymentComplete();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Payment error', error);
-      toast.error(error.message || "Erreur lors du paiement");
+      toast.error(getErrorMessage(error) || "Erreur lors du paiement");
     } finally {
       setIsProcessing(false);
     }

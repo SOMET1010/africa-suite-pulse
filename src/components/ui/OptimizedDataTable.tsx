@@ -2,16 +2,18 @@ import React, { useMemo } from 'react';
 import { DataTable } from './DataTable';
 import { useOptimizedFilter, useOptimizedMap } from '@/hooks/useOptimizedMemo';
 
-interface OptimizedDataTableProps<T> {
+import type { DataTableColumn, DataTableAction } from './DataTable';
+
+interface OptimizedDataTableProps<T extends Record<string, unknown>> {
   data: T[];
-  columns: any[];
+  columns: DataTableColumn<T>[];
   searchTerm?: string;
   searchFields?: (keyof T)[];
   filterFn?: (item: T) => boolean;
   sortBy?: keyof T;
   sortDirection?: 'asc' | 'desc';
   pageSize?: number;
-  actions?: any[];
+  actions?: DataTableAction<T>[];
   onExport?: (data: T[]) => void;
 }
 
@@ -19,7 +21,7 @@ interface OptimizedDataTableProps<T> {
  * Version optimisée du DataTable avec memoïsation automatique
  * des opérations coûteuses (filtrage, tri, recherche)
  */
-export function OptimizedDataTable<T extends Record<string, any>>({
+export function OptimizedDataTable<T extends Record<string, unknown>>({
   data,
   columns,
   searchTerm = '',
