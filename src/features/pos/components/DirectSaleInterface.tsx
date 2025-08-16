@@ -89,12 +89,18 @@ export function DirectSaleInterface({ staff, onBack }: DirectSaleInterfaceProps)
 
   const handlePaymentComplete = () => {
     setShowPaymentDialog(false);
+    orderState.actions.clearOrder();
     // Generate next ticket number for continuous service
     setTicketNumber(prev => prev + 1);
-    orderState.actions.clearOrder();
-    // Automatically create new order for next sale
+    // Automatically create new order for next sale (same staff context)
     setTimeout(() => {
       orderState.actions.createOrder(1);
+      // Focus back on quick add for immediate next sale
+      const focusQuickAdd = () => {
+        const el = document.getElementById('quick-add-input');
+        if (el) (el as HTMLInputElement).focus();
+      };
+      focusQuickAdd();
     }, 100);
   };
 

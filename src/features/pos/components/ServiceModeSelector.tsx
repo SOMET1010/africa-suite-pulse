@@ -1,13 +1,31 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Users } from 'lucide-react';
 
+export type ServiceMode = 'direct' | 'table';
+
 interface ServiceModeSelectorProps {
-  onModeSelect: (mode: 'direct' | 'table') => void;
+  onModeSelect: (mode: ServiceMode) => void;
 }
 
 export function ServiceModeSelector({ onModeSelect }: ServiceModeSelectorProps) {
+  // Persist service mode in session storage (not global - per session)
+  const [selectedMode, setSelectedMode] = useState<ServiceMode | null>(() => {
+    return (sessionStorage.getItem('pos.serviceMode') as ServiceMode) || null;
+  });
+
+  useEffect(() => {
+    if (selectedMode) {
+      sessionStorage.setItem('pos.serviceMode', selectedMode);
+    }
+  }, [selectedMode]);
+
+  const handleModeSelect = (mode: ServiceMode) => {
+    setSelectedMode(mode);
+    onModeSelect(mode);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 flex items-center justify-center p-6">
       <div className="max-w-4xl mx-auto">
@@ -38,7 +56,7 @@ export function ServiceModeSelector({ onModeSelect }: ServiceModeSelectorProps) 
                 <li>• Pas de gestion de table</li>
               </ul>
               <Button 
-                onClick={() => onModeSelect('direct')}
+                onClick={() => handleModeSelect('direct')}
                 className="w-full"
                 size="lg"
               >
@@ -66,7 +84,7 @@ export function ServiceModeSelector({ onModeSelect }: ServiceModeSelectorProps) 
                 <li>• Paiement en fin de service</li>
               </ul>
               <Button 
-                onClick={() => onModeSelect('table')}
+                onClick={() => handleModeSelect('table')}
                 className="w-full"
                 size="lg"
               >

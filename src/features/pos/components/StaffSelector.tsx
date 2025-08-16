@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -26,6 +26,17 @@ const mockStaff: Staff[] = [
 ];
 
 export function StaffSelector({ mode, onStaffSelect, onBack }: StaffSelectorProps) {
+  // Persist staff ID in session storage (scoped to session)
+  const [selectedStaffId, setSelectedStaffId] = useState<string | undefined>(() => 
+    sessionStorage.getItem('pos.staffId') || undefined
+  );
+
+  useEffect(() => {
+    if (selectedStaffId) {
+      sessionStorage.setItem('pos.staffId', selectedStaffId);
+    }
+  }, [selectedStaffId]);
+
   const filteredStaff = mockStaff.filter(staff => 
     mode === 'direct' ? staff.role === 'cashier' : staff.role === 'server'
   );
@@ -58,7 +69,10 @@ export function StaffSelector({ mode, onStaffSelect, onBack }: StaffSelectorProp
             <Card 
               key={staff.id}
               className="cursor-pointer hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50"
-              onClick={() => onStaffSelect(staff)}
+              onClick={() => {
+                setSelectedStaffId(staff.id);
+                onStaffSelect(staff);
+              }}
             >
               <CardContent className="flex items-center p-6">
                 <Avatar className="h-12 w-12 mr-4">

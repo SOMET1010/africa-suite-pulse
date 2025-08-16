@@ -15,6 +15,7 @@ import { StaffSelector } from "./StaffSelector";
 import { DirectSaleInterface } from "./DirectSaleInterface";
 import { usePOSOutlets, useCurrentPOSSession, useOpenPOSSession } from "../hooks/usePOSData";
 import { usePOSOrderState } from "../hooks/usePOSOrderState";
+import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
 import { useToast } from "@/hooks/use-toast";
 import type { POSOutlet, POSTable } from "../types";
 
@@ -114,59 +115,6 @@ export function RestaurantPOSTerminal() {
       }
     }
   }, [selectedOutlet]);
-
-  // Raccourcis clavier restauration
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
-      
-      switch (e.key) {
-        case 'F1': // Nouvelle commande
-          e.preventDefault();
-          handleNewOrder();
-          break;
-        case 'F2': // Envoyer en cuisine
-          e.preventDefault();
-          handleSendToKitchen();
-          break;
-        case 'F3': // Changer table rapidement
-          e.preventDefault();
-          handleQuickChangeTable();
-          break;
-        case 'F4': // Transférer table
-          e.preventDefault();
-          handleTransferTable();
-          break;
-        case 'F11': // Changer mode service
-          e.preventDefault();
-          handleQuickChangeMode();
-          break;
-        case 'F12': // Changer vendeur
-          e.preventDefault();
-          handleQuickChangeStaff();
-          break;
-        case 'F5': // Actualiser
-          e.preventDefault();
-          window.location.reload();
-          break;
-        case 'F6': // Séparer addition
-          e.preventDefault();
-          handleSplitBill();
-          break;
-        case 'F10': // Encaisser
-          e.preventDefault();
-          handleCheckout();
-          break;
-        case 'Escape': // Annuler/Retour
-          e.preventDefault();
-          handleCancel();
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [orderState.cartItems?.length]);
 
   // Gestionnaires d'actions restauration
   const handleNewOrder = () => {
@@ -376,13 +324,25 @@ export function RestaurantPOSTerminal() {
     };
   };
 
-  const clearAll = () => {
+  // ✅ REMOVED clearAll function - never force reset context
+  // Individual clear functions for specific cases only
+  const clearOrderOnly = () => {
     orderState.actions.clearOrder();
-    setSelectedTable(null);
-    setCustomerCount(1);
     setDiscountApplied({ type: 'none', value: 0 });
-    setSearchQuery("");
   };
+
+  // ✅ Modern keyboard shortcuts with unified hook (after handlers are declared)
+  useKeyboardShortcuts({
+    onSendToKitchen: handleSendToKitchen,
+    onCheckout: handleCheckout,
+    onChangeTable: serviceMode === 'table' ? handleQuickChangeTable : undefined,
+    onChangeMode: !orderState.cartItems.length ? handleQuickChangeMode : undefined,
+    onChangeStaff: !orderState.cartItems.length ? handleQuickChangeStaff : undefined,
+    onNewOrder: handleNewOrder,
+    onSplitBill: handleSplitBill,
+    onTransferTable: handleTransferTable,
+    disabled: false
+  });
 
   // Rendu conditionnel
   if (!selectedOutlet) {
@@ -543,9 +503,19 @@ export function RestaurantPOSTerminal() {
           onPaymentComplete={() => {
             setIsPaymentOpen(false);
             orderState.actions.clearOrder();
-            // Keep table selected for continuous service
-            // Don't reset selectedTable here!
-            setSelectedTable(null);
+            // ✅ CRITICAL: Keep table selected for continuous service
+            // Create new order on same table/same server immediately
+            setTimeout(() => {
+              if (selectedTable) {
+                orderState.actions.createOrder(customerCount);
+              }
+              // Focus back on quick add for immediate next order
+              const focusQuickAdd = () => {
+                const el = document.getElementById('quick-add-input');
+                if (el) (el as HTMLInputElement).focus();
+              };
+              focusQuickAdd();
+            }, 100);
           }}
         />
       )}
