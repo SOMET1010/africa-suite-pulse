@@ -13,6 +13,8 @@ import { ModernOutletSelector } from "./ModernOutletSelector";
 import { ServiceModeSelector } from "./ServiceModeSelector";
 import { StaffSelector } from "./StaffSelector";
 import { DirectSaleInterface } from "./DirectSaleInterface";
+import { BusinessTypeSelector } from "./BusinessTypeSelector";
+import { CollectivitesPOSInterface } from "./CollectivitesPOSInterface";
 import { usePOSOutlets, useCurrentPOSSession, useOpenPOSSession } from "../hooks/usePOSData";
 import { usePOSOrderState } from "../hooks/usePOSOrderState";
 import { useKeyboardShortcuts } from "../hooks/useKeyboardShortcuts";
@@ -27,6 +29,9 @@ interface Staff {
 }
 
 export function RestaurantPOSTerminal() {
+  const [businessType, setBusinessType] = useState<string | null>(() => 
+    sessionStorage.getItem('pos_business_type')
+  );
   const [selectedOutlet, setSelectedOutlet] = useState<POSOutlet | null>(null);
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
   const [customerCount, setCustomerCount] = useState(1);
@@ -343,6 +348,20 @@ export function RestaurantPOSTerminal() {
     onTransferTable: handleTransferTable,
     disabled: false
   });
+
+  // Business type selection first
+  if (!businessType) {
+    return <BusinessTypeSelector onBusinessTypeSelect={setBusinessType} />;
+  }
+
+  // Collectivités mode - direct interface
+  if (businessType === 'collectivites') {
+    return (
+      <div className="p-6">
+        <CollectivitesPOSInterface onBack={() => setBusinessType(null)} />
+      </div>
+    );
+  }
 
   // Rendu conditionnel
   if (!selectedOutlet) {

@@ -620,6 +620,59 @@ export type Database = {
         }
         Relationships: []
       }
+      beneficiary_cards: {
+        Row: {
+          beneficiary_id: string
+          card_number: string
+          card_type: string
+          created_at: string
+          expires_date: string | null
+          id: string
+          issued_date: string
+          last_used_at: string | null
+          metadata: Json | null
+          org_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          beneficiary_id: string
+          card_number: string
+          card_type?: string
+          created_at?: string
+          expires_date?: string | null
+          id?: string
+          issued_date?: string
+          last_used_at?: string | null
+          metadata?: Json | null
+          org_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          beneficiary_id?: string
+          card_number?: string
+          card_type?: string
+          created_at?: string
+          expires_date?: string | null
+          id?: string
+          issued_date?: string
+          last_used_at?: string | null
+          metadata?: Json | null
+          org_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficiary_cards_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "collective_beneficiaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cancellation_policies: {
         Row: {
           code: string
@@ -745,6 +798,270 @@ export type Database = {
           required_supplies?: Json | null
           room_type?: string | null
           task_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      collective_beneficiaries: {
+        Row: {
+          allergies: Json | null
+          beneficiary_code: string
+          category: string
+          collective_organization_id: string
+          created_at: string
+          credit_balance: number | null
+          department: string | null
+          dietary_restrictions: Json | null
+          email: string | null
+          first_name: string
+          grade_level: string | null
+          guest_id: string | null
+          id: string
+          is_active: boolean
+          last_name: string
+          monthly_allowance: number | null
+          org_id: string
+          phone: string | null
+          photo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          allergies?: Json | null
+          beneficiary_code: string
+          category: string
+          collective_organization_id: string
+          created_at?: string
+          credit_balance?: number | null
+          department?: string | null
+          dietary_restrictions?: Json | null
+          email?: string | null
+          first_name: string
+          grade_level?: string | null
+          guest_id?: string | null
+          id?: string
+          is_active?: boolean
+          last_name: string
+          monthly_allowance?: number | null
+          org_id: string
+          phone?: string | null
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allergies?: Json | null
+          beneficiary_code?: string
+          category?: string
+          collective_organization_id?: string
+          created_at?: string
+          credit_balance?: number | null
+          department?: string | null
+          dietary_restrictions?: Json | null
+          email?: string | null
+          first_name?: string
+          grade_level?: string | null
+          guest_id?: string | null
+          id?: string
+          is_active?: boolean
+          last_name?: string
+          monthly_allowance?: number | null
+          org_id?: string
+          phone?: string | null
+          photo_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_beneficiaries_collective_organization_id_fkey"
+            columns: ["collective_organization_id"]
+            isOneToOne: false
+            referencedRelation: "collective_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_beneficiaries_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guest_stay_history"
+            referencedColumns: ["guest_id"]
+          },
+          {
+            foreignKeyName: "collective_beneficiaries_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collective_meals: {
+        Row: {
+          attended_at: string
+          beneficiary_id: string
+          business_type: string
+          collective_organization_id: string
+          created_at: string
+          id: string
+          meal_date: string
+          meal_type: string
+          org_id: string
+          paid_amount: number
+          payment_method: string | null
+          pos_order_id: string | null
+          subsidy_amount: number | null
+          total_amount: number
+        }
+        Insert: {
+          attended_at?: string
+          beneficiary_id: string
+          business_type?: string
+          collective_organization_id: string
+          created_at?: string
+          id?: string
+          meal_date?: string
+          meal_type: string
+          org_id: string
+          paid_amount: number
+          payment_method?: string | null
+          pos_order_id?: string | null
+          subsidy_amount?: number | null
+          total_amount: number
+        }
+        Update: {
+          attended_at?: string
+          beneficiary_id?: string
+          business_type?: string
+          collective_organization_id?: string
+          created_at?: string
+          id?: string
+          meal_date?: string
+          meal_type?: string
+          org_id?: string
+          paid_amount?: number
+          payment_method?: string | null
+          pos_order_id?: string | null
+          subsidy_amount?: number | null
+          total_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_meals_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "collective_beneficiaries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_meals_collective_organization_id_fkey"
+            columns: ["collective_organization_id"]
+            isOneToOne: false
+            referencedRelation: "collective_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collective_menus: {
+        Row: {
+          allergens: Json | null
+          collective_organization_id: string
+          created_at: string
+          created_by: string | null
+          dietary_options: Json | null
+          id: string
+          is_published: boolean | null
+          meal_type: string
+          menu_date: string
+          menu_items: Json
+          org_id: string
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          allergens?: Json | null
+          collective_organization_id: string
+          created_at?: string
+          created_by?: string | null
+          dietary_options?: Json | null
+          id?: string
+          is_published?: boolean | null
+          meal_type: string
+          menu_date: string
+          menu_items?: Json
+          org_id: string
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          allergens?: Json | null
+          collective_organization_id?: string
+          created_at?: string
+          created_by?: string | null
+          dietary_options?: Json | null
+          id?: string
+          is_published?: boolean | null
+          meal_type?: string
+          menu_date?: string
+          menu_items?: Json
+          org_id?: string
+          price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_menus_collective_organization_id_fkey"
+            columns: ["collective_organization_id"]
+            isOneToOne: false
+            referencedRelation: "collective_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collective_organizations: {
+        Row: {
+          address: string | null
+          budget_consumed: number | null
+          budget_limit: number | null
+          code: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          name: string
+          org_id: string
+          organization_type: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          budget_consumed?: number | null
+          budget_limit?: number | null
+          code: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name: string
+          org_id: string
+          organization_type: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          budget_consumed?: number | null
+          budget_limit?: number | null
+          code?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          name?: string
+          org_id?: string
+          organization_type?: string
           updated_at?: string
         }
         Relationships: []
@@ -2119,6 +2436,62 @@ export type Database = {
             columns: ["equipment_id"]
             isOneToOne: false
             referencedRelation: "equipment"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_allowances: {
+        Row: {
+          allowance_type: string
+          amount: number
+          beneficiary_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          org_id: string
+          purchase_date: string | null
+          remaining_amount: number
+          status: string
+          updated_at: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          allowance_type: string
+          amount: number
+          beneficiary_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          org_id: string
+          purchase_date?: string | null
+          remaining_amount: number
+          status?: string
+          updated_at?: string
+          valid_from: string
+          valid_until: string
+        }
+        Update: {
+          allowance_type?: string
+          amount?: number
+          beneficiary_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          org_id?: string
+          purchase_date?: string | null
+          remaining_amount?: number
+          status?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_allowances_beneficiary_id_fkey"
+            columns: ["beneficiary_id"]
+            isOneToOne: false
+            referencedRelation: "collective_beneficiaries"
             referencedColumns: ["id"]
           },
         ]
@@ -5738,6 +6111,74 @@ export type Database = {
           },
         ]
       }
+      subsidy_programs: {
+        Row: {
+          applicable_business_types: Json | null
+          applicable_categories: Json | null
+          code: string
+          collective_organization_id: string
+          created_at: string
+          daily_limit: number | null
+          id: string
+          is_active: boolean
+          monthly_limit: number | null
+          name: string
+          org_id: string
+          program_type: string
+          rules: Json
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+          weekly_limit: number | null
+        }
+        Insert: {
+          applicable_business_types?: Json | null
+          applicable_categories?: Json | null
+          code: string
+          collective_organization_id: string
+          created_at?: string
+          daily_limit?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_limit?: number | null
+          name: string
+          org_id: string
+          program_type: string
+          rules?: Json
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+          weekly_limit?: number | null
+        }
+        Update: {
+          applicable_business_types?: Json | null
+          applicable_categories?: Json | null
+          code?: string
+          collective_organization_id?: string
+          created_at?: string
+          daily_limit?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_limit?: number | null
+          name?: string
+          org_id?: string
+          program_type?: string
+          rules?: Json
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+          weekly_limit?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subsidy_programs_collective_organization_id_fkey"
+            columns: ["collective_organization_id"]
+            isOneToOne: false
+            referencedRelation: "collective_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       system_performance: {
         Row: {
           active_connections: number | null
@@ -6848,6 +7289,14 @@ export type Database = {
           p_quantity?: number
         }
         Returns: Json
+      }
+      calculate_subsidy_amount: {
+        Args: {
+          p_base_amount: number
+          p_beneficiary_id: string
+          p_business_type?: string
+        }
+        Returns: number
       }
       can_access_view_data: {
         Args: Record<PropertyKey, never>
