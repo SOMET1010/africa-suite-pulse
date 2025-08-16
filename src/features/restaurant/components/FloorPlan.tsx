@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Plus, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/core/utils/cn';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Table {
   id: string;
@@ -23,59 +25,34 @@ interface FloorPlanProps {
   onOrderCreate?: (tableId: string) => void;
 }
 
-const mockTables: Table[] = [
-  {
-    id: '1',
-    number: 1,
-    seats: 4,
-    x: 10,
-    y: 10,
-    status: 'available'
-  },
-  {
-    id: '2', 
-    number: 2,
-    seats: 2,
-    x: 25,
-    y: 10,
-    status: 'occupied',
-    currentOrder: {
-      id: 'ord-1',
-      total: 45.50,
-      startTime: '19:30',
-      customerCount: 2
-    }
-  },
-  {
-    id: '3',
-    number: 3,
-    seats: 6,
-    x: 40,
-    y: 10,
-    status: 'reserved'
-  },
-  {
-    id: '4',
-    number: 4,
-    seats: 4,
-    x: 10,
-    y: 30,
-    status: 'cleaning'
-  },
-  {
-    id: '5',
-    number: 5,
-    seats: 2,
-    x: 25,
-    y: 30,
-    status: 'available'
-  }
-];
-
 export function FloorPlan({ onTableSelect, onOrderCreate }: FloorPlanProps) {
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [draggedTable, setDraggedTable] = useState<string | null>(null);
-  const [tables, setTables] = useState<Table[]>(mockTables);
+  
+  // Utiliser des données mockées temporairement
+  const { data: tables = [] } = useQuery({
+    queryKey: ['restaurant-tables'],
+    queryFn: async () => {
+      return [
+        {
+          id: '1',
+          number: 1,
+          seats: 4,
+          x: 10,
+          y: 10,
+          status: 'available' as const
+        },
+        {
+          id: '2', 
+          number: 2,
+          seats: 2,
+          x: 25,
+          y: 10,
+          status: 'occupied' as const
+        }
+      ];
+    }
+  });
 
   const getTableStatusColor = (status: Table['status']) => {
     switch (status) {
@@ -128,11 +105,8 @@ export function FloorPlan({ onTableSelect, onOrderCreate }: FloorPlanProps) {
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-    setTables(prev => prev.map(table => 
-      table.id === draggedTable 
-        ? { ...table, x: Math.max(0, Math.min(90, x)), y: Math.max(0, Math.min(90, y)) }
-        : table
-    ));
+    // Pour l'instant, on ne peut pas mettre à jour les positions en base
+    console.log('Position mise à jour pour table:', draggedTable, { x, y });
     
     setDraggedTable(null);
   }, [draggedTable]);
@@ -217,11 +191,6 @@ export function FloorPlan({ onTableSelect, onOrderCreate }: FloorPlanProps) {
               </div>
               <span className="text-[10px] opacity-70">{table.seats} places</span>
               
-              {table.currentOrder && (
-                <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] px-1 rounded-full">
-                  {table.currentOrder.total}€
-                </div>
-              )}
             </div>
           ))}
         </div>

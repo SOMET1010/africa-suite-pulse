@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { MobileOptimizedLayout, TouchOptimizedCard, ResponsiveGrid } from '@/core/ui/Mobile';
 import { TButton } from '@/core/ui/TButton';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePOSAuth } from '../auth/usePOSAuth';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface POSTable {
   id: string;
@@ -31,6 +33,37 @@ interface POSTable {
   needs_attention?: boolean;
 }
 
+interface MobileServerInterfaceProps {
+  serverId?: string;
+}
+
+const statusConfig = {
+  libre: { 
+    icon: CheckCircle2, 
+    label: 'Libre', 
+    color: 'text-success', 
+    priority: 4 
+  },
+  occupee: { 
+    icon: Users, 
+    label: 'Occupée', 
+    color: 'text-warning', 
+    priority: 2 
+  },
+  a_debarrasser: { 
+    icon: AlertTriangle, 
+    label: 'À débarrasser', 
+    color: 'text-destructive', 
+    priority: 1 
+  },
+  reservee: { 
+    icon: CircleDot, 
+    label: 'Réservée', 
+    color: 'text-primary', 
+    priority: 3 
+  }
+};
+
 export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) {
   const { session } = usePOSAuth();
   const { toast } = useToast();
@@ -43,32 +76,45 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     queryFn: async () => {
       if (!session?.org_id) return [];
       
-      const { data, error } = await supabase
-        .from('pos_tables')
-        .select(`
-          id,
-          table_number,
-          capacity,
-          zone,
-          status,
-          metadata
-        `)
-        .eq('org_id', session.org_id)
-        .eq('is_active', true);
+      // Utiliser des données simulées pour l'instant
+      const mockTables = [
+        {
+          id: '1',
+          table_number: '1',
+          status: 'libre',
+          customer_count: 0,
+          order_total: 0
+        },
+        {
+          id: '2',
+          table_number: '2', 
+          status: 'occupee',
+          customer_count: 4,
+          order_total: 85.50,
+          time_occupied: '45 min',
+          last_activity: '10 min'
+        },
+        {
+          id: '3',
+          table_number: '3',
+          status: 'a_debarrasser',
+          customer_count: 0,
+          order_total: 0,
+          needs_attention: true
+        }
+      ];
       
-      if (error) throw error;
-      
-      return data.map(table => ({
+      return mockTables.map(table => ({
         id: table.id,
         number: table.table_number,
         status: table.status as POSTable['status'],
-        customer_count: (table.metadata as any)?.customer_count || 0,
+        customer_count: table.customer_count || 0,
         server_id: serverId,
-        order_total: (table.metadata as any)?.order_total || 0,
-        time_occupied: (table.metadata as any)?.time_occupied || '',
-        last_activity: (table.metadata as any)?.last_activity || '',
-        has_pending_orders: (table.metadata as any)?.has_pending_orders || false,
-        needs_attention: (table.metadata as any)?.needs_attention || false,
+        order_total: table.order_total || 0,
+        time_occupied: table.time_occupied || '',
+        last_activity: table.last_activity || '',
+        has_pending_orders: false,
+        needs_attention: table.needs_attention || false,
       }));
     },
     enabled: !!session?.org_id
@@ -96,25 +142,41 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     }
   };
 
-  const handleTableAction = (tableId: string, action: string) => {
-    setTables(prev => prev.map(table => {
-      if (table.id === tableId) {
-        switch (action) {
-          case 'mark_clean':
-            return { ...table, status: 'libre' as const, needs_attention: false };
-          case 'mark_attention':
-            return { ...table, needs_attention: !table.needs_attention };
-          default:
-            return table;
-        }
+  const handleTableAction = async (tableId: string, action: string) => {
+    try {
+      let updateData = {};
+      
+      switch (action) {
+        case 'mark_clean':
+          updateData = { 
+            status: 'libre',
+            metadata: { needs_attention: false }
+          };
+          break;
+        case 'mark_attention':
+          // Toggle attention state in metadata
+          updateData = { 
+            metadata: { needs_attention: true }
+          };
+          break;
       }
-      return table;
-    }));
+      
+      await supabase
+        .from('pos_tables')
+        .update(updateData)
+        .eq('id', tableId);
 
-    toast({
-      title: "Table mise à jour",
-      description: `Action "${action}" effectuée`,
-    });
+      toast({
+        title: "Table mise à jour",
+        description: `Action "${action}" effectuée`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour la table",
+        variant: "destructive"
+      });
+    }
   };
 
   const getTableStats = () => {

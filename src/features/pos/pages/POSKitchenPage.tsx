@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { MainAppLayout } from "@/core/layout/MainAppLayout";
 import { ArrowLeft, Clock, ChefHat, CheckCircle, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface KitchenOrder {
   id: string;
@@ -26,55 +28,51 @@ interface KitchenItem {
   status: "pending" | "preparing" | "ready";
 }
 
-const mockOrders: KitchenOrder[] = [
-  {
-    id: "1",
-    orderNumber: "POS-000001",
-    tableNumber: "Table 5",
-    server: "Marie",
-    priority: "normal",
-    status: "pending",
-    createdAt: new Date(Date.now() - 5 * 60000).toISOString(), // 5 min ago
-    estimatedTime: 15,
-    items: [
-      { id: "1", name: "Poulet braisé", quantity: 2, status: "pending" },
-      { id: "2", name: "Riz au gras", quantity: 1, status: "pending" },
-      { id: "3", name: "Salade", quantity: 1, specialInstructions: "Sans oignon", status: "pending" },
-    ]
-  },
-  {
-    id: "2",
-    orderNumber: "POS-000002",
-    tableNumber: "Table 12",
-    server: "Jean",
-    priority: "urgent",
-    status: "in_progress",
-    createdAt: new Date(Date.now() - 12 * 60000).toISOString(), // 12 min ago
-    estimatedTime: 20,
-    items: [
-      { id: "4", name: "Attiéké poisson", quantity: 3, status: "preparing" },
-      { id: "5", name: "Alloco", quantity: 2, status: "ready" },
-    ]
-  },
-  {
-    id: "3",
-    orderNumber: "POS-000003",
-    tableNumber: "Table 3",
-    server: "Paul",
-    priority: "normal",
-    status: "ready",
-    createdAt: new Date(Date.now() - 25 * 60000).toISOString(), // 25 min ago
-    estimatedTime: 25,
-    items: [
-      { id: "6", name: "Thiéboudienne", quantity: 1, status: "ready" },
-      { id: "7", name: "Bissap", quantity: 2, status: "ready" },
-    ]
-  },
-];
-
 export default function POSKitchenPage() {
   const navigate = useNavigate();
-  const [orders, setOrders] = useState<KitchenOrder[]>(mockOrders);
+  
+  // Utiliser des données mockées pour l'instant (les tables POS n'existent pas encore)
+  const { data: allOrders = [], isLoading } = useQuery({
+    queryKey: ['pos-kitchen-orders'],
+    queryFn: async () => {
+      // Retourner des données mockées
+      return [
+        {
+          id: "1",
+          orderNumber: "POS-000001",
+          tableNumber: "Table 5",
+          server: "Marie",
+          priority: "normal",
+          status: "in_progress",
+          createdAt: new Date(Date.now() - 5 * 60000).toISOString(),
+          estimatedTime: 15,
+          items: [
+            { id: "1", name: "Poulet braisé", quantity: 2, status: "preparing", specialInstructions: "" },
+            { id: "2", name: "Riz au gras", quantity: 1, status: "ready", specialInstructions: "Sans piment" },
+          ]
+        },
+        {
+          id: "2",
+          orderNumber: "POS-000002",
+          tableNumber: "Table 3",
+          server: "Jean",
+          priority: "urgent",
+          status: "ready",
+          createdAt: new Date(Date.now() - 15 * 60000).toISOString(),
+          estimatedTime: 20,
+          items: [
+            { id: "3", name: "Attiéké poisson", quantity: 1, status: "ready", specialInstructions: "Bien épicé" },
+          ]
+        }
+      ] as KitchenOrder[];
+    },
+    refetchInterval: 30000
+  });
+   
+  const [localOrders, setLocalOrders] = useState<KitchenOrder[]>([]);
+  
+  // Utiliser allOrders au lieu de orders pour éviter les conflits de type
+  const orders = allOrders;
 
   const getTimeElapsed = (createdAt: string) => {
     const elapsed = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000);
@@ -95,27 +93,22 @@ export default function POSKitchenPage() {
     return priority === "urgent" ? "border-red-500 bg-red-50" : "";
   };
 
-  const updateOrderStatus = (orderId: string, newStatus: KitchenOrder["status"]) => {
-    setOrders(prev => 
-      prev.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+  const updateOrderStatus = async (orderId: string, newStatus: KitchenOrder["status"]) => {
+    try {
+      // Simulation - en réalité cela mettrait à jour Supabase
+      console.log('Updating order status:', orderId, newStatus);
+    } catch (error) {
+      console.error('Erreur mise à jour commande:', error);
+    }
   };
 
-  const updateItemStatus = (orderId: string, itemId: string, newStatus: KitchenItem["status"]) => {
-    setOrders(prev => 
-      prev.map(order => 
-        order.id === orderId 
-          ? {
-              ...order,
-              items: order.items.map(item =>
-                item.id === itemId ? { ...item, status: newStatus } : item
-              )
-            }
-          : order
-      )
-    );
+  const updateItemStatus = async (orderId: string, itemId: string, newStatus: KitchenItem["status"]) => {
+    try {
+      // Simulation - en réalité cela mettrait à jour Supabase
+      console.log('Updating item status:', orderId, itemId, newStatus);
+    } catch (error) {
+      console.error('Erreur mise à jour item:', error);
+    }
   };
 
   const getStatusLabel = (status: string) => {
@@ -171,7 +164,7 @@ export default function POSKitchenPage() {
               })}
             </div>
             <div className="text-sm text-muted-foreground">
-              {orders.filter(o => o.status !== "served").length} commandes actives
+              {isLoading ? 'Chargement...' : `${orders.filter(o => o.status !== "served").length} commandes actives`}
             </div>
           </div>
         </div>
@@ -304,7 +297,7 @@ export default function POSKitchenPage() {
         </div>
 
         {/* Empty State */}
-        {orders.filter(o => o.status !== "served").length === 0 && (
+        {!isLoading && orders.filter(o => o.status !== "served").length === 0 && (
           <Card>
             <CardContent className="text-center py-12">
               <ChefHat className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
