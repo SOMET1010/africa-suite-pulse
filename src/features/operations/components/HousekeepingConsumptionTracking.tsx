@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Droplets, Plus, Minus, Calculator, CheckCircle, X, Bed, Bath } from "lucide-react";
+import { logger } from '@/lib/logger';
 
 interface HousekeepingConsumptionTrackingProps {
   housekeepingTask: {
@@ -193,7 +194,7 @@ export function HousekeepingConsumptionTracking({
 
       // Insert stock movements
       // Mock stock movement creation for demo
-      console.log('Stock movements would be created:', stockMovements);
+      logger.audit('Stock movements would be created', { stockMovements });
 
       // Update housekeeping task
       const consumptionData = {

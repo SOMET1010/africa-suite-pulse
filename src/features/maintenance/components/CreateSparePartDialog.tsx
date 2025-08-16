@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateSparePart } from "../hooks/useSpareParts";
+import { logger } from '@/lib/logger';
 
 const formSchema = z.object({
   part_code: z.string().min(1, "Le code pièce est obligatoire"),
@@ -99,7 +100,7 @@ export function CreateSparePartDialog({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Erreur lors de la création de la pièce détachée:", error);
+      logger.error("Erreur lors de la création de la pièce détachée", error);
     }
   };
 

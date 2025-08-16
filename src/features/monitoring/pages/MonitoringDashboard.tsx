@@ -5,6 +5,7 @@ import { HotelHealthCard, AlertsPanel, ActivateMonitoringButton, MonitoringGuide
 import { useHotelHealthSummary, useHotelHealthStatus, useActiveAlerts } from '../hooks/useMonitoring';
 import { useCurrentOrg } from '../hooks/useCurrentOrg';
 import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { logger } from '@/lib/logger';
 
 export default function MonitoringDashboard() {
   const { data: summary, isLoading: summaryLoading } = useHotelHealthSummary();
@@ -90,7 +91,7 @@ export default function MonitoringDashboard() {
                         hotel={hotel}
                         onClick={() => {
                           // Navigate to hotel detail page
-                          console.log('Navigate to hotel detail:', hotel.org_id);
+                          logger.debug('Navigate to hotel detail', { org_id: hotel.org_id });
                         }}
                       />
                     ))}
@@ -103,7 +104,7 @@ export default function MonitoringDashboard() {
                         currentOrgId={currentOrg?.org_id}
                         onActivated={() => {
                           // Optionally refresh data or show success message
-                          console.log('Monitoring activated successfully');
+                          logger.audit('Monitoring activated successfully');
                         }}
                       />
                     </div>

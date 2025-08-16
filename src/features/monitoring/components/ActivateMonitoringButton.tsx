@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { simulateMetricsForDemo } from '../utils/simulateMetrics';
+import { logger } from '@/lib/logger';
 
 interface ActivateMonitoringButtonProps {
   currentOrgId?: string;
@@ -105,7 +106,7 @@ export default function ActivateMonitoringButton({ currentOrgId, onActivated }: 
 
       onActivated?.();
     } catch (error) {
-      console.error('Erreur lors de l\'activation du monitoring:', error);
+      logger.error('Erreur lors de l\'activation du monitoring', error);
       toast({
         title: "Erreur d'activation",
         description: "Impossible d'activer le monitoring. Veuillez réessayer.",

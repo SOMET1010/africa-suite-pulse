@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Package, Plus, Minus, Calculator, AlertTriangle, CheckCircle, X } from "lucide-react";
+import { logger } from '@/lib/logger';
 
 interface MaintenancePartsConsumptionProps {
   maintenanceRequest: {
@@ -123,7 +124,7 @@ export function MaintenancePartsConsumption({
 
       // Insert stock movements
       // Mock stock movement creation for demo
-      console.log('Stock movements would be created:', stockMovements);
+      logger.audit('Stock movements would be created', { stockMovements });
 
       // Update maintenance request with costs and parts used
       const partsUsed = data.consumedParts.map(part => ({

@@ -35,25 +35,21 @@ export function usePOSAuth() {
     if (!hasGloballyInitialized && !isGloballyValidating) {
       hasGloballyInitialized = true;
       
-      console.log("🚀 POS auth initialization - SINGLE INIT");
-      logger.debug("POS auth initialization started");
+      logger.debug("POS auth initialization - SINGLE INIT");
       
       // Check for existing POS session using secure validation
       const storedSession = sessionStorage.getItem("pos_session");
       if (storedSession) {
-        console.log("📦 POS session found in storage");
         logger.debug("POS session found in storage");
         try {
           const parsedSession = JSON.parse(storedSession) as POSSession;
           validateStoredSession(parsedSession);
         } catch (error) {
-          console.error("❌ Error parsing POS session", error);
           logger.error("Error parsing POS session", error);
           clearSession();
           updateGlobalLoading(false);
         }
       } else {
-        console.log("⚫ No POS session found");
         logger.debug("No POS session found");
         updateGlobalLoading(false);
       }
@@ -80,16 +76,11 @@ export function usePOSAuth() {
     if (isGloballyValidating) return;
     isGloballyValidating = true;
     
-    console.log("🔍 POS session validation started", {
+    logger.debug("POS session validation started", {
       user_id: storedSession.user_id,
       role: storedSession.role,
       org_id: storedSession.org_id,
       outlet_id: storedSession.outlet_id
-    });
-    
-    logger.debug("POS session validation started", {
-      user_id: storedSession.user_id,
-      role: storedSession.role
     });
 
     try {
@@ -105,8 +96,7 @@ export function usePOSAuth() {
       const { data, error } = await Promise.race([validationPromise, timeoutPromise]) as any;
 
       if (error || !data || data.length === 0) {
-        console.log("❌ POS session invalid or expired", error);
-        logger.warn("POS session invalid or expired");
+        logger.warn("POS session invalid or expired", { error });
         clearSession();
         return;
       }
@@ -115,7 +105,6 @@ export function usePOSAuth() {
       
       // Validation simple - utiliser directement les données validées
       if (!validatedData.org_id) {
-        console.error("❌ POS session validation failed: missing org_id");
         logger.error("POS session validation failed: missing org_id");
         clearSession();
         return;
@@ -131,22 +120,16 @@ export function usePOSAuth() {
         login_time: storedSession.login_time
       };
       
-      console.log("✅ POS session validated successfully", {
+      logger.audit("POS session validated successfully", {
         display_name: validSession.display_name,
         role: validSession.role,
         org_id: validSession.org_id,
         outlet_id: validSession.outlet_id
       });
       
-      logger.audit("POS session validated successfully", {
-        display_name: validSession.display_name,
-        role: validSession.role
-      });
-      
       updateGlobalSession(validSession);
       sessionStorage.setItem("pos_session", JSON.stringify(validSession));
     } catch (error) {
-      console.error("❌ POS session validation failed", error);
       logger.error("POS session validation failed", error);
       clearSession();
     } finally {
@@ -156,7 +139,7 @@ export function usePOSAuth() {
   };
 
   const clearSession = () => {
-    console.log("🧹 Clearing POS session");
+    logger.debug("Clearing POS session");
     updateGlobalSession(null);
     sessionStorage.removeItem("pos_session");
     isGloballyValidating = false;

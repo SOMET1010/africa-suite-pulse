@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { getErrorMessage } from '@/utils/errorHandling';
+import { logger } from '@/lib/logger';
 
 interface ExtractedData {
   first_name?: string;
@@ -60,7 +61,7 @@ export function DocumentScanner({ onDataExtracted, documentType = 'passport' }: 
         setShowCamera(true);
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      logger.error('Error accessing camera', error);
       setError('Impossible d\'accéder à la caméra. Veuillez utiliser l\'option de téléchargement.');
     }
   };
@@ -137,7 +138,7 @@ export function DocumentScanner({ onDataExtracted, documentType = 'passport' }: 
         throw new Error(data?.error || 'Erreur lors du traitement du document');
       }
     } catch (error: unknown) {
-      console.error('Error scanning document:', error);
+      logger.error('Error scanning document', error);
       setError(getErrorMessage(error) || 'Erreur lors du scan du document');
       toast.error('Erreur lors du scan du document');
     } finally {

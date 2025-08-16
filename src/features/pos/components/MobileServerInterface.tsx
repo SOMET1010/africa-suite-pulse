@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { usePOSTables } from '@/features/pos/hooks/usePOSData';
 import { useServerTables } from '@/features/pos/hooks/useTableAssignments';
+import { logger } from '@/lib/logger';
 
 interface POSTable {
   id: string;
@@ -73,14 +74,13 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   const [showNotifications, setShowNotifications] = useState(true);
 
   // Debug logs (more detailed)
-  console.log("🏪 MobileServerInterface DETAILED debug:", {
+  logger.debug("MobileServerInterface detailed debug", {
     session: session ? {
       user_id: session.user_id,
       display_name: session.display_name,
       role: session.role,
       org_id: session.org_id,
-      outlet_id: session.outlet_id,
-      login_time: session.login_time
+      outlet_id: session.outlet_id
     } : null,
     authLoading,
     serverId,
@@ -90,7 +90,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   });
 
   // CRITICAL: Check exact outlet_id match with database
-  console.log("🎯 OUTLET DEBUG:", {
+  logger.debug("Outlet configuration check", {
     session_outlet: session?.outlet_id,
     session_org: session?.org_id,
     expected_outlet_in_db: "9a32d161-7606-4270-9115-6b1ef719f716",
@@ -108,7 +108,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
     const autoAssignTables = async () => {
       if (!assignedTablesLoading && !allTablesLoading && assignedTables?.length === 0 && session?.user_id && session?.org_id) {
         try {
-          console.log("🚀 Auto-assigning tables for server:", session.user_id);
+          logger.debug("Auto-assigning tables for server", { server_id: session.user_id });
           
           const { error } = await supabase.rpc('auto_assign_all_tables_to_server', {
             p_server_id: session.user_id,
@@ -116,7 +116,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
           });
           
           if (error) {
-            console.error('Error auto-assigning tables:', error);
+            logger.error('Error auto-assigning tables', error);
             return;
           }
           
@@ -127,7 +127,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
             description: "Tables automatiquement assignées au serveur"
           });
         } catch (error) {
-          console.error('Error auto-assigning tables:', error);
+          logger.error('Error auto-assigning tables', error);
         }
       }
     };
@@ -138,14 +138,12 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
     queryKey: ['pos-tables-processed', session?.org_id, session?.outlet_id, session?.user_id, assignedTables, allTables],
     queryFn: async (): Promise<POSTable[]> => {
-      console.log("🔍 Processing tables for server:", {
+      logger.debug("Processing tables for server", {
         org_id: session?.org_id,
         outlet_id: session?.outlet_id,
         user_id: session?.user_id,
         assignedTablesCount: assignedTables.length,
-        allTablesCount: allTables.length,
-        assignedTables,
-        allTables
+        allTablesCount: allTables.length
       });
 
       // Priority 1: Use assigned tables if available
@@ -163,7 +161,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
           needs_attention: false,
         }));
         
-        console.log("✅ Using assigned tables from server assignments:", processedTables);
+        logger.debug("Using assigned tables from server assignments", { count: processedTables.length });
         return processedTables;
       }
 
@@ -182,12 +180,12 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
           needs_attention: false,
         }));
         
-        console.log("⚠️ Using all organization tables (no assignments found):", processedTables);
+        logger.warn("Using all organization tables (no assignments found)", { count: processedTables.length });
         return processedTables;
       }
 
       // Priority 3: Demo tables as last resort
-      console.log("⚠️ No tables found, using demo tables");
+      logger.warn("No tables found, using demo tables");
       return [];
     },
     enabled: !!session?.org_id && !authLoading && (!assignedTablesLoading && !allTablesLoading),
@@ -196,7 +194,7 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   });
 
   // More debug logs
-  console.log("🔍 Query state:", {
+  logger.debug("Query state", {
     isLoading,
     assignedTablesLoading,
     allTablesLoading,

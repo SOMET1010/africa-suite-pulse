@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/form";
 import { guestsApi } from "@/services/guests.api";
 import type { Guest, GuestUpdate } from "@/types/guest";
+import { logger } from "@/lib/logger";
 
 const guestSchema = z.object({
   first_name: z.string().min(1, "Le prénom est requis"),
@@ -116,7 +117,7 @@ export function EditGuestDialog({ guest, open, onOpenChange }: EditGuestDialogPr
     },
     onError: (error: unknown) => {
       toast.error("Erreur lors de la modification du client");
-      console.error("Error updating guest:", error);
+      logger.error("Error updating guest", error);
     },
   });
 

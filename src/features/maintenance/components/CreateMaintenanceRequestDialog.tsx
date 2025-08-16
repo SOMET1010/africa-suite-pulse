@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateMaintenanceRequest } from "../hooks/useMaintenanceRequests";
+import { logger } from '@/lib/logger';
 
 const formSchema = z.object({
   title: z.string().min(1, "Le titre est obligatoire"),
@@ -83,7 +84,7 @@ export function CreateMaintenanceRequestDialog({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Erreur lors de la création de la demande:", error);
+      logger.error("Erreur lors de la création de la demande", error);
     }
   };
 

@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateEquipment } from "../hooks/useEquipment";
+import { logger } from '@/lib/logger';
 
 const formSchema = z.object({
   equipment_code: z.string().min(1, "Le code équipement est obligatoire"),
@@ -94,7 +95,7 @@ export function CreateEquipmentDialog({
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Erreur lors de la création de l'équipement:", error);
+      logger.error("Erreur lors de la création de l'équipement", error);
     }
   };
 
