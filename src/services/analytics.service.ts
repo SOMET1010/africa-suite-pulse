@@ -86,7 +86,10 @@ class AnalyticsService {
       throw new Error(`Failed to fetch operational metrics: ${error.message}`);
     }
 
-    return data || [];
+    return (data || []).map(item => ({
+      ...item,
+      trend: item.trend as 'up' | 'down' | 'stable'
+    }));
   }
 
   /**
