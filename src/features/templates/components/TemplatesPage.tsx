@@ -15,6 +15,7 @@ import {
 import { useDocumentTemplates } from '../hooks/useDocumentTemplates';
 import { TemplateEditor } from './TemplateEditor';
 import { TemplatePreview } from './TemplatePreview';
+import { TemplateExportDemo } from './TemplateExportDemo';
 import { TEMPLATE_TYPES } from '@/types/templates';
 import type { TemplateType, DocumentTemplate } from '@/types/templates';
 
@@ -89,6 +90,18 @@ export default function TemplatesPage() {
       className="space-y-6"
     >
       <div className="space-y-6">
+        {/* Section d'export pour les prospects */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Exemples de Templates pour Prospects</CardTitle>
+            <CardDescription>
+              Téléchargez des exemples de factures et tickets pour présenter à vos prospects avant adhésion.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TemplateExportDemo />
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
