@@ -18,25 +18,32 @@ export function usePOSAuth() {
   const [session, setSession] = useState<POSSession | null>(null);
   const [loading, setLoading] = useState(true);
   const isValidating = useRef(false);
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    if (isValidating.current) return;
+    // Empêcher les réinitialisations multiples
+    if (hasInitialized.current || isValidating.current) return;
+    hasInitialized.current = true;
     
+    console.log("🚀 POS auth initialization - SINGLE INIT");
     logger.debug("POS auth initialization started");
     
     // Check for existing POS session using secure validation
     const storedSession = sessionStorage.getItem("pos_session");
     if (storedSession) {
+      console.log("📦 POS session found in storage");
       logger.debug("POS session found in storage");
       try {
         const parsedSession = JSON.parse(storedSession) as POSSession;
         validateStoredSession(parsedSession);
       } catch (error) {
+        console.error("❌ Error parsing POS session", error);
         logger.error("Error parsing POS session", error);
         clearSession();
         setLoading(false);
       }
     } else {
+      console.log("⚫ No POS session found");
       logger.debug("No POS session found");
       setLoading(false);
     }
@@ -122,9 +129,11 @@ export function usePOSAuth() {
   };
 
   const clearSession = () => {
+    console.log("🧹 Clearing POS session");
     setSession(null);
     sessionStorage.removeItem("pos_session");
     isValidating.current = false;
+    hasInitialized.current = false; // Permettre une nouvelle initialisation après logout
   };
 
   const logout = async () => {
