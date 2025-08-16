@@ -1,37 +1,42 @@
 /**
- * Utility to automatically replace console.log calls with logger
- * in development builds and remove them completely in production
+ * Utility to safely replace console.log calls with logger
+ * Prevents circular dependency with logger system
  */
 
 import { logger } from '@/lib/logger';
 
-// Mapping of console methods to logger methods
-const consoleMapping = {
-  log: logger.debug,
-  info: logger.info, 
-  warn: logger.warn,
-  error: logger.error,
-} as const;
-
-// Store original console methods
+// Store original console methods to prevent circular calls
 const originalConsole = {
-  log: console.log,
-  info: console.info,
-  warn: console.warn,
-  error: console.error,
+  log: console.log.bind(console),
+  info: console.info.bind(console),
+  warn: console.warn.bind(console),
+  error: console.error.bind(console),
 };
 
 /**
- * Replace console methods with logger equivalents in development
- * Remove them completely in production (handled by cleanup.ts)
+ * Safe console interceptor that prevents infinite recursion
+ * Only intercepts in development, production cleanup handled by cleanup.ts
  */
 export const setupConsoleInterceptor = () => {
   if (process.env.NODE_ENV === 'development') {
-    // In development, redirect to logger for consistency
-    console.log = (...args: any[]) => logger.debug(args[0], args.slice(1));
-    console.info = (...args: any[]) => logger.info(args[0], args.slice(1));
-    console.warn = (...args: any[]) => logger.warn(args[0], args.slice(1));
-    console.error = (...args: any[]) => logger.error(args[0], args[1], args.slice(2));
+    // Safe interceptors that don't call back to logger to prevent circular calls
+    console.log = (...args: any[]) => {
+      // Use original console method directly to avoid recursion
+      originalConsole.log('[DEBUG]', ...args);
+    };
+    
+    console.info = (...args: any[]) => {
+      originalConsole.info('[INFO]', ...args);
+    };
+    
+    console.warn = (...args: any[]) => {
+      originalConsole.warn('[WARN]', ...args);
+    };
+    
+    // Keep error logs functional but safe
+    console.error = (...args: any[]) => {
+      originalConsole.error('[ERROR]', ...args);
+    };
   }
   // Production cleanup is handled by cleanup.ts
 };

@@ -15,20 +15,65 @@ interface LogContext {
 class Logger {
   private isDevelopment = process.env.NODE_ENV === 'development';
   
+  // Store original console methods to prevent circular calls
+  private originalConsole = {
+    log: console.log.bind(console),
+    info: console.info.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+  };
+  
+  /**
+   * Safely stringify objects, handling large objects and circular references
+   */
+  private safeStringify(obj: any): string {
+    if (!obj) return '';
+    
+    try {
+      // Handle large objects by limiting depth and size
+      const stringified = JSON.stringify(obj, null, 2);
+      
+      // Prevent strings that are too large (JS limit is ~268MB, but we limit to 1MB)
+      if (stringified.length > 1024 * 1024) {
+        return '[Object too large to display]';
+      }
+      
+      return stringified;
+    } catch (error) {
+      // Handle circular references and other JSON.stringify errors
+      try {
+        return JSON.stringify(obj, (key, value) => {
+          if (typeof value === 'object' && value !== null) {
+            // Simple circular reference detection
+            if (JSON.stringify(value).length > 10000) {
+              return '[Complex object]';
+            }
+          }
+          return value;
+        });
+      } catch {
+        return '[Unable to serialize object]';
+      }
+    }
+  }
+  
   debug(message: string, context?: LogContext) {
     if (this.isDevelopment) {
-      console.log(`🐛 [DEBUG] ${message}`, context ? JSON.stringify(context, null, 2) : '');
+      const safeContext = this.safeStringify(context);
+      this.originalConsole.log(`🐛 [DEBUG] ${message}`, safeContext);
     }
   }
   
   info(message: string, context?: LogContext) {
     if (this.isDevelopment) {
-      console.info(`ℹ️ [INFO] ${message}`, context ? JSON.stringify(context, null, 2) : '');
+      const safeContext = this.safeStringify(context);
+      this.originalConsole.info(`ℹ️ [INFO] ${message}`, safeContext);
     }
   }
   
   warn(message: string, context?: LogContext) {
-    console.warn(`⚠️ [WARN] ${message}`, context ? JSON.stringify(context, null, 2) : '');
+    const safeContext = this.safeStringify(context);
+    this.originalConsole.warn(`⚠️ [WARN] ${message}`, safeContext);
   }
   
   error(message: string, error?: Error | unknown, context?: LogContext) {
@@ -36,25 +81,30 @@ class Logger {
       ? { message: error.message, stack: error.stack } 
       : error;
     
-    console.error(`❌ [ERROR] ${message}`, {
-      error: errorInfo,
-      context,
+    const safeErrorInfo = this.safeStringify(errorInfo);
+    const safeContext = this.safeStringify(context);
+    
+    this.originalConsole.error(`❌ [ERROR] ${message}`, {
+      error: safeErrorInfo,
+      context: safeContext,
       timestamp: new Date().toISOString()
     });
   }
   
   // Logs sécurisés pour les opérations critiques (toujours affichés)
   security(message: string, context?: LogContext) {
-    console.warn(`🔒 [SECURITY] ${message}`, {
-      ...context,
+    const safeContext = this.safeStringify(context);
+    this.originalConsole.warn(`🔒 [SECURITY] ${message}`, {
+      context: safeContext,
       timestamp: new Date().toISOString()
     });
   }
   
   // Logs d'audit pour traçabilité (toujours affichés)
   audit(action: string, context?: LogContext) {
-    console.info(`📋 [AUDIT] ${action}`, {
-      ...context,
+    const safeContext = this.safeStringify(context);
+    this.originalConsole.info(`📋 [AUDIT] ${action}`, {
+      context: safeContext,
       timestamp: new Date().toISOString()
     });
   }
