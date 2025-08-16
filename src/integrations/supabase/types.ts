@@ -8495,6 +8495,10 @@ export type Database = {
           zone: string
         }[]
       }
+      get_user_org_id_for_views: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       has_permission: {
         Args: { p_permission: string }
         Returns: boolean
