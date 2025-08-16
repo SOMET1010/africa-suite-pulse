@@ -7877,7 +7877,6 @@ export type Database = {
         Row: {
           adults: number | null
           allotment_id: string | null
-          allotment_partner: string | null
           cancellation_policy_id: string | null
           cancellation_policy_label: string | null
           checked_in_at: string | null
@@ -7890,12 +7889,8 @@ export type Database = {
           date_arrival: string | null
           date_departure: string | null
           discount_amount: number | null
-          discount_type: string | null
-          discount_value: number | null
           group_billing_mode: string | null
           group_id: string | null
-          group_leader_name: string | null
-          group_name: string | null
           guest_email: string | null
           guest_id: string | null
           guest_name: string | null
@@ -7907,7 +7902,6 @@ export type Database = {
           original_rate: number | null
           planned_time: string | null
           promotion_code: string | null
-          promotion_label: string | null
           rate_total: number | null
           reference: string | null
           room_id: string | null
