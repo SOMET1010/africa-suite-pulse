@@ -8474,6 +8474,17 @@ export type Database = {
           total_hotels: number
         }[]
       }
+      get_hotel_health_summary_v2: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_response_time: number
+          avg_uptime: number
+          degraded_hotels: number
+          down_hotels: number
+          healthy_hotels: number
+          total_hotels: number
+        }[]
+      }
       get_last_fiscal_hash: {
         Args: { p_org_id: string }
         Returns: string
@@ -8505,6 +8516,18 @@ export type Database = {
           setting_value: Json
         }[]
       }
+      get_organization_settings_v2: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          category: string
+          description: string
+          id: string
+          is_active: boolean
+          org_id: string
+          setting_key: string
+          setting_value: Json
+        }[]
+      }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }
         Returns: {
@@ -8523,6 +8546,18 @@ export type Database = {
         }[]
       }
       get_server_tables: {
+        Args: { p_org_id?: string; p_server_id: string }
+        Returns: {
+          assigned_at: string
+          assignment_id: string
+          capacity: number
+          status: string
+          table_id: string
+          table_number: string
+          zone: string
+        }[]
+      }
+      get_server_tables_v2: {
         Args: { p_org_id?: string; p_server_id: string }
         Returns: {
           assigned_at: string
