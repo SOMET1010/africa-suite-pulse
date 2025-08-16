@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useOrgId } from "@/core/auth/useOrg";
+import { useOrgId } from "@/core/auth/OrgProvider";
 import { User, KeyRound, Loader2, Info } from "lucide-react";
 import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
 import { logger } from "@/services/logger.service";
