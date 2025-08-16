@@ -1,20 +1,18 @@
 import React, { createContext, useContext } from 'react';
-import { useOrgId as useOrgIdHook } from './useOrg';
 
 interface OrgContextType {
-  orgId: string | null;
-  loading: boolean;
-  error: string | null;
-  refresh: () => Promise<void>;
+  orgId: string;
 }
 
 const OrgContext = createContext<OrgContextType | undefined>(undefined);
 
 export function OrgProvider({ children }: { children: React.ReactNode }) {
-  const orgData = useOrgIdHook();
+  const value = {
+    orgId: '7e389008-3dd1-4f54-816d-4f1daff1f435', // Utiliser l'org_id fixe pour éviter les conflits
+  };
 
   return (
-    <OrgContext.Provider value={orgData}>
+    <OrgContext.Provider value={value}>
       {children}
     </OrgContext.Provider>
   );
