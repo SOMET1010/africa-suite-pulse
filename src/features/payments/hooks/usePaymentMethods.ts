@@ -7,6 +7,7 @@ import {
   upsertPaymentMethod,
   deletePaymentMethod,
 } from "../payments.api";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 export function usePaymentMethods(orgId: string) {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
@@ -20,10 +21,10 @@ export function usePaymentMethods(orgId: string) {
       const { data, error } = await listPaymentMethods(orgId);
       if (error) throw error;
       setMethods(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de chargement",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -55,10 +56,10 @@ export function usePaymentMethods(orgId: string) {
           title: "Enregistré",
           description: "Méthode de paiement sauvegardée",
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         toast({
           title: "Erreur de sauvegarde",
-          description: error.message,
+          description: getErrorMessage(error),
           variant: "destructive",
         });
       } finally {
@@ -100,10 +101,10 @@ export function usePaymentMethods(orgId: string) {
         title: "Supprimé",
         description: "Méthode de paiement supprimée",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de suppression",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

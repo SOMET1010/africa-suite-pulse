@@ -136,7 +136,7 @@ export function DashboardChartsReal() {
                   <ChartTooltip 
                     content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
-                    formatter={(value: any, name: string) => [
+                    formatter={(value: number | string, name: string) => [
                       name === 'revenue' 
                         ? Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 })
                         : Number(value).toString(),
@@ -185,7 +185,7 @@ export function DashboardChartsReal() {
                   </Pie>
                   <ChartTooltip 
                     content={ChartTooltipContent}
-                    formatter={(value: any) => [
+                    formatter={(value: number | string) => [
                       Number(value).toString(),
                       'Réservations'
                     ]}
@@ -244,7 +244,7 @@ export function DashboardChartsReal() {
                   <ChartTooltip 
                     content={ChartTooltipContent}
                     labelFormatter={(value) => new Date(value).toLocaleDateString('fr-FR')}
-                    formatter={(value: any) => [
+                    formatter={(value: number | string) => [
                       Number(value).toLocaleString('fr-FR', { style: 'currency', currency: 'XOF', minimumFractionDigits: 0 }),
                       'Revenus'
                     ]}

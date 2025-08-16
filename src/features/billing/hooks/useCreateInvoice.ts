@@ -5,6 +5,7 @@ import { logger } from "@/lib/logger";
 import { createInvoice } from "../api/billing.api";
 import { billingKeys } from "./useBilling";
 import type { CreateInvoiceInput } from "../types/billing.types";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
@@ -29,11 +30,11 @@ export function useCreateInvoice() {
         description: `Facture ${invoice.number} créée avec succès`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       logger.error('Create invoice error', error);
       toast({
         title: "Erreur",
-        description: error.message || "Une erreur est survenue lors de la création",
+        description: getErrorMessage(error) || "Une erreur est survenue lors de la création",
         variant: "destructive",
       });
     },

@@ -7,6 +7,7 @@ import {
   upsertCurrency,
   deleteCurrency,
 } from "../payments.api";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 export function useCurrencies(orgId: string) {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
@@ -20,10 +21,10 @@ export function useCurrencies(orgId: string) {
       const { data, error } = await listCurrencies(orgId);
       if (error) throw error;
       setCurrencies(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de chargement",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -54,10 +55,10 @@ export function useCurrencies(orgId: string) {
           title: "Enregistré",
           description: "Devise sauvegardée",
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         toast({
           title: "Erreur de sauvegarde",
-          description: error.message,
+          description: getErrorMessage(error),
           variant: "destructive",
         });
       } finally {
@@ -98,10 +99,10 @@ export function useCurrencies(orgId: string) {
         title: "Supprimé",
         description: "Devise supprimée",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de suppression",
-        description: error.message,
+        description: getErrorMessage(error),
         variant: "destructive",
       });
     }

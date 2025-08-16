@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getErrorMessage } from '@/utils/errorHandling';
 
 interface ExtractedData {
   first_name?: string;
@@ -135,9 +136,9 @@ export function DocumentScanner({ onDataExtracted, documentType = 'passport' }: 
       } else {
         throw new Error(data?.error || 'Erreur lors du traitement du document');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error scanning document:', error);
-      setError(error.message || 'Erreur lors du scan du document');
+      setError(getErrorMessage(error) || 'Erreur lors du scan du document');
       toast.error('Erreur lors du scan du document');
     } finally {
       setIsScanning(false);

@@ -191,12 +191,12 @@ export function useOptimisticInvoiceUpdate() {
   const updateInvoiceOptimistically = (invoiceId: string, updates: UpdateInvoiceInput) => {
     queryClient.setQueryData(
       billingKeys.invoice(invoiceId),
-      (oldData: any) => {
-        if (oldData?.data) {
+      (oldData: Record<string, unknown> | undefined) => {
+        if (oldData && typeof oldData === 'object' && 'data' in oldData && oldData.data) {
           return {
             ...oldData,
             data: {
-              ...oldData.data,
+              ...(oldData.data as Record<string, unknown>),
               ...updates,
               updated_at: new Date().toISOString()
             }

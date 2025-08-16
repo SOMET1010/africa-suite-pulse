@@ -114,7 +114,7 @@ export function EditGuestDialog({ guest, open, onOpenChange }: EditGuestDialogPr
       toast.success("Client modifié avec succès");
       onOpenChange(false);
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error("Erreur lors de la modification du client");
       console.error("Error updating guest:", error);
     },

@@ -96,7 +96,7 @@ export function CreateGuestDialog({ open, onOpenChange }: CreateGuestDialogProps
       onOpenChange(false);
       form.reset();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error("Erreur lors de la création du client");
       // Error creating guest
     },
