@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { getErrorMessage } from "@/utils/errorHandling";
+import { EnhancedInput, ToggleButtons, TouchButton, FormLoadingState } from "@/components/enhanced";
+import { Mail, Lock, LogIn, UserPlus } from "lucide-react";
 
 export default function AuthPage() {
   const nav = useNavigate();
@@ -69,33 +71,96 @@ export default function AuthPage() {
     }
   }
 
+  const authOptions = [
+    { value: "login", label: "Connexion", icon: <LogIn className="h-4 w-4" /> },
+    { value: "signup", label: "Créer un compte", icon: <UserPlus className="h-4 w-4" /> }
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <form onSubmit={onSubmit} className="w-full max-w-sm rounded-2xl border border-border bg-card shadow-soft p-6 space-y-4">
-        <div className="text-xl font-semibold text-center">AfricaSuite PMS</div>
-        <div className="flex gap-2">
-          <button type="button" onClick={()=>setMode("login")}
-            className={`flex-1 px-3 py-2 rounded-xl border ${mode==="login"?"bg-primary/10 border-transparent":"border-border"}`}>Connexion</button>
-          <button type="button" onClick={()=>setMode("signup")}
-            className={`flex-1 px-3 py-2 rounded-xl border ${mode==="signup"?"bg-primary/10 border-transparent":"border-border"}`}>Créer un compte</button>
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-foreground">Adresse email</label>
-          <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" 
-                 placeholder="votre.email@exemple.com"
-                 type="email" value={email} onChange={e=>setEmail(e.target.value)} required />
-        </div>
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-foreground">Mot de passe</label>
-          <input className="w-full px-3 py-2 rounded-xl border border-border bg-card" 
-                 placeholder="Votre mot de passe"
-                 type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
-        </div>
-        {err && <div className="text-sm text-destructive p-2 rounded bg-destructive/10">{err}</div>}
-        <button disabled={busy} className="w-full min-h-11 px-4 rounded-xl text-primary-foreground bg-primary hover:bg-primary/90">
-          {busy ? "…" : (mode==="login" ? "Se connecter" : "Créer le compte")}
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background to-muted/20">
+      <div className="w-full max-w-md">
+        <form onSubmit={onSubmit} className="rounded-2xl border border-border bg-card shadow-luxury backdrop-blur-sm p-8 form-gap flex flex-col">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground mb-2">AfricaSuite PMS</h1>
+            <p className="text-sm text-muted-foreground">
+              {mode === "login" ? "Connectez-vous à votre compte" : "Créez votre compte professionnel"}
+            </p>
+          </div>
+
+          {/* Mode Toggle */}
+          <div className="mb-6">
+            <ToggleButtons
+              options={authOptions}
+              value={mode}
+              onChange={(value) => setMode(value as "login" | "signup")}
+              variant="primary"
+              size="md"
+              className="w-full"
+            />
+          </div>
+
+          {/* Email Input */}
+          <EnhancedInput
+            label="Adresse email"
+            type="email"
+            placeholder="votre.email@exemple.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            leftIcon={<Mail className="h-4 w-4" />}
+            required
+            disabled={busy}
+            size="md"
+          />
+
+          {/* Password Input */}
+          <EnhancedInput
+            label="Mot de passe"
+            type="password"
+            placeholder="Votre mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            leftIcon={<Lock className="h-4 w-4" />}
+            showPasswordToggle
+            required
+            disabled={busy}
+            size="md"
+          />
+
+          {/* Error/Success Message */}
+          {err && (
+            <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+              {err}
+            </div>
+          )}
+
+          {/* Loading State */}
+          {busy && (
+            <FormLoadingState 
+              text={mode === "login" ? "Connexion en cours..." : "Création du compte..."} 
+            />
+          )}
+
+          {/* Submit Button */}
+          <TouchButton
+            type="submit"
+            disabled={busy || !email || !password}
+            intent="primary"
+            touchSize="comfortable"
+            feedback="haptic"
+            className="w-full mt-2 h-12 text-base"
+          >
+            {mode === "login" ? "Se connecter" : "Créer le compte"}
+          </TouchButton>
+
+          {/* Additional Info for Signup */}
+          {mode === "signup" && (
+            <p className="text-xs text-muted-foreground text-center mt-4">
+              En créant un compte, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+            </p>
+          )}
+        </form>
+      </div>
     </div>
   );
 }

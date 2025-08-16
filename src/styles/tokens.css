@@ -95,6 +95,21 @@
 
     /* Touch-first sizing */
     --tap-target: 44px;
+    
+    /* Form & Input tokens */
+    --input-height: 48px;
+    --input-padding: 16px;
+    --form-gap: 20px;
+    
+    /* Tactile feedback tokens */
+    --press-scale: 0.98;
+    --press-duration: 120ms;
+    --ripple-duration: 600ms;
+    
+    /* Authentication specific */
+    --auth-card-width: 400px;
+    --auth-card-padding: 32px;
+    --auth-toggle-height: 44px;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -145,6 +160,20 @@
   .transition-smooth { transition: var(--transition-smooth); }
   .transition-elegant { transition: var(--transition-elegant); }
   .tap-target { min-height: var(--tap-target); }
+  
+  /* Form utilities */
+  .form-input { 
+    min-height: var(--input-height); 
+    padding: 0 var(--input-padding);
+    transition: var(--transition-smooth);
+  }
+  .form-gap { gap: var(--form-gap); }
+  
+  /* Tactile feedback */
+  .press-feedback { 
+    transition: transform var(--press-duration) ease-out;
+    &:active { transform: scale(var(--press-scale)); }
+  }
   
   /* Glassmorphism effects */
   .glass-card {
