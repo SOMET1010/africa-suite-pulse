@@ -25,7 +25,7 @@ import GroupsManagementPage from "@/features/reservations/GroupsManagementPage";
 import AllotmentsPage from "@/features/reservations/AllotmentsPage";
 import GuestsPage from "@/pages/GuestsPage";
 import SystemSettingsPage from "@/features/settings/system/SystemSettingsPage";
-import TemplatesPage from "@/features/settings/templates/TemplatesPage";
+import TemplatesPage from "@/features/templates/components/TemplatesPage";
 import SettingsAnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
 import CardexPage from "@/features/cardex/CardexPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
