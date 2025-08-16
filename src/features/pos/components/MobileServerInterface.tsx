@@ -1,4 +1,4 @@
-import React, { useState, startTransition, Suspense } from 'react';
+import React, { useState, startTransition, Suspense, useEffect } from 'react';
 import { MobileOptimizedLayout, TouchOptimizedCard, ResponsiveGrid } from '@/core/ui/Mobile';
 import { TButton } from '@/core/ui/TButton';
 import { Badge } from '@/components/ui/badge';
@@ -98,10 +98,42 @@ function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   });
 
   // Fetch assigned tables for the server first
-  const { data: assignedTables = [], isLoading: assignedTablesLoading } = useServerTables(session?.user_id, session?.org_id);
+  const { data: assignedTables = [], isLoading: assignedTablesLoading, refetch: refetchAssignedTables } = useServerTables(session?.user_id, session?.org_id);
   
   // Fetch all tables as fallback
   const { data: allTables = [], isLoading: allTablesLoading } = usePOSTables(session?.outlet_id, session?.org_id);
+
+  // Auto-assign tables if none exist
+  useEffect(() => {
+    const autoAssignTables = async () => {
+      if (!assignedTablesLoading && !allTablesLoading && assignedTables?.length === 0 && session?.user_id && session?.org_id) {
+        try {
+          console.log("🚀 Auto-assigning tables for server:", session.user_id);
+          
+          const { error } = await supabase.rpc('auto_assign_all_tables_to_server', {
+            p_server_id: session.user_id,
+            p_org_id: session.org_id
+          });
+          
+          if (error) {
+            console.error('Error auto-assigning tables:', error);
+            return;
+          }
+          
+          // Refetch to show newly assigned tables
+          await refetchAssignedTables();
+          toast({
+            title: "Tables assignées",
+            description: "Tables automatiquement assignées au serveur"
+          });
+        } catch (error) {
+          console.error('Error auto-assigning tables:', error);
+        }
+      }
+    };
+
+    autoAssignTables();
+  }, [assignedTablesLoading, allTablesLoading, assignedTables?.length, session?.user_id, session?.org_id, refetchAssignedTables]);
   
   const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
     queryKey: ['pos-tables-processed', session?.org_id, session?.outlet_id, session?.user_id, assignedTables, allTables],

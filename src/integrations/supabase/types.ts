@@ -8080,6 +8080,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      auto_assign_all_tables_to_server: {
+        Args: { p_org_id: string; p_server_id: string }
+        Returns: undefined
+      }
       calculate_composed_product_cost: {
         Args: { p_product_id: string }
         Returns: number
