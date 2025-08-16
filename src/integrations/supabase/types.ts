@@ -3571,6 +3571,96 @@ export type Database = {
           },
         ]
       }
+      pos_kitchen_messages: {
+        Row: {
+          category: string
+          color: string | null
+          created_at: string
+          display_order: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_priority: boolean | null
+          message_text: string
+          org_id: string
+          outlet_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          color?: string | null
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_priority?: boolean | null
+          message_text: string
+          org_id: string
+          outlet_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          color?: string | null
+          created_at?: string
+          display_order?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_priority?: boolean | null
+          message_text?: string
+          org_id?: string
+          outlet_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pos_menu_compositions: {
+        Row: {
+          component_name: string
+          component_product_id: string | null
+          component_type: string
+          created_at: string
+          display_order: number | null
+          extra_price: number | null
+          id: string
+          is_default: boolean
+          is_required: boolean
+          org_id: string
+          parent_product_id: string
+          updated_at: string
+        }
+        Insert: {
+          component_name: string
+          component_product_id?: string | null
+          component_type: string
+          created_at?: string
+          display_order?: number | null
+          extra_price?: number | null
+          id?: string
+          is_default?: boolean
+          is_required?: boolean
+          org_id: string
+          parent_product_id: string
+          updated_at?: string
+        }
+        Update: {
+          component_name?: string
+          component_product_id?: string | null
+          component_type?: string
+          created_at?: string
+          display_order?: number | null
+          extra_price?: number | null
+          id?: string
+          is_default?: boolean
+          is_required?: boolean
+          org_id?: string
+          parent_product_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pos_menu_items: {
         Row: {
           created_at: string
@@ -4426,6 +4516,54 @@ export type Database = {
           split_type?: string
           total_splits?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      pos_stock_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          created_at: string
+          current_quantity: number
+          id: string
+          is_active: boolean | null
+          message: string | null
+          org_id: string
+          outlet_id: string
+          product_id: string
+          stock_item_id: string | null
+          threshold_quantity: number | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          created_at?: string
+          current_quantity: number
+          id?: string
+          is_active?: boolean | null
+          message?: string | null
+          org_id: string
+          outlet_id: string
+          product_id: string
+          stock_item_id?: string | null
+          threshold_quantity?: number | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          created_at?: string
+          current_quantity?: number
+          id?: string
+          is_active?: boolean | null
+          message?: string | null
+          org_id?: string
+          outlet_id?: string
+          product_id?: string
+          stock_item_id?: string | null
+          threshold_quantity?: number | null
         }
         Relationships: []
       }

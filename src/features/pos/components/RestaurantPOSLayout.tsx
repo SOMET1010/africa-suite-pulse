@@ -6,6 +6,7 @@ import { RestaurantOrderPanel } from "./RestaurantOrderPanel";
 import { RestaurantActionBar } from "./RestaurantActionBar";
 import { RestaurantPaymentFlow } from "./RestaurantPaymentFlow";
 import { MarketTilesCatalog } from "./MarketTilesCatalog";
+import { StockAlertsPanel } from "./StockAlertsPanel";
 import { TableSelector } from "./TableSelector";
 import { ModernOutletSelector } from "./ModernOutletSelector";
 import { ServiceModeSelector } from "./ServiceModeSelector";
@@ -263,12 +264,13 @@ export function RestaurantPOSLayout() {
           </div>
 
           {/* Colonne droite - Actions rapides (20%) */}
-          <div className="col-span-3">
+          <div className="col-span-3 space-y-4">
             <RestaurantActionBar
               onApplyDiscount={logic.handleApplyDiscount}
               onRoomCharge={logic.handleRoomCharge}
               onSelectPrinter={logic.handleSelectPrinter}
             />
+            <StockAlertsPanel outletId={selectedOutlet.id} />
           </div>
         </div>
 

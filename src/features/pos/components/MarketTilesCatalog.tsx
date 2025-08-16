@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { usePOSCategories, usePOSProducts } from "../hooks/usePOSData";
 import { useBusinessContext } from "../hooks/useBusinessContext";
+import { MenuCompositionDialog } from "./MenuCompositionDialog";
+import { KitchenMessagesSelector } from "./KitchenMessagesSelector";
 import { formatCurrency } from "@/lib/utils";
 import { 
   Search, 
@@ -60,6 +62,9 @@ export function MarketTilesCatalog({
   const [viewMode, setViewMode] = useState<'tiles' | 'list'>('tiles');
   const [showFavorites, setShowFavorites] = useState(false);
   const [showHappyHour, setShowHappyHour] = useState(false);
+  const [showCompositionDialog, setShowCompositionDialog] = useState(false);
+  const [showKitchenMessages, setShowKitchenMessages] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<POSProduct | null>(null);
 
   const { businessType, getBusinessConfig } = useBusinessContext();
   const businessConfig = getBusinessConfig();
@@ -101,10 +106,27 @@ export function MarketTilesCatalog({
   }, [allProducts, selectedCategory, searchQuery, showFavorites, showHappyHour]);
 
   const handleProductAdd = (product: POSProduct) => {
-    onAddToCart(product, 1);
+    // Check if product has compositions or needs customization
+    setSelectedProduct(product);
+    setShowKitchenMessages(true);
     // Haptic feedback
     if (navigator.vibrate) {
       navigator.vibrate(30);
+    }
+  };
+
+  const handleCompositionConfirm = (selections: Record<string, string[]>) => {
+    if (selectedProduct) {
+      onAddToCart(selectedProduct, 1);
+      setShowKitchenMessages(true);
+    }
+  };
+
+  const handleKitchenMessagesConfirm = (messages: string[], customMessage?: string) => {
+    if (selectedProduct) {
+      // Add product with kitchen messages
+      onAddToCart(selectedProduct, 1);
+      setSelectedProduct(null);
     }
   };
 
@@ -272,6 +294,54 @@ export function MarketTilesCatalog({
           </div>
         )}
       </div>
+      
+      {/* Dialogs */}
+      {selectedProduct && (
+        <>
+          <MenuCompositionDialog
+            isOpen={showCompositionDialog}
+            onClose={() => {
+              setShowCompositionDialog(false);
+              setSelectedProduct(null);
+            }}
+            productName={selectedProduct.name}
+            compositions={[
+              {
+                type: 'side',
+                name: 'Accompagnement',
+                isRequired: true,
+                allowMultiple: false,
+                options: [
+                  { id: '1', name: 'Frites', extraPrice: 0, isDefault: true },
+                  { id: '2', name: 'Riz', extraPrice: 0, isDefault: false },
+                  { id: '3', name: 'Salade', extraPrice: 500, isDefault: false }
+                ]
+              },
+              {
+                type: 'sauce',
+                name: 'Sauce',
+                isRequired: false,
+                allowMultiple: true,
+                options: [
+                  { id: '1', name: 'Ketchup', extraPrice: 0, isDefault: false },
+                  { id: '2', name: 'Mayonnaise', extraPrice: 0, isDefault: false },
+                  { id: '3', name: 'Sauce piquante', extraPrice: 200, isDefault: false }
+                ]
+              }
+            ]}
+            onConfirm={handleCompositionConfirm}
+          />
+          
+          <KitchenMessagesSelector
+            isOpen={showKitchenMessages}
+            onClose={() => {
+              setShowKitchenMessages(false);
+              setSelectedProduct(null);
+            }}
+            onConfirm={handleKitchenMessagesConfirm}
+          />
+        </>
+      )}
     </div>
   );
 }
