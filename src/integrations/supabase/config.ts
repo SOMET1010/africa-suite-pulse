@@ -1,3 +1,4 @@
+
 type Cfg = { url: string; anon: string };
 
 export function getSupabaseConfig(): Cfg {
@@ -16,13 +17,9 @@ export function getSupabaseConfig(): Cfg {
     };
   }
   
-  // Use environment variables instead of hardcoded values
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error('Missing Supabase environment variables. Please check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your environment.');
-  }
+  // Use the actual Supabase project values
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://alfflpvdnywwbrzygmoc.supabase.co";
+  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZmZscHZkbnl3d2JyenlnbW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3OTIxNTUsImV4cCI6MjA3MDM2ODE1NX0.hV_xY6voTcybMwno9ViAVZvsN8Gbj8L-CDw2Jof17mY";
   
   return {
     url: supabaseUrl,
