@@ -8294,7 +8294,7 @@ export type Database = {
         }[]
       }
       get_guests_masked: {
-        Args: { limit_count?: number; offset_count?: number }
+        Args: { limit_count: number; offset_count: number }
         Returns: {
           address_line1: string
           address_line2: string
