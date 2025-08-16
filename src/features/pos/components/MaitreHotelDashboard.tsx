@@ -9,6 +9,7 @@ import { usePOSTables } from '../hooks/usePOSData';
 import { useTableAssignments, useAssignTable } from '../hooks/useTableAssignments';
 import { POSTable, POSTableAssignment } from '../types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import { PlanningDialog } from './PlanningDialog';
 import { AutoAssignmentDialog } from './AutoAssignmentDialog';
 
@@ -49,17 +50,17 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
 
   // Handlers pour les actions
   const handleAssignTable = async (tableId: string, serverId: string) => {
-    console.log('🔄 Tentative d\'assignation:', { tableId, serverId });
+    logger.audit('Table assignment attempt', { tableId, serverId });
     
     try {
       await assignTable.mutateAsync({ tableId, serverId });
-      console.log('✅ Assignation réussie');
+      logger.audit('Table assignment successful', { tableId, serverId });
       setShowAssignDialog(false);
       setSelectedTable(null);
       setSelectedServerId('');
       toast.success('Table assignée avec succès');
     } catch (error) {
-      console.error('❌ Erreur d\'assignation:', error);
+      logger.error('Table assignment failed', error, { tableId, serverId });
       toast.error(`Erreur lors de l'assignation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
     }
   };
@@ -409,7 +410,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
               </Button>
               <Button 
                 onClick={() => {
-                  console.log('🔄 Clic sur Assigner:', { 
+                  logger.debug('Assignment button clicked', { 
                     selectedTable: selectedTable?.id, 
                     selectedServerId,
                     hasTable: !!selectedTable,
@@ -418,7 +419,7 @@ export const MaitreHotelDashboard: React.FC<MaitreHotelDashboardProps> = ({ outl
                   if (selectedTable && selectedServerId) {
                     handleAssignTable(selectedTable.id, selectedServerId);
                   } else {
-                    console.warn('⚠️ Données manquantes pour l\'assignation');
+                    logger.warn('Missing data for assignment', { selectedTable: !!selectedTable, selectedServerId: !!selectedServerId });
                   }
                 }}
                 disabled={!selectedServerId || assignTable.isPending}

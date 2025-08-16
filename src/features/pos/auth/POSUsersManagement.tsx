@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useOrgId } from "@/core/auth/useOrg";
 import { User, Clock, LogOut, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 interface POSUser {
   id: string;
@@ -67,7 +68,7 @@ export default function POSUsersManagement() {
 
       setUsers(formattedUsers);
     } catch (error: any) {
-      console.error("Error fetching POS users:", error);
+      logger.error("Error fetching POS users", error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les utilisateurs POS",
@@ -118,7 +119,7 @@ export default function POSUsersManagement() {
         });
 
         if (error) {
-          console.error(`Error creating user ${user.display_name}:`, error);
+          logger.error(`Error creating user ${user.display_name}`, error);
         }
       }
 
@@ -129,7 +130,7 @@ export default function POSUsersManagement() {
 
       fetchPOSUsers();
     } catch (error: any) {
-      console.error("Error creating demo users:", error);
+      logger.error("Error creating demo users", error);
       toast({
         title: "Erreur",
         description: "Impossible de créer les utilisateurs de démonstration",
