@@ -75,10 +75,11 @@ export const usePOSTables = (outletId?: string, orgId?: string) => {
   return useQuery({
     queryKey: ["pos-tables", outletId, orgId],
     queryFn: async () => {
-      console.log("🗃️ usePOSTables query:", { outletId, orgId });
+      console.log("🗃️ usePOSTables query STARTING:", { outletId, orgId });
       
       // First try with outlet_id if provided
       if (outletId) {
+        console.log("🔍 Trying with outlet_id:", outletId);
         const { data: outletData, error: outletError } = await supabase
           .from("pos_tables")
           .select("id, table_number, zone, capacity, status, outlet_id, org_id")

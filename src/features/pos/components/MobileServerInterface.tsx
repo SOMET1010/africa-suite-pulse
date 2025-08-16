@@ -87,11 +87,13 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     hasOrgId: !!session?.org_id,
     queryEnabled: !!session?.org_id && !authLoading
   });
-  console.log("🏪 MobileServerInterface debug:", {
-    session,
-    org_id: session?.org_id,
-    authLoading,
-    serverId
+
+  // CRITICAL: Check exact outlet_id match with database
+  console.log("🎯 OUTLET DEBUG:", {
+    session_outlet: session?.outlet_id,
+    session_org: session?.org_id,
+    expected_outlet_in_db: "9a32d161-7606-4270-9115-6b1ef719f716",
+    should_match: session?.outlet_id === "9a32d161-7606-4270-9115-6b1ef719f716"
   });
 
   // Fetch real tables from database with fallback strategy
