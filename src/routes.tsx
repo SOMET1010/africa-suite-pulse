@@ -1,4 +1,5 @@
 import { Outlet, Route, Routes } from "react-router-dom";
+import { Suspense } from "react";
 import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
 import ArrivalsPage from "@/pages/ArrivalsPage";
@@ -151,9 +152,21 @@ export function AppRoutes() {
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="pos/mobile-server" element={<RequirePOSAuth requiredRole="pos_server"><POSMobileServerPage /></RequirePOSAuth>} />
         {/* Role-based dashboards */}
-        <Route path="dashboard/receptionist" element={<ReceptionistDashboard />} />
-        <Route path="dashboard/server" element={<ServerDashboard />} />
-        <Route path="dashboard/manager" element={<ManagerDashboard />} />
+        <Route path="dashboard/receptionist" element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <ReceptionistDashboard />
+          </Suspense>
+        } />
+        <Route path="dashboard/server" element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <ServerDashboard />
+          </Suspense>
+        } />
+        <Route path="dashboard/manager" element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <ManagerDashboard />
+          </Suspense>
+        } />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
