@@ -1687,6 +1687,132 @@ export type Database = {
         }
         Relationships: []
       }
+      fne_api_logs: {
+        Row: {
+          api_endpoint: string
+          api_timestamp: string
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          fne_invoice_id: string | null
+          fne_reference_number: string | null
+          http_method: string
+          id: string
+          ntp_offset_ms: number | null
+          ntp_synchronized: boolean | null
+          operation_type: string
+          order_id: string | null
+          org_id: string
+          request_headers: Json | null
+          request_payload: Json | null
+          response_body: Json | null
+          response_headers: Json | null
+          response_status: number | null
+          response_time_ms: number | null
+          success: boolean
+        }
+        Insert: {
+          api_endpoint: string
+          api_timestamp?: string
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          fne_invoice_id?: string | null
+          fne_reference_number?: string | null
+          http_method?: string
+          id?: string
+          ntp_offset_ms?: number | null
+          ntp_synchronized?: boolean | null
+          operation_type: string
+          order_id?: string | null
+          org_id: string
+          request_headers?: Json | null
+          request_payload?: Json | null
+          response_body?: Json | null
+          response_headers?: Json | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          success?: boolean
+        }
+        Update: {
+          api_endpoint?: string
+          api_timestamp?: string
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          fne_invoice_id?: string | null
+          fne_reference_number?: string | null
+          http_method?: string
+          id?: string
+          ntp_offset_ms?: number | null
+          ntp_synchronized?: boolean | null
+          operation_type?: string
+          order_id?: string | null
+          org_id?: string
+          request_headers?: Json | null
+          request_payload?: Json | null
+          response_body?: Json | null
+          response_headers?: Json | null
+          response_status?: number | null
+          response_time_ms?: number | null
+          success?: boolean
+        }
+        Relationships: []
+      }
+      fne_pending_invoices: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_payload: Json
+          last_error_code: string | null
+          last_error_message: string | null
+          max_retries: number
+          next_retry_at: string | null
+          order_id: string
+          org_id: string
+          priority: number
+          processed_at: string | null
+          processing_timeout: string | null
+          retry_count: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_payload: Json
+          last_error_code?: string | null
+          last_error_message?: string | null
+          max_retries?: number
+          next_retry_at?: string | null
+          order_id: string
+          org_id: string
+          priority?: number
+          processed_at?: string | null
+          processing_timeout?: string | null
+          retry_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_payload?: Json
+          last_error_code?: string | null
+          last_error_message?: string | null
+          max_retries?: number
+          next_retry_at?: string | null
+          order_id?: string
+          org_id?: string
+          priority?: number
+          processed_at?: string | null
+          processing_timeout?: string | null
+          retry_count?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guest_access_rate_limits: {
         Row: {
           access_count: number
@@ -4473,6 +4599,13 @@ export type Database = {
           created_at: string
           customer_count: number | null
           discount_amount: number
+          fne_error_message: string | null
+          fne_invoice_id: string | null
+          fne_qr_code: string | null
+          fne_reference_number: string | null
+          fne_status: string | null
+          fne_submitted_at: string | null
+          fne_validated_at: string | null
           guest_id: string | null
           id: string
           kitchen_notes: string | null
@@ -4502,6 +4635,13 @@ export type Database = {
           created_at?: string
           customer_count?: number | null
           discount_amount?: number
+          fne_error_message?: string | null
+          fne_invoice_id?: string | null
+          fne_qr_code?: string | null
+          fne_reference_number?: string | null
+          fne_status?: string | null
+          fne_submitted_at?: string | null
+          fne_validated_at?: string | null
           guest_id?: string | null
           id?: string
           kitchen_notes?: string | null
@@ -4531,6 +4671,13 @@ export type Database = {
           created_at?: string
           customer_count?: number | null
           discount_amount?: number
+          fne_error_message?: string | null
+          fne_invoice_id?: string | null
+          fne_qr_code?: string | null
+          fne_reference_number?: string | null
+          fne_status?: string | null
+          fne_submitted_at?: string | null
+          fne_validated_at?: string | null
           guest_id?: string | null
           id?: string
           kitchen_notes?: string | null
@@ -7996,6 +8143,10 @@ export type Database = {
           total_preparation_time: number
         }[]
       }
+      calculate_next_fne_retry: {
+        Args: { p_base_delay_minutes?: number; p_retry_count: number }
+        Returns: string
+      }
       calculate_next_maintenance_date: {
         Args: { equipment_id_param: string }
         Returns: string
@@ -8050,6 +8201,10 @@ export type Database = {
           p_window_minutes?: number
         }
         Returns: boolean
+      }
+      cleanup_old_fne_logs: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       complete_housekeeping_task: {
         Args: {
@@ -8370,6 +8525,14 @@ export type Database = {
           ok: boolean
           reason: string
         }[]
+      }
+      schedule_fne_retry: {
+        Args: {
+          p_error_code?: string
+          p_error_message: string
+          p_pending_invoice_id: string
+        }
+        Returns: boolean
       }
       search_guests_secure: {
         Args: { limit_count?: number; search_term: string }
