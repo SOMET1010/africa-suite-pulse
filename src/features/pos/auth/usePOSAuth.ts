@@ -14,44 +14,71 @@ export interface POSSession {
   login_time: string;
 }
 
+// Singleton pour éviter les initialisations multiples
+let globalSession: POSSession | null = null;
+let globalLoading = true;
+let isGloballyValidating = false;
+let hasGloballyInitialized = false;
+const sessionListeners: Set<(session: POSSession | null) => void> = new Set();
+const loadingListeners: Set<(loading: boolean) => void> = new Set();
+
 export function usePOSAuth() {
-  const [session, setSession] = useState<POSSession | null>(null);
-  const [loading, setLoading] = useState(true);
-  const isValidating = useRef(false);
-  const hasInitialized = useRef(false);
+  const [session, setSession] = useState<POSSession | null>(globalSession);
+  const [loading, setLoading] = useState(globalLoading);
 
   useEffect(() => {
-    // Empêcher les réinitialisations multiples
-    if (hasInitialized.current || isValidating.current) return;
-    hasInitialized.current = true;
+    // Ajouter les listeners
+    sessionListeners.add(setSession);
+    loadingListeners.add(setLoading);
     
-    console.log("🚀 POS auth initialization - SINGLE INIT");
-    logger.debug("POS auth initialization started");
-    
-    // Check for existing POS session using secure validation
-    const storedSession = sessionStorage.getItem("pos_session");
-    if (storedSession) {
-      console.log("📦 POS session found in storage");
-      logger.debug("POS session found in storage");
-      try {
-        const parsedSession = JSON.parse(storedSession) as POSSession;
-        validateStoredSession(parsedSession);
-      } catch (error) {
-        console.error("❌ Error parsing POS session", error);
-        logger.error("Error parsing POS session", error);
-        clearSession();
-        setLoading(false);
+    // Initialisation globale une seule fois
+    if (!hasGloballyInitialized && !isGloballyValidating) {
+      hasGloballyInitialized = true;
+      
+      console.log("🚀 POS auth initialization - SINGLE INIT");
+      logger.debug("POS auth initialization started");
+      
+      // Check for existing POS session using secure validation
+      const storedSession = sessionStorage.getItem("pos_session");
+      if (storedSession) {
+        console.log("📦 POS session found in storage");
+        logger.debug("POS session found in storage");
+        try {
+          const parsedSession = JSON.parse(storedSession) as POSSession;
+          validateStoredSession(parsedSession);
+        } catch (error) {
+          console.error("❌ Error parsing POS session", error);
+          logger.error("Error parsing POS session", error);
+          clearSession();
+          updateGlobalLoading(false);
+        }
+      } else {
+        console.log("⚫ No POS session found");
+        logger.debug("No POS session found");
+        updateGlobalLoading(false);
       }
-    } else {
-      console.log("⚫ No POS session found");
-      logger.debug("No POS session found");
-      setLoading(false);
     }
+    
+    // Cleanup function
+    return () => {
+      sessionListeners.delete(setSession);
+      loadingListeners.delete(setLoading);
+    };
   }, []);
 
+  const updateGlobalSession = (newSession: POSSession | null) => {
+    globalSession = newSession;
+    sessionListeners.forEach(listener => listener(newSession));
+  };
+
+  const updateGlobalLoading = (newLoading: boolean) => {
+    globalLoading = newLoading;
+    loadingListeners.forEach(listener => listener(newLoading));
+  };
+
   const validateStoredSession = async (storedSession: POSSession) => {
-    if (isValidating.current) return;
-    isValidating.current = true;
+    if (isGloballyValidating) return;
+    isGloballyValidating = true;
     
     console.log("🔍 POS session validation started", {
       user_id: storedSession.user_id,
@@ -116,24 +143,24 @@ export function usePOSAuth() {
         role: validSession.role
       });
       
-      setSession(validSession);
+      updateGlobalSession(validSession);
       sessionStorage.setItem("pos_session", JSON.stringify(validSession));
     } catch (error) {
       console.error("❌ POS session validation failed", error);
       logger.error("POS session validation failed", error);
       clearSession();
     } finally {
-      isValidating.current = false;
-      setLoading(false);
+      isGloballyValidating = false;
+      updateGlobalLoading(false);
     }
   };
 
   const clearSession = () => {
     console.log("🧹 Clearing POS session");
-    setSession(null);
+    updateGlobalSession(null);
     sessionStorage.removeItem("pos_session");
-    isValidating.current = false;
-    hasInitialized.current = false; // Permettre une nouvelle initialisation après logout
+    isGloballyValidating = false;
+    hasGloballyInitialized = false; // Permettre une nouvelle initialisation après logout
   };
 
   const logout = async () => {
@@ -150,7 +177,7 @@ export function usePOSAuth() {
   };
 
   const updateOutlet = async (outletId: string) => {
-    if (!session) return;
+    if (!globalSession) return;
     
     // Récupérer l'org_id de l'outlet sélectionné
     const { data: outlet } = await supabase
@@ -160,16 +187,16 @@ export function usePOSAuth() {
       .single();
     
     const updatedSession = { 
-      ...session, 
+      ...globalSession, 
       outlet_id: outletId,
-      org_id: outlet?.org_id || session.org_id 
+      org_id: outlet?.org_id || globalSession.org_id 
     };
-    setSession(updatedSession);
+    updateGlobalSession(updatedSession);
     sessionStorage.setItem("pos_session", JSON.stringify(updatedSession));
   };
 
   const hasRole = (requiredRole: POSRole): boolean => {
-    if (!session) return false;
+    if (!globalSession) return false;
     
     const roleHierarchy = {
       'pos_hostess': 1,
@@ -178,11 +205,11 @@ export function usePOSAuth() {
       'pos_manager': 4,
     };
     
-    return roleHierarchy[session.role] >= roleHierarchy[requiredRole];
+    return roleHierarchy[globalSession.role] >= roleHierarchy[requiredRole];
   };
 
-  const isHostess = session?.role === 'pos_hostess';
-  const isServer = session?.role === 'pos_server';
+  const isHostess = globalSession?.role === 'pos_hostess';
+  const isServer = globalSession?.role === 'pos_server';
   const isCashier = hasRole('pos_cashier');
   const isManager = hasRole('pos_manager');
 
