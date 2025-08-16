@@ -3,6 +3,7 @@ import { PageLayout } from "@/core/layout/PageLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Calendar, Users, UserCheck, UserX, Building, FileText, Download } from "lucide-react";
+import ExportButton from "@/components/ui/ExportButton";
 import { ArrivalsReport } from "./components/ArrivalsReport";
 import { DeparturesReport } from "./components/DeparturesReport";
 import { InHouseReport } from "./components/InHouseReport";
