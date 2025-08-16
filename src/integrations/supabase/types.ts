@@ -2396,6 +2396,13 @@ export type Database = {
             foreignKeyName: "invoices_reservation_id_fkey"
             columns: ["reservation_id"]
             isOneToOne: false
+            referencedRelation: "rack_data_view"
+            referencedColumns: ["reservation_id"]
+          },
+          {
+            foreignKeyName: "invoices_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
             referencedRelation: "rack_reservations_enriched"
             referencedColumns: ["id"]
           },
@@ -6454,6 +6461,13 @@ export type Database = {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
+            referencedRelation: "rack_data_view"
+            referencedColumns: ["room_id"]
+          },
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
@@ -7774,6 +7788,26 @@ export type Database = {
         }
         Relationships: []
       }
+      rack_data_view: {
+        Row: {
+          adults: number | null
+          children: number | null
+          date_arrival: string | null
+          date_departure: string | null
+          floor: string | null
+          guest_name: string | null
+          org_id: string | null
+          rate_total: number | null
+          reservation_id: string | null
+          reservation_reference: string | null
+          reservation_status: string | null
+          room_id: string | null
+          room_number: string | null
+          room_status: string | null
+          room_type: string | null
+        }
+        Relationships: []
+      }
       rack_reservations_enriched: {
         Row: {
           adults: number | null
@@ -7791,6 +7825,13 @@ export type Database = {
           status: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rack_data_view"
+            referencedColumns: ["room_id"]
+          },
           {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
@@ -7816,6 +7857,13 @@ export type Database = {
           status: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rack_data_view"
+            referencedColumns: ["room_id"]
+          },
           {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
@@ -7888,6 +7936,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "guests"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_reservations_room_id"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rack_data_view"
+            referencedColumns: ["room_id"]
           },
           {
             foreignKeyName: "fk_reservations_room_id"
@@ -8062,6 +8117,10 @@ export type Database = {
           p_product_id: string
           p_quantity?: number
         }
+        Returns: Json
+      }
+      calculate_rack_kpis: {
+        Args: { p_end_date: string; p_org_id: string; p_start_date: string }
         Returns: Json
       }
       calculate_subsidy_amount: {
@@ -8325,6 +8384,10 @@ export type Database = {
           setting_key: string
           setting_value: Json
         }[]
+      }
+      get_rack_data_optimized: {
+        Args: { p_end_date: string; p_org_id: string; p_start_date: string }
+        Returns: Json
       }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }

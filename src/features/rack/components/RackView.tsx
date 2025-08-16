@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Users, Key, AlertCircle } from 'lucide-react';
 import { ModernRackGrid } from './ModernRackGrid';
+import { VirtualizedRackGrid } from './VirtualizedRackGrid';
 import { useRackDataModern } from '../useRackDataModern';
 import { useRackState } from '../hooks/useRackState';
 
@@ -184,21 +185,39 @@ export function RackView() {
         </div>
       </Card>
 
-      {/* Grid principal */}
-      <ModernRackGrid
-        days={days}
-        filteredRooms={filteredRooms}
-        reservations={reservations}
-        compact={compact}
-        vivid={vivid}
-        zoom={zoom}
-        onReservationMove={(resId, roomId) => {
-          console.log('Move reservation', resId, 'to room', roomId);
-        }}
-        onCellClick={(room, day) => {
-          console.log('Cell clicked', room, day);
-        }}
-      />
+      {/* Grid principal - Virtualisé pour + de 50 chambres */}
+      {filteredRooms.length > 50 ? (
+        <VirtualizedRackGrid
+          rooms={rooms}
+          days={daysISO}
+          reservations={reservations}
+          filteredRooms={filteredRooms}
+          onDropReservation={(resId, roomId) => {
+            console.log('Move reservation', resId, 'to room', roomId);
+          }}
+          onLeftClick={(room, day) => {
+            console.log('Cell clicked', room, day);
+          }}
+          compact={compact}
+          vividColors={vivid}
+          className="w-full"
+        />
+      ) : (
+        <ModernRackGrid
+          days={days}
+          filteredRooms={filteredRooms}
+          reservations={reservations}
+          compact={compact}
+          vivid={vivid}
+          zoom={zoom}
+          onReservationMove={(resId, roomId) => {
+            console.log('Move reservation', resId, 'to room', roomId);
+          }}
+          onCellClick={(room, day) => {
+            console.log('Cell clicked', room, day);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { useRackData } from "@/queries/rack.queries";
 import { useOrgId } from "@/core/auth/useOrg";
 import { useHotelDate } from "@/features/settings/hooks/useHotelDate";
@@ -83,34 +83,61 @@ export function useRackDataModern() {
   // Query avec React Query
   const rackQuery = useRackData(orgId!, startISO, endISO);
 
-  // Transformation des données pour l'UI
+  // Transformation des données pour l'UI avec memoization optimisée
   const processedData = useMemo(() => {
     if (!rackQuery.data) return null;
 
-    const { rooms, reservations } = rackQuery.data;
+    const { rooms, reservations, kpis } = rackQuery.data;
 
-    // Transformation vers types UI
-    const uiRooms: UIRoom[] = rooms.map(toUIRoom);
-    const uiReservations: UIReservation[] = reservations
-      .filter((r) => r.room_id !== null)
-      .map(toUIReservation);
+    // Transformation vers types UI - déjà optimisée côté serveur
+    const uiRooms: UIRoom[] = rooms.map(room => ({
+      id: room.id,
+      number: room.number,
+      type: room.type,
+      floor: room.floor,
+      status: room.status as UIRoom["status"],
+    }));
 
-    console.log("✅ React Query rack data processed:", { 
+    const uiReservations: UIReservation[] = reservations.map(reservation => ({
+      id: reservation.id,
+      guestName: reservation.reference ?? "Réservation",
+      status: (reservation.status === "noshow" ? "cancelled" : reservation.status) as UIReservation["status"],
+      ae: (reservation.children ?? 0) > 0 ? "E" : "A",
+      nights: diffNights(reservation.date_arrival, reservation.date_departure),
+      rate: reservation.rate_total ?? 0,
+      roomId: reservation.room_id,
+      start: reservation.date_arrival,
+      end: reservation.date_departure,
+    }));
+
+    console.log("✅ Optimized rack data processed:", { 
       rooms: uiRooms.length, 
-      reservations: uiReservations.length 
+      reservations: uiReservations.length,
+      serverKpis: kpis
     });
 
-    return { days, rooms: uiRooms, reservations: uiReservations };
+    return { 
+      days, 
+      rooms: uiRooms, 
+      reservations: uiReservations,
+      serverKpis: kpis // KPIs déjà calculés côté serveur
+    };
   }, [rackQuery.data, days]);
 
-  // Calcul des KPIs
+  // Utiliser les KPIs calculés côté serveur ou fallback vers calcul client
   const kpis = useMemo(() => {
     if (!processedData) return { occ: 0, arrivals: 0, presents: 0, hs: 0 };
 
+    // Utiliser les KPIs du serveur si disponibles
+    if (processedData.serverKpis) {
+      return processedData.serverKpis;
+    }
+
+    // Fallback vers calcul client (optimisé)
     const totalCells = processedData.rooms.length * processedData.days.length || 1;
     let occupiedCells = 0;
 
-    // Compter les cellules occupées
+    // Compter les cellules occupées de manière optimisée
     for (const room of processedData.rooms) {
       for (const day of processedData.days) {
         const hasRes = processedData.reservations.some(

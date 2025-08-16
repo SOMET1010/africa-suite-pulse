@@ -4,6 +4,38 @@ import { supabase } from '@/integrations/supabase/client';
 import { queryKeys, invalidateRackQueries } from '@/lib/queryClient';
 import type { Room, Reservation } from '@/features/rack/rack.types';
 
+// Type pour les données optimisées du rack
+interface OptimizedRackData {
+  rooms: Array<{
+    id: string;
+    number: string;
+    type: string;
+    floor: number;
+    status: string;
+  }>;
+  reservations: Array<{
+    id: string;
+    room_id: string;
+    reference: string;
+    status: string;
+    date_arrival: string;
+    date_departure: string;
+    adults: number;
+    children: number;
+    rate_total: number;
+  }>;
+  kpis: {
+    occ: number;
+    arrivals: number;
+    presents: number;
+    hs: number;
+    total_rooms: number;
+    occupied_cells: number;
+    total_cells: number;
+  };
+  generated_at: string;
+}
+
 // Types unifiés pour les queries
 type RoomData = {
   id: string;
@@ -80,43 +112,51 @@ export function useReservations(orgId: string, startISO?: string, endISO?: strin
   });
 }
 
-// Query combinée pour le rack (rooms + reservations)
+/**
+ * Hook to fetch optimized rack data using server-side RPC
+ * Combines rooms, reservations, and KPIs in a single efficient query
+ */
 export function useRackData(orgId: string, startISO: string, endISO: string) {
   return useQuery({
     queryKey: queryKeys.rackData(orgId, startISO, endISO),
-    queryFn: async () => {
-      console.log("🔄 Fetching rack data with React Query", { orgId, startISO, endISO });
+    queryFn: async (): Promise<OptimizedRackData> => {
+      if (!orgId) {
+        throw new Error('Organization ID is required');
+      }
+
+      console.log("🔄 Fetching optimized rack data", { orgId, startISO, endISO });
+
+      // Use the optimized RPC function
+      const { data, error } = await supabase
+        .rpc('get_rack_data_optimized', {
+          p_org_id: orgId,
+          p_start_date: startISO,
+          p_end_date: endISO
+        });
+
+      if (error) {
+        console.error('❌ Rack data fetch error:', error);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error('No data returned from rack query');
+      }
+
+      // Type assertion safe car nous connaissons la structure retournée par notre RPC
+      const rackData = data as unknown as OptimizedRackData;
       
-      const [roomsResult, reservationsResult] = await Promise.all([
-        supabase
-          .from("rooms")
-          .select("id, org_id, number, type, floor, status, features, created_at, updated_at")
-          .eq("org_id", orgId)
-          .order("number", { ascending: true }),
-        supabase
-          .from("reservations")
-          .select("id, org_id, room_id, reference, status, date_arrival, date_departure, adults, children, rate_total, planned_time")
-          .eq("org_id", orgId)
-          .lte("date_arrival", endISO)
-          .gte("date_departure", startISO)
-          .order("date_arrival", { ascending: true })
-      ]);
-
-      if (roomsResult.error) throw roomsResult.error;
-      if (reservationsResult.error) throw reservationsResult.error;
-
-      const rooms = roomsResult.data as Room[];
-      const reservations = reservationsResult.data as Reservation[];
-
-      console.log("✅ Rack data fetched", { 
-        rooms: rooms.length, 
-        reservations: reservations.length 
+      console.log("✅ Optimized rack data fetched", { 
+        rooms: rackData.rooms?.length || 0, 
+        reservations: rackData.reservations?.length || 0,
+        kpis: rackData.kpis
       });
 
-      return { rooms, reservations };
+      return rackData;
     },
     enabled: !!orgId && !!startISO && !!endISO,
-    staleTime: 2 * 60 * 1000, // 2 minutes pour le rack (données volatiles)
+    staleTime: 5 * 60 * 1000, // 5 minutes (increased cache time)
+    gcTime: 10 * 60 * 1000,   // 10 minutes garbage collection
   });
 }
 
