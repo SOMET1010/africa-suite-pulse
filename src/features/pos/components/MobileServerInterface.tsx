@@ -1,4 +1,4 @@
-import React, { useState, startTransition } from 'react';
+import React, { useState, startTransition, Suspense } from 'react';
 import { MobileOptimizedLayout, TouchOptimizedCard, ResponsiveGrid } from '@/core/ui/Mobile';
 import { TButton } from '@/core/ui/TButton';
 import { Badge } from '@/components/ui/badge';
@@ -65,7 +65,7 @@ const statusConfig = {
   }
 };
 
-export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) {
+function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
   const { session, loading: authLoading } = usePOSAuth();
   const { toast } = useToast();
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
@@ -575,3 +575,21 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     </MobileOptimizedLayout>
   );
 }
+
+// Wrapper with Suspense boundary to handle async operations
+export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-muted-foreground">Chargement de l'interface serveur...</p>
+        </div>
+      </div>
+    }>
+      <MobileServerInterfaceInner serverId={serverId} />
+    </Suspense>
+  );
+}
+
+export { MobileServerInterface as default };

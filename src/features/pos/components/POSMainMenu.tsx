@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, startTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -120,16 +120,28 @@ export function POSMainMenu() {
   );
 
   const handleMenuClick = (path: string) => {
-    navigate(path);
+    startTransition(() => {
+      navigate(path);
+    });
   };
 
   const handleLogout = () => {
-    logout();
-    navigate("/pos/login");
+    startTransition(() => {
+      logout();
+      navigate("/pos/login");
+    });
   };
 
+  // Handle navigation in useEffect to prevent synchronous updates
+  useEffect(() => {
+    if (!session) {
+      startTransition(() => {
+        navigate("/pos/login");
+      });
+    }
+  }, [session, navigate]);
+
   if (!session) {
-    navigate("/pos/login");
     return null;
   }
 
