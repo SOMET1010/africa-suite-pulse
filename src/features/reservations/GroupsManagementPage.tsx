@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { GlobalNavigationLayout } from '@/core/layout/GlobalNavigationLayout';
 import { FilterBar } from '@/core/ui/FilterBar';
 import { DataCard } from '@/core/ui/DataCard';
 import { TButton } from '@/core/ui/TButton';
@@ -43,7 +43,7 @@ export default function GroupsManagementPage() {
   });
 
   return (
-    <UnifiedLayout
+    <GlobalNavigationLayout
       title="Gestion des groupes"
       headerAction={
         <TButton
@@ -55,7 +55,6 @@ export default function GroupsManagementPage() {
           Nouveau groupe
         </TButton>
       }
-      showBottomBar={false}
     >
       {/* Statistics Cards */}
       {stats && (
@@ -213,6 +212,6 @@ export default function GroupsManagementPage() {
         onOpenChange={setShowCreateDialog}
         orgId={orgId}
       />
-    </UnifiedLayout>
+    </GlobalNavigationLayout>
   );
 }
