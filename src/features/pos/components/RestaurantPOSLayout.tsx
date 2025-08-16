@@ -13,6 +13,7 @@ import { StaffSelector } from "./StaffSelector";
 import { DirectSaleInterface } from "./DirectSaleInterface";
 import { BusinessTypeSelector } from "./BusinessTypeSelector";
 import { CollectivitesPOSInterface } from "./CollectivitesPOSInterface";
+import { BusinessProvider } from "./BusinessProvider";
 import { usePOSOutlets, useCurrentPOSSession, useOpenPOSSession } from "../hooks/usePOSData";
 import { useRestaurantPOSLogic } from "../hooks/useRestaurantPOSLogic";
 import type { POSOutlet, POSTable } from "../types";
@@ -199,99 +200,101 @@ export function RestaurantPOSLayout() {
   const totals = logic.calculateTotals();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-accent/5">
-      {/* Header */}
-      <RestaurantPOSHeader
-        selectedOutlet={selectedOutlet}
-        currentSession={currentSession}
-        selectedTable={selectedTable}
-        customerCount={customerCount}
-        serviceMode={serviceMode}
-        selectedStaff={selectedStaff}
-        searchQuery={searchQuery}
-        onCustomerCountChange={setCustomerCount}
-        onChangeOutlet={handleBackToStaff}
-        onQuickChangeMode={handleQuickChangeMode}
-        onQuickChangeStaff={handleQuickChangeStaff}
-        onQuickChangeTable={handleQuickChangeTable}
-        onSearchChange={setSearchQuery}
-      />
+    <BusinessProvider>
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-accent/5">
+        {/* Header */}
+        <RestaurantPOSHeader
+          selectedOutlet={selectedOutlet}
+          currentSession={currentSession}
+          selectedTable={selectedTable}
+          customerCount={customerCount}
+          serviceMode={serviceMode}
+          selectedStaff={selectedStaff}
+          searchQuery={searchQuery}
+          onCustomerCountChange={setCustomerCount}
+          onChangeOutlet={handleBackToStaff}
+          onQuickChangeMode={handleQuickChangeMode}
+          onQuickChangeStaff={handleQuickChangeStaff}
+          onQuickChangeTable={handleQuickChangeTable}
+          onSearchChange={setSearchQuery}
+        />
 
-      {/* Layout 3 colonnes optimisé restauration */}
-      <div className="grid grid-cols-12 min-h-[calc(100vh-7rem)] gap-4 p-4">
-        {/* Colonne gauche - Ticket (35%) */}
-        <div className="col-span-4">
-          <RestaurantOrderPanel
-            items={logic.orderState.cartItems}
-            selectedTable={selectedTable}
-            customerCount={customerCount}
-            totals={totals}
-            onUpdateQuantity={logic.handleUpdateQuantity}
-            onRemoveFromCart={logic.handleRemoveFromCart}
-            onAddToCart={logic.handleAddToCart}
-            onSendToKitchen={logic.handleSendToKitchen}
-            onCheckout={logic.handleCheckout}
-            onSplitBill={logic.handleSplitBill}
-            onTransferTable={logic.handleTransferTable}
-          />
-        </div>
+        {/* Layout 3 colonnes optimisé restauration */}
+        <div className="grid grid-cols-12 min-h-[calc(100vh-7rem)] gap-4 p-4">
+          {/* Colonne gauche - Ticket (35%) */}
+          <div className="col-span-4">
+            <RestaurantOrderPanel
+              items={logic.orderState.cartItems}
+              selectedTable={selectedTable}
+              customerCount={customerCount}
+              totals={totals}
+              onUpdateQuantity={logic.handleUpdateQuantity}
+              onRemoveFromCart={logic.handleRemoveFromCart}
+              onAddToCart={logic.handleAddToCart}
+              onSendToKitchen={logic.handleSendToKitchen}
+              onCheckout={logic.handleCheckout}
+              onSplitBill={logic.handleSplitBill}
+              onTransferTable={logic.handleTransferTable}
+            />
+          </div>
 
-        {/* Colonne centrale - Catalogue produits (45%) */}
-        <div className="col-span-5">
-          <div className="h-full flex flex-col glass-card rounded-2xl shadow-elevate overflow-hidden">
-            {/* Sélecteur de table */}
-            <div className="p-6 border-b bg-gradient-to-r from-card/50 to-muted/10">
-              <TableSelector
-                outletId={selectedOutlet.id}
-                selectedTable={selectedTable}
-                onSelectTable={setSelectedTable}
-              />
+          {/* Colonne centrale - Catalogue produits (45%) */}
+          <div className="col-span-5">
+            <div className="h-full flex flex-col glass-card rounded-2xl shadow-elevate overflow-hidden">
+              {/* Sélecteur de table */}
+              <div className="p-6 border-b bg-gradient-to-r from-card/50 to-muted/10">
+                <TableSelector
+                  outletId={selectedOutlet.id}
+                  selectedTable={selectedTable}
+                  onSelectTable={setSelectedTable}
+                />
+              </div>
+
+              {/* Catalogue produits */}
+              <div className="flex-1 p-6 overflow-hidden">
+                <MarketTilesCatalog
+                  outletId={selectedOutlet.id}
+                  searchQuery={searchQuery}
+                  onAddToCart={logic.handleAddToCart}
+                  onSearchChange={setSearchQuery}
+                />
+              </div>
             </div>
+          </div>
 
-            {/* Catalogue produits */}
-            <div className="flex-1 p-6 overflow-hidden">
-              <MarketTilesCatalog
-                outletId={selectedOutlet.id}
-                searchQuery={searchQuery}
-                onAddToCart={logic.handleAddToCart}
-                onSearchChange={setSearchQuery}
-              />
-            </div>
+          {/* Colonne droite - Actions rapides (20%) */}
+          <div className="col-span-3">
+            <RestaurantActionBar
+              onApplyDiscount={logic.handleApplyDiscount}
+              onRoomCharge={logic.handleRoomCharge}
+              onSelectPrinter={logic.handleSelectPrinter}
+            />
           </div>
         </div>
 
-        {/* Colonne droite - Actions rapides (20%) */}
-        <div className="col-span-3">
-          <RestaurantActionBar
-            onApplyDiscount={logic.handleApplyDiscount}
-            onRoomCharge={logic.handleRoomCharge}
-            onSelectPrinter={logic.handleSelectPrinter}
-          />
-        </div>
+        {/* Payment Flow Dialogs */}
+        <RestaurantPaymentFlow
+          isPaymentOpen={logic.isPaymentOpen}
+          onClosePayment={() => logic.setIsPaymentOpen(false)}
+          currentOrder={logic.orderState.currentOrder}
+          cartItems={logic.orderState.cartItems}
+          totals={totals}
+          onPaymentComplete={handlePaymentComplete}
+          isSplitBillOpen={logic.isSplitBillOpen}
+          onCloseSplitBill={() => logic.setIsSplitBillOpen(false)}
+          isTableTransferOpen={logic.isTableTransferOpen}
+          onCloseTableTransfer={() => logic.setIsTableTransferOpen(false)}
+          selectedTable={selectedTable}
+          selectedOutlet={selectedOutlet}
+        />
+
+        {/* Loading indicator */}
+        {logic.orderState.isLoading && (
+          <div className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg">
+            Synchronisation...
+          </div>
+        )}
       </div>
-
-      {/* Payment Flow Dialogs */}
-      <RestaurantPaymentFlow
-        isPaymentOpen={logic.isPaymentOpen}
-        onClosePayment={() => logic.setIsPaymentOpen(false)}
-        currentOrder={logic.orderState.currentOrder}
-        cartItems={logic.orderState.cartItems}
-        totals={totals}
-        onPaymentComplete={handlePaymentComplete}
-        isSplitBillOpen={logic.isSplitBillOpen}
-        onCloseSplitBill={() => logic.setIsSplitBillOpen(false)}
-        isTableTransferOpen={logic.isTableTransferOpen}
-        onCloseTableTransfer={() => logic.setIsTableTransferOpen(false)}
-        selectedTable={selectedTable}
-        selectedOutlet={selectedOutlet}
-      />
-
-      {/* Loading indicator */}
-      {logic.orderState.isLoading && (
-        <div className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg">
-          Synchronisation...
-        </div>
-      )}
-    </div>
+    </BusinessProvider>
   );
 }
