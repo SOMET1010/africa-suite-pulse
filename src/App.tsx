@@ -19,6 +19,8 @@ import { queryClient } from '@/lib/queryClient';
 
 // Production optimizations
 import { useProductionOptimizations } from '@/hooks/useProductionOptimizations';
+import { PWAInstaller, PWAUpdateNotification } from '@/components/PWAInstaller';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { logger } from '@/lib/logger';
 
 function App() {
