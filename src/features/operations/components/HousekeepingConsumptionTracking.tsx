@@ -17,7 +17,7 @@ interface HousekeepingConsumptionTrackingProps {
     room_number: string;
     task_type: string;
     estimated_duration: number;
-  };
+  } | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -92,6 +92,11 @@ export function HousekeepingConsumptionTracking({
   open, 
   onOpenChange 
 }: HousekeepingConsumptionTrackingProps) {
+  // Early return if no task is selected
+  if (!housekeepingTask) {
+    return null;
+  }
+
   const [selectedTemplate, setSelectedTemplate] = useState<ConsumptionTemplate | null>(null);
   const [consumedProducts, setConsumedProducts] = useState<ConsumedProduct[]>([]);
   const [actualDuration, setActualDuration] = useState(housekeepingTask.estimated_duration);
