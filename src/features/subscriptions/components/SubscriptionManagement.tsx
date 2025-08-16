@@ -9,10 +9,12 @@ import { AlertTriangle, Calendar, CreditCard, Settings, TrendingUp, Users, Build
 import { SubscriptionCard } from './SubscriptionCard';
 import { useSubscriptionPlans, useOrganizationSubscription, useSubscriptionUsage, useUpdateSubscription } from '../hooks/useSubscription';
 import { calculateSubscriptionPrice, hasFeature, isUsageLimitReached } from '../api/subscriptions.api';
+import { useCurrency } from '@/hooks/useCurrency';
 import { toast } from 'sonner';
 
 export function SubscriptionManagement() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const { formatSubscriptionPrice, formatCurrency } = useCurrency();
   
   const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
   const { data: subscription, isLoading: subscriptionLoading } = useOrganizationSubscription();
@@ -91,7 +93,11 @@ export function SubscriptionManagement() {
           variant={subscription.status === 'active' ? 'default' : 'destructive'}
           className="capitalize"
         >
-          {subscription.status}
+          {subscription.status === 'active' ? 'Actif' : 
+           subscription.status === 'cancelled' ? 'Annulé' :
+           subscription.status === 'expired' ? 'Expiré' :
+           subscription.status === 'suspended' ? 'Suspendu' :
+           subscription.status}
         </Badge>
       </div>
 
@@ -161,19 +167,27 @@ function CurrentPlanOverview({ subscription, usage }: {
             <div className="flex justify-between">
               <span>Prix</span>
               <span className="font-medium">
-                {currentPrice.toLocaleString('fr-FR')}€/{subscription.billing_cycle === 'yearly' ? 'an' : 'mois'}
+                {formatSubscriptionPrice(currentPrice, subscription.billing_cycle)}
               </span>
             </div>
             
             <div className="flex justify-between">
               <span>Cycle de facturation</span>
-              <span className="font-medium capitalize">{subscription.billing_cycle}</span>
+              <span className="font-medium capitalize">
+                {subscription.billing_cycle === 'monthly' ? 'Mensuel' : 
+                 subscription.billing_cycle === 'yearly' ? 'Annuel' : 
+                 subscription.billing_cycle}
+              </span>
             </div>
             
             <div className="flex justify-between">
               <span>Statut</span>
               <Badge variant={subscription.status === 'active' ? 'default' : 'destructive'}>
-                {subscription.status}
+                {subscription.status === 'active' ? 'Actif' : 
+                 subscription.status === 'cancelled' ? 'Annulé' :
+                 subscription.status === 'expired' ? 'Expiré' :
+                 subscription.status === 'suspended' ? 'Suspendu' :
+                 subscription.status}
               </Badge>
             </div>
           </div>
@@ -343,14 +357,20 @@ function BillingDetails({ subscription }: { subscription: any }) {
             <div>
               <h4 className="font-medium">Cycle de facturation</h4>
               <p className="text-muted-foreground capitalize">
-                {subscription.billing_cycle}
+                {subscription.billing_cycle === 'monthly' ? 'Mensuel' : 
+                 subscription.billing_cycle === 'yearly' ? 'Annuel' : 
+                 subscription.billing_cycle}
               </p>
             </div>
             
             <div>
               <h4 className="font-medium">Statut</h4>
               <Badge variant={subscription.status === 'active' ? 'default' : 'destructive'}>
-                {subscription.status}
+                {subscription.status === 'active' ? 'Actif' : 
+                 subscription.status === 'cancelled' ? 'Annulé' :
+                 subscription.status === 'expired' ? 'Expiré' :
+                 subscription.status === 'suspended' ? 'Suspendu' :
+                 subscription.status}
               </Badge>
             </div>
             

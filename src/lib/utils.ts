@@ -5,7 +5,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// DEPRECATED: Use useCurrency hook or formatCurrency from @/lib/currency instead
 export function formatCurrency(amount: number): string {
+  console.warn('DEPRECATED: formatCurrency from utils.ts is deprecated. Use useCurrency hook instead.');
   return new Intl.NumberFormat('fr-FR', {
     style: 'currency',
     currency: 'XOF',
