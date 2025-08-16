@@ -75,7 +75,7 @@ export function usePOSAuth() {
         user_id: validatedData.user_id,
         display_name: validatedData.display_name,
         role: validatedData.role_name as POSRole,
-        org_id: validatedData.org_id,
+        org_id: validatedData.org_id || '7e389008-3dd1-4f54-816d-4f1daff1f435',
         outlet_id: validatedData.outlet_id || storedSession.outlet_id || '',
         session_token: storedSession.session_token,
         login_time: storedSession.login_time
