@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 
 export function SubscriptionManagement() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const { formatSubscriptionPrice, formatCurrency } = useCurrency();
+  const { formatSubscriptionPrice } = useCurrency();
   
   const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
   const { data: subscription, isLoading: subscriptionLoading } = useOrganizationSubscription();
