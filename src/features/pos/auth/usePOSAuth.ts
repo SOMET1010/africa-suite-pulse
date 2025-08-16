@@ -71,6 +71,7 @@ export function usePOSAuth() {
       const { data, error } = await Promise.race([validationPromise, timeoutPromise]) as any;
 
       if (error || !data || data.length === 0) {
+        console.log("❌ POS session invalid or expired", error);
         logger.warn("POS session invalid or expired");
         clearSession();
         return;
@@ -78,7 +79,7 @@ export function usePOSAuth() {
 
       const validatedData = data[0];
       
-      // Utiliser directement l'org_id validé sans synchronisation complexe
+      // Validation simple - utiliser directement les données validées
       if (!validatedData.org_id) {
         console.error("❌ POS session validation failed: missing org_id");
         logger.error("POS session validation failed: missing org_id");
@@ -111,6 +112,7 @@ export function usePOSAuth() {
       setSession(validSession);
       sessionStorage.setItem("pos_session", JSON.stringify(validSession));
     } catch (error) {
+      console.error("❌ POS session validation failed", error);
       logger.error("POS session validation failed", error);
       clearSession();
     } finally {
