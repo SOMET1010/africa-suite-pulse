@@ -70,7 +70,22 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
   const [showNotifications, setShowNotifications] = useState(true);
 
-  // Debug logs
+  // Debug logs (more detailed)
+  console.log("🏪 MobileServerInterface DETAILED debug:", {
+    session: session ? {
+      user_id: session.user_id,
+      display_name: session.display_name,
+      role: session.role,
+      org_id: session.org_id,
+      outlet_id: session.outlet_id,
+      login_time: session.login_time
+    } : null,
+    authLoading,
+    serverId,
+    sessionExists: !!session,
+    hasOrgId: !!session?.org_id,
+    queryEnabled: !!session?.org_id && !authLoading
+  });
   console.log("🏪 MobileServerInterface debug:", {
     session,
     org_id: session?.org_id,
@@ -164,9 +179,30 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <h2 className="text-xl font-semibold mb-2">Session POS requise</h2>
         <p className="text-muted-foreground mb-4">Vous devez vous connecter au système POS pour accéder aux tables.</p>
-        <TButton onClick={() => window.location.href = '/pos/login'}>
-          Se connecter au POS
-        </TButton>
+        <div className="space-y-2">
+          <TButton onClick={() => window.location.href = '/pos/login'}>
+            Se connecter au POS
+          </TButton>
+          <TButton 
+            variant="ghost" 
+            onClick={() => {
+              // Create demo session for testing
+              const demoSession = {
+                user_id: "demo-user-123",
+                display_name: "Serveur Démo",
+                role: "pos_server" as const,
+                org_id: "demo-org-456",
+                outlet_id: "demo-outlet-789",
+                session_token: "demo-token-abc",
+                login_time: new Date().toISOString()
+              };
+              sessionStorage.setItem("pos_session", JSON.stringify(demoSession));
+              window.location.reload();
+            }}
+          >
+            Mode Démo (Test)
+          </TButton>
+        </div>
       </div>
     );
   }
