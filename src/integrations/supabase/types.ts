@@ -6613,28 +6613,40 @@ export type Database = {
       }
       security_policy_notes: {
         Row: {
+          approved_at: string | null
           approved_by: string | null
           created_at: string | null
-          description: string
           id: string
           justification: string
+          policy_name: string
           policy_type: string
+          review_required_by: string | null
+          security_level: string
+          updated_at: string | null
         }
         Insert: {
+          approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
-          description: string
           id?: string
           justification: string
+          policy_name: string
           policy_type: string
+          review_required_by?: string | null
+          security_level?: string
+          updated_at?: string | null
         }
         Update: {
+          approved_at?: string | null
           approved_by?: string | null
           created_at?: string | null
-          description?: string
           id?: string
           justification?: string
+          policy_name?: string
           policy_type?: string
+          review_required_by?: string | null
+          security_level?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -8704,11 +8716,13 @@ export type Database = {
         }[]
       }
       validate_table_function_access: {
-        Args: {
-          p_function_name: string
-          p_org_id?: string
-          p_required_role?: string
-        }
+        Args:
+          | {
+              p_function_name: string
+              p_org_id?: string
+              p_required_role?: string
+            }
+          | { p_function_name: string; p_org_id?: string; p_user_id?: string }
         Returns: boolean
       }
     }
