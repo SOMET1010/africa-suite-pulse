@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { logger } from "@/lib/logger";
+import { useOrgId } from "@/core/auth/useOrg";
+import { syncOrganizations, validateUserOrgAccess } from "./orgSync";
 
 export type POSRole = "pos_hostess" | "pos_server" | "pos_cashier" | "pos_manager";
 
@@ -17,6 +19,7 @@ export interface POSSession {
 export function usePOSAuth() {
   const [session, setSession] = useState<POSSession | null>(null);
   const [loading, setLoading] = useState(true);
+  const { orgId: authOrgId } = useOrgId();
 
   useEffect(() => {
     logger.debug("POS auth initialization started");
@@ -71,11 +74,41 @@ export function usePOSAuth() {
       }
 
       const validatedData = data[0];
+      
+      // Synchroniser les organisations Auth et POS
+      const orgSyncResult = await syncOrganizations(authOrgId, validatedData.org_id);
+      
+      if (!orgSyncResult.success || !orgSyncResult.org_id) {
+        console.error("❌ Organization sync failed", {
+          authOrgId,
+          posOrgId: validatedData.org_id,
+          error: orgSyncResult.error
+        });
+        logger.error("Organization sync failed", orgSyncResult);
+        clearSession();
+        return;
+      }
+
+      // Vérifier que l'utilisateur a accès à cette organisation
+      const hasAccess = await validateUserOrgAccess(validatedData.user_id, orgSyncResult.org_id);
+      if (!hasAccess) {
+        console.error("❌ User doesn't have access to organization", {
+          userId: validatedData.user_id,
+          orgId: orgSyncResult.org_id
+        });
+        logger.error("User access validation failed", {
+          userId: validatedData.user_id,
+          orgId: orgSyncResult.org_id
+        });
+        clearSession();
+        return;
+      }
+      
       const validSession: POSSession = {
         user_id: validatedData.user_id,
         display_name: validatedData.display_name,
         role: validatedData.role_name as POSRole,
-        org_id: validatedData.org_id || '7e389008-3dd1-4f54-816d-4f1daff1f435',
+        org_id: orgSyncResult.org_id,
         outlet_id: validatedData.outlet_id || storedSession.outlet_id || '',
         session_token: storedSession.session_token,
         login_time: storedSession.login_time
