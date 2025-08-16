@@ -20,6 +20,7 @@ import { FamilyManagement } from "../components/FamilyManagement";
 import { KeyboardManager } from "../components/KeyboardManager";
 import { FiscalArchiveManager } from "../components/FiscalArchiveManager";
 import { FiscalJournalViewer } from "../components/FiscalJournalViewer";
+import { FNEIntegrationPanel } from "../components/FNEIntegrationPanel";
 import EnhancedProductManagement from "../components/EnhancedProductManagement";
 import type { POSCategory } from "../types";
 
@@ -192,13 +193,14 @@ export function POSSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-10">
+        <TabsList className="grid w-full grid-cols-11">
           <TabsTrigger value="general">Général</TabsTrigger>
           <TabsTrigger value="products">Produits</TabsTrigger>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
           <TabsTrigger value="keyboards">Claviers</TabsTrigger>
           <TabsTrigger value="fiscal">Fiscal</TabsTrigger>
           <TabsTrigger value="journal">Journal ISCA</TabsTrigger>
+          <TabsTrigger value="fne">FNE DGI</TabsTrigger>
           <TabsTrigger value="payment">Paiements</TabsTrigger>
           <TabsTrigger value="taxes">Taxes</TabsTrigger>
           <TabsTrigger value="receipt">Reçus</TabsTrigger>
@@ -472,6 +474,10 @@ export function POSSettings() {
 
         <TabsContent value="journal" className="space-y-4">
           <FiscalJournalViewer />
+        </TabsContent>
+        
+        <TabsContent value="fne" className="space-y-4">
+          <FNEIntegrationPanel />
         </TabsContent>
 
 
