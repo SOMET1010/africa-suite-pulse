@@ -31,7 +31,7 @@ interface AdaptivePOSLayoutProps {
     total: number;
     discount: number;
   };
-  onAddToCart: (product: any, quantity?: number) => void;
+  onAddToCart: (product: POSProduct, quantity?: number) => void;
   onSearchChange: (query: string) => void;
   onUpdateQuantity: (productId: string, quantity: number) => void;
   onRemoveFromCart: (productId: string) => void;

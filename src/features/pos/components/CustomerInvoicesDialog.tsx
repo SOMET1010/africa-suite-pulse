@@ -6,9 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Receipt, Printer } from 'lucide-react';
+import type { Customer } from '../types/product.types';
 
 interface CustomerInvoicesDialogProps {
-  customer: any;
+  customer: Customer;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

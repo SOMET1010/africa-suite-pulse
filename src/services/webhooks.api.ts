@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiHelpers, throwIfError } from './api.core';
+import { getErrorMessage } from '@/utils/errorHandling';
 
 // Types
 export interface Webhook {
@@ -162,8 +163,8 @@ export class WebhooksAPI {
 
       if (error) throw error;
       return { success: true, message: 'Test webhook delivered successfully' };
-    } catch (error: any) {
-      return { success: false, message: error.message };
+    } catch (error: unknown) {
+      return { success: false, message: getErrorMessage(error) };
     }
   }
 }

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { DollarSign, Calendar, ArrowRight, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { getErrorMessage } from '@/utils/errorHandling';
 
 interface TariffConfirmationModalProps {
   isOpen: boolean;
@@ -109,9 +110,9 @@ export function TariffConfirmationModal({
 
       setCurrentCalculation(currentResult.data.calculation);
       setNewCalculation(newResult.data.calculation);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error calculating tariffs:', err);
-      setError(err.message || 'Erreur lors du calcul des tarifs');
+      setError(getErrorMessage(err) || 'Erreur lors du calcul des tarifs');
       toast({
         title: "Erreur de calcul",
         description: "Impossible de calculer les nouveaux tarifs",

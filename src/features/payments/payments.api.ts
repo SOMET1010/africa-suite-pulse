@@ -47,7 +47,7 @@ export const deleteCurrency = (id: string) =>
 
 // Payment transactions
 export async function createPaymentTransaction(input: CreateTransactionInput): Promise<PaymentTransaction> {
-  const { data, error } = await (supabase as any)
+  const { data, error } = await supabase
     .from('payment_transactions')
     .insert({
       org_id: input.org_id,
@@ -57,13 +57,13 @@ export async function createPaymentTransaction(input: CreateTransactionInput): P
       currency_code: input.currency_code ?? null,
       status: 'captured',
       reference: input.reference ?? null,
-      metadata: input.metadata ?? {},
+      metadata: input.metadata as any ?? {},
     })
-    .select('id, org_id, invoice_id, method_id, amount, currency_code, status, reference, created_at')
+    .select('id, org_id, invoice_id, method_id, amount, currency_code, status, reference, created_at, metadata, updated_at')
     .single();
 
   if (error) throw error;
-  return data;
+  return data as PaymentTransaction;
 }
 
 export async function listInvoiceTransactions(invoiceId: string): Promise<PaymentTransactionWithMethod[]> {
@@ -80,7 +80,7 @@ export async function listInvoiceTransactions(invoiceId: string): Promise<Paymen
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+  return data as PaymentTransactionWithMethod[] || [];
 }
 
 export async function getInvoicePaymentSummary(invoiceId: string): Promise<PaymentSummary> {

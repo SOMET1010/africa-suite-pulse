@@ -34,7 +34,7 @@ export function MainCoranteReport({ period, onPeriodChange }: MainCoranteReportP
 
       if (error) throw error;
       setReport(data.report);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading main courante:', error);
       toast({
         title: "Erreur",
@@ -69,7 +69,7 @@ export function MainCoranteReport({ period, onPeriodChange }: MainCoranteReportP
         title: "Export réussi",
         description: `Main courante exportée en ${format.toUpperCase()}`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error exporting main courante:', error);
       toast({
         title: "Erreur d'export",

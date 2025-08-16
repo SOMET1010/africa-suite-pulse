@@ -52,7 +52,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
       const { data, error } = await listUserProfiles(orgId);
       if (error) throw error;
       setProfiles(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erreur lors du chargement des profils");
     } finally {
       setLoading(false);
@@ -70,7 +70,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
         category: item.category
       }));
       setPermissions(mappedPermissions);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erreur lors du chargement des permissions");
     }
   };
@@ -100,7 +100,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
       toast.success(editingProfile ? "Profil modifié" : "Profil créé");
       resetForm();
       loadProfiles();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erreur lors de la sauvegarde");
     }
   };
@@ -125,7 +125,7 @@ export default function ProfilesTab({ orgId }: ProfilesTabProps) {
       
       toast.success("Profil supprimé");
       loadProfiles();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error("Erreur lors de la suppression");
     }
   };

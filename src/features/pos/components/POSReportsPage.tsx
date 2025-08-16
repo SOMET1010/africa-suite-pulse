@@ -201,7 +201,7 @@ export function POSReportsPage() {
       setTopProducts(topProductsData);
       setPaymentMethods(paymentMethodsData);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
         description: "Impossible de charger les données des rapports",

@@ -38,7 +38,7 @@ export function SyscohadaExport({ period, onPeriodChange }: SyscohadaExportProps
 
       if (error) throw error;
       setExportData(data.export);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading SYSCOHADA data:', error);
       toast({
         title: "Erreur",
@@ -74,7 +74,7 @@ export function SyscohadaExport({ period, onPeriodChange }: SyscohadaExportProps
         title: "Export réussi",
         description: `Données SYSCOHADA exportées en ${exportFormat.toUpperCase()}`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error exporting SYSCOHADA:', error);
       toast({
         title: "Erreur d'export",

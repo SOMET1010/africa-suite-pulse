@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { webhooksAPI, type Webhook as WebhookType } from '@/services/webhooks.api';
 import { channelsAPI, type ChannelIntegration } from '@/services/channels.api';
 import { workflowsAPI, type Workflow as WorkflowType } from '@/services/workflows.api';
+import { getErrorMessage } from '@/utils/errorHandling';
 
 export default function IntegrationsPage() {
   const [webhooks, setWebhooks] = useState<WebhookType[]>([]);
@@ -32,8 +33,8 @@ export default function IntegrationsPage() {
       setWebhooks(webhooksData);
       setChannels(channelsData);
       setWorkflows(workflowsData);
-    } catch (error: any) {
-      toast.error('Erreur lors du chargement: ' + error.message);
+    } catch (error: unknown) {
+      toast.error('Erreur lors du chargement: ' + getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -47,8 +48,8 @@ export default function IntegrationsPage() {
       } else {
         toast.error('Échec du test: ' + result.message);
       }
-    } catch (error: any) {
-      toast.error('Erreur: ' + error.message);
+    } catch (error: unknown) {
+      toast.error('Erreur: ' + getErrorMessage(error));
     }
   };
 
@@ -60,8 +61,8 @@ export default function IntegrationsPage() {
       } else {
         toast.error('Échec de la connexion: ' + result.message);
       }
-    } catch (error: any) {
-      toast.error('Erreur: ' + error.message);
+    } catch (error: unknown) {
+      toast.error('Erreur: ' + getErrorMessage(error));
     }
   };
 
@@ -69,8 +70,8 @@ export default function IntegrationsPage() {
     try {
       await workflowsAPI.executeWorkflow(id);
       toast.success('Workflow exécuté avec succès');
-    } catch (error: any) {
-      toast.error('Erreur: ' + error.message);
+    } catch (error: unknown) {
+      toast.error('Erreur: ' + getErrorMessage(error));
     }
   };
 

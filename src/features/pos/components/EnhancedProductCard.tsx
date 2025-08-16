@@ -25,7 +25,7 @@ interface EnhancedProductCardProps {
   };
   outletId: string;
   searchQuery?: string;
-  onAddToCart: (product: any, quantity?: number) => void;
+  onAddToCart: (product: POSProduct, quantity?: number) => void;
   isHappyHour?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: (productId: string) => void;

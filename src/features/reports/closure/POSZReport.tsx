@@ -31,7 +31,7 @@ export function POSZReport({ selectedDate, outletId }: POSZReportProps) {
 
       if (error) throw error;
       setReports(data.reports || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading Z reports:', error);
       toast({
         title: "Erreur",
@@ -61,7 +61,7 @@ export function POSZReport({ selectedDate, outletId }: POSZReportProps) {
       });
       
       await loadZReports();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error generating Z report:', error);
       toast({
         title: "Erreur",
@@ -95,7 +95,7 @@ export function POSZReport({ selectedDate, outletId }: POSZReportProps) {
         title: "Export réussi",
         description: `Rapport Z exporté en ${format.toUpperCase()}`
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error exporting Z report:', error);
       toast({
         title: "Erreur d'export",

@@ -47,7 +47,7 @@ export function PreClosureReport({ selectedDate, onCanClose }: PreClosureReportP
           description: "Tous les contrôles sont passés avec succès"
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error running pre-closure checks:', error);
       toast({
         title: "Erreur",
