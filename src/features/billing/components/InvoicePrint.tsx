@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useOrgId } from "@/core/auth/useOrg";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/services/logger.service";
 
 interface InvoiceItem {
   id: string;
@@ -73,7 +74,7 @@ export const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
             setHotelSettings(data);
           }
         } catch (error) {
-          console.error('Error loading hotel settings:', error);
+          logger.error('Error loading hotel settings', { error, orgId });
         }
       };
 

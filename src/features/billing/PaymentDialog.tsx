@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { getInvoicePaymentSummary } from "@/features/payments/payments.api";
 import BillingPaymentSheet from "./BillingPaymentSheet";
 import { PaymentHistoryWidget } from "./PaymentHistoryWidget";
+import { logger } from "@/services/logger.service";
 
 interface PaymentDialogProps {
   open: boolean;
@@ -21,7 +22,7 @@ export function PaymentDialog({ open, onOpenChange, invoiceId, totalDue, guestNa
       const summary = await getInvoicePaymentSummary(invoiceId);
       setPaymentSummary(summary);
     } catch (error) {
-      console.error('Error loading payment summary:', error);
+      logger.error('Error loading payment summary', { error, invoiceId });
     }
   };
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/services/logger.service';
 
 export interface ReservationService {
   id: string;
@@ -50,7 +51,7 @@ export function useReservationServices(reservationId: string) {
         .order('created_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching reservation services:', error);
+        logger.error('Error fetching reservation services', { error, reservationId });
         toast({
           title: "Erreur",
           description: "Impossible de charger les prestations",
@@ -61,7 +62,7 @@ export function useReservationServices(reservationId: string) {
 
       setData((services as any) || []);
     } catch (error) {
-      console.error('Error fetching reservation services:', error);
+      logger.error('Error fetching reservation services (catch)', { error, reservationId });
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors du chargement",

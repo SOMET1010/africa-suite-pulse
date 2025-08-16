@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePaymentMethods, useCreatePaymentTransaction } from '@/queries/payments.queries';
 import type { CartItem } from '../types';
+import { logger } from '@/services/logger.service';
 
 interface PaymentState {
   selectedMethodId: string;
@@ -62,7 +63,7 @@ export function usePOSPayment(orgId: string) {
 
   // Process payment
   const processPayment = async (input: ProcessPaymentInput) => {
-    console.log('🔄 Processing POS payment:', input);
+    logger.audit('Processing POS payment', { orderId: input.orderId, amount: input.amountReceived, method: input.methodId });
     
     setPaymentState(prev => ({ ...prev, isProcessing: true }));
 
@@ -116,7 +117,7 @@ export function usePOSPayment(orgId: string) {
       return { invoice, success: true };
 
     } catch (error: any) {
-      console.error('❌ Payment processing failed:', error);
+      logger.error('Payment processing failed', { error, orderId: input.orderId });
       
       toast({
         title: "Erreur de paiement",

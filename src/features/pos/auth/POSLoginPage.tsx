@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useOrgId } from "@/core/auth/useOrg";
 import { User, KeyRound, Loader2, Info } from "lucide-react";
 import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
+import { logger } from "@/services/logger.service";
 
 type POSRole = "pos_hostess" | "pos_server" | "pos_cashier" | "pos_manager";
 
@@ -100,7 +101,7 @@ export default function POSLoginPage() {
       // Navigate to POS
       navigate("/pos");
     } catch (err: any) {
-      console.error("Erreur d'authentification POS:", err);
+      logger.security("POS authentication failed", { error: err, pin: pin.length > 0 ? "[REDACTED]" : "empty" });
       setError(err.message || "Erreur lors de la connexion");
       setPin("");
     } finally {
@@ -120,7 +121,7 @@ export default function POSLoginPage() {
           });
         }
       } catch (error) {
-        console.error("Logout error:", error);
+        logger.error("POS logout error", { error });
       }
     }
     setCurrentUser(null);
