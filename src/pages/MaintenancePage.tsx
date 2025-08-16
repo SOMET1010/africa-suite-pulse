@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UnifiedLayout } from '@/core/layout/UnifiedLayout';
+import { GlobalNavigationLayout } from '@/core/layout/GlobalNavigationLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TButton } from '@/core/ui/TButton';
 import { Input } from '@/components/ui/input';
@@ -138,7 +138,7 @@ export default function MaintenancePage() {
   };
 
   return (
-    <UnifiedLayout title="Maintenance">
+    <GlobalNavigationLayout title="Maintenance">
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -390,6 +390,6 @@ export default function MaintenancePage() {
           </TabsContent>
         </Tabs>
       </div>
-    </UnifiedLayout>
+    </GlobalNavigationLayout>
   );
 }
