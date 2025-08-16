@@ -6,7 +6,7 @@ import { ModernTicketPanel } from "./ModernTicketPanel";
 import { ModernProductCatalog } from "./ModernProductCatalog";
 import { ModernActionsPanel } from "./ModernActionsPanel";
 import { TableSelector } from "./TableSelector";
-import { ComprehensivePaymentDialog } from "./ComprehensivePaymentDialog";
+import { ModernPaymentDialog } from "./ModernPaymentDialog";
 import { SplitBillDialog } from "./SplitBillDialog";
 import { TableTransferDialog } from "./TableTransferDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
@@ -259,7 +259,7 @@ export function RestaurantPOSTerminal() {
     });
   };
 
-  const calculateTotal = () => {
+  const calculateTotals = () => {
     const subtotal = orderState.cartItems.reduce((sum, item) => sum + item.total_price, 0);
     const taxRate = 18; // TVA
     const serviceChargeRate = 10; // Service
@@ -325,7 +325,7 @@ export function RestaurantPOSTerminal() {
     );
   }
 
-  const totals = calculateTotal();
+  const totals = calculateTotals();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/10 to-accent/5">
@@ -411,18 +411,20 @@ export function RestaurantPOSTerminal() {
       </div>
 
       {/* Dialogues */}
-      <ComprehensivePaymentDialog
-        isOpen={isPaymentOpen}
-        onClose={() => setIsPaymentOpen(false)}
-        cartItems={orderState.cartItems}
-        subtotal={totals.subtotal}
-        serviceCharge={totals.serviceCharge}
-        taxAmount={totals.taxAmount}
-        total={totals.total}
-        onPaymentComplete={clearAll}
-        tableNumber={selectedTable?.number}
-        customerCount={customerCount}
-      />
+      {orderState.currentOrder && (
+        <ModernPaymentDialog
+          isOpen={isPaymentOpen}
+          onClose={() => setIsPaymentOpen(false)}
+          order={orderState.currentOrder}
+          cartItems={orderState.cartItems}
+          totals={totals}
+          onPaymentComplete={() => {
+            setIsPaymentOpen(false);
+            orderState.actions.clearOrder();
+            setSelectedTable(null);
+          }}
+        />
+      )}
 
       <SplitBillDialog
         open={isSplitBillOpen}
