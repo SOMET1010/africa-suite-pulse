@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, startTransition } from 'react';
 import { MobileOptimizedLayout, TouchOptimizedCard, ResponsiveGrid } from '@/core/ui/Mobile';
 import { TButton } from '@/core/ui/TButton';
 import { Badge } from '@/components/ui/badge';
@@ -71,9 +71,9 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
   const [showNotifications, setShowNotifications] = useState(true);
 
   // Utiliser de vraies données depuis Supabase
-  const { data: tables = [], isLoading } = useQuery({
+  const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
     queryKey: ['pos-tables', session?.org_id],
-    queryFn: async () => {
+    queryFn: async (): Promise<POSTable[]> => {
       if (!session?.org_id) return [];
       
       // Utiliser des données simulées pour l'instant
@@ -117,7 +117,9 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
         needs_attention: table.needs_attention || false,
       }));
     },
-    enabled: !!session?.org_id
+    enabled: !!session?.org_id,
+    staleTime: 30000, // 30 seconds
+    refetchOnWindowFocus: false
   });
 
   // Trier les tables par priorité (urgence d'attention)
@@ -131,52 +133,64 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     return <div className="flex justify-center p-4">Chargement des tables...</div>;
   }
 
+  if (error) {
+    return <div className="flex justify-center p-4 text-destructive">Erreur lors du chargement des tables</div>;
+  }
+
   const handleTableSelect = (table: POSTable) => {
-    setSelectedTable(table);
-    if (table.status === 'occupee') {
-      // Navigation vers l'interface de commande
-      toast({
-        title: `Table ${table.number}`,
-        description: "Interface de commande en cours de développement",
-      });
-    }
+    startTransition(() => {
+      setSelectedTable(table);
+      if (table.status === 'occupee') {
+        // Navigation vers l'interface de commande
+        toast({
+          title: `Table ${table.number}`,
+          description: "Interface de commande en cours de développement",
+        });
+      }
+    });
   };
 
   const handleTableAction = async (tableId: string, action: string) => {
-    try {
-      let updateData = {};
-      
-      switch (action) {
-        case 'mark_clean':
-          updateData = { 
-            status: 'libre',
-            metadata: { needs_attention: false }
-          };
-          break;
-        case 'mark_attention':
-          // Toggle attention state in metadata
-          updateData = { 
-            metadata: { needs_attention: true }
-          };
-          break;
-      }
-      
-      await supabase
-        .from('pos_tables')
-        .update(updateData)
-        .eq('id', tableId);
+    startTransition(() => {
+      const performAction = async () => {
+        try {
+          let updateData = {};
+          
+          switch (action) {
+            case 'mark_clean':
+              updateData = { 
+                status: 'libre',
+                metadata: { needs_attention: false }
+              };
+              break;
+            case 'mark_attention':
+              // Toggle attention state in metadata
+              updateData = { 
+                metadata: { needs_attention: true }
+              };
+              break;
+          }
+          
+          await supabase
+            .from('pos_tables')
+            .update(updateData)
+            .eq('id', tableId);
 
-      toast({
-        title: "Table mise à jour",
-        description: `Action "${action}" effectuée`,
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la table",
-        variant: "destructive"
-      });
-    }
+          toast({
+            title: "Table mise à jour",
+            description: `Action "${action}" effectuée`,
+          });
+        } catch (error) {
+          toast({
+            title: "Erreur",
+            description: "Impossible de mettre à jour la table",
+            variant: "destructive"
+          });
+        }
+      };
+      
+      performAction();
+    });
   };
 
   const getTableStats = () => {
