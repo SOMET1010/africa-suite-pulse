@@ -12,6 +12,7 @@ import { AppRoutes } from '@/routes';
 
 // Core auth
 import { OrgProvider } from '@/core/auth/OrgProvider';
+import { POSAuthProvider } from '@/features/pos/auth/POSAuthProvider';
 
 // Import the optimized query client
 import { queryClient } from '@/lib/queryClient';
@@ -23,8 +24,10 @@ function App() {
         <TooltipProvider>
           <BrowserRouter>
             <OrgProvider>
-              <AppRoutes />
-              <Toaster />
+              <POSAuthProvider>
+                <AppRoutes />
+                <Toaster />
+              </POSAuthProvider>
             </OrgProvider>
           </BrowserRouter>
         </TooltipProvider>
