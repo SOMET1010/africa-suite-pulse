@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { TButton } from "@/core/ui/TButton";
 import { ModernPOSHeader } from "./ModernPOSHeader";
 import { ModernTicketPanel } from "./ModernTicketPanel";
-import { ModernProductCatalog } from "./ModernProductCatalog";
+import { MarketTilesCatalog } from "./MarketTilesCatalog";
 import { ModernActionsPanel } from "./ModernActionsPanel";
 import { TableSelector } from "./TableSelector";
 import { ModernPaymentDialog } from "./ModernPaymentDialog";
@@ -490,10 +490,11 @@ export function RestaurantPOSTerminal() {
 
             {/* Catalogue produits */}
             <div className="flex-1 p-6 overflow-hidden">
-              <ModernProductCatalog
+              <MarketTilesCatalog
                 outletId={selectedOutlet.id}
                 searchQuery={searchQuery}
                 onAddToCart={handleAddToCart}
+                onSearchChange={setSearchQuery}
               />
             </div>
           </div>

@@ -45,6 +45,7 @@ export interface POSProduct {
   created_at: string;
   updated_at: string;
   // Enhanced Elyx-like features
+  happy_hour_price?: number;
   is_for_sale?: boolean;
   is_stock_managed?: boolean;
   unit_sale?: string;
