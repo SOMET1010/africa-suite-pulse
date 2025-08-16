@@ -2,6 +2,7 @@ import { toast } from "@/hooks/use-toast";
 import { useReassignReservation } from "@/queries/rack.queries";
 import { canSwap, findFirstFreeRoom, findBestRelocationRooms, type Relocation } from "../conflictValidation";
 import type { UIRoom, UIReservation, RackData } from "../rack.types";
+import { logger } from "@/lib/logger";
 
 interface UseRackActionsProps {
   data: RackData | null;
@@ -69,7 +70,7 @@ export function useRackActions({
     const conflictType = conflicts.length > 0 ? 
       (conflicts.some(c => c.start <= today) ? "CURRENT" : "FUTURE") : null;
 
-    console.log("📊 Conflict analysis:", { 
+    logger.debug('Conflict analysis', { 
       conflictType, 
       today, 
       conflictDates: conflicts.map(c => ({ start: c.start, guest: c.guestName, isCurrent: c.start <= today }))
@@ -82,7 +83,7 @@ export function useRackActions({
         today 
       }) : [];
       
-    console.log("📋 Preview calculation:", { 
+    logger.debug('Preview calculation', { 
       preview: preview.length, 
       conflictType,
       previewDetails: preview.map(p => ({ 
@@ -282,7 +283,10 @@ export function useRackActions({
       // Exécuter le plan de re-lodging
       for (const relocation of plan) {
         if (relocation.target) {
-          console.log(`🔄 Re-lodging ${relocation.conflict.guestName} to room ${relocation.target.number}`);
+          logger.info('Re-lodging guest', { 
+            guestName: relocation.conflict.guestName, 
+            roomNumber: relocation.target.number 
+          });
           await reassignMutation.mutateAsync({ reservationId: relocation.conflict.id, roomId: relocation.target.id });
         }
       }

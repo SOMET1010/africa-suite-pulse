@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { POSTable } from '../types';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Server {
   id: string;
@@ -175,7 +176,7 @@ export const useAutoAssignment = () => {
       createdAt: new Date().toISOString()
     };
     
-    console.log('Template sauvegardé:', newTemplate);
+    logger.info('Template sauvegardé', { template: newTemplate });
     toast.success(`Template "${name}" sauvegardé`);
   };
 

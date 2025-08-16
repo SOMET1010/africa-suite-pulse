@@ -12,6 +12,7 @@ import { cardexApi } from "@/services/cardex.api";
 import { FOLIO_DEFINITIONS } from "@/types/billing";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 interface QuickPostingDialogProps {
   open: boolean;

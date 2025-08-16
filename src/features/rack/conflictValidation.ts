@@ -1,4 +1,5 @@
 import type { RackData, UIReservation, UIRoom } from "./rack.types";
+import { logger } from "@/lib/logger";
 
 /** Vrai si une résa occupe la nuit `dayISO` (arrival <= day < departure) */
 export function overlapsDay(startISO: string, endISO: string, dayISO: string) {
@@ -55,7 +56,7 @@ export function validateDrop(
 
   // CRITIQUE : Empêcher le drop sur la même chambre
   if (dragged.roomId === targetRoomId) {
-    console.log(`🔄 Same room drop detected: ${dragged.guestName} already in target room`);
+    logger.debug('Same room drop detected', { guestName: dragged.guestName });
     return { ok: false, reason: "BLOCKED" }; // Bloquer complètement le drop
   }
 

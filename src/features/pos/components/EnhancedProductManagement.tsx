@@ -10,6 +10,7 @@ import ProductCompositionDialog from './ProductCompositionDialog';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 interface EnhancedProductManagementProps {
   outletId: string;
