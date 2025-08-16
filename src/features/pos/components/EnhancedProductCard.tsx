@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import type { POSProduct } from "../types";
 import { TButton } from "@/core/ui/TButton";
 import { Heart, Clock, Percent, Tag, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -101,7 +102,7 @@ export function EnhancedProductCard({
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => !isOutOfStock && onAddToCart(product)}
+      onClick={() => !isOutOfStock && onAddToCart(product as POSProduct)}
     >
       {/* Product Image */}
       <div className="relative h-32 bg-gradient-to-br from-muted/30 to-muted/10 overflow-hidden">
@@ -233,7 +234,7 @@ export function EnhancedProductCard({
             className="shadow-xl"
             onClick={(e) => {
               e.stopPropagation();
-              onAddToCart(product);
+              onAddToCart(product as POSProduct);
             }}
           >
             <Plus className="w-5 h-5 mr-2" />

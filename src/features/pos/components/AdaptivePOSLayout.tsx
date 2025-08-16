@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import type { POSProduct } from "../types";
 import { useBusinessContext } from "../hooks/useBusinessContext";
 import { ModernTicketPanel } from "./ModernTicketPanel";
 import { MarketTilesCatalog } from "./MarketTilesCatalog";
