@@ -88,6 +88,8 @@ export interface DocumentTemplate {
   qr_code: TemplateQRCode;
   style: TemplateStyle;
   content: TemplateContent;
+  variables?: string[];
+  version?: number;
   created_at: string;
   updated_at: string;
   created_by?: string;

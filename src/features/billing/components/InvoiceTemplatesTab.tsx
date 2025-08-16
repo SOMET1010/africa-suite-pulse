@@ -1,4 +1,4 @@
-// Page des modèles de factures - Templates et prévisualisations
+// Onglet des modèles de factures dans la section facturation
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,59 +7,23 @@ import { FileText, Eye, Download, Settings } from "lucide-react";
 import { InvoiceTemplatePreview } from "./InvoiceTemplatePreview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTemplateExport } from "@/features/templates/hooks/useTemplateExport";
-import { InvoiceTemplateRenderer } from "@/features/templates/components/InvoiceTemplateRenderer";
+import { useDocumentTemplates } from "@/features/templates/hooks/useDocumentTemplates";
+import type { DocumentTemplate } from "@/types/templates";
 
-export function InvoiceTemplatesPage() {
+export function InvoiceTemplatesTab() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const { exportToPDF } = useTemplateExport();
+  const { templates, isLoading } = useDocumentTemplates();
 
-  const templates = [
-    {
-      id: "standard",
-      name: "Facture Standard",
-      description: "Modèle classique adapté à la plupart des établissements",
-      preview: "/api/placeholder/400/500",
-      category: "Professionnel",
-      features: ["En-tête personnalisé", "Détail des services", "Conditions de paiement"],
-      isDefault: true
-    },
-    {
-      id: "luxury",
-      name: "Facture Premium",
-      description: "Design élégant pour les établissements de luxe",
-      preview: "/api/placeholder/400/500",
-      category: "Luxe",
-      features: ["Design haut de gamme", "Logo en relief", "Finitions premium"],
-      isDefault: false
-    },
-    {
-      id: "minimal",
-      name: "Facture Minimaliste",
-      description: "Design épuré et moderne",
-      preview: "/api/placeholder/400/500",
-      category: "Moderne",
-      features: ["Design épuré", "Mise en page optimisée", "Lisibilité maximale"],
-      isDefault: false
-    },
-    {
-      id: "detailed",
-      name: "Facture Détaillée",
-      description: "Modèle avec breakdown complet des charges",
-      preview: "/api/placeholder/400/500",
-      category: "Détaillé",
-      features: ["Détail par poste", "Taxes détaillées", "Notes explicatives"],
-      isDefault: false
-    }
-  ];
+  // Filtrer uniquement les templates de facture
+  const invoiceTemplates = templates.filter(template => template.type === 'invoice');
 
   const categories = ["Tous", "Professionnel", "Luxe", "Moderne", "Détaillé"];
   const [activeCategory, setActiveCategory] = useState("Tous");
 
-  const filteredTemplates = activeCategory === "Tous" 
-    ? templates 
-    : templates.filter(t => t.category === activeCategory);
+  const filteredTemplates = invoiceTemplates; // Utiliser tous les templates de facture pour le moment
 
-  const handleExportTemplate = async (template: any) => {
+  const handleExportTemplate = async (template: DocumentTemplate) => {
     // Créer un élément temporaire avec le template
     const tempDiv = document.createElement('div');
     tempDiv.id = `temp-template-${template.id}`;
@@ -69,29 +33,6 @@ export function InvoiceTemplatesPage() {
     tempDiv.style.width = '800px';
     tempDiv.style.backgroundColor = 'white';
     document.body.appendChild(tempDiv);
-
-    // Créer le template rendu
-    const mockTemplate = {
-      id: template.id,
-      type: 'invoice',
-      style: {
-        font_family: 'Arial',
-        font_size: 12,
-        primary_color: '#1f2937',
-        text_color: '#000000'
-      },
-      header: {
-        show_logo: true,
-        custom_text: ''
-      },
-      footer: {
-        show_legal_info: true,
-        custom_text: 'Merci de votre confiance'
-      },
-      qr_code: {
-        enabled: true
-      }
-    };
 
     const mockData = {
       invoiceNumber: 'FAC-2024-001',
@@ -237,8 +178,21 @@ export function InvoiceTemplatesPage() {
     document.body.removeChild(tempDiv);
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 bg-muted animate-pulse rounded" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-64 bg-muted animate-pulse rounded" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Modèles de Factures</h1>
@@ -270,8 +224,8 @@ export function InvoiceTemplatesPage() {
                     <div>
                       <CardTitle className="text-lg">{template.name}</CardTitle>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="default">{template.category}</Badge>
-                        {template.isDefault && (
+                        <Badge variant="default">Facture</Badge>
+                        {template.is_default && (
                           <Badge variant="default">Par défaut</Badge>
                         )}
                       </div>
@@ -300,12 +254,18 @@ export function InvoiceTemplatesPage() {
                   <div>
                     <h4 className="text-sm font-medium mb-2">Caractéristiques :</h4>
                     <ul className="text-xs text-muted-foreground space-y-1">
-                      {template.features.map((feature, index) => (
-                        <li key={index} className="flex items-center gap-1">
-                          <div className="h-1 w-1 bg-current rounded-full" />
-                          {feature}
-                        </li>
-                      ))}
+                      <li className="flex items-center gap-1">
+                        <div className="h-1 w-1 bg-current rounded-full" />
+                        En-tête personnalisé
+                      </li>
+                      <li className="flex items-center gap-1">
+                        <div className="h-1 w-1 bg-current rounded-full" />
+                        Détail des services
+                      </li>
+                      <li className="flex items-center gap-1">
+                        <div className="h-1 w-1 bg-current rounded-full" />
+                        Conditions de paiement
+                      </li>
                     </ul>
                   </div>
 
@@ -337,10 +297,17 @@ export function InvoiceTemplatesPage() {
       </Tabs>
 
       {/* Template Preview Modal */}
-      {selectedTemplate && (
+      {selectedTemplate && filteredTemplates.find(t => t.id === selectedTemplate) && (
         <InvoiceTemplatePreview
           templateId={selectedTemplate}
-          template={templates.find(t => t.id === selectedTemplate)!}
+          template={{
+            id: selectedTemplate,
+            name: filteredTemplates.find(t => t.id === selectedTemplate)!.name,
+            description: filteredTemplates.find(t => t.id === selectedTemplate)!.description || '',
+            category: 'Facture',
+            features: ['En-tête personnalisé', 'Détail des services', 'Conditions de paiement'],
+            isDefault: filteredTemplates.find(t => t.id === selectedTemplate)!.is_default
+          }}
           onClose={() => setSelectedTemplate(null)}
         />
       )}

@@ -8,7 +8,7 @@ import { useBillingStats } from "./hooks/useBilling";
 import { BillingDashboard } from "./components/BillingDashboard";
 import { InvoicesWorkflow } from "./components/InvoicesWorkflow";
 import { CreateInvoiceDialog } from "./components/CreateInvoiceDialog";
-import { InvoiceTemplatesPage } from "./components/InvoiceTemplatesPage";
+import { InvoiceTemplatesTab } from "./components/InvoiceTemplatesTab";
 
 export default function BillingPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function BillingPage() {
         </TabsContent>
         
         <TabsContent value="modeles" className="mt-6">
-          <InvoiceTemplatesPage />
+          <InvoiceTemplatesTab />
         </TabsContent>
       </Tabs>
 
