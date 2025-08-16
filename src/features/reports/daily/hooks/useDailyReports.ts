@@ -306,10 +306,10 @@ export function useNoShows(selectedDate: string) {
         expectedArrival: reservation.date_arrival,
         source: reservation.source || 'Direct',
         totalAmount: reservation.rate_total || 0,
-        depositPaid: 0, // TODO: Calculate from deposits
-        penaltyAmount: 0, // TODO: Calculate penalty based on policy
+        depositPaid: reservation.deposit_amount || 0,
+        penaltyAmount: reservation.penalty_amount || 0,
         status: reservation.status,
-        cancellationCode: '', // TODO: Add cancellation codes
+        cancellationCode: reservation.cancellation_code || '',
         notes: reservation.notes,
       })) || [];
     },

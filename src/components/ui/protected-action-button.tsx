@@ -3,6 +3,7 @@ import { Button, ButtonProps } from '@/components/ui/button';
 import { DataProtectionIndicator } from './data-protection-indicator';
 import { useDataProtection } from '@/hooks/useDataProtection';
 import { DataProtectionStatus } from '@/services/data-protection.service';
+import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 export interface ProtectedActionButtonProps extends Omit<ButtonProps, 'onClick'> {
@@ -69,7 +70,7 @@ export function ProtectedActionButton({
       setProtectionStatus(status);
       onProtectionCheck?.(status);
     } catch (error) {
-      console.error('Erreur vérification protection:', error);
+      logger.security('Erreur vérification protection', error);
       setProtectionStatus({
         isProtected: true,
         reason: 'Erreur de vérification'

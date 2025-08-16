@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useOrgId } from "@/core/auth/useOrg";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import { createInvoice } from "../api/billing.api";
 import { billingKeys } from "./useBilling";
 import type { CreateInvoiceInput } from "../types/billing.types";
@@ -29,7 +30,7 @@ export function useCreateInvoice() {
       });
     },
     onError: (error: any) => {
-      console.error('Create invoice error:', error);
+      logger.error('Create invoice error', error);
       toast({
         title: "Erreur",
         description: error.message || "Une erreur est survenue lors de la création",

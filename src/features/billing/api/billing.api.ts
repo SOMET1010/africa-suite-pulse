@@ -1,5 +1,6 @@
 // API Facturation robuste avec gestion d'erreurs - Phase 1 refactoring
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 import { throwIfError, handleError, withPerformanceLogging } from "@/services/api.core";
 import type {
   Invoice,
@@ -87,7 +88,7 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<BillingA
 
       return { data: invoice as any, error: null };
     } catch (error) {
-      console.error('❌ Error creating invoice:', error);
+      logger.error('Error creating invoice', error);
       return { data: null, error: error as Error };
     }
   });
@@ -109,7 +110,7 @@ export async function getInvoiceById(invoiceId: string): Promise<BillingApiRespo
       
       return { data: { ...data, items: data.invoice_items || [] } as any, error: null };
     } catch (error) {
-      console.error('❌ Error fetching invoice:', error);
+      logger.error('Error fetching invoice', error);
       return { data: null, error: error as Error };
     }
   });
@@ -178,7 +179,7 @@ export async function listInvoices(
         has_more: (count || 0) > offset + limit
       };
     } catch (error) {
-      console.error('❌ Error listing invoices:', error);
+      logger.error('Error listing invoices', error);
       return { data: null, error: error as Error };
     }
   });
@@ -204,7 +205,7 @@ export async function updateInvoice(
       
       return { data: data as any, error: null };
     } catch (error) {
-      console.error('❌ Error updating invoice:', error);
+      logger.error('Error updating invoice', error);
       return { data: null, error: error as Error };
     }
   });
@@ -229,7 +230,7 @@ export async function deleteInvoice(invoiceId: string): Promise<BillingApiRespon
       
       return { data: true, error: null };
     } catch (error) {
-      console.error('❌ Error deleting invoice:', error);
+      logger.error('Error deleting invoice', error);
       return { data: null, error: error as Error };
     }
   });
@@ -292,7 +293,7 @@ export async function getBillingStats(orgId: string): Promise<BillingApiResponse
 
       return { data: stats, error: null };
     } catch (error) {
-      console.error('❌ Error fetching billing stats:', error);
+      logger.error('Error fetching billing stats', error);
       return { data: null, error: error as Error };
     }
   });

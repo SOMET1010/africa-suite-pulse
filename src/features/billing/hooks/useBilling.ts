@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useOrgId } from "@/core/auth/useOrg";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 import {
   createInvoice,
   getInvoiceById,
@@ -96,7 +97,7 @@ export function useCreateInvoice() {
       }
     },
     onError: (error) => {
-      console.error('Create invoice error:', error);
+      logger.error('Create invoice error', error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la création",
@@ -134,7 +135,7 @@ export function useUpdateInvoice() {
       }
     },
     onError: (error) => {
-      console.error('Update invoice error:', error);
+      logger.error('Update invoice error', error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la mise à jour",
@@ -171,7 +172,7 @@ export function useDeleteInvoice() {
       }
     },
     onError: (error) => {
-      console.error('Delete invoice error:', error);
+      logger.error('Delete invoice error', error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la suppression",

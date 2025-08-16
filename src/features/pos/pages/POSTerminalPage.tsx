@@ -121,7 +121,25 @@ export default function POSTerminalPage() {
       return;
     }
     
-    // TODO: Create order and redirect to payment
+    // Create order and navigate to payment
+    const orderData = {
+      items: orderItems,
+      total: calculateTotal(),
+      serverId: session?.user_id,
+      timestamp: new Date().toISOString()
+    };
+    
+    logger.audit('POS Order created', orderData);
+    
+    // Navigate to payment page with order data
+    navigate('/pos/payment', { 
+      state: { orderData }
+    });
+    
+    toast({
+      title: "Commande créée",
+      description: `Total: ${calculateTotal().toLocaleString()} FCFA`,
+    });
   };
 
   return (

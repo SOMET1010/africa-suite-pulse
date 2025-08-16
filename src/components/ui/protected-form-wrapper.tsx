@@ -4,6 +4,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DataProtectionIndicator } from './data-protection-indicator';
 import { useDataProtection } from '@/hooks/useDataProtection';
 import { DataProtectionStatus } from '@/services/data-protection.service';
+import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 interface ProtectedFormWrapperProps {
@@ -66,7 +67,7 @@ export function ProtectedFormWrapper({
       setProtectionStatus(status);
       onProtectionStatusChange?.(status);
     } catch (error) {
-      console.error('Erreur vérification protection:', error);
+      logger.security('Erreur vérification protection', error);
       const errorStatus = {
         isProtected: true,
         reason: 'Erreur de vérification'

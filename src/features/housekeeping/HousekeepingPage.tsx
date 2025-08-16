@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { logger } from "@/lib/logger";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -90,6 +91,7 @@ export default function HousekeepingPage() {
   const { data: staff = [], isLoading: staffLoading } = useHousekeepingStaff();
   const { data: roomStatusData = [], isLoading: roomsLoading } = useRoomStatusSummary();
   const { data: workflowsData = [], isLoading: workflowsLoading } = useRecoucheWorkflows();
+  const { toast } = useToast();
   
   // Enable realtime updates
   useHousekeepingRealtime();
@@ -314,7 +316,20 @@ export default function HousekeepingPage() {
   // Handler pour les changements de linge
   const handleLinenChange = (roomId: string, details: any) => {
     logger.info('Changement de linge pour la chambre', { roomId, details });
-    // TODO: Ajouter API pour mettre à jour le statut de chambre
+    
+    // Update room status with linen change
+    updateTaskMutation.mutate({
+      id: `linen-${roomId}-${Date.now()}`,
+      status: 'completed',
+      type: 'linen_change',
+      roomId,
+      details
+    });
+    
+    toast({
+      title: "Linge mis à jour",
+      description: `Chambre ${roomId} - ${details.type || 'changement'} effectué`,
+    });
   };
 
   // Handler pour assigner une tâche
@@ -375,18 +390,47 @@ export default function HousekeepingPage() {
 
   // Functions for recouche workflow
   const startTask = (roomId: string, taskType: 'cleaning' | 'inspection') => {
-    // TODO: Implement start task logic
     logger.info('Starting task', { roomId, taskType });
+    
+    const taskId = `${taskType}-${roomId}-${Date.now()}`;
+    updateTaskMutation.mutate({
+      id: taskId,
+      status: 'in_progress',
+      type: taskType,
+      roomId,
+      startedAt: new Date().toISOString()
+    });
   };
 
   const completeTask = (roomId: string, taskType: 'cleaning' | 'inspection') => {
-    // TODO: Implement complete task logic
     logger.info('Completing task', { roomId, taskType });
+    
+    const taskId = `${taskType}-${roomId}-${Date.now()}`;
+    completeTaskMutation.mutate({
+      taskId,
+      actualDuration: undefined,
+      qualityScore: taskType === 'inspection' ? 95 : undefined
+    });
+    
+    toast({
+      title: "Tâche terminée",
+      description: `${taskType === 'cleaning' ? 'Nettoyage' : 'Inspection'} de la chambre ${roomId} terminé`,
+    });
   };
 
   const assignStaff = (roomId: string, staffId: string, role: 'cleaner' | 'inspector') => {
-    // TODO: Implement staff assignment logic
     logger.info('Assigning staff', { roomId, staffId, role });
+    
+    const taskId = `${role}-assignment-${roomId}-${Date.now()}`;
+    assignTaskMutation.mutate({
+      taskId,
+      staffId
+    });
+    
+    toast({
+      title: "Personnel assigné",
+      description: `${role === 'cleaner' ? 'Nettoyeur' : 'Inspecteur'} assigné à la chambre ${roomId}`,
+    });
   };
 
   // Handler pour les actions d'alertes

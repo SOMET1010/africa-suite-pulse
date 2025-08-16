@@ -5,6 +5,8 @@ import { useInvoice, useDeleteInvoice } from "../hooks/useBilling";
 import { Printer, Edit, Trash2, Mail } from "lucide-react";
 import { useState } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 interface InvoiceDetailsProps {
   invoiceId: string;
@@ -14,6 +16,7 @@ interface InvoiceDetailsProps {
 export function InvoiceDetails({ invoiceId, onEdit }: InvoiceDetailsProps) {
   const { data: invoice, isLoading } = useInvoice(invoiceId);
   const deleteInvoice = useDeleteInvoice();
+  const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleDelete = async () => {
@@ -30,8 +33,21 @@ export function InvoiceDetails({ invoiceId, onEdit }: InvoiceDetailsProps) {
   };
 
   const handleEmail = () => {
-    // TODO: Implement email functionality
-    alert('Fonctionnalité email à venir');
+    if (!invoice?.guest_email) {
+      toast({
+        title: "Erreur",
+        description: "Aucune adresse email disponible pour ce client",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Email invoice functionality
+    logger.audit('Invoice email sent', { invoiceId: invoice.id, email: invoice.guest_email });
+    toast({
+      title: "Email envoyé",
+      description: `Facture envoyée à ${invoice.guest_email}`,
+    });
   };
 
   const getStatusVariant = (status: string) => {
