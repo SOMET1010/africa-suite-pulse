@@ -3,9 +3,30 @@ import QRCode from 'qrcode';
 import { useCurrency } from '@/hooks/useCurrency';
 import type { DocumentTemplate } from '@/types/templates';
 
+interface TemplateData {
+  id: string;
+  number: string;
+  date: string;
+  amount: number;
+  customer: {
+    name: string;
+    email: string;
+    address: string;
+  };
+  items: Array<{
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }>;
+  subtotal: number;
+  tax: number;
+  total: number;
+}
+
 interface TemplateRendererProps {
   template: DocumentTemplate;
-  data?: any; // Document data (invoice, receipt, etc.)
+  data?: TemplateData; // Document data (invoice, receipt, etc.)
 }
 
 export function TemplateRenderer({ template, data }: TemplateRendererProps) {
@@ -48,7 +69,7 @@ export function TemplateRenderer({ template, data }: TemplateRendererProps) {
             qrContent = `https://hotel.com/pay/${sampleData.id}`;
             break;
           case 'custom':
-            qrContent = template.qr_code.custom_content || sampleData.id;
+            qrContent = template.qr_code.custom_content || String(sampleData.id);
             break;
         }
 
@@ -184,7 +205,7 @@ export function TemplateRenderer({ template, data }: TemplateRendererProps) {
               </tr>
             </thead>
             <tbody>
-              {sampleData.items.map((item: any, index: number) => (
+              {sampleData.items.map((item, index: number) => (
                 <tr key={index} className={getRowClasses(index)}>
                   <td className="px-4 py-3">{item.description}</td>
                   <td className="px-4 py-3 text-center">{item.quantity}</td>

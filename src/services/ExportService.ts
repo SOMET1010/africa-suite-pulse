@@ -16,7 +16,7 @@ export interface ExportOptions {
   filename: string;
   format: ExportFormat;
   elementId?: string; // Pour PDF/Image d'éléments DOM
-  data?: any[]; // Pour CSV/Excel/JSON
+  data?: Record<string, unknown>[]; // Pour CSV/Excel/JSON
   columns?: ExportColumn[]; // Configuration colonnes
   title?: string;
   subtitle?: string;

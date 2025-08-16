@@ -11,7 +11,7 @@ export interface NotificationData {
   message: string;
   priority: 'low' | 'medium' | 'high' | 'critical';
   timestamp: Date;
-  data?: any;
+  data?: Record<string, unknown>;
   read: boolean;
   action_url?: string;
   context_id?: string;

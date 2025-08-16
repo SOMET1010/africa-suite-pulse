@@ -11,7 +11,7 @@ export interface WidgetConfig {
   size: 'small' | 'medium' | 'large';
   position: { x: number; y: number };
   visible: boolean;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 interface DashboardWidgetProps {

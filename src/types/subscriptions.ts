@@ -1,3 +1,5 @@
+import type { Json } from '@/integrations/supabase/types';
+
 export interface SubscriptionPlan {
   id: string;
   name: string;
@@ -8,7 +10,7 @@ export interface SubscriptionPlan {
   currency_code: string;
   max_rooms?: number;
   max_users?: number;
-  features: any;
+  features: Json;
   is_active: boolean;
   sort_order: number;
   created_at: string;
@@ -25,7 +27,7 @@ export interface OrganizationSubscription {
   current_period_end: string;
   trial_end?: string;
   setup_fee_paid: boolean;
-  metadata?: any;
+  metadata?: Json;
   created_at: string;
   updated_at: string;
   plan?: SubscriptionPlan;
@@ -48,12 +50,12 @@ export interface CreateSubscriptionInput {
   plan_id: string;
   billing_cycle: 'monthly' | 'yearly';
   trial_end?: string;
-  metadata?: Record<string, any>;
+  metadata?: Json;
 }
 
 export interface UpdateSubscriptionInput {
   plan_id?: string;
   billing_cycle?: 'monthly' | 'yearly';
   status?: 'active' | 'cancelled' | 'expired' | 'suspended';
-  metadata?: Record<string, any>;
+  metadata?: Json;
 }

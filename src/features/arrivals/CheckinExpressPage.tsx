@@ -74,8 +74,9 @@ export default function CheckinExpressPage() {
       toast({ title: "Chambre assignée", description: "✅ Assignation réussie" });
       setAssignOpen(false);
       setTargetResa(undefined);
-    } catch (e: any) {
-      toast({ title: "Erreur assignation", description: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Erreur inconnue";
+      toast({ title: "Erreur assignation", description: message });
     }
   }
 
@@ -84,8 +85,9 @@ export default function CheckinExpressPage() {
     try {
       await checkinMutation.mutateAsync({ reservationId });
       toast({ title: "Check-in effectué", description: "✅ Client présent" });
-    } catch (e: any) {
-      toast({ title: "Erreur check-in", description: e.message });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Erreur inconnue";
+      toast({ title: "Erreur check-in", description: message });
     }
   }
 
@@ -93,7 +95,7 @@ export default function CheckinExpressPage() {
     if (!confirm("Confirmer le check-in express ? (Création automatique de la facture)")) return;
     try {
       await expressCheckinMutation.mutateAsync(reservationId);
-    } catch (e: any) {
+    } catch (e: unknown) {
       // Error handling is done in the hook
     }
   }

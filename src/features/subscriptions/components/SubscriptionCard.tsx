@@ -41,16 +41,23 @@ export function SubscriptionCard({
 
   const getFeaturesList = () => {
     const features = [];
-    if (plan.features.pms) features.push('PMS Complet');
-    if (plan.features.pos) features.push('Point de Vente');
-    if (plan.features.advanced_reports) features.push('Rapports Avancés');
-    else if (plan.features.basic_reports) features.push('Rapports de Base');
-    if (plan.features.inventory) features.push('Gestion Stock');
-    if (plan.features.api_access) features.push('Accès API');
-    if (plan.features.multi_property) features.push('Multi-Propriétés');
-    if (plan.features.priority_support) features.push('Support Prioritaire');
-    else if (plan.features.phone_support) features.push('Support Téléphonique');
-    else if (plan.features.email_support) features.push('Support Email');
+    
+    // Type guard pour vérifier que features est un objet
+    const featuresObj = plan.features as Record<string, unknown>;
+    if (typeof featuresObj !== 'object' || featuresObj === null) {
+      return [];
+    }
+    
+    if (featuresObj.pms) features.push('PMS Complet');
+    if (featuresObj.pos) features.push('Point de Vente');
+    if (featuresObj.advanced_reports) features.push('Rapports Avancés');
+    else if (featuresObj.basic_reports) features.push('Rapports de Base');
+    if (featuresObj.inventory) features.push('Gestion Stock');
+    if (featuresObj.api_access) features.push('Accès API');
+    if (featuresObj.multi_property) features.push('Multi-Propriétés');
+    if (featuresObj.priority_support) features.push('Support Prioritaire');
+    else if (featuresObj.phone_support) features.push('Support Téléphonique');
+    else if (featuresObj.email_support) features.push('Support Email');
     
     return features;
   };
