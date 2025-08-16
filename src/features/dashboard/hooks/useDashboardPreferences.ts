@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { WidgetConfig } from '../components/DashboardWidget';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface DashboardPreferences {
   widgets: WidgetConfig[];
@@ -124,7 +125,7 @@ export function useDashboardPreferences() {
           setPreferences(DEFAULT_PREFERENCES);
         }
       } catch (error) {
-        console.error('Error loading preferences:', error);
+        logger.error('Error loading dashboard preferences', error);
         setPreferences(DEFAULT_PREFERENCES);
       } finally {
         setIsLoading(false);
@@ -147,7 +148,7 @@ export function useDashboardPreferences() {
         description: 'Vos préférences ont été mises à jour'
       });
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logger.error('Error saving dashboard preferences', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder les préférences',

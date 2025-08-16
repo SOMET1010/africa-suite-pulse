@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautif
 import { DashboardWidget, WidgetConfig } from './DashboardWidget';
 import { useDashboardPreferences } from '../hooks/useDashboardPreferences';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface DashboardGridProps {
   widgets: WidgetConfig[];
@@ -42,7 +43,7 @@ export function DashboardGrid({ widgets, onWidgetUpdate, children }: DashboardGr
 
   const handleConfigureWidget = useCallback((widgetId: string) => {
     // This would open a configuration modal
-    console.log('Configure widget:', widgetId);
+    logger.debug('Configure widget', { widgetId });
   }, []);
 
   return (

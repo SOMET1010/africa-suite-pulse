@@ -23,6 +23,7 @@ import { useRealtimeNotifications, NotificationData } from '../hooks/useRealtime
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const NOTIFICATION_ICONS = {
   reservation: Calendar,
@@ -199,7 +200,7 @@ export function NotificationCenter() {
                         onMarkAsRead={markAsRead}
                         onRemove={(id) => {
                           // In a real app, you'd want to confirm this action
-                          console.log('Remove notification:', id);
+                          logger.debug('Remove notification', { id });
                         }}
                       />
                     </div>

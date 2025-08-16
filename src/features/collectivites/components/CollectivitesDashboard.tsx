@@ -11,6 +11,7 @@ import { CollectivitesExports } from './CollectivitesExports';
 import { useCollectivitesStats } from '../hooks/useCollectivitesStats';
 import { cn } from '@/core/utils/cn';
 import { DateRange } from 'react-day-picker';
+import { logger } from '@/lib/logger';
 
 type PeriodType = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
 
@@ -30,7 +31,7 @@ export function CollectivitesDashboard() {
 
   const handleExport = (format: 'excel' | 'pdf') => {
     // Export functionality will be implemented
-    console.log('Exporting in', format);
+    logger.debug('Exporting collectivites data', { format });
   };
 
   return (
