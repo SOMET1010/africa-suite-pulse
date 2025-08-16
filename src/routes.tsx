@@ -66,7 +66,7 @@ import {
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 import DemoPage from "@/pages/DemoPage";
 import PricingPage from "@/pages/PricingPage";
-import UXFoundationsDemo from "@/pages/UXFoundationsDemo";
+
 // Dashboards now lazy loaded
 import { MonitoringSettings } from "@/features/monitoring";
 // Other monitoring components now lazy loaded
@@ -90,7 +90,6 @@ export function AppRoutes() {
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/pos/login" element={<POSLoginPage />} />
       {/* Special pages that need direct auth without Layout wrapper */}
-      <Route path="ux-demo" element={<RequireAuth><UXFoundationsDemo /></RequireAuth>} />
       <Route index element={<RequireAuth><Index /></RequireAuth>} />
       
       {/* Critical Business Pages - Migrated to UnifiedLayout */}
