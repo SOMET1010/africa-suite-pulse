@@ -382,6 +382,13 @@ export type Database = {
             referencedRelation: "hotel_settings"
             referencedColumns: ["org_id"]
           },
+          {
+            foreignKeyName: "fk_app_users_org_id"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "v_daily_revenue"
+            referencedColumns: ["org_id"]
+          },
         ]
       }
       arrangement_services: {
@@ -8120,6 +8127,21 @@ export type Database = {
           },
         ]
       }
+      v_daily_revenue: {
+        Row: {
+          arrivals: number | null
+          avg_room_rate: number | null
+          business_date: string | null
+          departures: number | null
+          occupied_rooms: number | null
+          org_id: string | null
+          outstanding_balance: number | null
+          total_payments: number | null
+          total_reservations: number | null
+          total_revenue: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       activate_organization_module: {
@@ -8421,6 +8443,17 @@ export type Database = {
         Args: { p_org_id: string }
         Returns: number
       }
+      get_operational_metrics: {
+        Args: { p_from_date?: string; p_org_id?: string; p_to_date?: string }
+        Returns: {
+          current_value: number
+          last_updated: string
+          metric_name: string
+          percentage_change: number
+          previous_value: number
+          trend: string
+        }[]
+      }
       get_organization_settings: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -8616,6 +8649,14 @@ export type Database = {
       upsert_organization_setting: {
         Args: { setting_key: string; setting_value: Json }
         Returns: Json
+      }
+      validate_index_performance: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          estimated_improvement: string
+          index_name: string
+          table_name: string
+        }[]
       }
       validate_payment_amount: {
         Args: { p_amount: number; p_currency_code?: string }
