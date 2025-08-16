@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MarketTilesCatalog } from './MarketTilesCatalog';
 import { ModernPaymentDialog } from './ModernPaymentDialog';
+import { BusinessProvider } from './BusinessProvider';
 import { Receipt, ArrowLeft, ShoppingCart } from 'lucide-react';
 import { usePOSOrderState } from '../hooks/usePOSOrderState';
 import { usePOSOutlets, useCurrentPOSSession } from '../hooks/usePOSData';
@@ -117,117 +118,119 @@ export function DirectSaleInterface({ staff, onBack }: DirectSaleInterfaceProps)
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card p-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={onBack}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Vente Directe</h1>
-              <p className="text-muted-foreground">
-                Vendeur: {staff.name} • Ticket #{ticketNumber}
-              </p>
+    <BusinessProvider>
+      <div className="min-h-screen bg-background">
+        {/* Header */}
+        <div className="border-b bg-card p-4">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" onClick={onBack}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold">Vente Directe</h1>
+                <p className="text-muted-foreground">
+                  Vendeur: {staff.name} • Ticket #{ticketNumber}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Total</p>
+              <p className="text-2xl font-bold">{totals.total.toFixed(0)} FCFA</p>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground">Total</p>
-            <p className="text-2xl font-bold">{totals.total.toFixed(0)} FCFA</p>
-          </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Product Catalog */}
-          <div className="lg:col-span-2">
-            <MarketTilesCatalog
-              outletId={selectedOutlet.id}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onAddToCart={(product, quantity = 1) => {
-                orderState.actions.addItem(product, quantity);
-              }}
-            />
-          </div>
+        <div className="max-w-7xl mx-auto p-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Product Catalog */}
+            <div className="lg:col-span-2">
+              <MarketTilesCatalog
+                outletId={selectedOutlet.id}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onAddToCart={(product, quantity = 1) => {
+                  orderState.actions.addItem(product, quantity);
+                }}
+              />
+            </div>
 
-          {/* Order Summary */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Commande Actuelle
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {orderState.cartItems.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    Aucun article dans la commande
-                  </p>
-                ) : (
-                  <>
-                    <div className="space-y-3">
-                      {orderState.cartItems.map((item: CartItem) => (
-                        <div key={item.id} className="flex justify-between items-center">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{item.product_name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {item.quantity} × {item.unit_price.toFixed(0)} FCFA
-                            </p>
+            {/* Order Summary */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <ShoppingCart className="h-5 w-5 mr-2" />
+                    Commande Actuelle
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {orderState.cartItems.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">
+                      Aucun article dans la commande
+                    </p>
+                  ) : (
+                    <>
+                      <div className="space-y-3">
+                        {orderState.cartItems.map((item: CartItem) => (
+                          <div key={item.id} className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{item.product_name}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {item.quantity} × {item.unit_price.toFixed(0)} FCFA
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">{item.total_price.toFixed(0)} FCFA</p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-medium">{item.total_price.toFixed(0)} FCFA</p>
-                          </div>
+                        ))}
+                      </div>
+
+                      <div className="border-t pt-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Sous-total:</span>
+                          <span>{totals.subtotal.toFixed(0)} FCFA</span>
                         </div>
-                      ))}
-                    </div>
+                        <div className="flex justify-between text-sm">
+                          <span>TVA (18%):</span>
+                          <span>{totals.taxAmount.toFixed(0)} FCFA</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-lg border-t pt-2">
+                          <span>Total:</span>
+                          <span>{totals.total.toFixed(0)} FCFA</span>
+                        </div>
+                      </div>
 
-                    <div className="border-t pt-4 space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Sous-total:</span>
-                        <span>{totals.subtotal.toFixed(0)} FCFA</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>TVA (18%):</span>
-                        <span>{totals.taxAmount.toFixed(0)} FCFA</span>
-                      </div>
-                      <div className="flex justify-between font-bold text-lg border-t pt-2">
-                        <span>Total:</span>
-                        <span>{totals.total.toFixed(0)} FCFA</span>
-                      </div>
-                    </div>
-
-                    <Button 
-                      onClick={handleCheckout}
-                      className="w-full"
-                      size="lg"
-                    >
-                      <Receipt className="h-4 w-4 mr-2" />
-                      Encaisser
-                    </Button>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+                      <Button 
+                        onClick={handleCheckout}
+                        className="w-full"
+                        size="lg"
+                      >
+                        <Receipt className="h-4 w-4 mr-2" />
+                        Encaisser
+                      </Button>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Payment Dialog */}
-      {showPaymentDialog && orderState.currentOrder && (
-        <ModernPaymentDialog
-          isOpen={showPaymentDialog}
-          onClose={() => setShowPaymentDialog(false)}
-          order={orderState.currentOrder}
-          cartItems={orderState.cartItems}
-          totals={totals}
-          onPaymentComplete={handlePaymentComplete}
-        />
-      )}
-    </div>
+        {/* Payment Dialog */}
+        {showPaymentDialog && orderState.currentOrder && (
+          <ModernPaymentDialog
+            isOpen={showPaymentDialog}
+            onClose={() => setShowPaymentDialog(false)}
+            order={orderState.currentOrder}
+            cartItems={orderState.cartItems}
+            totals={totals}
+            onPaymentComplete={handlePaymentComplete}
+          />
+        )}
+      </div>
+    </BusinessProvider>
   );
 }
