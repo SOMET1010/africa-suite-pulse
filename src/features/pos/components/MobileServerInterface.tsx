@@ -31,94 +31,48 @@ interface POSTable {
   needs_attention?: boolean;
 }
 
-// Mock data pour le développement - sera remplacé par les vrais hooks
-const mockTables: POSTable[] = [
-  {
-    id: '1',
-    number: 'T01',
-    status: 'occupee',
-    customer_count: 4,
-    server_id: 'server1',
-    order_total: 67.50,
-    time_occupied: '1h 15min',
-    last_activity: '5min',
-    has_pending_orders: true,
-    needs_attention: false
-  },
-  {
-    id: '2',
-    number: 'T02',
-    status: 'libre',
-    customer_count: 0,
-    needs_attention: false
-  },
-  {
-    id: '3',
-    number: 'T03',
-    status: 'a_debarrasser',
-    customer_count: 0,
-    time_occupied: '2h 30min',
-    needs_attention: true
-  },
-  {
-    id: '4',
-    number: 'T04',
-    status: 'occupee',
-    customer_count: 2,
-    server_id: 'server1',
-    order_total: 34.20,
-    time_occupied: '45min',
-    last_activity: '2min',
-    has_pending_orders: false,
-    needs_attention: false
-  },
-  {
-    id: '5',
-    number: 'T05',
-    status: 'reservee',
-    customer_count: 6,
-    time_occupied: '19h30',
-    needs_attention: false
-  }
-];
-
-const statusConfig = {
-  libre: {
-    label: 'Libre',
-    color: 'bg-success/10 text-success border-success/20',
-    icon: CheckCircle2,
-    priority: 0
-  },
-  occupee: {
-    label: 'Occupée',
-    color: 'bg-warning/10 text-warning border-warning/20',
-    icon: Users,
-    priority: 2
-  },
-  a_debarrasser: {
-    label: 'À débarrasser',
-    color: 'bg-destructive/10 text-destructive border-destructive/20',
-    icon: AlertTriangle,
-    priority: 3
-  },
-  reservee: {
-    label: 'Réservée',
-    color: 'bg-primary/10 text-primary border-primary/20',
-    icon: Clock,
-    priority: 1
-  }
-};
-
-interface MobileServerInterfaceProps {
-  serverId?: string;
-}
-
 export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) {
   const { session } = usePOSAuth();
   const { toast } = useToast();
-  const [tables, setTables] = useState<POSTable[]>(mockTables);
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
   const [showNotifications, setShowNotifications] = useState(true);
+
+  // Utiliser de vraies données depuis Supabase
+  const { data: tables = [], isLoading } = useQuery({
+    queryKey: ['pos-tables', session?.org_id],
+    queryFn: async () => {
+      if (!session?.org_id) return [];
+      
+      const { data, error } = await supabase
+        .from('pos_tables')
+        .select(`
+          id,
+          table_number,
+          capacity,
+          zone,
+          status,
+          metadata
+        `)
+        .eq('org_id', session.org_id)
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      
+      return data.map(table => ({
+        id: table.id,
+        number: table.table_number,
+        status: table.status as POSTable['status'],
+        customer_count: (table.metadata as any)?.customer_count || 0,
+        server_id: serverId,
+        order_total: (table.metadata as any)?.order_total || 0,
+        time_occupied: (table.metadata as any)?.time_occupied || '',
+        last_activity: (table.metadata as any)?.last_activity || '',
+        has_pending_orders: (table.metadata as any)?.has_pending_orders || false,
+        needs_attention: (table.metadata as any)?.needs_attention || false,
+      }));
+    },
+    enabled: !!session?.org_id
+  });
 
   // Trier les tables par priorité (urgence d'attention)
   const sortedTables = [...tables].sort((a, b) => {
@@ -126,6 +80,10 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     if (!a.needs_attention && b.needs_attention) return 1;
     return statusConfig[a.status].priority - statusConfig[b.status].priority;
   });
+
+  if (isLoading) {
+    return <div className="flex justify-center p-4">Chargement des tables...</div>;
+  }
 
   const handleTableSelect = (table: POSTable) => {
     setSelectedTable(table);

@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { CollectiveBeneficiary } from '@/types/collectivites';
 import { BadgeScanner } from './BadgeScanner';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CollectivitesPOSInterfaceProps {
   onBack: () => void;
@@ -30,16 +32,25 @@ interface CartItem {
   subsidyAmount?: number;
 }
 
-const MOCK_MENU_ITEMS = [
-  { id: '1', name: 'Menu Étudiant', price: 350, category: 'menus' },
-  { id: '2', name: 'Menu Complet', price: 500, category: 'menus' },
-  { id: '3', name: 'Salade Composée', price: 250, category: 'entrees' },
-  { id: '4', name: 'Sandwich Thon', price: 200, category: 'snacks' },
-  { id: '5', name: 'Boisson 33cl', price: 150, category: 'boissons' },
-  { id: '6', name: 'Café', price: 100, category: 'boissons' },
-];
-
 export function CollectivitesPOSInterface({ onBack }: CollectivitesPOSInterfaceProps) {
+  // Hook pour charger les vrais produits POS
+  const { data: menuItems = [] } = useQuery({
+    queryKey: ['pos-products', 'collective-menu'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('pos_products')
+        .select('id, name, price_ht')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price_ht,
+        category: 'collective'
+      }));
+    },
+  });
   const [step, setStep] = useState<'scanner' | 'ordering' | 'payment'>('scanner');
   const [beneficiary, setBeneficiary] = useState<CollectiveBeneficiary | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -52,7 +63,7 @@ export function CollectivitesPOSInterface({ onBack }: CollectivitesPOSInterfaceP
     }
   };
 
-  const addToCart = (item: typeof MOCK_MENU_ITEMS[0]) => {
+  const addToCart = (item: typeof menuItems[0]) => {
     setCart(prev => {
       const existing = prev.find(cartItem => cartItem.id === item.id);
       if (existing) {
@@ -189,7 +200,7 @@ export function CollectivitesPOSInterface({ onBack }: CollectivitesPOSInterfaceP
 
         {/* Menu Categories */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {MOCK_MENU_ITEMS.map((item) => (
+          {menuItems.map((item) => (
             <Card key={item.id} className="cursor-pointer hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <h3 className="font-medium mb-2">{item.name}</h3>
