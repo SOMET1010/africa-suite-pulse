@@ -47,7 +47,7 @@ export function GlobalNavigationLayout({
   title,
   headerAction,
   showStatusBar = false,
-  hotelDate = new Date().toISOString().split('T')[0],
+  hotelDate = new Date().toLocaleDateString('fr-FR'),
   shiftLabel = "Jour",
   orgName = "AfricaSuite PMS",
   showBottomBar = false,
