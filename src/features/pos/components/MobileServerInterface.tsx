@@ -65,16 +65,29 @@ const statusConfig = {
 };
 
 export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) {
-  const { session } = usePOSAuth();
+  const { session, loading: authLoading } = usePOSAuth();
   const { toast } = useToast();
   const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
   const [showNotifications, setShowNotifications] = useState(true);
+
+  // Debug logs
+  console.log("🏪 MobileServerInterface debug:", {
+    session,
+    org_id: session?.org_id,
+    authLoading,
+    serverId
+  });
 
   // Utiliser de vraies données depuis Supabase
   const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
     queryKey: ['pos-tables', session?.org_id],
     queryFn: async (): Promise<POSTable[]> => {
-      if (!session?.org_id) return [];
+      console.log("📊 Fetching tables for org_id:", session?.org_id);
+      
+      if (!session?.org_id) {
+        console.log("❌ No org_id found, returning empty array");
+        return [];
+      }
       
       // Utiliser des données simulées pour l'instant
       const mockTables = [
@@ -104,7 +117,7 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
         }
       ];
       
-      return mockTables.map(table => ({
+      const mappedTables = mockTables.map(table => ({
         id: table.id,
         number: table.table_number,
         status: table.status as POSTable['status'],
@@ -116,10 +129,23 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
         has_pending_orders: false,
         needs_attention: table.needs_attention || false,
       }));
+      
+      console.log("✅ Tables mapped successfully:", mappedTables);
+      return mappedTables;
     },
-    enabled: !!session?.org_id,
+    enabled: !!session?.org_id && !authLoading,
     staleTime: 30000, // 30 seconds
     refetchOnWindowFocus: false
+  });
+
+  // More debug logs
+  console.log("🔍 Query state:", {
+    isLoading,
+    error,
+    tables: tables.length,
+    enabled: !!session?.org_id && !authLoading,
+    authLoading,
+    sessionOrgId: session?.org_id
   });
 
   // Trier les tables par priorité (urgence d'attention)
@@ -129,12 +155,66 @@ export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) 
     return statusConfig[a.status].priority - statusConfig[b.status].priority;
   });
 
+  if (authLoading) {
+    return <div className="flex justify-center p-4">Chargement de la session...</div>;
+  }
+
+  if (!session) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <h2 className="text-xl font-semibold mb-2">Session POS requise</h2>
+        <p className="text-muted-foreground mb-4">Vous devez vous connecter au système POS pour accéder aux tables.</p>
+        <TButton onClick={() => window.location.href = '/pos/login'}>
+          Se connecter au POS
+        </TButton>
+      </div>
+    );
+  }
+
+  if (!session.org_id) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <h2 className="text-xl font-semibold mb-2">Organisation manquante</h2>
+        <p className="text-muted-foreground mb-4">Votre session POS n'a pas d'organisation associée.</p>
+        <TButton onClick={() => window.location.href = '/pos/login'}>
+          Se reconnecter
+        </TButton>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return <div className="flex justify-center p-4">Chargement des tables...</div>;
   }
 
   if (error) {
-    return <div className="flex justify-center p-4 text-destructive">Erreur lors du chargement des tables</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <h2 className="text-xl font-semibold mb-2 text-destructive">Erreur de chargement</h2>
+        <p className="text-muted-foreground mb-4">Impossible de charger les tables.</p>
+        <TButton 
+          onClick={() => window.location.reload()}
+          variant="ghost"
+        >
+          Réessayer
+        </TButton>
+      </div>
+    );
+  }
+
+  if (tables.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <h2 className="text-xl font-semibold mb-2">Aucune table trouvée</h2>
+        <p className="text-muted-foreground mb-4">Aucune table n'est assignée à ce serveur pour l'organisation {session.org_id}.</p>
+        <TButton 
+          onClick={() => window.location.reload()}
+          variant="ghost"
+        >
+          Actualiser
+        </TButton>
+      </div>
+    );
   }
 
   const handleTableSelect = (table: POSTable) => {

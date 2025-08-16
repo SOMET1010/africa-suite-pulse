@@ -40,6 +40,13 @@ export function usePOSAuth() {
   }, []);
 
   const validateStoredSession = async (storedSession: POSSession) => {
+    console.log("🔍 POS session validation started", {
+      user_id: storedSession.user_id,
+      role: storedSession.role,
+      org_id: storedSession.org_id,
+      outlet_id: storedSession.outlet_id
+    });
+    
     logger.debug("POS session validation started", {
       user_id: storedSession.user_id,
       role: storedSession.role
@@ -73,6 +80,13 @@ export function usePOSAuth() {
         session_token: storedSession.session_token,
         login_time: storedSession.login_time
       };
+      
+      console.log("✅ POS session validated successfully", {
+        display_name: validSession.display_name,
+        role: validSession.role,
+        org_id: validSession.org_id,
+        outlet_id: validSession.outlet_id
+      });
       
       logger.audit("POS session validated successfully", {
         display_name: validSession.display_name,
