@@ -7,7 +7,7 @@ import { usePOSCategories, usePOSProducts } from "../hooks/usePOSData";
 import { useBusinessContext } from "../hooks/useBusinessContext";
 import { MenuCompositionDialog } from "./MenuCompositionDialog";
 import { KitchenMessagesSelector } from "./KitchenMessagesSelector";
-import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/hooks/useCurrency";
 import { 
   Search, 
   Plus, 
@@ -65,6 +65,7 @@ export function MarketTilesCatalog({
   const [showCompositionDialog, setShowCompositionDialog] = useState(false);
   const [showKitchenMessages, setShowKitchenMessages] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<POSProduct | null>(null);
+  const { formatCurrency } = useCurrency();
 
   const { businessType, getBusinessConfig } = useBusinessContext();
   const businessConfig = getBusinessConfig();
@@ -365,6 +366,7 @@ function MarketTileCard({
   businessType 
 }: MarketTileCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { formatCurrency } = useCurrency();
 
   const getStockStatus = () => {
     if (!product.is_stock_managed) return 'unlimited';

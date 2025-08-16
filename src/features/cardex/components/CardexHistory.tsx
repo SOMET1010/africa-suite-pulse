@@ -13,7 +13,7 @@ import {
   User
 } from "lucide-react";
 import { cardexApi } from "@/services/cardex.api";
-import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/hooks/useCurrency";
 import { useState } from "react";
 
 interface CardexHistoryProps {
@@ -22,6 +22,7 @@ interface CardexHistoryProps {
 
 export function CardexHistory({ reservationId }: CardexHistoryProps) {
   const [filterFolio, setFilterFolio] = useState<number | null>(null);
+  const { formatCurrency } = useCurrency();
   
   const { data: cardex, isLoading } = useQuery({
     queryKey: ['cardex-overview', reservationId],

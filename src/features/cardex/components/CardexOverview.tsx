@@ -13,13 +13,14 @@ import {
   AlertCircle
 } from "lucide-react";
 import { cardexApi } from "@/services/cardex.api";
-import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface CardexOverviewProps {
   reservationId: string;
 }
 
 export function CardexOverview({ reservationId }: CardexOverviewProps) {
+  const { formatCurrency } = useCurrency();
   const { data: cardex, isLoading, error } = useQuery({
     queryKey: ['cardex-overview', reservationId],
     queryFn: () => cardexApi.getCardexOverview(reservationId),

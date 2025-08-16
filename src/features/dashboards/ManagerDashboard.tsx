@@ -9,6 +9,7 @@ import {
   Clock, AlertCircle, CheckCircle, Target, Star, Settings
 } from 'lucide-react';
 import { QuickActions } from '@/core/navigation/RoleBasedNavigation';
+import { useCurrency } from '@/hooks/useCurrency';
 
 // Mock data - En production, utiliser des hooks/API
 const managerData = {
@@ -57,8 +58,9 @@ export function ManagerDashboard() {
     { id: "audit", label: "Audit Nuit", variant: "ghost" as const, href: "/night-audit", icon: <Clock size={18} /> },
   ];
 
+  const { formatCurrency: formatCurrencyBase } = useCurrency();
   const formatCurrency = (amount: number) => {
-    return `${(amount / 1000).toFixed(0)}k XOF`;
+    return formatCurrencyBase(amount, { compact: true });
   };
 
   return (

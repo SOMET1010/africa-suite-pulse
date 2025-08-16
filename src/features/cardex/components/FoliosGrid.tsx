@@ -11,7 +11,7 @@ import {
   FileText
 } from "lucide-react";
 import { cardexApi } from "@/services/cardex.api";
-import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/hooks/useCurrency";
 import { FOLIO_DEFINITIONS } from "@/types/billing";
 
 interface FoliosGridProps {
@@ -19,6 +19,7 @@ interface FoliosGridProps {
 }
 
 export function FoliosGrid({ reservationId }: FoliosGridProps) {
+  const { formatCurrency } = useCurrency();
   const { data: cardex, isLoading } = useQuery({
     queryKey: ['cardex-overview', reservationId],
     queryFn: () => cardexApi.getCardexOverview(reservationId),

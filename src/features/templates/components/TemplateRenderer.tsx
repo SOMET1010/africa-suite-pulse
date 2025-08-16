@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
-import { formatCurrency } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 import type { DocumentTemplate } from '@/types/templates';
 
 interface TemplateRendererProps {
@@ -10,6 +10,7 @@ interface TemplateRendererProps {
 
 export function TemplateRenderer({ template, data }: TemplateRendererProps) {
   const qrCodeRef = useRef<HTMLCanvasElement>(null);
+  const { formatCurrency } = useCurrency();
 
   // Données d'exemple pour l'aperçu
   const sampleData = data || {

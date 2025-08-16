@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Wifi, Tv, Car, Utensils, Wind, Bath, Coffee, Shield, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { UIRoom } from '../rack.types';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface RoomPhotoGalleryProps {
   room: UIRoom;
@@ -34,6 +35,7 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
   const [photos, setPhotos] = useState<RoomPhoto[]>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { formatCurrency } = useCurrency();
 
   useEffect(() => {
     if (open && room) {
@@ -222,15 +224,15 @@ export function RoomPhotoGallery({ room, open, onOpenChange }: RoomPhotoGalleryP
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Base nuit</span>
-                    <span className="font-semibold">85€</span>
+                    <span className="font-semibold">{formatCurrency(85)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Weekend</span>
-                    <span className="font-semibold">95€</span>
+                    <span className="font-semibold">{formatCurrency(95)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Haute saison</span>
-                    <span className="font-semibold">110€</span>
+                    <span className="font-semibold">{formatCurrency(110)}</span>
                   </div>
                 </div>
               </div>

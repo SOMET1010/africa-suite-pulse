@@ -9,13 +9,14 @@ import { GroupCard } from './components/GroupCard';
 import { CreateGroupDialog } from './components/CreateGroupDialog';
 import { reservationGroupsApi } from '@/services/reservationGroups.api';
 import { queryKeys } from '@/lib/queryClient';
-import { formatCurrency } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 import type { ReservationGroup, ReservationGroupSearchParams } from '@/types/reservationGroup';
 
 export default function GroupsManagementPage() {
   const [selectedGroup, setSelectedGroup] = useState<ReservationGroup | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const { formatCurrency } = useCurrency();
   
   // TODO: Get orgId from auth context
   const orgId = 'temp-org-id';

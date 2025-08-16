@@ -33,6 +33,7 @@ import {
   BarChart3
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface DashboardStats {
   totalRevenue: number;
@@ -67,6 +68,7 @@ export function POSReportsPage() {
   const [paymentMethods, setPaymentMethods] = useState<ChartData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { formatCurrency } = useCurrency();
 
   useEffect(() => {
     loadReportsData();
@@ -295,7 +297,7 @@ export function POSReportsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Chiffre d'affaires</p>
-                  <p className="text-2xl font-bold">{stats.totalRevenue.toFixed(2)}€</p>
+                  <p className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-green-600" />
               </div>
@@ -319,7 +321,7 @@ export function POSReportsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Panier moyen</p>
-                  <p className="text-2xl font-bold">{stats.averageOrderValue.toFixed(2)}€</p>
+                  <p className="text-2xl font-bold">{formatCurrency(stats.averageOrderValue)}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-purple-600" />
               </div>
@@ -388,7 +390,7 @@ export function POSReportsPage() {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold">{product.value} vendus</div>
-                        <div className="text-sm text-muted-foreground">{product.revenue?.toFixed(2)}€</div>
+                        <div className="text-sm text-muted-foreground">{formatCurrency(product.revenue || 0)}</div>
                       </div>
                     </div>
                   ))}
@@ -418,7 +420,7 @@ export function POSReportsPage() {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: any) => [`${value}€`, 'Montant']} />
+                    <Tooltip formatter={(value: any) => [formatCurrency(value), 'Montant']} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -477,7 +479,7 @@ export function POSReportsPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Objectif journalier</span>
-                  <span>1000€</span>
+                  <span>{formatCurrency(1000)}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
@@ -498,7 +500,7 @@ export function POSReportsPage() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <span>Période: {selectedPeriod}</span>
             <span>•</span>
-            <span>{stats.totalRevenue.toFixed(0)}€ CA</span>
+            <span>{formatCurrency(stats.totalRevenue)} CA</span>
             <span>•</span>
             <span>{stats.totalOrders} commandes</span>
           </div>

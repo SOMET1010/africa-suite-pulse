@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Users, Calendar, MapPin, Phone, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatCurrency } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 import type { ReservationGroup } from '@/types/reservationGroup';
 
 interface GroupCardProps {
@@ -13,6 +13,7 @@ interface GroupCardProps {
 }
 
 export function GroupCard({ group, isSelected, onClick }: GroupCardProps) {
+  const { formatCurrency } = useCurrency();
   return (
     <div
       className={cn(
