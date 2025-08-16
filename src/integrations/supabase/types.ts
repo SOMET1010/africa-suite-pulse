@@ -8553,7 +8553,7 @@ export type Database = {
         Returns: boolean
       }
       search_guests_secure: {
-        Args: { limit_count?: number; search_term: string }
+        Args: { limit_count: number; search_term: string }
         Returns: {
           city: string
           country: string
