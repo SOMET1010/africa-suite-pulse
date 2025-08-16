@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import type { POSOrder, POSOrderItem, POSTable, POSOutlet, CartItem } from "../types";
+import { useCreateFiscalEvent } from "./useFiscalJournal";
 
 interface OrderState {
   currentOrder: POSOrder | null;
@@ -26,6 +27,7 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const createFiscalEventMutation = useCreateFiscalEvent();
 
   // Récupérer la commande active pour la table
   const { data: existingOrder, isLoading: loadingOrder } = useQuery({
@@ -88,6 +90,21 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
         cartItems: []
       }));
       queryClient.invalidateQueries({ queryKey: ["active-order"] });
+      
+      // Créer un événement fiscal pour la nouvelle commande
+      createFiscalEventMutation.mutate({
+        eventType: 'SALE_LINE',
+        referenceType: 'order',
+        referenceId: newOrder.id,
+        eventData: {
+          order_number: newOrder.order_number,
+          table_id: newOrder.table_id,
+          customer_count: newOrder.customer_count,
+          action: 'order_created'
+        },
+        posStationId: 'POS-01'
+      });
+      
       toast({
         title: "Nouvelle commande",
         description: `Commande ${newOrder.order_number} créée`,
@@ -140,6 +157,21 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
       return data;
     },
     onSuccess: (newItem) => {
+      // Créer un événement fiscal pour l'ajout d'article
+      createFiscalEventMutation.mutate({
+        eventType: 'SALE_LINE',
+        referenceType: 'order_item',
+        referenceId: newItem.id,
+        eventData: {
+          product_id: newItem.product_id,
+          quantity: newItem.quantity,
+          unit_price: newItem.unit_price,
+          total_price: newItem.total_price,
+          action: 'item_added'
+        },
+        posStationId: 'POS-01'
+      });
+      
       // Rafraîchir les données depuis la DB
       queryClient.invalidateQueries({ queryKey: ["active-order"] });
       toast({

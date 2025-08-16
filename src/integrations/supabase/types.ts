@@ -3772,6 +3772,72 @@ export type Database = {
           },
         ]
       }
+      pos_daily_closures_z: {
+        Row: {
+          cashier_id: string
+          closure_data: Json
+          closure_date: string
+          closure_signature: string
+          compliance_status: string
+          created_at: string
+          created_by: string | null
+          daily_chain_hash: string
+          id: string
+          is_sealed: boolean
+          ntp_server: string | null
+          ntp_timestamp: string | null
+          org_id: string
+          pos_station_id: string
+          signature_certificate: string
+          signature_timestamp: string
+          total_sales_amount: number
+          total_tax_amount: number
+          total_transactions_count: number
+        }
+        Insert: {
+          cashier_id: string
+          closure_data: Json
+          closure_date: string
+          closure_signature: string
+          compliance_status?: string
+          created_at?: string
+          created_by?: string | null
+          daily_chain_hash: string
+          id?: string
+          is_sealed?: boolean
+          ntp_server?: string | null
+          ntp_timestamp?: string | null
+          org_id: string
+          pos_station_id: string
+          signature_certificate: string
+          signature_timestamp?: string
+          total_sales_amount?: number
+          total_tax_amount?: number
+          total_transactions_count?: number
+        }
+        Update: {
+          cashier_id?: string
+          closure_data?: Json
+          closure_date?: string
+          closure_signature?: string
+          compliance_status?: string
+          created_at?: string
+          created_by?: string | null
+          daily_chain_hash?: string
+          id?: string
+          is_sealed?: boolean
+          ntp_server?: string | null
+          ntp_timestamp?: string | null
+          org_id?: string
+          pos_station_id?: string
+          signature_certificate?: string
+          signature_timestamp?: string
+          total_sales_amount?: number
+          total_tax_amount?: number
+          total_transactions_count?: number
+        }
+        Relationships: []
+      }
       pos_families: {
         Row: {
           color: string | null
@@ -3814,6 +3880,123 @@ export type Database = {
           outlet_id?: string | null
           sort_order?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pos_fiscal_certificates: {
+        Row: {
+          certificate_pem: string
+          certificate_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          issuer_dn: string
+          org_id: string
+          private_key_id: string
+          revocation_reason: string | null
+          revoked_at: string | null
+          serial_number: string
+          signature_algorithms: string[]
+          subject_dn: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          certificate_pem: string
+          certificate_type: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          issuer_dn: string
+          org_id: string
+          private_key_id: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          serial_number: string
+          signature_algorithms?: string[]
+          subject_dn: string
+          valid_from: string
+          valid_until: string
+        }
+        Update: {
+          certificate_pem?: string
+          certificate_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          issuer_dn?: string
+          org_id?: string
+          private_key_id?: string
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          serial_number?: string
+          signature_algorithms?: string[]
+          subject_dn?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: []
+      }
+      pos_fiscal_events: {
+        Row: {
+          cashier_id: string | null
+          created_at: string
+          created_by: string | null
+          digital_signature: string
+          event_data: Json
+          event_hash: string
+          event_timestamp: string
+          event_type: string
+          fiscal_period: string
+          id: string
+          org_id: string
+          pos_station_id: string | null
+          previous_hash: string
+          reference_id: string
+          reference_type: string
+          sequence_number: number
+          signature_algorithm: string
+        }
+        Insert: {
+          cashier_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          digital_signature: string
+          event_data: Json
+          event_hash: string
+          event_timestamp?: string
+          event_type: string
+          fiscal_period?: string
+          id?: string
+          org_id: string
+          pos_station_id?: string | null
+          previous_hash: string
+          reference_id: string
+          reference_type: string
+          sequence_number: number
+          signature_algorithm?: string
+        }
+        Update: {
+          cashier_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          digital_signature?: string
+          event_data?: Json
+          event_hash?: string
+          event_timestamp?: string
+          event_type?: string
+          fiscal_period?: string
+          id?: string
+          org_id?: string
+          pos_station_id?: string | null
+          previous_hash?: string
+          reference_id?: string
+          reference_type?: string
+          sequence_number?: number
+          signature_algorithm?: string
         }
         Relationships: []
       }
@@ -7881,6 +8064,18 @@ export type Database = {
         Args: { p_session_id: string }
         Returns: boolean
       }
+      create_fiscal_event: {
+        Args: {
+          p_cashier_id?: string
+          p_event_data: Json
+          p_event_type: string
+          p_org_id: string
+          p_pos_station_id?: string
+          p_reference_id: string
+          p_reference_type: string
+        }
+        Returns: string
+      }
       create_notification: {
         Args: {
           p_action_url?: string
@@ -7913,6 +8108,18 @@ export type Database = {
           p_org_id: string
           p_period_end: string
           p_period_start: string
+        }
+        Returns: string
+      }
+      generate_fiscal_event_hash: {
+        Args: {
+          p_event_data: Json
+          p_event_timestamp: string
+          p_event_type: string
+          p_previous_hash: string
+          p_reference_id: string
+          p_reference_type: string
+          p_sequence_number: number
         }
         Returns: string
       }
@@ -8014,6 +8221,14 @@ export type Database = {
           healthy_hotels: number
           total_hotels: number
         }[]
+      }
+      get_last_fiscal_hash: {
+        Args: { p_org_id: string }
+        Returns: string
+      }
+      get_next_fiscal_sequence: {
+        Args: { p_org_id: string }
+        Returns: number
       }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }
