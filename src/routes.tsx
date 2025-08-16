@@ -133,8 +133,16 @@ export function AppRoutes() {
       
       {/* Still in Legacy Layout - To be migrated in next phases */}
       <Route element={<RequireAuth><Layout /></RequireAuth>}>
-        <Route path="reservations/groups" element={<GroupsManagementPage />} />
-        <Route path="reservations/allotments" element={<AllotmentsPage />} />
+        <Route path="reservations/groups" element={
+          <Suspense fallback={<div>Loading groups...</div>}>
+            <GroupsManagementPage />
+          </Suspense>
+        } />
+        <Route path="reservations/allotments" element={
+          <Suspense fallback={<div>Loading allotments...</div>}>
+            <AllotmentsPage />
+          </Suspense>
+        } />
         <Route path="cardex" element={<CardexPage />} />
         <Route path="analytics/advanced" element={<AdvancedAnalytics />} />
         <Route path="reports/daily" element={<DailyReportsPage />} />
