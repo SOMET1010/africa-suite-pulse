@@ -442,3 +442,91 @@ export const useDeletePOSCategory = () => {
     },
   });
 };
+
+export const useDuplicatePOSCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (categoryId: string) => {
+      // Get original category
+      const { data: original, error: fetchError } = await supabase
+        .from("pos_categories")
+        .select("*")
+        .eq("id", categoryId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Create duplicate
+      const { data, error } = await supabase
+        .from("pos_categories")
+        .insert({
+          org_id: original.org_id,
+          outlet_id: original.outlet_id,
+          code: `${original.code}_copy`,
+          name: `${original.name} (Copie)`,
+          description: original.description,
+          color: original.color,
+          icon: original.icon,
+          sort_order: original.sort_order + 1,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as POSCategory;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pos-categories"] });
+      toast({
+        title: "Catégorie dupliquée",
+        description: "La catégorie a été dupliquée avec succès",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de dupliquer la catégorie",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useReorderPOSCategories = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      const promises = updates.map(({ id, sort_order }) =>
+        supabase
+          .from("pos_categories")
+          .update({ sort_order })
+          .eq("id", id)
+      );
+
+      const results = await Promise.all(promises);
+      const error = results.find(result => result.error)?.error;
+      if (error) throw error;
+
+      return updates;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pos-categories"] });
+      toast({
+        title: "Ordre mis à jour",
+        description: "L'ordre des catégories a été mis à jour",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de réorganiser les catégories",
+        variant: "destructive",
+      });
+    },
+  });
+};

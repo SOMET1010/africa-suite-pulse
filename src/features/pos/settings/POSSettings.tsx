@@ -8,12 +8,14 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Printer, Receipt, CreditCard, Percent, DollarSign, Globe, Bell, Package, Grid3X3, Keyboard, Plus, Edit, Trash2 } from "lucide-react";
+import { Settings, Printer, Receipt, CreditCard, Percent, DollarSign, Globe, Bell, Package, Grid3X3, Keyboard, Plus, Edit, Trash2, Download, Upload } from "lucide-react";
 import { useSystemSettings } from "../hooks/useSystemSettings";
 import { useToast } from "@/hooks/use-toast";
-import { usePOSCategories, useCreatePOSCategory, useUpdatePOSCategory, useDeletePOSCategory } from "../hooks/usePOSData";
+import { usePOSCategories, useCreatePOSCategory, useUpdatePOSCategory, useDeletePOSCategory, useDuplicatePOSCategory, useReorderPOSCategories } from "../hooks/usePOSData";
 import { CategoryDialog, type CategoryFormData } from "../components/CategoryDialog";
 import { OutletSelector } from "../components/OutletSelector";
+import { DraggableCategoryList } from "../components/DraggableCategoryList";
+import { ImportExportDialog } from "../components/ImportExportDialog";
 import type { POSCategory } from "../types";
 
 export function POSSettings() {
@@ -23,6 +25,7 @@ export function POSSettings() {
   // State for category management
   const [selectedOutlet, setSelectedOutlet] = useState<string>("");
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [importExportDialogOpen, setImportExportDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<POSCategory | null>(null);
   
   // Queries and mutations
@@ -30,6 +33,8 @@ export function POSSettings() {
   const createCategory = useCreatePOSCategory();
   const updateCategory = useUpdatePOSCategory();
   const deleteCategory = useDeletePOSCategory();
+  const duplicateCategory = useDuplicatePOSCategory();
+  const reorderCategories = useReorderPOSCategories();
 
   // Helper function to get setting value
   const getSetting = (key: string, defaultValue: any = "") => {
@@ -69,6 +74,65 @@ export function POSSettings() {
     if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
       await deleteCategory.mutateAsync(categoryId);
     }
+  };
+
+  const handleDuplicateCategory = async (categoryId: string) => {
+    await duplicateCategory.mutateAsync(categoryId);
+  };
+
+  const handleReorderCategories = async (startIndex: number, endIndex: number) => {
+    if (!categories) return;
+
+    const reorderedCategories = Array.from(categories);
+    const [removed] = reorderedCategories.splice(startIndex, 1);
+    reorderedCategories.splice(endIndex, 0, removed);
+
+    // Update sort orders
+    const updates = reorderedCategories.map((category, index) => ({
+      id: category.id,
+      sort_order: index,
+    }));
+
+    await reorderCategories.mutateAsync(updates);
+  };
+
+  const handleExportCategory = (category: POSCategory) => {
+    const exportData = [{
+      name: category.name,
+      description: category.description,
+      color: category.color,
+      icon: (category as any).icon || 'utensils',
+      sort_order: category.sort_order
+    }];
+
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `category_${category.name.toLowerCase().replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportCategories = async (importedCategories: any[]) => {
+    if (!selectedOutlet) return;
+
+    const promises = importedCategories.map((cat, index) => 
+      createCategory.mutateAsync({
+        outletId: selectedOutlet,
+        name: cat.name,
+        description: cat.description || '',
+        color: cat.color || '#6366f1',
+        icon: cat.icon || 'utensils',
+        sortOrder: (categories?.length || 0) + index,
+      })
+    );
+
+    await Promise.all(promises);
   };
 
   const handleSaveCategory = async (data: CategoryFormData) => {
@@ -297,75 +361,51 @@ export function POSSettings() {
               {selectedOutlet && (
                 <>
                   {/* Categories Management */}
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <h3 className="font-medium">Catégories</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Organisez vos produits par catégories
-                        </p>
+                    <div>
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h3 className="font-medium">Catégories</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Organisez vos produits par catégories
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => setImportExportDialogOpen(true)}
+                            className="gap-2"
+                          >
+                            <Upload className="w-4 h-4" />
+                            Import/Export
+                          </Button>
+                          <Button onClick={handleCreateCategory} className="gap-2">
+                            <Plus className="w-4 h-4" />
+                            Nouvelle Catégorie
+                          </Button>
+                        </div>
                       </div>
-                      <Button onClick={handleCreateCategory} className="gap-2">
-                        <Plus className="w-4 h-4" />
-                        Nouvelle Catégorie
-                      </Button>
-                    </div>
 
-                    <div className="border rounded-lg">
                       {categoriesLoading ? (
-                        <div className="p-8 text-center">
+                        <div className="border rounded-lg p-8 text-center">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
                           <p className="text-muted-foreground">Chargement des catégories...</p>
                         </div>
                       ) : categories && categories.length > 0 ? (
-                        <div className="divide-y">
-                          {categories.map((category) => (
-                            <div key={category.id} className="p-4 flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <div
-                                  className="w-4 h-4 rounded-full"
-                                  style={{ backgroundColor: category.color }}
-                                />
-                                <div>
-                                  <h4 className="font-medium">{category.name}</h4>
-                                  {category.description && (
-                                    <p className="text-sm text-muted-foreground">
-                                      {category.description}
-                                    </p>
-                                  )}
-                                </div>
-                                <Badge variant="outline">
-                                  Ordre: {category.sort_order}
-                                </Badge>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleEditCategory(category)}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => handleDeleteCategory(category.id)}
-                                  className="text-destructive hover:text-destructive"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <DraggableCategoryList
+                          categories={categories}
+                          onReorder={handleReorderCategories}
+                          onEdit={handleEditCategory}
+                          onDelete={handleDeleteCategory}
+                          onDuplicate={handleDuplicateCategory}
+                          onExport={handleExportCategory}
+                        />
                       ) : (
-                        <div className="p-8 text-center text-muted-foreground">
+                        <div className="border rounded-lg p-8 text-center text-muted-foreground">
                           <Grid3X3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
                           <p>Aucune catégorie configurée</p>
                           <p className="text-sm">Cliquez sur "Nouvelle Catégorie" pour commencer</p>
                         </div>
                       )}
-                    </div>
                   </div>
                 </>
               )}
@@ -380,13 +420,21 @@ export function POSSettings() {
             </CardContent>
           </Card>
 
-          {/* Category Dialog */}
+          {/* Dialogs */}
           <CategoryDialog
             open={categoryDialogOpen}
             onOpenChange={setCategoryDialogOpen}
             category={selectedCategory}
             onSave={handleSaveCategory}
             isLoading={createCategory.isPending || updateCategory.isPending}
+          />
+          
+          <ImportExportDialog
+            open={importExportDialogOpen}
+            onOpenChange={setImportExportDialogOpen}
+            categories={categories || []}
+            outletId={selectedOutlet}
+            onImport={handleImportCategories}
           />
         </TabsContent>
 
