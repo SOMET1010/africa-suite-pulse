@@ -91,7 +91,7 @@ export function usePOSPayment(orgId: string) {
       // 2. Create payment transaction
       await createTransactionMutation.mutateAsync({
         orgId: input.orgId,
-        invoiceId: invoice.id,
+        invoiceId: invoice.id.toString(),
         methodId: input.methodId,
         amount: input.amountReceived,
         reference: input.reference

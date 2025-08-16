@@ -10,10 +10,20 @@ import { ModernPaymentDialog } from "./ModernPaymentDialog";
 import { SplitBillDialog } from "./SplitBillDialog";
 import { TableTransferDialog } from "./TableTransferDialog";
 import { ModernOutletSelector } from "./ModernOutletSelector";
+import { ServiceModeSelector } from "./ServiceModeSelector";
+import { StaffSelector } from "./StaffSelector";
+import { DirectSaleInterface } from "./DirectSaleInterface";
 import { usePOSOutlets, useCurrentPOSSession, useOpenPOSSession } from "../hooks/usePOSData";
 import { usePOSOrderState } from "../hooks/usePOSOrderState";
 import { useToast } from "@/hooks/use-toast";
 import type { POSOutlet, POSTable } from "../types";
+
+interface Staff {
+  id: string;
+  name: string;
+  role: 'cashier' | 'server';
+  initials: string;
+}
 
 export function RestaurantPOSTerminal() {
   const [selectedOutlet, setSelectedOutlet] = useState<POSOutlet | null>(null);
@@ -24,6 +34,11 @@ export function RestaurantPOSTerminal() {
   const [isTableTransferOpen, setIsTableTransferOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [discountApplied, setDiscountApplied] = useState({ type: 'none', value: 0 });
+  
+  // New state for workflow management
+  const [serviceMode, setServiceMode] = useState<'direct' | 'table' | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
+  const [currentStep, setCurrentStep] = useState<'mode' | 'staff' | 'pos'>('mode');
 
   const { data: outlets = [] } = usePOSOutlets();
   const { data: currentSession } = useCurrentPOSSession(selectedOutlet?.id);
@@ -32,6 +47,42 @@ export function RestaurantPOSTerminal() {
 
   // État centralisé des commandes
   const orderState = usePOSOrderState({ selectedOutlet, selectedTable });
+
+  // Workflow handlers
+  const handleModeSelect = (mode: 'direct' | 'table') => {
+    setServiceMode(mode);
+    setCurrentStep('staff');
+  };
+
+  const handleStaffSelect = (staff: Staff) => {
+    setSelectedStaff(staff);
+    setCurrentStep('pos');
+  };
+
+  const handleBackToMode = () => {
+    setServiceMode(null);
+    setSelectedStaff(null);
+    setCurrentStep('mode');
+  };
+
+  const handleBackToStaff = () => {
+    setSelectedStaff(null);
+    setCurrentStep('staff');
+  };
+
+  // Reset state when switching outlets
+  useEffect(() => {
+    if (selectedOutlet) {
+      setSelectedTable(null);
+      setCustomerCount(1);
+      setDiscountApplied({ type: 'none', value: 0 });
+      setSearchQuery('');
+      // Reset workflow when changing outlet
+      setServiceMode(null);
+      setSelectedStaff(null);
+      setCurrentStep('mode');
+    }
+  }, [selectedOutlet]);
 
   // Raccourcis clavier restauration
   useEffect(() => {
@@ -75,7 +126,7 @@ export function RestaurantPOSTerminal() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [orderState.cartItems.length]);
+  }, [orderState.cartItems?.length]);
 
   // Gestionnaires d'actions restauration
   const handleNewOrder = () => {
@@ -325,6 +376,32 @@ export function RestaurantPOSTerminal() {
     );
   }
 
+  // Workflow management - show appropriate step
+  if (currentStep === 'mode') {
+    return <ServiceModeSelector onModeSelect={handleModeSelect} />;
+  }
+
+  if (currentStep === 'staff') {
+    return (
+      <StaffSelector 
+        mode={serviceMode!}
+        onStaffSelect={handleStaffSelect}
+        onBack={handleBackToMode}
+      />
+    );
+  }
+
+  // Direct sale mode
+  if (serviceMode === 'direct' && selectedStaff) {
+    return (
+      <DirectSaleInterface 
+        staff={selectedStaff}
+        onBack={handleBackToStaff}
+      />
+    );
+  }
+
+  // Table service mode - existing restaurant POS interface
   const totals = calculateTotals();
 
   return (
@@ -336,7 +413,7 @@ export function RestaurantPOSTerminal() {
         selectedTable={selectedTable}
         customerCount={customerCount}
         onCustomerCountChange={setCustomerCount}
-        onChangeOutlet={() => setSelectedOutlet(null)}
+        onChangeOutlet={handleBackToStaff}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />
