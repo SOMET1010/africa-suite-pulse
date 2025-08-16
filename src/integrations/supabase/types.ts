@@ -1461,6 +1461,187 @@ export type Database = {
         }
         Relationships: []
       }
+      fiscal_archive_entries: {
+        Row: {
+          amount: number | null
+          archive_id: string
+          archived_at: string
+          currency_code: string
+          entry_hash: string
+          entry_type: string
+          id: string
+          previous_hash: string | null
+          reference_id: string | null
+          reference_number: string | null
+          tax_amount: number | null
+          transaction_data: Json
+          transaction_timestamp: string
+        }
+        Insert: {
+          amount?: number | null
+          archive_id: string
+          archived_at?: string
+          currency_code?: string
+          entry_hash: string
+          entry_type: string
+          id?: string
+          previous_hash?: string | null
+          reference_id?: string | null
+          reference_number?: string | null
+          tax_amount?: number | null
+          transaction_data?: Json
+          transaction_timestamp: string
+        }
+        Update: {
+          amount?: number | null
+          archive_id?: string
+          archived_at?: string
+          currency_code?: string
+          entry_hash?: string
+          entry_type?: string
+          id?: string
+          previous_hash?: string | null
+          reference_id?: string | null
+          reference_number?: string | null
+          tax_amount?: number | null
+          transaction_data?: Json
+          transaction_timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_archive_entries_archive_id_fkey"
+            columns: ["archive_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_archives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fiscal_archives: {
+        Row: {
+          archive_data: Json
+          archive_date: string
+          archive_type: string
+          certificate_number: string
+          certification_number: string
+          cloud_backup_url: string | null
+          created_at: string
+          created_by: string | null
+          digital_signature: string
+          file_path: string | null
+          file_size_bytes: number | null
+          hash_signature: string
+          id: string
+          is_sealed: boolean
+          org_id: string
+          period_end: string
+          period_start: string
+          sealed_at: string | null
+          software_version: string
+          status: string
+          updated_at: string
+          usb_export_path: string | null
+          validation_errors: Json | null
+        }
+        Insert: {
+          archive_data?: Json
+          archive_date: string
+          archive_type: string
+          certificate_number: string
+          certification_number?: string
+          cloud_backup_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          digital_signature: string
+          file_path?: string | null
+          file_size_bytes?: number | null
+          hash_signature: string
+          id?: string
+          is_sealed?: boolean
+          org_id: string
+          period_end: string
+          period_start: string
+          sealed_at?: string | null
+          software_version: string
+          status?: string
+          updated_at?: string
+          usb_export_path?: string | null
+          validation_errors?: Json | null
+        }
+        Update: {
+          archive_data?: Json
+          archive_date?: string
+          archive_type?: string
+          certificate_number?: string
+          certification_number?: string
+          cloud_backup_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          digital_signature?: string
+          file_path?: string | null
+          file_size_bytes?: number | null
+          hash_signature?: string
+          id?: string
+          is_sealed?: boolean
+          org_id?: string
+          period_end?: string
+          period_start?: string
+          sealed_at?: string | null
+          software_version?: string
+          status?: string
+          updated_at?: string
+          usb_export_path?: string | null
+          validation_errors?: Json | null
+        }
+        Relationships: []
+      }
+      fiscal_compliance_logs: {
+        Row: {
+          archive_id: string | null
+          compliance_notes: string | null
+          compliance_status: string
+          event_data: Json | null
+          event_description: string
+          event_type: string
+          id: string
+          org_id: string
+          performed_at: string
+          performed_by: string | null
+        }
+        Insert: {
+          archive_id?: string | null
+          compliance_notes?: string | null
+          compliance_status?: string
+          event_data?: Json | null
+          event_description: string
+          event_type: string
+          id?: string
+          org_id: string
+          performed_at?: string
+          performed_by?: string | null
+        }
+        Update: {
+          archive_id?: string | null
+          compliance_notes?: string | null
+          compliance_status?: string
+          event_data?: Json | null
+          event_description?: string
+          event_type?: string
+          id?: string
+          org_id?: string
+          performed_at?: string
+          performed_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fiscal_compliance_logs_archive_id_fkey"
+            columns: ["archive_id"]
+            isOneToOne: false
+            referencedRelation: "fiscal_archives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fiscal_jurisdictions: {
         Row: {
           code: string
@@ -7723,6 +7904,15 @@ export type Database = {
           p_pin: string
           p_role?: string
           p_user_id: string
+        }
+        Returns: string
+      }
+      generate_fiscal_archive: {
+        Args: {
+          p_archive_type: string
+          p_org_id: string
+          p_period_end: string
+          p_period_start: string
         }
         Returns: string
       }

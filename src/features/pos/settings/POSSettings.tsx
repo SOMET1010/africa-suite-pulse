@@ -18,6 +18,7 @@ import { DraggableCategoryList } from "../components/DraggableCategoryList";
 import { ImportExportDialog } from "../components/ImportExportDialog";
 import { FamilyManagement } from "../components/FamilyManagement";
 import { KeyboardManager } from "../components/KeyboardManager";
+import { FiscalArchiveManager } from "../components/FiscalArchiveManager";
 import EnhancedProductManagement from "../components/EnhancedProductManagement";
 import type { POSCategory } from "../types";
 
@@ -190,11 +191,12 @@ export function POSSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="general">Général</TabsTrigger>
           <TabsTrigger value="products">Produits</TabsTrigger>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
           <TabsTrigger value="keyboards">Claviers</TabsTrigger>
+          <TabsTrigger value="fiscal">Fiscal</TabsTrigger>
           <TabsTrigger value="payment">Paiements</TabsTrigger>
           <TabsTrigger value="taxes">Taxes</TabsTrigger>
           <TabsTrigger value="receipt">Reçus</TabsTrigger>
@@ -462,130 +464,10 @@ export function POSSettings() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="payment" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
-                Méthodes de Paiement
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="font-medium">Configuration des Claviers</h3>
-                  <p className="text-sm text-muted-foreground">Créer et organiser les claviers pour la prise de commande</p>
-                </div>
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Nouveau Clavier
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium mb-3">Claviers Existants</h4>
-                  <div className="space-y-2">
-                    <Card className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h5 className="font-medium">Clavier Principal</h5>
-                          <p className="text-sm text-muted-foreground">16 boutons configurés</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            Dupliquer
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                    
-                    <Card className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h5 className="font-medium">Clavier Boissons</h5>
-                          <p className="text-sm text-muted-foreground">12 boutons configurés</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            Dupliquer
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium mb-3">Configuration Rapide</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="keyboard_layout">Disposition par défaut</Label>
-                      <Select value="4x4" onValueChange={() => {}}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="3x3">3x3 (9 boutons)</SelectItem>
-                          <SelectItem value="4x4">4x4 (16 boutons)</SelectItem>
-                          <SelectItem value="5x4">5x4 (20 boutons)</SelectItem>
-                          <SelectItem value="6x4">6x4 (24 boutons)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="button_size">Taille des boutons</Label>
-                      <Select value="medium" onValueChange={() => {}}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="small">Petits</SelectItem>
-                          <SelectItem value="medium">Moyens</SelectItem>
-                          <SelectItem value="large">Grands</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label>Images sur boutons</Label>
-                        <p className="text-sm text-muted-foreground">Afficher les images produits</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label>Prix sur boutons</Label>
-                        <p className="text-sm text-muted-foreground">Afficher les prix</p>
-                      </div>
-                      <Switch defaultChecked />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 p-4 border rounded-lg bg-muted/30">
-                <h4 className="font-medium mb-2">Aperçu du Clavier</h4>
-                <div className="grid grid-cols-4 gap-2">
-                  {Array.from({ length: 16 }, (_, i) => (
-                    <div key={i} className="aspect-square bg-background border rounded-md flex items-center justify-center text-xs font-medium">
-                      Btn {i + 1}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="fiscal" className="space-y-4">
+          <FiscalArchiveManager />
         </TabsContent>
+
 
         <TabsContent value="payment" className="space-y-4">
           <Card>
