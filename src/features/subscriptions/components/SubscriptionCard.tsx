@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Star, Zap } from 'lucide-react';
 import type { SubscriptionPlan } from '@/types/subscriptions';
 import { calculateSubscriptionPrice } from '../api/subscriptions.api';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface SubscriptionCardProps {
   plan: SubscriptionPlan;
@@ -23,6 +24,7 @@ export function SubscriptionCard({
   onSelect,
   disabled 
 }: SubscriptionCardProps) {
+  const { formatSubscriptionPrice, formatCurrency } = useCurrency();
   const price = calculateSubscriptionPrice(plan, billingCycle);
   const monthlyPrice = billingCycle === 'yearly' ? price / 12 : price;
   const savings = billingCycle === 'yearly' && plan.price_yearly ? 
@@ -71,23 +73,13 @@ export function SubscriptionCard({
         
         <div className="space-y-1">
           <div className="text-3xl font-bold">
-            {price.toLocaleString('fr-FR')}€
-            {billingCycle === 'yearly' && (
-              <span className="text-base font-normal text-muted-foreground ml-1">
-                /an
-              </span>
-            )}
-            {billingCycle === 'monthly' && (
-              <span className="text-base font-normal text-muted-foreground ml-1">
-                /mois
-              </span>
-            )}
+            {formatSubscriptionPrice(price, billingCycle)}
           </div>
           
           {billingCycle === 'yearly' && savings > 0 && (
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">
-                {monthlyPrice.toFixed(0)}€/mois facturé annuellement
+                {formatCurrency(monthlyPrice)}/mois facturé annuellement
               </div>
               <Badge variant="secondary" className="text-xs">
                 Économisez {savings}%

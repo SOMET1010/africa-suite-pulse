@@ -41,10 +41,10 @@ export function useOrganizationSettings() {
         .from("organization_settings")
         .select("*")
         .eq("is_active", true)
-        .order("category", { ascending: true });
+        .order("category", { ascending: true }) as any;
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as OrganizationSetting[];
     },
   });
 
@@ -66,9 +66,9 @@ export function useOrganizationSettings() {
           setting_value: value,
           category: 'general',
           is_active: true
-        })
+        } as any)
         .select()
-        .single();
+        .single() as any;
 
       if (error) throw error;
       return data;

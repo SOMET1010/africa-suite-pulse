@@ -139,6 +139,7 @@ function CurrentPlanOverview({ subscription, usage }: {
   subscription: any; 
   usage: any[] 
 }) {
+  const { formatSubscriptionPrice } = useCurrency();
   const plan = subscription.plan;
   const currentPrice = calculateSubscriptionPrice(plan, subscription.billing_cycle);
   
