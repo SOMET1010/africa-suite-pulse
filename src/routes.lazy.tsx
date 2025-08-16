@@ -27,8 +27,6 @@ export const TemplatesPage = lazy(() => import('@/features/templates/components/
 // Monitoring System - Real-time data processing (using existing exports)
 export const MonitoringDashboard = lazy(() => import('@/features/monitoring').then(m => ({ default: m.MonitoringDashboard })));
 export const MonitoringIncidents = lazy(() => import('@/features/monitoring').then(m => ({ default: m.MonitoringIncidents })));
-export const MonitoringAlerts = lazy(() => import('@/features/monitoring').then(m => ({ default: m.MonitoringAlerts })));
-export const NetworkMonitoring = lazy(() => import('@/features/monitoring').then(m => ({ default: m.NetworkMonitoring })));
 
 // Specialty Features
 export const CardexPage = lazy(() => import('@/features/cardex/CardexPage'));

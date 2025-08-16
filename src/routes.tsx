@@ -53,8 +53,6 @@ import {
   TemplatesPage,
   MonitoringDashboard,
   MonitoringIncidents,
-  MonitoringAlerts,
-  NetworkMonitoring,
   CardexPage,
   NightAuditPage,
   GroupsManagementPage,
@@ -64,14 +62,9 @@ import {
   ServerDashboard
 } from "@/routes.lazy";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
-import DemoPage from "@/pages/DemoPage";
-import PricingPage from "@/pages/PricingPage";
 
 // Dashboards now lazy loaded
-import { MonitoringSettings } from "@/features/monitoring";
 // Other monitoring components now lazy loaded
-import TestingPage from "@/pages/TestingPage";
-import TestModulePage from "@/pages/TestModulePage";
 import { DiscoveryPage } from "@/features/discovery/pages/DiscoveryPage";
 
 function Layout() {
@@ -109,13 +102,6 @@ export function AppRoutes() {
       {/* Monitoring Routes */}
       <Route path="monitoring" element={<RequireAuth><MonitoringDashboard /></RequireAuth>} />
       <Route path="monitoring/incidents" element={<RequireAuth><MonitoringIncidents /></RequireAuth>} />
-      <Route path="monitoring/alerts" element={<RequireAuth><MonitoringAlerts /></RequireAuth>} />
-      <Route path="monitoring/network" element={<RequireAuth><NetworkMonitoring /></RequireAuth>} />
-      <Route path="monitoring/settings" element={<RequireAuth><MonitoringSettings /></RequireAuth>} />
-      
-      {/* Testing Routes */}
-      <Route path="testing" element={<RequireAuth><TestingPage /></RequireAuth>} />
-      <Route path="testing/module/:moduleId" element={<RequireAuth><TestModulePage /></RequireAuth>} />
       
       {/* Discovery Guide Route */}
       <Route path="guide" element={<RequireAuth><DiscoveryPage /></RequireAuth>} />
@@ -164,8 +150,6 @@ export function AppRoutes() {
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="pos/mobile-server" element={<RequirePOSAuth requiredRole="pos_server"><POSMobileServerPage /></RequirePOSAuth>} />
-        <Route path="demo" element={<DemoPage />} />
-        <Route path="pricing" element={<PricingPage />} />
         {/* Role-based dashboards */}
         <Route path="dashboard/receptionist" element={<ReceptionistDashboard />} />
         <Route path="dashboard/server" element={<ServerDashboard />} />
