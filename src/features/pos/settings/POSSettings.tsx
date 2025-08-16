@@ -11,10 +11,25 @@ import { Badge } from "@/components/ui/badge";
 import { Settings, Printer, Receipt, CreditCard, Percent, DollarSign, Globe, Bell, Package, Grid3X3, Keyboard, Plus, Edit, Trash2 } from "lucide-react";
 import { useSystemSettings } from "../hooks/useSystemSettings";
 import { useToast } from "@/hooks/use-toast";
+import { usePOSCategories, useCreatePOSCategory, useUpdatePOSCategory, useDeletePOSCategory } from "../hooks/usePOSData";
+import { CategoryDialog, type CategoryFormData } from "../components/CategoryDialog";
+import { OutletSelector } from "../components/OutletSelector";
+import type { POSCategory } from "../types";
 
 export function POSSettings() {
   const { settings, isLoading, updateSetting, saveSettings, isSaving } = useSystemSettings();
   const { toast } = useToast();
+  
+  // State for category management
+  const [selectedOutlet, setSelectedOutlet] = useState<string>("");
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<POSCategory | null>(null);
+  
+  // Queries and mutations
+  const { data: categories, isLoading: categoriesLoading } = usePOSCategories(selectedOutlet);
+  const createCategory = useCreatePOSCategory();
+  const updateCategory = useUpdatePOSCategory();
+  const deleteCategory = useDeletePOSCategory();
 
   // Helper function to get setting value
   const getSetting = (key: string, defaultValue: any = "") => {
@@ -29,6 +44,51 @@ export function POSSettings() {
 
   const handleSave = () => {
     saveSettings();
+  };
+
+  // Category management handlers
+  const handleCreateCategory = () => {
+    if (!selectedOutlet) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un point de vente",
+        variant: "destructive",
+      });
+      return;
+    }
+    setSelectedCategory(null);
+    setCategoryDialogOpen(true);
+  };
+
+  const handleEditCategory = (category: POSCategory) => {
+    setSelectedCategory(category);
+    setCategoryDialogOpen(true);
+  };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
+      await deleteCategory.mutateAsync(categoryId);
+    }
+  };
+
+  const handleSaveCategory = async (data: CategoryFormData) => {
+    try {
+      if (selectedCategory) {
+        await updateCategory.mutateAsync({
+          id: selectedCategory.id,
+          ...data,
+        });
+      } else {
+        await createCategory.mutateAsync({
+          outletId: selectedOutlet,
+          ...data,
+        });
+      }
+      setCategoryDialogOpen(false);
+      setSelectedCategory(null);
+    } catch (error) {
+      // Error handling is done in the mutation hooks
+    }
   };
 
   if (isLoading) {
@@ -225,84 +285,109 @@ export function POSSettings() {
                 Catégories et Familles
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Catégories Principales</h3>
-                    <Button size="sm" variant="outline" className="gap-2">
-                      <Plus className="w-4 h-4" />
-                      Ajouter
-                    </Button>
-                  </div>
-                  <div className="border rounded-lg p-4">
-                    <div className="text-center py-4 text-muted-foreground">
-                      <Grid3X3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">Aucune catégorie</p>
-                    </div>
-                  </div>
-                </div>
+            <CardContent className="space-y-6">
+              {/* Outlet Selection */}
+              <OutletSelector
+                value={selectedOutlet}
+                onValueChange={setSelectedOutlet}
+                label="Point de vente"
+                placeholder="Sélectionner un point de vente pour gérer les catégories"
+              />
 
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-medium">Sous-Catégories</h3>
-                    <Button size="sm" variant="outline" className="gap-2">
-                      <Plus className="w-4 h-4" />
-                      Ajouter
-                    </Button>
-                  </div>
-                  <div className="border rounded-lg p-4">
-                    <div className="text-center py-4 text-muted-foreground">
-                      <Grid3X3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">Aucune sous-catégorie</p>
+              {selectedOutlet && (
+                <>
+                  {/* Categories Management */}
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <h3 className="font-medium">Catégories</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Organisez vos produits par catégories
+                        </p>
+                      </div>
+                      <Button onClick={handleCreateCategory} className="gap-2">
+                        <Plus className="w-4 h-4" />
+                        Nouvelle Catégorie
+                      </Button>
                     </div>
-                  </div>
-                </div>
-              </div>
 
-              <div className="mt-6">
-                <h3 className="font-medium mb-4">Organisation des Familles</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card className="p-4">
-                    <h4 className="font-medium text-sm mb-2">Boissons</h4>
-                    <p className="text-xs text-muted-foreground mb-3">Toutes les boissons</p>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" className="h-6 px-2">
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-6 px-2 text-destructive">
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                    <div className="border rounded-lg">
+                      {categoriesLoading ? (
+                        <div className="p-8 text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                          <p className="text-muted-foreground">Chargement des catégories...</p>
+                        </div>
+                      ) : categories && categories.length > 0 ? (
+                        <div className="divide-y">
+                          {categories.map((category) => (
+                            <div key={category.id} className="p-4 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ backgroundColor: category.color }}
+                                />
+                                <div>
+                                  <h4 className="font-medium">{category.name}</h4>
+                                  {category.description && (
+                                    <p className="text-sm text-muted-foreground">
+                                      {category.description}
+                                    </p>
+                                  )}
+                                </div>
+                                <Badge variant="outline">
+                                  Ordre: {category.sort_order}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleEditCategory(category)}
+                                >
+                                  <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteCategory(category.id)}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="p-8 text-center text-muted-foreground">
+                          <Grid3X3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                          <p>Aucune catégorie configurée</p>
+                          <p className="text-sm">Cliquez sur "Nouvelle Catégorie" pour commencer</p>
+                        </div>
+                      )}
                     </div>
-                  </Card>
-                  <Card className="p-4">
-                    <h4 className="font-medium text-sm mb-2">Plats Chauds</h4>
-                    <p className="text-xs text-muted-foreground mb-3">Plats principaux</p>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" className="h-6 px-2">
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-6 px-2 text-destructive">
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </Card>
-                  <Card className="p-4">
-                    <h4 className="font-medium text-sm mb-2">Desserts</h4>
-                    <p className="text-xs text-muted-foreground mb-3">Desserts et sucreries</p>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="ghost" className="h-6 px-2">
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-6 px-2 text-destructive">
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </Card>
+                  </div>
+                </>
+              )}
+
+              {!selectedOutlet && (
+                <div className="border rounded-lg p-8 text-center text-muted-foreground">
+                  <Grid3X3 className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>Sélectionnez un point de vente</p>
+                  <p className="text-sm">Choisissez un point de vente pour gérer ses catégories</p>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Category Dialog */}
+          <CategoryDialog
+            open={categoryDialogOpen}
+            onOpenChange={setCategoryDialogOpen}
+            category={selectedCategory}
+            onSave={handleSaveCategory}
+            isLoading={createCategory.isPending || updateCategory.isPending}
+          />
         </TabsContent>
 
         <TabsContent value="keyboards" className="space-y-4">

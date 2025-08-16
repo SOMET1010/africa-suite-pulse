@@ -28,14 +28,14 @@ export const usePOSCategories = (outletId?: string) => {
       
       const { data, error } = await supabase
         .from("pos_categories")
-        .select("id, name, outlet_id, sort_order, is_active, color")
+        .select("id, name, description, code, outlet_id, sort_order, is_active, color, icon, created_at, updated_at")
         .eq("outlet_id", outletId)
         .eq("is_active", true)
         .order("sort_order")
         .range(0, 99);
 
       if (error) throw error;
-      return data as POSCategory[];
+      return data as unknown as POSCategory[];
     },
     enabled: !!outletId,
   });
@@ -288,6 +288,155 @@ export const useOpenPOSSession = () => {
       toast({
         title: "Erreur",
         description: error.message || "Impossible d'ouvrir la session",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useCreatePOSCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      outletId,
+      name,
+      description,
+      color,
+      icon,
+      sortOrder,
+    }: {
+      outletId: string;
+      name: string;
+      description?: string;
+      color?: string;
+      icon?: string;
+      sortOrder?: number;
+    }) => {
+      const orgIdResponse = await supabase.rpc("get_current_user_org_id");
+      const orgId = orgIdResponse.data;
+
+      const { data, error } = await supabase
+        .from("pos_categories")
+        .insert({
+          org_id: orgId,
+          outlet_id: outletId,
+          code: name.toLowerCase().replace(/\s+/g, '_'),
+          name,
+          description,
+          color: color || '#6366f1',
+          icon: icon || 'utensils',
+          sort_order: sortOrder || 0,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as POSCategory;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pos-categories"] });
+      toast({
+        title: "Catégorie créée",
+        description: "La catégorie a été créée avec succès",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de créer la catégorie",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useUpdatePOSCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      name,
+      description,
+      color,
+      icon,
+      sortOrder,
+    }: {
+      id: string;
+      name?: string;
+      description?: string;
+      color?: string;
+      icon?: string;
+      sortOrder?: number;
+    }) => {
+      const updates: any = {};
+      if (name !== undefined) {
+        updates.name = name;
+        updates.code = name.toLowerCase().replace(/\s+/g, '_');
+      }
+      if (description !== undefined) updates.description = description;
+      if (color !== undefined) updates.color = color;
+      if (icon !== undefined) updates.icon = icon;
+      if (sortOrder !== undefined) updates.sort_order = sortOrder;
+      
+      updates.updated_at = new Date().toISOString();
+
+      const { data, error } = await supabase
+        .from("pos_categories")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as POSCategory;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pos-categories"] });
+      toast({
+        title: "Catégorie modifiée",
+        description: "La catégorie a été modifiée avec succès",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de modifier la catégorie",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeletePOSCategory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (categoryId: string) => {
+      const { error } = await supabase
+        .from("pos_categories")
+        .update({ is_active: false })
+        .eq("id", categoryId);
+
+      if (error) throw error;
+      return categoryId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["pos-categories"] });
+      toast({
+        title: "Catégorie supprimée",
+        description: "La catégorie a été supprimée avec succès",
+        variant: "success",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer la catégorie",
         variant: "destructive",
       });
     },
