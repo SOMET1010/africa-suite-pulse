@@ -38,9 +38,9 @@ export const ChartContainer = React.forwardRef<
 ChartContainer.displayName = "ChartContainer";
 
 interface ChartTooltipProps {
-  content?: React.ComponentType<any>;
+  content?: React.ComponentType<Record<string, unknown>>;
   children?: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const ChartTooltip = ({ content, children, ...props }: ChartTooltipProps) => {
@@ -50,10 +50,10 @@ export const ChartTooltip = ({ content, children, ...props }: ChartTooltipProps)
 
 interface ChartTooltipContentProps {
   active?: boolean;
-  payload?: any[];
+  payload?: Array<{ value: unknown; dataKey: string; color: string; [key: string]: unknown }>;
   label?: string;
-  labelFormatter?: (value: any) => string;
-  formatter?: (value: any, name: string) => [string, string];
+  labelFormatter?: (value: unknown) => string;
+  formatter?: (value: unknown, name: string) => [string, string];
   className?: string;
 }
 
@@ -96,9 +96,9 @@ export const ChartTooltipContent = React.forwardRef<
               <span className="text-sm text-muted-foreground">
                 {formattedName}:
               </span>
-              <span className="text-sm font-medium">
-                {formattedValue}
-              </span>
+               <span className="text-sm font-medium">
+                 {String(formattedValue)}
+               </span>
             </div>
           );
         })}
@@ -109,9 +109,9 @@ export const ChartTooltipContent = React.forwardRef<
 ChartTooltipContent.displayName = "ChartTooltipContent";
 
 interface ChartLegendProps {
-  content?: React.ComponentType<any>;
+  content?: React.ComponentType<Record<string, unknown>>;
   children?: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export const ChartLegend = ({ content: Content, children, ...props }: ChartLegendProps) => {
@@ -122,7 +122,7 @@ export const ChartLegend = ({ content: Content, children, ...props }: ChartLegen
 };
 
 interface ChartLegendContentProps {
-  payload?: any[];
+  payload?: Array<{ value: string; color: string; [key: string]: unknown }>;
   className?: string;
 }
 

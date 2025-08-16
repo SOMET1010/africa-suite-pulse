@@ -119,9 +119,10 @@ export function useOrgId(): UseOrgIdResult {
         if (org) sessionStorage.setItem(CACHE_KEY, org);
         else sessionStorage.removeItem(CACHE_KEY);
       } catch {}
-    } catch (e: any) {
+    } catch (e: unknown) {
       if (!alive.current) return;
-      setError(e?.message ?? "Erreur inconnue lors de la récupération de l'organisation");
+      const errorMessage = e instanceof Error ? e.message : "Erreur inconnue lors de la récupération de l'organisation";
+      setError(errorMessage);
       setOrgId(null);
       try { sessionStorage.removeItem(CACHE_KEY); } catch {}
     } finally {

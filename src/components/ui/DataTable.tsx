@@ -27,18 +27,18 @@ import { Search, Filter, SortAsc, SortDesc, MoreVertical } from 'lucide-react';
 import { ExportButton } from './ExportButton';
 import type { ExportFormat } from '@/services/ExportService';
 
-export interface DataTableColumn<T = any> {
+export interface DataTableColumn<T = Record<string, unknown>> {
   key: string;
   label: string;
   sortable?: boolean;
   filterable?: boolean;
   width?: string;
   className?: string;
-  render?: (value: any, row: T, index: number) => React.ReactNode;
-  formatter?: (value: any) => string; // Pour l'export
+  render?: (value: unknown, row: T, index: number) => React.ReactNode;
+  formatter?: (value: unknown) => string; // Pour l'export
 }
 
-export interface DataTableAction<T = any> {
+export interface DataTableAction<T = Record<string, unknown>> {
   label: string;
   icon?: React.ComponentType<{ className?: string }>;
   onClick: (row: T) => void;
@@ -46,7 +46,7 @@ export interface DataTableAction<T = any> {
   variant?: 'default' | 'destructive';
 }
 
-interface DataTableProps<T = any> {
+interface DataTableProps<T = Record<string, unknown>> {
   data: T[];
   columns: DataTableColumn<T>[];
   loading?: boolean;
@@ -70,7 +70,7 @@ interface DataTableProps<T = any> {
   };
 }
 
-export function DataTable<T extends Record<string, any>>({
+export function DataTable<T extends Record<string, unknown>>({
   data,
   columns,
   loading = false,
@@ -129,14 +129,14 @@ export function DataTable<T extends Record<string, any>>({
     if (sortColumn === column.key) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortColumn(column.key);
+      setSortColumn(String(column.key));
       setSortDirection('asc');
     }
   };
 
   // Configuration pour l'export
   const exportColumns = columns.map(col => ({
-    key: col.key,
+    key: String(col.key),
     label: col.label,
     formatter: col.formatter,
   }));
@@ -199,9 +199,9 @@ export function DataTable<T extends Record<string, any>>({
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.map((column) => (
+              {columns.map((column, columnIndex) => (
                 <TableHead
-                  key={column.key}
+                  key={String(column.key)}
                   className={`${column.className} ${
                     column.sortable ? 'cursor-pointer hover:bg-muted/50' : ''
                   }`}
@@ -249,14 +249,14 @@ export function DataTable<T extends Record<string, any>>({
                   className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
                   onClick={() => onRowClick?.(row)}
                 >
-                  {columns.map((column) => (
-                    <TableCell key={column.key} className={column.className}>
-                      {column.render 
-                        ? column.render(row[column.key], row, index)
-                        : String(row[column.key] || '-')
-                      }
-                    </TableCell>
-                  ))}
+                   {columns.map((column, columnIndex) => (
+                     <TableCell key={String(column.key)} className={column.className}>
+                       {column.render 
+                         ? column.render(row[column.key], row, index)
+                         : String(row[column.key] || '-')
+                       }
+                     </TableCell>
+                   ))}
                   
                   {actions.length > 0 && (
                     <TableCell>

@@ -18,8 +18,8 @@ import { Download, FileImage, FileText, Table, File } from 'lucide-react';
 import { ExportService, type ExportOptions, type ExportFormat } from '@/services/ExportService';
 
 interface ExportButtonProps {
-  data?: any[];
-  columns?: Array<{ key: string; label: string; formatter?: (value: any) => string }>;
+  data?: Record<string, unknown>[];
+  columns?: Array<{ key: string; label: string; formatter?: (value: unknown) => string }>;
   elementId?: string;
   filename: string;
   title?: string;

@@ -46,11 +46,12 @@ export function WhatsAppButton({
         variant: "success"
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error sending WhatsApp:', error);
+      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer le message WhatsApp";
       toast({
         title: "Erreur WhatsApp",
-        description: error.message || "Impossible d'envoyer le message WhatsApp",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

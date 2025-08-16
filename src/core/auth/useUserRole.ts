@@ -31,9 +31,10 @@ export function useUserRole() {
         }
 
         setRole(data as UserRole);
-      } catch (err: any) {
+      } catch (err: unknown) {
         // Silently handle error - getCurrentUserRole failed
-        setError(err.message || "Unknown error");
+        const errorMessage = err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
         setRole(null);
       } finally {
         setLoading(false);
