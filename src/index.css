@@ -1,6 +1,7 @@
 /* Système de couleurs et animations modernes - AfricaSuite PMS */
 
 @import "./styles/tokens.css";
+@import "./styles/z-index.css";
 @import "./styles/animations.css";
 @import "./styles/focus.css";
 @import "./styles/interactions.css";

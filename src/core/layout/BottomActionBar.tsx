@@ -11,7 +11,7 @@ export const BottomActionBar: React.FC<BottomActionBarProps> = ({ className, chi
       role="toolbar"
       aria-label="Barre d'actions"
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border-t border-border shadow-soft",
+        "fixed inset-x-0 bottom-0 z-overlay bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border-t border-border shadow-soft",
         "[padding-bottom:env(safe-area-inset-bottom)]",
         "px-4 py-2"
       , className)}

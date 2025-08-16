@@ -19,7 +19,7 @@ export function BottomActionBar({
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-[var(--z-overlay)] bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75",
+        "fixed bottom-0 left-0 right-0 z-overlay bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/75",
         "shadow-luxury border-t border-border",
         "safe-area-inset-b px-3 py-2",
         className
