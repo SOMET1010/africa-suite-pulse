@@ -1,10 +1,18 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+function getSecureCorsHeaders(request: Request): Record<string, string> {
+  const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') ?? 'https://app.africasuite.com').split(',');
+  const origin = request.headers.get('origin') ?? '';
+  const allowedOrigin = allowedOrigins.includes(origin) ? origin : 'https://app.africasuite.com';
+  
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Vary': 'Origin',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+  };
+}
 
 interface AdvancedAnalyticsRequest {
   orgId: string;
@@ -12,6 +20,8 @@ interface AdvancedAnalyticsRequest {
 }
 
 serve(async (req) => {
+  const corsHeaders = getSecureCorsHeaders(req);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
