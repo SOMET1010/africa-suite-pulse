@@ -11,6 +11,7 @@ import { Download, Upload, FileText, CheckCircle, AlertCircle, FileSpreadsheet }
 import { useInventoryData } from "../../hooks/useInventoryData";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 interface ImportExportDialogProps {
   open: boolean;
@@ -298,8 +299,8 @@ export function ImportExportDialog({ open, onOpenChange }: ImportExportDialogPro
           }
 
           successCount++;
-        } catch (error: any) {
-          errors.push(`Ligne ${item.lineNumber}: ${error.message}`);
+        } catch (error: unknown) {
+          errors.push(`Ligne ${item.lineNumber}: ${getErrorMessage(error)}`);
         }
       }
 
@@ -313,10 +314,10 @@ export function ImportExportDialog({ open, onOpenChange }: ImportExportDialogPro
         
         setTimeout(() => window.location.reload(), 2000);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur d'import",
-        description: `Impossible de traiter le fichier: ${error.message}`,
+        description: `Impossible de traiter le fichier: ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     } finally {

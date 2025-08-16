@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ShoppingCart, Package, AlertTriangle, Calculator, Truck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 interface RestockManagementDialogProps {
   open: boolean;
@@ -143,11 +144,11 @@ export function RestockManagementDialog({
 
       onRefresh();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating restock order:', error);
       toast({
         title: "Erreur",
-        description: `Impossible de créer la commande: ${error.message}`,
+        description: `Impossible de créer la commande: ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     } finally {

@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { TButton } from "@/core/ui/TButton";
 import { logger } from "@/lib/logger";
 import { RefreshCw, Plus } from "lucide-react";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 // Simple styles pour drag & drop
 const dragDropStyles = `
@@ -131,21 +132,22 @@ export default function RackGrid() {
         title: "✅ Réservation déplacée", 
         description: `Chambre ${targetRoomId}`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error('Erreur mutation', error);
       
       // Afficher un message utilisateur convivial basé sur le type d'erreur
+      const errorMsg = getErrorMessage(error);
       let userMessage = "Impossible de déplacer la réservation";
       
-      if (error.code === "23514" && error.message?.includes("Conflicting reservation")) {
-        userMessage = "Des réservations en conflit empêchent ce déplacement. Utilisez la gestion des conflits pour résoudre cette situation.";
-      } else if (error.userMessage) {
-        userMessage = error.userMessage;
-      } else if (error.message) {
-        // Traduire d'autres messages techniques courants
-        if (error.message.includes("permission denied")) {
+      if (typeof error === 'object' && error !== null) {
+        const err = error as any;
+        if (err.code === "23514" && errorMsg.includes("Conflicting reservation")) {
+          userMessage = "Des réservations en conflit empêchent ce déplacement. Utilisez la gestion des conflits pour résoudre cette situation.";
+        } else if (err.userMessage) {
+          userMessage = err.userMessage;
+        } else if (errorMsg.includes("permission denied")) {
           userMessage = "Vous n'avez pas les permissions nécessaires pour cette action";
-        } else if (error.message.includes("network")) {
+        } else if (errorMsg.includes("network")) {
           userMessage = "Problème de connexion réseau. Veuillez réessayer.";
         }
       }

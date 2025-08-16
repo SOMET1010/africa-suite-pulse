@@ -9,6 +9,7 @@ import { Calendar, AlertTriangle, Package, Trash2, Archive, RotateCcw } from "lu
 import { useInventoryData } from "../../hooks/useInventoryData";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 interface ExpiryManagementDialogProps {
   open: boolean;
@@ -118,10 +119,10 @@ export function ExpiryManagementDialog({ open, onOpenChange }: ExpiryManagementD
       });
 
       window.location.reload();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: `Impossible de traiter les produits expirés: ${error.message}`,
+        description: `Impossible de traiter les produits expirés: ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     } finally {
@@ -163,10 +164,10 @@ export function ExpiryManagementDialog({ open, onOpenChange }: ExpiryManagementD
       });
 
       window.location.reload();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur",
-        description: `Impossible d'appliquer la démarque: ${error.message}`,
+        description: `Impossible d'appliquer la démarque: ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     } finally {

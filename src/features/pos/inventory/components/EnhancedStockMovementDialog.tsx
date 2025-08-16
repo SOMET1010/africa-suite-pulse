@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { AlertCircle, Calendar, User, FileText, DollarSign, Package } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getErrorMessage } from "@/utils/errorHandling";
 
 interface EnhancedStockMovementDialogProps {
   open: boolean;
@@ -182,11 +183,11 @@ export function EnhancedStockMovementDialog({
 
       onRefresh();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating movement:', error);
       toast({
         title: "Erreur",
-        description: `Impossible de créer le mouvement: ${error.message}`,
+        description: `Impossible de créer le mouvement: ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     } finally {
