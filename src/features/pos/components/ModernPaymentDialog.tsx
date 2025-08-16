@@ -14,6 +14,7 @@ import {
   Calculator,
   Loader2
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { CashVisualizer } from '@/components/pos/CashVisualizer';
 import { usePOSPayment } from '../hooks/usePOSPayment';
 import type { CartItem, POSOrder } from '../types';
@@ -127,7 +128,7 @@ export function ModernPaymentDialog({
     }
   };
 
-  console.log('🐛 [DEBUG] Payment Validation Debug', {
+  logger.debug('Payment Validation Debug', {
     selectedPaymentMode: 'single',
     selectedMethodId: paymentState.selectedMethodId,
     finalTotal: totals.total,
