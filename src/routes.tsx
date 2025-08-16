@@ -50,6 +50,7 @@ import POSServerPage from "@/pages/POSServerPage";
 import POSCustomersPage from "@/pages/POSCustomersPage";
 import POSKitchen from "@/pages/POSKitchen";
 import POSReports from "@/pages/POSReports";
+import POSMobileServerPage from "@/pages/POSMobileServerPage";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 import DemoPage from "@/pages/DemoPage";
 import PricingPage from "@/pages/PricingPage";
@@ -156,6 +157,7 @@ export function AppRoutes() {
         <Route path="pos/settings" element={<RequirePOSAuth requiredRole="pos_manager"><POSSettingsPage /></RequirePOSAuth>} />
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
+        <Route path="pos/mobile-server" element={<RequirePOSAuth requiredRole="pos_server"><POSMobileServerPage /></RequirePOSAuth>} />
         <Route path="demo" element={<DemoPage />} />
         <Route path="pricing" element={<PricingPage />} />
         {/* Role-based dashboards */}
