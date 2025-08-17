@@ -146,14 +146,16 @@ export default function ReservationsPage() {
 
         {/* Onglets par statut */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="all">{getTabLabel("all")}</TabsTrigger>
-            <TabsTrigger value="option">{getTabLabel("option")}</TabsTrigger>
-            <TabsTrigger value="confirmed">{getTabLabel("confirmed")}</TabsTrigger>
-            <TabsTrigger value="present">{getTabLabel("present")}</TabsTrigger>
-            <TabsTrigger value="cancelled">{getTabLabel("cancelled")}</TabsTrigger>
-            <TabsTrigger value="noshow">{getTabLabel("noshow")}</TabsTrigger>
-          </TabsList>
+          <div className="flex justify-center">
+            <TabsList className="grid grid-cols-6 w-full max-w-4xl">
+              <TabsTrigger value="all">{getTabLabel("all")}</TabsTrigger>
+              <TabsTrigger value="option">{getTabLabel("option")}</TabsTrigger>
+              <TabsTrigger value="confirmed">{getTabLabel("confirmed")}</TabsTrigger>
+              <TabsTrigger value="present">{getTabLabel("present")}</TabsTrigger>
+              <TabsTrigger value="cancelled">{getTabLabel("cancelled")}</TabsTrigger>
+              <TabsTrigger value="noshow">{getTabLabel("noshow")}</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value={activeTab} className="space-y-4">
             {/* Liste des réservations */}

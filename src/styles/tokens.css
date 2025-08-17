@@ -290,5 +290,26 @@
   @media (min-width: 1536px) {
     .dashboard-responsive-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
-  .container-app { max-width: 80rem; margin: 0 auto; }
+  /* Enhanced container system for better centering */
+  .container-app { 
+    max-width: 75rem; 
+    margin: 0 auto; 
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-app {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-app {
+      max-width: 80rem;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
 }

@@ -19,7 +19,7 @@ export function MainAppLayout({ children, className }: MainAppLayoutProps) {
           <ModernAppHeader />
           
           <main className="flex-1 overflow-auto">
-            <div className="container-app p-6">
+            <div className="container-app py-6">
               {children}
             </div>
           </main>
