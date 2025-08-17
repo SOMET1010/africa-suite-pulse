@@ -7,11 +7,12 @@ import { Mail, Lock, LogIn, UserPlus } from "lucide-react";
 
 export default function AuthPage() {
   const nav = useNavigate();
-  const [mode, setMode] = useState<"login"|"signup">("login");
+  const [mode, setMode] = useState<"login"|"signup"|"reset">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string|undefined>();
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -35,7 +36,7 @@ export default function AuthPage() {
           throw error;
         }
         console.log('Login successful');
-      } else {
+      } else if (mode === "signup") {
         console.log('Attempting signup...');
         const redirectUrl = `${window.location.origin}/`;
         console.log('Redirect URL:', redirectUrl);
@@ -62,6 +63,23 @@ export default function AuthPage() {
         }
         
         console.log('Signup successful');
+      } else if (mode === "reset") {
+        console.log('Attempting password reset...');
+        const redirectUrl = `${window.location.origin}/auth?mode=reset-confirm`;
+        
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: redirectUrl
+        });
+        
+        if (error) {
+          console.error('Reset error:', error);
+          throw error;
+        }
+        
+        setResetEmailSent(true);
+        setErr("Email de récupération envoyé ! Vérifiez votre boîte mail.");
+        console.log('Reset email sent successfully');
+        return;
       }
     } catch (e: unknown) {
       console.error('Auth error:', e);
@@ -89,16 +107,28 @@ export default function AuthPage() {
           </div>
 
           {/* Mode Toggle */}
-          <div className="mb-6">
-            <ToggleButtons
-              options={authOptions}
-              value={mode}
-              onChange={(value) => setMode(value as "login" | "signup")}
-              variant="primary"
-              size="md"
-              className="w-full"
-            />
-          </div>
+          {mode !== "reset" && (
+            <div className="mb-6">
+              <ToggleButtons
+                options={authOptions}
+                value={mode}
+                onChange={(value) => setMode(value as "login" | "signup")}
+                variant="primary"
+                size="md"
+                className="w-full"
+              />
+            </div>
+          )}
+
+          {/* Reset Mode Header */}
+          {mode === "reset" && (
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-semibold text-foreground mb-2">Récupération de mot de passe</h2>
+              <p className="text-sm text-muted-foreground">
+                Entrez votre adresse email pour recevoir un lien de récupération
+              </p>
+            </div>
+          )}
 
           {/* Email Input */}
           <EnhancedInput
@@ -114,18 +144,33 @@ export default function AuthPage() {
           />
 
           {/* Password Input */}
-          <EnhancedInput
-            label="Mot de passe"
-            type="password"
-            placeholder="Votre mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            leftIcon={<Lock className="h-4 w-4" />}
-            showPasswordToggle
-            required
-            disabled={busy}
-            size="md"
-          />
+          {mode !== "reset" && (
+            <EnhancedInput
+              label="Mot de passe"
+              type="password"
+              placeholder="Votre mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              leftIcon={<Lock className="h-4 w-4" />}
+              showPasswordToggle
+              required
+              disabled={busy}
+              size="md"
+            />
+          )}
+
+          {/* Forgot Password Link */}
+          {mode === "login" && (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setMode("reset")}
+                className="text-sm text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
+          )}
 
           {/* Error/Success Message */}
           {err && (
@@ -137,21 +182,34 @@ export default function AuthPage() {
           {/* Loading State */}
           {busy && (
             <FormLoadingState 
-              text={mode === "login" ? "Connexion en cours..." : "Création du compte..."} 
+              text={mode === "login" ? "Connexion en cours..." : mode === "signup" ? "Création du compte..." : "Envoi de l'email..."} 
             />
           )}
 
           {/* Submit Button */}
           <TouchButton
             type="submit"
-            disabled={busy || !email || !password}
+            disabled={busy || !email || (mode !== "reset" && !password)}
             intent="primary"
             touchSize="comfortable"
             feedback="haptic"
             className="w-full mt-2 h-12 text-base"
           >
-            {mode === "login" ? "Se connecter" : "Créer le compte"}
+            {mode === "login" ? "Se connecter" : mode === "signup" ? "Créer le compte" : "Envoyer l'email"}
           </TouchButton>
+
+          {/* Back to Login Link for Reset Mode */}
+          {mode === "reset" && (
+            <div className="text-center mt-4">
+              <button
+                type="button"
+                onClick={() => { setMode("login"); setErr(undefined); setResetEmailSent(false); }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                Retour à la connexion
+              </button>
+            </div>
+          )}
 
           {/* Additional Info for Signup */}
           {mode === "signup" && (
