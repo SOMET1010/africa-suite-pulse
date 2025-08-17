@@ -7685,14 +7685,22 @@ export type Database = {
         }[]
       }
       calculate_reservation_rate_enhanced: {
-        Args: {
-          p_date_arrival: string
-          p_date_departure: string
-          p_guest_type?: string
-          p_org_id: string
-          p_promo_code?: string
-          p_room_id: string
-        }
+        Args:
+          | {
+              p_arrangement_id?: string
+              p_date_arrival: string
+              p_date_departure: string
+              p_guest_type?: string
+              p_room_type: string
+            }
+          | {
+              p_date_arrival: string
+              p_date_departure: string
+              p_guest_type?: string
+              p_org_id: string
+              p_promo_code?: string
+              p_room_id: string
+            }
         Returns: Json
       }
       calculate_subsidy_amount: {
@@ -8132,6 +8140,10 @@ export type Database = {
           p_fields_accessed?: string[]
           p_guest_id: string
         }
+        Returns: undefined
+      }
+      log_unauthorized_access_attempt: {
+        Args: { p_action: string; p_details?: Json; p_table_name: string }
         Returns: undefined
       }
       log_user_activity: {
