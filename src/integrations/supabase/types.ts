@@ -8019,17 +8019,6 @@ export type Database = {
         Args: { p_org_id: string }
         Returns: number
       }
-      get_operational_metrics: {
-        Args: { p_from_date: string; p_org_id: string; p_to_date: string }
-        Returns: {
-          current_value: number
-          last_updated: string
-          metric_name: string
-          percentage_change: number
-          previous_value: number
-          trend: string
-        }[]
-      }
       get_organization_settings: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -8132,6 +8121,26 @@ export type Database = {
           table_id: string
           table_number: string
           zone: string
+        }[]
+      }
+      get_services_with_family: {
+        Args: { p_service_id?: string }
+        Returns: {
+          category: string
+          code: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          label: string
+          org_id: string
+          service_family_code: string
+          service_family_id: string
+          service_family_label: string
+          tax_rate: number
+          unit: string
+          unit_price: number
+          updated_at: string
         }[]
       }
       get_user_org_id_for_views: {

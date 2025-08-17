@@ -49,7 +49,7 @@ export const useHousekeepingTasks = (filters?: TaskFilter) => {
     queryFn: async () => {
       if (!orgId) throw new Error('Organization ID required');
       
-      const { data, error } = await supabase
+      let query = supabase
         .rpc('get_housekeeping_tasks_with_staff')
         .returns<any[]>()
         .order('created_at', { ascending: false })
