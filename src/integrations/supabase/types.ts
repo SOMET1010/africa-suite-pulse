@@ -8264,6 +8264,10 @@ export type Database = {
         Args: { setting_key: string; setting_value: Json }
         Returns: Json
       }
+      validate_auth_security_settings: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       validate_index_performance: {
         Args: Record<PropertyKey, never>
         Returns: {
