@@ -61,7 +61,8 @@ import {
   AllotmentsPage,
   ManagerDashboard,
   ReceptionistDashboard,
-  ServerDashboard
+  ServerDashboard,
+  UnifiedBIDashboard
 } from "@/routes.lazy";
 import { ProfessionalHeader } from "@/components/layout/ProfessionalHeader";
 
@@ -89,6 +90,7 @@ export function AppRoutes() {
       
       {/* Critical Business Pages - Migrated to UnifiedLayout */}
       <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+      <Route path="business-intelligence" element={<RequireAuth><Suspense fallback={<div>Loading...</div>}><UnifiedBIDashboard /></Suspense></RequireAuth>} />
       <Route path="settings" element={<RequireAuth><SettingsHomePage /></RequireAuth>} />
       <Route path="settings/hotel" element={<RequireAuth><HotelSettingsFormPage /></RequireAuth>} />
       <Route path="settings/rooms" element={<RequireAuth><RoomsSettingsPage /></RequireAuth>} />

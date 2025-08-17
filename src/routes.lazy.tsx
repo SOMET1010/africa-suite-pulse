@@ -46,3 +46,6 @@ export const POSCustomersPage = lazy(() => import('@/pages/POSCustomersPage'));
 export const POSKitchen = lazy(() => import('@/pages/POSKitchen'));
 export const POSReports = lazy(() => import('@/pages/POSReports'));
 export const POSMobileServerPage = lazy(() => import('@/pages/POSMobileServerPage'));
+
+// Business Intelligence Dashboard  
+export const UnifiedBIDashboard = lazy(() => import('@/pages/UnifiedBIDashboard'));

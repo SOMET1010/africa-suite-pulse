@@ -162,9 +162,14 @@ const navigationSections = [
     title: "Analyse & Rapports",
     items: [
       {
-        title: "Analytics",
-        icon: BarChart3,
-        url: "/analytics",
+    title: "Analytics",
+    icon: BarChart3,
+    url: "/analytics",
+  },
+  {
+    title: "Business Intelligence",
+    icon: Brain,
+    url: "/business-intelligence",
         subItems: [
           { title: "Vue générale", url: "/analytics" },
           { title: "Analytics avancées", url: "/analytics/advanced" },

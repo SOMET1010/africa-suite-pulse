@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Brain, Target, TrendingUp, AlertTriangle, CheckCircle, Zap, DollarSign, Users, Calendar } from 'lucide-react';
+import { useAIInsights } from '@/features/ai/hooks/useAIInsights';
 
 interface PricingRecommendationsProps {
   orgId: string;
@@ -13,6 +14,21 @@ interface PricingRecommendationsProps {
 
 export function PricingRecommendations({ orgId, strategy }: PricingRecommendationsProps) {
   const [autoApplyEnabled, setAutoApplyEnabled] = useState(false);
+  const { insights, generateInsights, isLoading: aiLoading } = useAIInsights();
+
+  // Generate AI-powered pricing recommendations
+  useEffect(() => {
+    const mockAnalyticsData = {
+      occupancyRate: 75,
+      adr: 52000,
+      revpar: 39000,
+      competitorRates: { hotelRiviera: 48000, grandHotel: 55000 },
+      seasonality: 'high',
+      demand: 'moderate'
+    };
+    
+    generateInsights(mockAnalyticsData, 'week');
+  }, [strategy, generateInsights]);
 
   // Mock AI recommendations based on strategy
   const generateRecommendations = () => {
