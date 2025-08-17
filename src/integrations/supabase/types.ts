@@ -8280,6 +8280,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      validate_final_security_status: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       validate_index_performance: {
         Args: Record<PropertyKey, never>
         Returns: {
