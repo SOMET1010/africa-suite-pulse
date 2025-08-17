@@ -19,10 +19,8 @@ export function useArrivals(orgId: string, dateISO: string) {
       console.log("🔄 Fetching arrivals with React Query", { orgId, dateISO });
       
       const { data, error } = await supabase
-        .rpc("get_reservations_arrivals")
-        .returns<any[]>()
-        .eq("date_arrival", dateISO)
-        .order("planned_time", { ascending: true, nullsFirst: false });
+        .rpc("get_reservations_arrivals", { p_date: dateISO })
+        .returns<any[]>();
 
       return throwIfError(data, error) as ArrivalRow[];
     },

@@ -15,21 +15,23 @@ import {
 import type { CartItem } from '../types';
 
 interface MobileServerInterfaceProps {
-  items: CartItem[];
-  onAddItem: (productId: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number) => void;
-  onSendToKitchen: () => void;
-  onCheckout: () => void;
-  onAddNote: (note: string) => void;
+  serverId?: string;
+  items?: CartItem[];
+  onAddItem?: (productId: string) => void;
+  onUpdateQuantity?: (productId: string, quantity: number) => void;
+  onSendToKitchen?: () => void;
+  onCheckout?: () => void;
+  onAddNote?: (note: string) => void;
 }
 
 export function MobileServerInterface({
-  items,
-  onAddItem,
-  onUpdateQuantity,
-  onSendToKitchen,
-  onCheckout,
-  onAddNote
+  serverId,
+  items = [],
+  onAddItem = () => {},
+  onUpdateQuantity = () => {},
+  onSendToKitchen = () => {},
+  onCheckout = () => {},
+  onAddNote = () => {}
 }: MobileServerInterfaceProps) {
   const [quickNote, setQuickNote] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('populaires');

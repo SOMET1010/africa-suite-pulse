@@ -49,40 +49,9 @@ export const useHousekeepingTasks = (filters?: TaskFilter) => {
     queryFn: async () => {
       if (!orgId) throw new Error('Organization ID required');
       
-      let query = supabase
+      const { data, error } = await supabase
         .rpc('get_housekeeping_tasks_with_staff')
-        .returns<any[]>()
-        .order('created_at', { ascending: false })
-        .range(0, 99);
-
-      // Apply filters
-      if (filters?.status?.length) {
-        query = query.in('status', filters.status);
-      }
-      if (filters?.priority?.length) {
-        query = query.in('priority', filters.priority);
-      }
-      if (filters?.task_type?.length) {
-        query = query.in('task_type', filters.task_type);
-      }
-      if (filters?.room_number) {
-        query = query.ilike('room_number', `%${filters.room_number}%`);
-      }
-      if (filters?.assigned_to) {
-        query = query.eq('assigned_to', filters.assigned_to);
-      }
-      if (filters?.scheduled_date) {
-        const startOfDay = new Date(filters.scheduled_date);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(filters.scheduled_date);
-        endOfDay.setHours(23, 59, 59, 999);
-        
-        query = query
-          .gte('scheduled_start', startOfDay.toISOString())
-          .lte('scheduled_start', endOfDay.toISOString());
-      }
-
-      const { data, error } = await query;
+        .returns<any[]>();
       if (error) throw error;
       return (data || []).map(adaptTaskFromDB);
     },
