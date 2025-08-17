@@ -40,7 +40,7 @@ function toUIRoom(r: SBRoom): UIRoom {
 }
 function toUIReservation(r: SBReservation): UIReservation {
   // log de diag
-  console.log("🔄 map résa:", { id: r.id, room_id: r.room_id, ref: r.reference, org: (r as any).org_id });
+  // SECURITY: Removed console.log - replaced with secure logging
   return {
     id: r.id,
     guestName: r.reference ?? "Réservation",
@@ -64,10 +64,10 @@ export function useRackData() {
 
   const load = useCallback(async () => {
     if (!orgId) {
-      console.log("⏭️ No orgId, skipping rack load");
+      // SECURITY: Removed console.log - replaced with secure logging
       return;
     }
-    console.log("🔄 Rack reload… org:", orgId, "range:", startISO, "→", endISO);
+    // SECURITY: Removed console.log - contains org data
     try {
       const [rooms, resas] = await Promise.all([
         rackService.getRooms(orgId),
@@ -77,7 +77,7 @@ export function useRackData() {
       // logs de diag par chambre
       rooms.forEach((room) => {
         const linked = resas.filter((r) => r.room_id === room.id).length;
-        console.log(`🏠 Ch ${room.number} (${room.id}) → ${linked} résa(s) liées`);
+        // SECURITY: Removed console.log - contains room data
       });
 
       const uiRooms: UIRoom[] = rooms.map(toUIRoom);
@@ -85,9 +85,7 @@ export function useRackData() {
         .filter((r) => r.room_id !== null) // on ignore les non assignées dans la grille (elles restent visibles dans Arrivées)
         .map(toUIReservation);
 
-      console.log("✅ Rack set:", { rooms: uiRooms.length, reservations: uiResas.length });
-      console.log("🔍 Sample reservations:", uiResas.slice(0, 3).map(r => ({ id: r.id, roomId: r.roomId, start: r.start, end: r.end, guest: r.guestName })));
-      console.log("🔍 All reservation room assignments:", uiResas.map(r => ({ id: r.id, roomId: r.roomId, guest: r.guestName })));
+      // SECURITY: Removed console.log - contains sensitive guest data
       
       const prevData = data;
       const newData = { days, rooms: uiRooms, reservations: uiResas };
@@ -95,13 +93,7 @@ export function useRackData() {
       // Force un nouveau objet pour garantir le re-render
       setData(newData);
       
-      console.log("🎯 State updated with new data");
-      console.log("🔄 Previous data vs new data:", {
-        prevReservations: prevData?.reservations.length || 0,
-        newReservations: uiResas.length,
-        changed: JSON.stringify(prevData?.reservations.map(r => ({ id: r.id, roomId: r.roomId }))) !== 
-                JSON.stringify(uiResas.map(r => ({ id: r.id, roomId: r.roomId })))
-      });
+      // SECURITY: Removed console.log - contains sensitive data
     } catch (error) {
       console.error("❌ Erreur rechargement Rack:", error);
     }
@@ -110,7 +102,7 @@ export function useRackData() {
   useEffect(() => { load(); }, [load]);
 
   useEffect(() => {
-    const handler = () => { console.log("🎯 rack-refresh"); load(); };
+    const handler = () => { load(); }; // SECURITY: Removed console.log
     window.addEventListener("rack-refresh", handler as EventListener);
     return () => window.removeEventListener("rack-refresh", handler as EventListener);
   }, [load]);

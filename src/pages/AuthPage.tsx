@@ -25,21 +25,21 @@ export default function AuthPage() {
     e.preventDefault();
     setBusy(true); setErr(undefined);
     
-    console.log('Form submission started:', { mode, email });
+    // SECURITY: Removed console.log - contains email data
     
     try {
       if (mode === "login") {
-        console.log('Attempting login...');
+        // SECURITY: Removed console.log
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           console.error('Login error:', error);
           throw error;
         }
-        console.log('Login successful');
+        // SECURITY: Removed console.log
       } else if (mode === "signup") {
-        console.log('Attempting signup...');
+        // SECURITY: Removed console.log
         const redirectUrl = `${window.location.origin}/`;
-        console.log('Redirect URL:', redirectUrl);
+        // SECURITY: Removed console.log
         
         const { data, error } = await supabase.auth.signUp({ 
           email, 
@@ -49,7 +49,7 @@ export default function AuthPage() {
           } 
         });
         
-        console.log('Signup response:', { data, error });
+        // SECURITY: Removed console.log - contains sensitive auth data
         
         if (error) {
           console.error('Signup error:', error);
@@ -58,13 +58,13 @@ export default function AuthPage() {
         
         if (data.user && !data.session) {
           setErr("Compte créé ! Vérifiez votre email pour confirmer votre inscription.");
-          console.log('Account created, email confirmation required');
+          // SECURITY: Removed console.log
           return;
         }
         
-        console.log('Signup successful');
+        // SECURITY: Removed console.log
       } else if (mode === "reset") {
-        console.log('Attempting password reset...');
+        // SECURITY: Removed console.log
         const redirectUrl = `${window.location.origin}/auth?mode=reset-confirm`;
         
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -78,7 +78,7 @@ export default function AuthPage() {
         
         setResetEmailSent(true);
         setErr("Email de récupération envoyé ! Vérifiez votre boîte mail.");
-        console.log('Reset email sent successfully');
+        // SECURITY: Removed console.log
         return;
       }
     } catch (e: unknown) {
