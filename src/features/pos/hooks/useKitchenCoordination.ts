@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -82,7 +83,7 @@ export function useKitchenCoordination() {
         status: (order.status === 'sent' ? 'pending' : order.status) as KitchenOrder['status'],
         created_at: order.created_at,
         estimated_time: 15,
-        notes: order.note || '' // Utiliser 'note' au lieu de 'notes'
+        notes: (order as any).notes || (order as any).note || '' // Gestion sécurisée des propriétés notes
       })) || [];
 
       setKitchenOrders(formattedOrders);
@@ -203,3 +204,4 @@ export function useKitchenCoordination() {
     refresh: fetchKitchenOrders
   };
 }
+
