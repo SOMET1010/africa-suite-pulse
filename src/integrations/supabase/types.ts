@@ -8564,19 +8564,12 @@ export type Database = {
         }
       }
       pms_search_free_rooms: {
-        Args:
-          | {
-              p_end: string
-              p_exclude_room_ids?: string[]
-              p_org: string
-              p_start: string
-            }
-          | {
-              p_end: string
-              p_exclude_room_ids?: string[]
-              p_org: string
-              p_start: string
-            }
+        Args: {
+          p_end: string
+          p_exclude_room_ids?: string[]
+          p_org: string
+          p_start: string
+        }
         Returns: {
           base_rate: number
           features: Json
