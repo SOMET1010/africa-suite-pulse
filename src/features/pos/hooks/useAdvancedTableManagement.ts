@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { POSTable } from "../types";
@@ -44,7 +45,7 @@ export function useAdvancedTableManagement() {
   });
   const { toast } = useToast();
 
-  // Statuts de table étendus
+  // Statuts de table étendus - ajout de "merged"
   const tableStatuses = {
     'available': { label: 'Libre', color: 'bg-success', priority: 1 },
     'occupied': { label: 'Occupée', color: 'bg-warning', priority: 2 },
@@ -172,7 +173,7 @@ export function useAdvancedTableManagement() {
         if (tableIds.includes(table.id)) {
           return table.id === primaryTable.id
             ? { ...table, capacity: newCapacity, is_merged: true, merged_tables: tableIds }
-            : { ...table, status: 'merged', merged_with: primaryTable.id };
+            : { ...table, status: 'merged' as any, merged_with: primaryTable.id };
         }
         return table;
       }));
@@ -286,7 +287,7 @@ export function useAdvancedTableManagement() {
 
   const getTableNumber = (tableId: string) => {
     const table = extendedTables.find(t => t.id === tableId);
-    return table?.number || tableId;
+    return table?.table_number || table?.number || tableId;
   };
 
   const calculateServerLoad = (serverId: string) => {
@@ -307,21 +308,33 @@ export function useAdvancedTableManagement() {
     const mockTables: ExtendedTable[] = [
       {
         id: '1',
+        org_id: 'mock-org',
+        outlet_id: 'mock-outlet',
         number: '1',
+        table_number: '1',
         capacity: 4,
         status: 'available',
         position_x: 100,
         position_y: 100,
-        shape: 'rectangle'
+        shape: 'rectangle',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       },
       {
         id: '2',
+        org_id: 'mock-org',
+        outlet_id: 'mock-outlet',
         number: '2',
+        table_number: '2',
         capacity: 2,
         status: 'occupied',
         position_x: 200,
         position_y: 100,
         shape: 'round',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
         assigned_server_id: 'server1',
         assigned_server_name: 'Marie',
         guest_count: 2,
