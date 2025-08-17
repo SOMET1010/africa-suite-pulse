@@ -43,7 +43,7 @@ export function useInitiateMobileMoneyPayment() {
         .from('app_users')
         .select('org_id')
         .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (!orgData) throw new Error('Organization not found');
 

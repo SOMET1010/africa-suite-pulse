@@ -167,7 +167,7 @@ export function usePOSAuth() {
       .from('pos_outlets')
       .select('org_id')
       .eq('id', outletId)
-      .single();
+      .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
     
     const updatedSession = { 
       ...globalSession, 

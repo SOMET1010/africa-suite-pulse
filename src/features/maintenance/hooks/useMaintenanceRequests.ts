@@ -119,7 +119,7 @@ export function useCreateMaintenanceRequest() {
         .from("app_users")
         .select("org_id")
         .eq("user_id", userOrgData.user?.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (!orgData?.org_id) {
         throw new Error("Organization not found");
@@ -138,7 +138,7 @@ export function useCreateMaintenanceRequest() {
         .from("maintenance_requests")
         .insert([insertData] as any)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         throw new Error(error.message);

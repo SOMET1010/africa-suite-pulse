@@ -88,7 +88,7 @@ export function useReservationServices(reservationId: string) {
           *,
           service:services(code, label, price)
         `)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         logger.error('Error adding reservation service', { error, reservationId });

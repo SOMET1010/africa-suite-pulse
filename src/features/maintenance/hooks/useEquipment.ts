@@ -99,7 +99,7 @@ export function useCreateEquipment() {
         .from("app_users")
         .select("org_id")
         .eq("user_id", userOrgData.user?.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (!orgData?.org_id) {
         throw new Error("Organization not found");
@@ -113,7 +113,7 @@ export function useCreateEquipment() {
           created_by: userOrgData.user?.id,
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         throw new Error(error.message);

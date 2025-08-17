@@ -37,7 +37,7 @@ export const FNETestPanel = () => {
           fne_status: "pending",
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (orderError) throw orderError;
 

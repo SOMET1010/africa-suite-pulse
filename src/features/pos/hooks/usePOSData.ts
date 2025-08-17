@@ -178,7 +178,7 @@ export const useCreatePOSOrder = () => {
           total_amount: 0,
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       return data as unknown as POSOrder;

@@ -60,7 +60,7 @@ export async function createPaymentTransaction(input: CreateTransactionInput): P
       metadata: input.metadata as any ?? {},
     })
     .select('id, org_id, invoice_id, method_id, amount, currency_code, status, reference, created_at, metadata, updated_at')
-    .single();
+    .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
   if (error) throw error;
   return data as PaymentTransaction;

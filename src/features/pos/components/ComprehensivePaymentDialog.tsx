@@ -171,7 +171,7 @@ export function ComprehensivePaymentDialog({
     
     try {
       // Create order in database
-      const { data: userData } = await supabase.from('app_users').select('org_id').eq('user_id', (await supabase.auth.getUser()).data.user?.id).single();
+      const { data: userData } = await supabase.from('app_users').select('org_id').eq('user_id', (await supabase.auth.getUser()).data.user?.id).maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
       
       const orderData = {
         org_id: userData?.org_id,

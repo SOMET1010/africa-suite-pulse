@@ -68,7 +68,7 @@ export const InvoicePrint = forwardRef<HTMLDivElement, InvoicePrintProps>(
             .from('hotel_settings')
             .select('*')
             .eq('org_id', orgId)
-            .single();
+            .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
           
           if (data) {
             setHotelSettings(data);
