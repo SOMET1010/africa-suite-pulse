@@ -3,11 +3,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Plus, Minus, Trash2, CreditCard, ChefHat, Users, MapPin, Smartphone } from 'lucide-react';
+import { Plus, Minus, Trash2, CreditCard, ChefHat, Users, MapPin, Smartphone, Grid3X3, Keyboard } from 'lucide-react';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
 import { usePOSAuth } from '../auth/usePOSAuth';
 import { toast } from 'sonner';
+import { VisualProductKeyboard } from './VisualProductKeyboard';
+
+// Import des images de produits africains
+import attiekeImage from '@/assets/attieke-poisson.jpg';
+import rizSauceImage from '@/assets/riz-sauce-graine.jpg';
+import brochettesImage from '@/assets/brochettes.jpg';
+import allocoImage from '@/assets/alloco.jpg';
+import kedjenuImage from '@/assets/kedjenou.jpg';
+import bissapImage from '@/assets/bissap.jpg';
 
 interface AfricanPOSInterfaceProps {
   serverId: string;
@@ -22,23 +31,23 @@ interface OrderItem {
   totalPrice: number;
 }
 
-// Produits africains pré-configurés avec codes rapides
+// Produits africains pré-configurés avec codes rapides et images authentiques
 const AFRICAN_PRODUCTS = [
-  { code: '1', name: 'Attiéké Poisson', price: 1500, category: 'Plats' },
-  { code: '2', name: 'Riz Sauce Graine', price: 2000, category: 'Plats' },
-  { code: '3', name: 'Brochettes', price: 1000, category: 'Grillades' },
-  { code: '4', name: 'Poisson Braisé', price: 2500, category: 'Grillades' },
-  { code: '5', name: 'Bissap', price: 500, category: 'Boissons' },
-  { code: '6', name: 'Coca Cola', price: 600, category: 'Boissons' },
-  { code: '7', name: 'Bière Ivoire', price: 800, category: 'Bières' },
-  { code: '8', name: 'Flag', price: 700, category: 'Bières' },
-  { code: '9', name: 'Plantain Frit', price: 500, category: 'Accompagnements' },
-  { code: '11', name: 'Café Robusta', price: 300, category: 'Boissons' },
-  { code: '12', name: 'Thé Lipton', price: 250, category: 'Boissons' },
-  { code: '21', name: 'Alloco', price: 1000, category: 'Plats' },
-  { code: '22', name: 'Kedjenou', price: 3000, category: 'Plats' },
-  { code: '31', name: 'Eau Minérale', price: 400, category: 'Boissons' },
-  { code: '32', name: 'Jus Orange', price: 700, category: 'Boissons' },
+  { code: '1', name: 'Attiéké Poisson', price: 1500, category: 'Plats', image_url: attiekeImage, emoji: '🐟' },
+  { code: '2', name: 'Riz Sauce Graine', price: 2000, category: 'Plats', image_url: rizSauceImage, emoji: '🍚' },
+  { code: '3', name: 'Brochettes', price: 1000, category: 'Grillades', image_url: brochettesImage, emoji: '🍢' },
+  { code: '4', name: 'Poisson Braisé', price: 2500, category: 'Grillades', image_url: '/placeholder.svg', emoji: '🔥' },
+  { code: '5', name: 'Bissap', price: 500, category: 'Boissons', image_url: bissapImage, emoji: '🌺' },
+  { code: '6', name: 'Coca Cola', price: 600, category: 'Boissons', image_url: '/placeholder.svg', emoji: '🥤' },
+  { code: '7', name: 'Bière Ivoire', price: 800, category: 'Bières', image_url: '/placeholder.svg', emoji: '🍺' },
+  { code: '8', name: 'Flag', price: 700, category: 'Bières', image_url: '/placeholder.svg', emoji: '🍻' },
+  { code: '9', name: 'Plantain Frit', price: 500, category: 'Accompagnements', image_url: '/placeholder.svg', emoji: '🍌' },
+  { code: '11', name: 'Café Robusta', price: 300, category: 'Boissons', image_url: '/placeholder.svg', emoji: '☕' },
+  { code: '12', name: 'Thé Lipton', price: 250, category: 'Boissons', image_url: '/placeholder.svg', emoji: '🍵' },
+  { code: '21', name: 'Alloco', price: 1000, category: 'Plats', image_url: allocoImage, emoji: '🍠' },
+  { code: '22', name: 'Kedjenou', price: 3000, category: 'Plats', image_url: kedjenuImage, emoji: '🍲' },
+  { code: '31', name: 'Eau Minérale', price: 400, category: 'Boissons', image_url: '/placeholder.svg', emoji: '💧' },
+  { code: '32', name: 'Jus Orange', price: 700, category: 'Boissons', image_url: '/placeholder.svg', emoji: '🍊' },
 ];
 
 export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({ 
@@ -53,6 +62,7 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
   const [productCode, setProductCode] = useState('');
   const [showTablePlan, setShowTablePlan] = useState(false);
   const [customerCount, setCustomerCount] = useState(1);
+  const [showVisualKeyboard, setShowVisualKeyboard] = useState(true);
 
   // Interface en mode "stress" - Ultra simplifiée
   const [isStressMode, setIsStressMode] = useState(true);
@@ -307,42 +317,73 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
       </div>
 
       <div className="flex-1 flex">
-        {/* Zone saisie codes - Style ultra-rapide */}
-        <div className="w-1/3 bg-card border-r-2 border-border">
-          {/* Saisie code produit XXL */}
-          <div className="p-6 border-b bg-accent/10">
-            <div className="text-center mb-4">
-              <h3 className="text-lg font-bold mb-2">CODE PRODUIT</h3>
-              <Input
-                value={productCode}
-                onChange={(e) => setProductCode(e.target.value)}
-                placeholder="Tapez le code..."
-                className="text-center text-4xl h-20 font-mono font-bold"
-                autoFocus
-              />
-              <div className="mt-3 text-sm text-muted-foreground">
-                Tapez directement ou Enter pour ajouter
-              </div>
+        {/* Zone saisie codes / Clavier visuel */}
+        <div className="w-1/3 bg-card border-r-2 border-border flex flex-col">
+          {/* Toggle entre code et clavier visuel */}
+          <div className="p-4 border-b bg-accent/10">
+            <div className="flex gap-2 mb-4">
+              <Button
+                variant={!showVisualKeyboard ? "default" : "outline"}
+                onClick={() => setShowVisualKeyboard(false)}
+                className="flex-1"
+              >
+                <Keyboard className="h-4 w-4 mr-2" />
+                Code
+              </Button>
+              <Button
+                variant={showVisualKeyboard ? "default" : "outline"}
+                onClick={() => setShowVisualKeyboard(true)}
+                className="flex-1"
+              >
+                <Grid3X3 className="h-4 w-4 mr-2" />
+                Visuel
+              </Button>
             </div>
+
+            {!showVisualKeyboard && (
+              <div className="text-center">
+                <h3 className="text-lg font-bold mb-2">CODE PRODUIT</h3>
+                <Input
+                  value={productCode}
+                  onChange={(e) => setProductCode(e.target.value)}
+                  placeholder="Tapez le code..."
+                  className="text-center text-4xl h-20 font-mono font-bold"
+                  autoFocus
+                />
+                <div className="mt-3 text-sm text-muted-foreground">
+                  Tapez directement ou Enter pour ajouter
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Grille codes rapides populaires */}
-          <div className="p-4">
-            <h4 className="font-bold mb-3 text-center">⚡ CODES RAPIDES</h4>
-            <div className="grid grid-cols-3 gap-2">
-              {AFRICAN_PRODUCTS.slice(0, 12).map((product) => (
-                <Button
-                  key={product.code}
-                  variant="outline"
-                  onClick={() => addToOrder(product)}
-                  className="h-16 flex flex-col text-xs p-2"
-                >
-                  <div className="font-bold text-lg">{product.code}</div>
-                  <div className="truncate">{product.name}</div>
-                  <div className="text-primary font-bold">{product.price.toLocaleString()}</div>
-                </Button>
-              ))}
-            </div>
+          {/* Clavier visuel ou codes rapides */}
+          <div className="flex-1 overflow-hidden">
+            {showVisualKeyboard ? (
+              <VisualProductKeyboard
+                products={AFRICAN_PRODUCTS}
+                onProductSelect={addToOrder}
+                className="h-full"
+              />
+            ) : (
+              <div className="p-4 h-full overflow-y-auto">
+                <h4 className="font-bold mb-3 text-center">⚡ CODES RAPIDES</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {AFRICAN_PRODUCTS.slice(0, 12).map((product) => (
+                    <Button
+                      key={product.code}
+                      variant="outline"
+                      onClick={() => addToOrder(product)}
+                      className="h-16 flex flex-col text-xs p-2"
+                    >
+                      <div className="font-bold text-lg">{product.code}</div>
+                      <div className="truncate">{product.name}</div>
+                      <div className="text-primary font-bold">{product.price.toLocaleString()}</div>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Actions rapides */}
