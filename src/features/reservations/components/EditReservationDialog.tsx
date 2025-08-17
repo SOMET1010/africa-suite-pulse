@@ -28,7 +28,7 @@ const editReservationSchema = z.object({
   children: z.coerce.number().min(0),
   room_id: z.string().optional(),
   rate_total: z.coerce.number().optional(),
-  status: z.enum(["option", "confirmed", "present", "cancelled", "noshow"]),
+  status: z.enum(["draft", "option", "pending_payment", "confirmed", "checked_in", "checked_out", "no_show", "cancelled", "modified"]),
   source: z.enum(["walk_in", "phone", "email", "website", "booking_com", "airbnb", "other"]),
   source_reference: z.string().optional(),
   special_requests: z.string().optional(),
@@ -61,7 +61,7 @@ export function EditReservationDialog({ open, onOpenChange, reservation }: EditR
       adults: 2,
       children: 0,
       rate_total: 0,
-      status: "option",
+      status: "draft",
       source: "walk_in",
       source_reference: "",
       special_requests: "",
@@ -342,13 +342,17 @@ export function EditReservationDialog({ open, onOpenChange, reservation }: EditR
                                   <SelectValue />
                                 </SelectTrigger>
                               </FormControl>
-                              <SelectContent>
+                               <SelectContent>
+                                <SelectItem value="draft">Brouillon</SelectItem>
                                 <SelectItem value="option">Option</SelectItem>
+                                <SelectItem value="pending_payment">En attente paiement</SelectItem>
                                 <SelectItem value="confirmed">Confirmée</SelectItem>
-                                <SelectItem value="present">Présente</SelectItem>
+                                <SelectItem value="checked_in">Arrivé</SelectItem>
+                                <SelectItem value="checked_out">Parti</SelectItem>
+                                <SelectItem value="no_show">No Show</SelectItem>
                                 <SelectItem value="cancelled">Annulée</SelectItem>
-                                <SelectItem value="noshow">No Show</SelectItem>
-                              </SelectContent>
+                                <SelectItem value="modified">Modifiée</SelectItem>
+                               </SelectContent>
                             </Select>
                             <FormMessage />
                           </FormItem>

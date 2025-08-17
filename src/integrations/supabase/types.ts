@@ -8135,6 +8135,17 @@ export type Database = {
           total_rate: number
         }[]
       }
+      calculate_reservation_rate_enhanced: {
+        Args: {
+          p_date_arrival: string
+          p_date_departure: string
+          p_guest_type?: string
+          p_org_id: string
+          p_promo_code?: string
+          p_room_id: string
+        }
+        Returns: Json
+      }
       calculate_subsidy_amount: {
         Args: {
           p_base_amount: number
@@ -8640,6 +8651,13 @@ export type Database = {
           user_id: string
         }[]
       }
+      validate_reservation_status_transition: {
+        Args: {
+          p_new_status: Database["public"]["Enums"]["reservation_status"]
+          p_old_status: Database["public"]["Enums"]["reservation_status"]
+        }
+        Returns: boolean
+      }
       validate_table_function_access: {
         Args:
           | {
@@ -8674,6 +8692,16 @@ export type Database = {
         | "network"
         | "business"
         | "database"
+      reservation_status:
+        | "draft"
+        | "option"
+        | "pending_payment"
+        | "confirmed"
+        | "checked_in"
+        | "checked_out"
+        | "no_show"
+        | "cancelled"
+        | "modified"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -8824,6 +8852,17 @@ export const Constants = {
         "network",
         "business",
         "database",
+      ],
+      reservation_status: [
+        "draft",
+        "option",
+        "pending_payment",
+        "confirmed",
+        "checked_in",
+        "checked_out",
+        "no_show",
+        "cancelled",
+        "modified",
       ],
     },
   },

@@ -2,7 +2,7 @@
  * Types pour la gestion des réservations
  */
 
-export type ReservationStatus = "option" | "confirmed" | "present" | "cancelled" | "noshow";
+export type ReservationStatus = "draft" | "option" | "pending_payment" | "confirmed" | "checked_in" | "checked_out" | "no_show" | "cancelled" | "modified";
 
 export interface Reservation {
   id: string;

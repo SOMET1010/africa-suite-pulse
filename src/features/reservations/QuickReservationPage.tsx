@@ -21,11 +21,14 @@ import type { ReservationInsert } from "@/types/reservation";
 const quickReservationSchema = z.object({
   guest_name: z.string().min(1, "Le nom du client est requis"),
   guest_phone: z.string().optional(),
+  guest_type: z.enum(['individual', 'corporate', 'group', 'vip']).default('individual'),
   date_arrival: z.string().min(1, "La date d'arrivée est requise"),
   date_departure: z.string().min(1, "La date de départ est requise"),
   adults: z.coerce.number().min(1, "Au moins 1 adulte requis"),
   room_id: z.string().optional(),
   rate_total: z.coerce.number().optional(),
+  promo_code: z.string().optional(),
+  supplements: z.array(z.string()).default([]),
 });
 
 type FormData = z.infer<typeof quickReservationSchema>;
@@ -43,14 +46,18 @@ export default function QuickReservationPage() {
   const form = useForm<FormData>({
     resolver: zodResolver(quickReservationSchema),
     defaultValues: {
+      guest_type: 'individual',
       date_arrival: format(new Date(), "yyyy-MM-dd"),
       date_departure: format(addDays(new Date(), 1), "yyyy-MM-dd"),
       adults: 2,
+      supplements: [],
     },
   });
 
   const watchedDates = form.watch(["date_arrival", "date_departure", "adults"]);
   const selectedRoom = form.watch("room_id");
+  const guestType = form.watch("guest_type");
+  const promoCode = form.watch("promo_code");
 
   // Check room availability when dates change
   const checkAvailability = async () => {
@@ -90,11 +97,13 @@ export default function QuickReservationPage() {
     if (selectedRoom && dateArrival && dateDeparture && orgId) {
       setIsCalculatingRate(true);
       try {
-        const rateResult = await reservationsApi.calculateRate(
+        const rateResult = await reservationsApi.calculateRateEnhanced(
           orgId,
           selectedRoom,
           dateArrival,
-          dateDeparture
+          dateDeparture,
+          guestType,
+          promoCode || undefined
         );
         setCalculatedRate(rateResult);
         form.setValue("rate_total", rateResult.total_rate);
@@ -115,10 +124,10 @@ export default function QuickReservationPage() {
     checkAvailability();
   }, [watchedDates, orgId]);
 
-  // Calculate rate when room or dates change
+  // Calculate rate when room, dates, guest type or promo code change
   React.useEffect(() => {
     calculateRateForRoom();
-  }, [selectedRoom, watchedDates, orgId]);
+  }, [selectedRoom, watchedDates, guestType, promoCode, orgId]);
 
   const onSubmit = async (data: FormData) => {
     if (!orgId) return;
@@ -233,14 +242,14 @@ export default function QuickReservationPage() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Client */}
+                 {/* Client */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-sm font-medium text-primary">
                     <User className="h-4 w-4" />
                     Client
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="guest_name"
@@ -264,6 +273,30 @@ export default function QuickReservationPage() {
                           <FormControl>
                             <Input {...field} placeholder="+225 XX XX XX XX" />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="guest_type"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Type de client</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="individual">Particulier</SelectItem>
+                              <SelectItem value="corporate">Entreprise</SelectItem>
+                              <SelectItem value="group">Groupe</SelectItem>
+                              <SelectItem value="vip">VIP</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -343,7 +376,7 @@ export default function QuickReservationPage() {
                       Chambre ({availableRooms.length} disponible{availableRooms.length > 1 ? 's' : ''})
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <FormField
                         control={form.control}
                         name="room_id"
@@ -364,6 +397,26 @@ export default function QuickReservationPage() {
                                 ))}
                               </SelectContent>
                             </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="promo_code"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Code promo</FormLabel>
+                            <FormControl>
+                              <Input 
+                                {...field} 
+                                placeholder="WELCOME10, EARLY20..."
+                                onChange={(e) => {
+                                  field.onChange(e.target.value.toUpperCase());
+                                }}
+                              />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -396,17 +449,68 @@ export default function QuickReservationPage() {
                            <div className="w-2 h-2 bg-success rounded-full"></div>
                            <span className="text-sm font-medium text-success">Calcul automatique</span>
                          </div>
-                         <div className="space-y-2 text-sm">
-                           <div className="flex justify-between">
-                             <span className="text-muted-foreground">Tarif de base/nuit:</span>
-                             <span className="font-medium">{calculatedRate.base_rate?.toLocaleString()} XOF</span>
+                         <div className="space-y-3 text-sm">
+                           {/* Breakdown détaillé */}
+                           <div className="space-y-1">
+                             <div className="flex justify-between">
+                               <span className="text-muted-foreground">Tarif de base/nuit:</span>
+                               <span className="font-medium">{calculatedRate.base_rate?.toLocaleString()} XOF</span>
+                             </div>
+                             <div className="flex justify-between">
+                               <span className="text-muted-foreground">Nombre de nuits:</span>
+                               <span className="font-medium">{calculatedRate.nights}</span>
+                             </div>
+                             {calculatedRate.subtotals?.accommodation && (
+                               <div className="flex justify-between">
+                                 <span className="text-muted-foreground">Sous-total hébergement:</span>
+                                 <span className="font-medium">{calculatedRate.subtotals.accommodation?.toLocaleString()} XOF</span>
+                               </div>
+                             )}
                            </div>
-                           <div className="flex justify-between">
-                             <span className="text-muted-foreground">Nombre de nuits:</span>
-                             <span className="font-medium">{calculatedRate.nights}</span>
-                           </div>
+
+                           {/* Remises */}
+                           {calculatedRate.discounts && calculatedRate.discounts.length > 0 && (
+                             <div className="border-t border-success/20 pt-2 space-y-1">
+                               <div className="text-xs font-medium text-muted-foreground mb-1">Remises appliquées:</div>
+                               {calculatedRate.discounts.map((discount: any, index: number) => (
+                                 <div key={index} className="flex justify-between text-green-600">
+                                   <span className="text-xs">{discount.description}:</span>
+                                   <span className="text-xs font-medium">-{discount.amount?.toLocaleString()} XOF</span>
+                                 </div>
+                               ))}
+                             </div>
+                           )}
+
+                           {/* Taxes */}
+                           {calculatedRate.taxes && calculatedRate.taxes.length > 0 && (
+                             <div className="border-t border-success/20 pt-2 space-y-1">
+                               <div className="text-xs font-medium text-muted-foreground mb-1">Taxes (non incluses):</div>
+                               {calculatedRate.taxes.map((tax: any, index: number) => (
+                                 <div key={index} className="flex justify-between text-orange-600">
+                                   <span className="text-xs">{tax.name}:</span>
+                                   <span className="text-xs font-medium">+{tax.total_amount?.toLocaleString()} XOF</span>
+                                 </div>
+                               ))}
+                             </div>
+                           )}
+
+                           {/* Suppléments proposés */}
+                           {calculatedRate.supplements && calculatedRate.supplements.length > 0 && (
+                             <div className="border-t border-success/20 pt-2">
+                               <div className="text-xs font-medium text-muted-foreground mb-2">Suppléments disponibles:</div>
+                               <div className="grid grid-cols-2 gap-2">
+                                 {calculatedRate.supplements.map((supplement: any, index: number) => (
+                                   <div key={index} className="flex items-center justify-between text-xs bg-muted/30 rounded p-2">
+                                     <span>{supplement.name}</span>
+                                     <span className="font-medium">{supplement.total_price?.toLocaleString()} XOF</span>
+                                   </div>
+                                 ))}
+                               </div>
+                             </div>
+                           )}
+
                            <div className="border-t border-success/20 pt-2 flex justify-between font-semibold">
-                             <span>Total:</span>
+                             <span>Total hébergement:</span>
                              <span className="text-success">{calculatedRate.total_rate?.toLocaleString()} XOF</span>
                            </div>
                          </div>

@@ -173,7 +173,15 @@ export const reservationsApi = {
 
     if (error) throw error;
 
-    return data || [];
+    // Transform et typage des données pour correspondre à AvailableRoom
+    return (data || []).map((room: any) => ({
+      id: room.id,
+      number: room.number,
+      type: room.type,
+      floor: room.floor,
+      features: typeof room.features === 'object' ? room.features : {},
+      base_rate: room.base_rate
+    }));
   },
 
   async calculateRate(orgId: string, roomId: string, dateArrival: string, dateDeparture: string): Promise<RateCalculation> {
@@ -204,6 +212,33 @@ export const reservationsApi = {
       nights,
       breakdown,
     };
+  },
+
+  async calculateRateEnhanced(
+    orgId: string, 
+    roomId: string, 
+    dateArrival: string, 
+    dateDeparture: string,
+    guestType: string = 'individual',
+    promoCode?: string
+  ): Promise<any> {
+    try {
+      const { data, error } = await supabase.rpc('calculate_reservation_rate_enhanced', {
+        p_org_id: orgId,
+        p_room_id: roomId,
+        p_date_arrival: dateArrival,
+        p_date_departure: dateDeparture,
+        p_guest_type: guestType,
+        p_promo_code: promoCode
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error calculating enhanced rate:', error);
+      // Fallback vers l'ancien calcul
+      return this.calculateRate(orgId, roomId, dateArrival, dateDeparture);
+    }
   },
 
   async confirm(id: string, confirmedBy: string) {
