@@ -11,8 +11,9 @@ export interface Reservation {
   // Références
   reference?: string;
   
-  // Client
+  // Client (seulement guest_id existe dans la table)
   guest_id?: string;
+  // Les données suivantes sont enrichies via jointure ou API
   guest_name?: string;
   guest_email?: string;
   guest_phone?: string;
@@ -61,9 +62,6 @@ export interface ReservationInsert {
   org_id: string;
   reference?: string;
   guest_id?: string;
-  guest_name?: string;
-  guest_email?: string;
-  guest_phone?: string;
   room_id?: string;
   date_arrival: string;
   date_departure: string;
@@ -71,22 +69,25 @@ export interface ReservationInsert {
   adults: number;
   children: number;
   rate_total?: number;
-  currency?: string;
-  arrangement_id?: string;
   status: ReservationStatus;
   notes?: string;
   special_requests?: string;
   source?: string;
   source_reference?: string;
   created_by?: string;
+  group_id?: string;
+  tariff_id?: string;
+  promotion_code?: string;
+  allotment_id?: string;
+  cancellation_policy_id?: string;
+  discount_amount?: number;
+  original_rate?: number;
+  group_billing_mode?: string;
 }
 
 export interface ReservationUpdate {
   reference?: string;
   guest_id?: string;
-  guest_name?: string;
-  guest_email?: string;
-  guest_phone?: string;
   room_id?: string;
   date_arrival?: string;
   date_departure?: string;
@@ -94,8 +95,6 @@ export interface ReservationUpdate {
   adults?: number;
   children?: number;
   rate_total?: number;
-  currency?: string;
-  arrangement_id?: string;
   status?: ReservationStatus;
   notes?: string;
   special_requests?: string;
@@ -105,6 +104,14 @@ export interface ReservationUpdate {
   confirmed_by?: string;
   checked_in_at?: string;
   checked_out_at?: string;
+  group_id?: string;
+  tariff_id?: string;
+  promotion_code?: string;
+  allotment_id?: string;
+  cancellation_policy_id?: string;
+  discount_amount?: number;
+  original_rate?: number;
+  group_billing_mode?: string;
 }
 
 export interface ReservationFilters {

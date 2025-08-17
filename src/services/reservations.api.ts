@@ -15,7 +15,21 @@ export const reservationsApi = {
   async list(orgId: string, params: ReservationSearchParams = {}) {
     let query = supabase
       .from('reservations')
-      .select('*')
+      .select(`
+        *,
+        guests:guest_id (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        ),
+        rooms:room_id (
+          id,
+          number,
+          type
+        )
+      `)
       .eq('org_id', orgId)
       .order('date_arrival', { ascending: false });
 
@@ -57,9 +71,9 @@ export const reservationsApi = {
       guest_phone: (reservation as any).guests?.phone,
       room_number: (reservation as any).rooms?.number,
       room_type: (reservation as any).rooms?.type,
-      // Ajouter des timestamps par défaut car la table n'a pas ces colonnes
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      // Les timestamps viennent directement de la table
+      created_at: reservation.created_at,
+      updated_at: reservation.updated_at,
     }));
 
     return { data: enrichedData, error: null };
@@ -68,7 +82,21 @@ export const reservationsApi = {
   async get(id: string) {
     const { data, error } = await supabase
       .from('reservations')
-      .select('*')
+      .select(`
+        *,
+        guests:guest_id (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        ),
+        rooms:room_id (
+          id,
+          number,
+          type
+        )
+      `)
       .eq('id', id)
       .maybeSingle();
 
@@ -85,9 +113,9 @@ export const reservationsApi = {
         guest_phone: (data as any).guests?.phone,
         room_number: (data as any).rooms?.number,
         room_type: (data as any).rooms?.type,
-        // Ajouter des timestamps par défaut car la table n'a pas ces colonnes
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        // Les timestamps viennent directement de la table
+        created_at: data.created_at,
+        updated_at: data.updated_at,
       };
       return { data: enrichedData, error: null };
     }
@@ -116,10 +144,7 @@ export const reservationsApi = {
   async update(id: string, updates: ReservationUpdate) {
     const { data, error } = await supabase
       .from('reservations')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();

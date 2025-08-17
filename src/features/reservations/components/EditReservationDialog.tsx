@@ -98,9 +98,7 @@ export function EditReservationDialog({ open, onOpenChange, reservation }: EditR
     
     try {
       const updateData: ReservationUpdate = {
-        guest_name: data.guest_name,
-        guest_email: data.guest_email || undefined,
-        guest_phone: data.guest_phone || undefined,
+        guest_id: reservation.guest_id, // Conserver l'ID existant du guest
         date_arrival: data.date_arrival,
         date_departure: data.date_departure,
         planned_time: data.planned_time || undefined,

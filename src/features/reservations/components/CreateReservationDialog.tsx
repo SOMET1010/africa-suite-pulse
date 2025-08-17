@@ -121,12 +121,31 @@ export function CreateReservationDialog({ open, onOpenChange }: CreateReservatio
     setIsSubmitting(true);
     
     try {
+      let guestId = data.guest_id;
+      
+      // Si pas de guest_id mais qu'on a des données de guest, créer un nouveau guest
+      if (!guestId && (data.guest_name || data.guest_email || data.guest_phone)) {
+        const [firstName, ...lastNameParts] = data.guest_name.split(' ');
+        const lastName = lastNameParts.join(' ') || firstName;
+        
+        const newGuest = await guestsApi.create({
+          org_id: orgId,
+          first_name: firstName,
+          last_name: lastName,
+          email: data.guest_email || undefined,
+          phone: data.guest_phone || undefined,
+          guest_type: 'individual',
+          vip_status: false,
+          marketing_consent: false,
+          preferred_communication: 'email',
+        });
+        
+        guestId = newGuest.data?.id;
+      }
+
       const reservationData: ReservationInsert = {
         org_id: orgId,
-        guest_id: data.guest_id || undefined,
-        guest_name: data.guest_name,
-        guest_email: data.guest_email || undefined,
-        guest_phone: data.guest_phone || undefined,
+        guest_id: guestId,
         date_arrival: data.date_arrival,
         date_departure: data.date_departure,
         planned_time: data.planned_time || undefined,

@@ -15,6 +15,7 @@ import { ReservationSuccessModal } from "@/components/reservations/ReservationSu
 import { useOrgId } from "@/core/auth/useOrg";
 import { toast } from "@/components/ui/toast-unified";
 import { reservationsApi } from "@/services/reservations.api";
+import { guestsApi } from "@/services/guests.api";
 import { format, addDays, differenceInDays } from "date-fns";
 import type { ReservationInsert } from "@/types/reservation";
 
@@ -140,10 +141,30 @@ export default function QuickReservationPage() {
         description: "Veuillez patienter pendant la création de la réservation.",
       });
 
+      // Créer un guest si nécessaire
+      let guestId: string | undefined;
+      
+      if (data.guest_name || data.guest_phone) {
+        const [firstName, ...lastNameParts] = data.guest_name.split(' ');
+        const lastName = lastNameParts.join(' ') || firstName;
+        
+        const newGuest = await guestsApi.create({
+          org_id: orgId,
+          first_name: firstName,
+          last_name: lastName,
+          phone: data.guest_phone || undefined,
+          guest_type: 'individual',
+          vip_status: false,
+          marketing_consent: false,
+          preferred_communication: 'phone',
+        });
+        
+        guestId = newGuest.data?.id;
+      }
+
       const reservationData: ReservationInsert = {
         org_id: orgId,
-        guest_name: data.guest_name,
-        guest_phone: data.guest_phone || undefined,
+        guest_id: guestId,
         date_arrival: data.date_arrival,
         date_departure: data.date_departure,
         adults: data.adults,
