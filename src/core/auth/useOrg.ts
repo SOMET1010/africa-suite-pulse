@@ -19,7 +19,7 @@ async function createProfileForUser(userId: string, email?: string): Promise<voi
         org_id: crypto.randomUUID()
       })
       .select("org_id")
-      .single();
+      .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
     
     orgId = newOrg.org_id;
   } else {

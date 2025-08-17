@@ -888,7 +888,7 @@ export type Database = {
             foreignKeyName: "collective_beneficiaries_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["guest_id"]
           },
           {
@@ -2375,7 +2375,7 @@ export type Database = {
             foreignKeyName: "invoices_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["guest_id"]
           },
           {
@@ -2389,14 +2389,7 @@ export type Database = {
             foreignKeyName: "invoices_reservation_id_fkey"
             columns: ["reservation_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
-            referencedColumns: ["reservation_id"]
-          },
-          {
-            foreignKeyName: "invoices_reservation_id_fkey"
-            columns: ["reservation_id"]
-            isOneToOne: false
-            referencedRelation: "rack_data_view"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["reservation_id"]
           },
           {
@@ -6447,7 +6440,7 @@ export type Database = {
             foreignKeyName: "fk_reservations_guest_id"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["guest_id"]
           },
           {
@@ -6461,13 +6454,6 @@ export type Database = {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
-            referencedRelation: "rack_data_view"
-            referencedColumns: ["room_id"]
-          },
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
@@ -6475,7 +6461,7 @@ export type Database = {
             foreignKeyName: "reservations_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["guest_id"]
           },
           {
@@ -7735,7 +7721,7 @@ export type Database = {
         }
         Relationships: []
       }
-      guest_stay_history: {
+      guest_stay_history_secure: {
         Row: {
           adults: number | null
           children: number | null
@@ -7744,8 +7730,6 @@ export type Database = {
           email: string | null
           first_name: string | null
           guest_id: string | null
-          invoice_number: string | null
-          invoice_total: number | null
           last_name: string | null
           nights_count: number | null
           phone: string | null
@@ -7788,26 +7772,6 @@ export type Database = {
         }
         Relationships: []
       }
-      rack_data_view: {
-        Row: {
-          adults: number | null
-          children: number | null
-          date_arrival: string | null
-          date_departure: string | null
-          floor: string | null
-          guest_name: string | null
-          org_id: string | null
-          rate_total: number | null
-          reservation_id: string | null
-          reservation_reference: string | null
-          reservation_status: string | null
-          room_id: string | null
-          room_number: string | null
-          room_status: string | null
-          room_type: string | null
-        }
-        Relationships: []
-      }
       rack_reservations_enriched: {
         Row: {
           adults: number | null
@@ -7825,13 +7789,6 @@ export type Database = {
           status: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rack_data_view"
-            referencedColumns: ["room_id"]
-          },
           {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
@@ -7857,13 +7814,6 @@ export type Database = {
           status: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rack_data_view"
-            referencedColumns: ["room_id"]
-          },
           {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
@@ -7921,7 +7871,7 @@ export type Database = {
             foreignKeyName: "fk_reservations_guest_id"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["guest_id"]
           },
           {
@@ -7935,13 +7885,6 @@ export type Database = {
             foreignKeyName: "fk_reservations_room_id"
             columns: ["room_id"]
             isOneToOne: false
-            referencedRelation: "rack_data_view"
-            referencedColumns: ["room_id"]
-          },
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
@@ -7949,7 +7892,7 @@ export type Database = {
             foreignKeyName: "reservations_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history"
+            referencedRelation: "guest_stay_history_secure"
             referencedColumns: ["guest_id"]
           },
           {
@@ -8153,6 +8096,10 @@ export type Database = {
           p_business_type?: string
         }
         Returns: number
+      }
+      can_access_sensitive_data: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
       }
       can_access_sensitive_guest_data: {
         Args: Record<PropertyKey, never>

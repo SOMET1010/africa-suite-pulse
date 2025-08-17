@@ -12,7 +12,7 @@ export function useCurrentOrg() {
         .from('app_users')
         .select('org_id')
         .eq('user_id', user.user.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       return data;

@@ -35,32 +35,32 @@ export const guestsApi = {
     return query;
   },
 
-  // Obtenir un client par ID
+  // Obtenir un client par ID - VERSION SÉCURISÉE
   async getById(id: string) {
     return supabase
       .from("guests")
       .select("*")
       .eq("id", id)
-      .single();
+      .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
   },
 
-  // Créer un nouveau client
+  // Créer un nouveau client - VERSION SÉCURISÉE
   async create(guest: GuestInsert) {
     return supabase
       .from("guests")
       .insert(guest)
       .select()
-      .single();
+      .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
   },
 
-  // Mettre à jour un client
+  // Mettre à jour un client - VERSION SÉCURISÉE
   async update(id: string, updates: GuestUpdate) {
     return supabase
       .from("guests")
       .update(updates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
   },
 
   // Supprimer un client
@@ -82,10 +82,10 @@ export const guestsApi = {
       .limit(10);
   },
 
-  // Historique des séjours d'un client
+  // Historique des séjours d'un client - VERSION SÉCURISÉE
   async getStayHistory(guestId: string) {
     return supabase
-      .from("guest_stay_history")
+      .from("guest_stay_history_secure") // SECURITY FIX: Use secure view
       .select("*")
       .eq("guest_id", guestId)
       .order("date_arrival", { ascending: false });
