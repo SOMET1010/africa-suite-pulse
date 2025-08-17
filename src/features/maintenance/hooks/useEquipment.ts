@@ -155,7 +155,7 @@ export function useUpdateEquipment() {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         throw new Error(error.message);

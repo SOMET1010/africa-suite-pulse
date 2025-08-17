@@ -124,7 +124,7 @@ export function MaintenanceRequestFromHousekeeping({
           status: 'pending'
         } as any])
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       return result;

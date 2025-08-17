@@ -78,7 +78,7 @@ export function useCreateMaintenanceSchedule() {
         .from("app_users")
         .select("org_id")
         .eq("user_id", userOrgData.user?.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (!orgData?.org_id) {
         throw new Error("Organization not found");
@@ -92,7 +92,7 @@ export function useCreateMaintenanceSchedule() {
           created_by: userOrgData.user?.id,
         }])
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         throw new Error(error.message);
@@ -137,7 +137,7 @@ export function useUpdateMaintenanceSchedule() {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         throw new Error(error.message);
@@ -176,7 +176,7 @@ export function useExecuteMaintenanceSchedule() {
         .from("maintenance_schedules")
         .select("*")
         .eq("id", scheduleId)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (scheduleError) {
         throw new Error(scheduleError.message);
@@ -187,7 +187,7 @@ export function useExecuteMaintenanceSchedule() {
         .from("app_users")
         .select("org_id")
         .eq("user_id", userOrgData.user?.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (!orgData?.org_id) {
         throw new Error("Organization not found");
@@ -213,7 +213,7 @@ export function useExecuteMaintenanceSchedule() {
         .from("maintenance_requests")
         .insert([requestData] as any)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (requestError) {
         throw new Error(requestError.message);

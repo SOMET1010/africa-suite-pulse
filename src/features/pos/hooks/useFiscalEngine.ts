@@ -60,7 +60,7 @@ export function useFiscalJurisdiction(jurisdictionId?: string) {
         .from('fiscal_jurisdictions')
         .select('*')
         .eq('id', jurisdictionId)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       return data as any;
@@ -78,7 +78,7 @@ export function useCreateFiscalJurisdiction() {
         .from('app_users')
         .select('org_id')
         .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (!orgData) throw new Error('Organization not found');
 
@@ -91,7 +91,7 @@ export function useCreateFiscalJurisdiction() {
           fiscal_rules: data.fiscal_rules as any
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       return result;

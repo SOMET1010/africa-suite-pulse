@@ -219,7 +219,7 @@ export function HousekeepingConsumptionTracking({
         })
         .eq('id', data.taskId)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (updateError) throw updateError;
 

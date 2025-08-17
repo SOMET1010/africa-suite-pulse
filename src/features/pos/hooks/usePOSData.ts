@@ -221,7 +221,7 @@ export const useAddToCart = () => {
         .from("pos_products")
         .select("id, name, code, base_price")
         .eq("id", productId)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (productError) throw productError;
 

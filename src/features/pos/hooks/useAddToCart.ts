@@ -41,7 +41,7 @@ export const useAddToCart = () => {
           status: 'pending',
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
 

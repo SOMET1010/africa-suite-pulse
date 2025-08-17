@@ -191,7 +191,7 @@ export function useUpdateMaintenanceRequest() {
         .update(updates)
         .eq("id", id)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) {
         throw new Error(error.message);

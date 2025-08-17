@@ -158,7 +158,7 @@ export function OrderHoldManager({
           discount_amount: 0
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (orderError) throw orderError;
 

@@ -148,7 +148,7 @@ export function MaintenancePartsConsumption({
         })
         .eq('id', data.maintenanceId)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (updateError) throw updateError;
 

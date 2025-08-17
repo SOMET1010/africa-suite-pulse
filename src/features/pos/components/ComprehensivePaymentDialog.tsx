@@ -191,7 +191,7 @@ export function ComprehensivePaymentDialog({
         .from('pos_orders')
         .insert(orderData)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (orderError) throw orderError;
 
