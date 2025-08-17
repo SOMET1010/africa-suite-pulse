@@ -204,14 +204,6 @@ export default function QuickReservationPage() {
           onClick: () => navigate("/reservations/new/advanced"),
           variant: 'ghost',
         },
-        {
-          id: 'save',
-          label: isSubmitting ? 'Création...' : 'Créer & Confirmer',
-          icon: <Zap className="h-4 w-4" />,
-          onClick: () => form.handleSubmit(onSubmit)(),
-          variant: 'primary',
-          disabled: isSubmitting,
-        },
       ]}
       contentClassName="max-w-4xl mx-auto"
     >
@@ -419,14 +411,26 @@ export default function QuickReservationPage() {
                          </div>
                        </div>
                      )}
-                   </div>
-                 )}
+                 </div>
+                )}
 
-                {/* Actions intégrées dans le formulaire pour feedback visuel */}
-                <div className="text-center pt-4">
-                  <p className="text-sm text-muted-foreground">
-                    💡 Les détails manquants pourront être complétés après la création
-                  </p>
+                {/* Bouton de validation dans le formulaire */}
+                <div className="flex flex-col gap-4 pt-6 border-t border-border">
+                  <LoadingButton
+                    type="submit"
+                    loading={isSubmitting}
+                    className="w-full h-12 text-lg"
+                    size="lg"
+                  >
+                    <Zap className="h-5 w-5 mr-2" />
+                    Créer & Confirmer
+                  </LoadingButton>
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">
+                      💡 Les détails manquants pourront être complétés après la création
+                    </p>
+                  </div>
                 </div>
               </form>
             </Form>
