@@ -42,6 +42,10 @@ export {
   PageLoadingState 
 } from './LoadingState';
 
+// Layout et Dashboard
+export { DashboardLayout } from './DashboardLayout';
+export { SmartWidget } from './SmartWidget';
+
 // Types communs
 export type { HotelCardProps } from './HotelCard';
 export type { StatusIndicatorProps } from './StatusIndicator'; 

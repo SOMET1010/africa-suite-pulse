@@ -110,6 +110,24 @@
     --auth-card-width: 400px;
     --auth-card-padding: 32px;
     --auth-toggle-height: 44px;
+    
+    /* Dashboard Layout */
+    --dashboard-gap: 1.5rem;
+    --dashboard-gap-compact: 1rem;
+    --dashboard-gap-comfortable: 1.5rem;
+    --dashboard-gap-spacious: 2rem;
+    --widget-radius: 1rem;
+    --sidebar-width: 280px;
+    --sidebar-collapsed: 72px;
+    
+    /* Navigation Heights */
+    --header-height: 4rem;
+    --mobile-nav-height: 4.5rem;
+    
+    /* Animation Timings */
+    --sidebar-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --widget-hover: 0.2s ease-out;
+    --layout-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -257,4 +275,20 @@
   .cell-soft--present { background-color: hsl(var(--soft-info)); }
   .cell-soft--option { background-color: hsl(var(--soft-warning)); }
   .cell-soft--cancelled { background-color: hsl(var(--soft-danger)); }
+  
+  /* Dashboard utilities */
+  .dashboard-responsive-grid { 
+    display: grid; 
+    grid-template-columns: repeat(1, minmax(0, 1fr)); 
+  }
+  @media (min-width: 768px) {
+    .dashboard-responsive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .dashboard-responsive-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1536px) {
+    .dashboard-responsive-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .container-app { max-width: 80rem; margin: 0 auto; }
 }
