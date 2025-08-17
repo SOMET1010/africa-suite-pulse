@@ -24,6 +24,7 @@ import QuickReservationPage from "@/pages/QuickReservationPage";
 import AdvancedReservationPage from "@/pages/AdvancedReservationPage";
 // Groups and allotments now lazy loaded
 import GuestsPage from "@/pages/GuestsPage";
+import CustomerExperiencePage from "@/pages/CustomerExperiencePage";
 import SettingsAnalyticsPage from "@/features/settings/analytics/AnalyticsPage";
 import AnalyticsPage from "@/pages/AnalyticsPage";
 import ReportsPage from "@/pages/ReportsPage";
@@ -125,6 +126,7 @@ export function AppRoutes() {
       
       <Route path="arrivals" element={<RequireAuth><ArrivalsPage /></RequireAuth>} />
       <Route path="guests" element={<RequireAuth><GuestsPage /></RequireAuth>} />
+      <Route path="customer-experience" element={<RequireAuth><CustomerExperiencePage /></RequireAuth>} />
       <Route path="analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
       <Route path="reports" element={<RequireAuth><ReportsPage /></RequireAuth>} />
       <Route path="operations" element={<RequireAuth><OperationsPage /></RequireAuth>} />
