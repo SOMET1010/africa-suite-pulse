@@ -521,15 +521,24 @@ export default function QuickReservationPage() {
 
                 {/* Bouton de validation dans le formulaire */}
                 <div className="flex flex-col gap-4 pt-6 border-t border-border">
-                  <LoadingButton
-                    type="submit"
-                    loading={isSubmitting}
-                    className="w-full h-12 text-lg"
-                    size="lg"
-                  >
-                    <Zap className="h-5 w-5 mr-2" />
-                    Créer & Confirmer
-                  </LoadingButton>
+                   <LoadingButton
+                     type="submit"
+                     loading={isSubmitting}
+                     className="w-full h-12 text-lg"
+                     size="lg"
+                   >
+                     {isSubmitting ? (
+                       <div className="flex items-center gap-2">
+                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                         Veuillez patienter...
+                       </div>
+                     ) : (
+                       <>
+                         <Zap className="h-5 w-5 mr-2" />
+                         Créer & Confirmer
+                       </>
+                     )}
+                   </LoadingButton>
                   
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">
