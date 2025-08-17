@@ -185,8 +185,8 @@ export function TaskTimer({
         <div className="flex gap-2">
           {isPaused ? (
             <TouchButton
-              variant="success"
-              size="sm"
+              intent="success"
+              touchSize="compact"
               className="flex-1"
               onClick={onResume}
             >
@@ -195,8 +195,8 @@ export function TaskTimer({
             </TouchButton>
           ) : (
             <TouchButton
-              variant="outline"
-              size="sm"
+              intent="outline"
+              touchSize="compact"
               className="flex-1"
               onClick={onPause}
             >
@@ -206,8 +206,8 @@ export function TaskTimer({
           )}
           
           <TouchButton
-            variant="primary"
-            size="sm"
+            intent="primary"
+            touchSize="compact"
             className="flex-1"
             onClick={onComplete}
           >

@@ -99,7 +99,7 @@ export function MobileCheckinFlow({
         return (
           <SmartWidget
             title="Vérification Documents"
-            variant="info"
+            data={{}}
             className="mb-6"
           >
             <div className="space-y-4">
@@ -113,8 +113,8 @@ export function MobileCheckinFlow({
               </div>
               
               <TouchButton
-                variant={documentVerified ? "success" : "outline"}
-                size="lg"
+                intent={documentVerified ? "success" : "outline"}
+                touchSize="spacious"
                 className="w-full"
                 onClick={() => setDocumentVerified(!documentVerified)}
               >
@@ -138,7 +138,7 @@ export function MobileCheckinFlow({
         return (
           <SmartWidget
             title="Attribution de Chambre"
-            variant="success"
+            data={{}}
             className="mb-6"
           >
             <div className="space-y-4">
@@ -154,8 +154,8 @@ export function MobileCheckinFlow({
               
               {!roomNumber && (
                 <TouchButton
-                  variant="outline"
-                  size="lg"
+                  intent="outline"
+                  touchSize="spacious"
                   className="w-full"
                   onClick={() => {/* Auto-assign room */}}
                 >
@@ -170,7 +170,7 @@ export function MobileCheckinFlow({
         return (
           <SmartWidget
             title="Paiement et Facturation"
-            variant="warning"
+            data={{}}
             className="mb-6"
           >
             <div className="space-y-4">
@@ -186,8 +186,8 @@ export function MobileCheckinFlow({
               </div>
               
               <TouchButton
-                variant={paymentConfirmed ? "success" : "primary"}
-                size="lg"
+                intent={paymentConfirmed ? "success" : "primary"}
+                touchSize="spacious"
                 className="w-full"
                 onClick={() => setPaymentConfirmed(!paymentConfirmed)}
               >
@@ -211,7 +211,7 @@ export function MobileCheckinFlow({
         return (
           <SmartWidget
             title="Signature Numérique"
-            variant="primary"
+            data={{}}
             className="mb-6"
           >
             <div className="space-y-4">
@@ -241,8 +241,8 @@ export function MobileCheckinFlow({
             <p className="text-sm text-muted-foreground">Réf: {reference}</p>
           </div>
           <TouchButton
-            variant="ghost"
-            size="sm"
+            intent="ghost"
+            touchSize="compact"
             onClick={onCancel}
           >
             Annuler
@@ -307,8 +307,8 @@ export function MobileCheckinFlow({
         {/* Navigation Buttons */}
         <div className="flex gap-3 mt-8">
           <TouchButton
-            variant="outline"
-            size="lg"
+            intent="outline"
+            touchSize="spacious"
             className="flex-1"
             onClick={handlePrevious}
             disabled={currentStep === 0}
@@ -317,8 +317,8 @@ export function MobileCheckinFlow({
           </TouchButton>
           
           <TouchButton
-            variant="primary"
-            size="lg"
+            intent="primary"
+            touchSize="spacious"
             className="flex-1"
             onClick={handleNext}
             disabled={!canProceed()}

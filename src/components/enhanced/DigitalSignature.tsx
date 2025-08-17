@@ -190,8 +190,8 @@ export function DigitalSignature({
         {/* Action Buttons */}
         <div className="flex gap-2">
           <TouchButton
-            variant="outline"
-            size="sm"
+            intent="outline"
+            touchSize="compact"
             onClick={clearSignature}
             disabled={!hasSignature}
             className="flex-1"
@@ -202,8 +202,8 @@ export function DigitalSignature({
 
           {onCancel && (
             <TouchButton
-              variant="ghost"
-              size="sm"
+              intent="ghost"
+              touchSize="compact"
               onClick={onCancel}
               className="flex-1"
             >
@@ -213,8 +213,8 @@ export function DigitalSignature({
           )}
 
           <TouchButton
-            variant="primary"
-            size="sm"
+            intent="primary"
+            touchSize="compact"
             onClick={saveSignature}
             disabled={!hasSignature}
             className="flex-1"

@@ -104,8 +104,8 @@ export function GuestInfoPanel({
             Informations Client
           </CardTitle>
           <TouchButton
-            variant="ghost"
-            size="sm"
+            intent="ghost"
+            touchSize="compact"
             onClick={onClose}
           >
             <X className="h-4 w-4" />
@@ -263,8 +263,8 @@ export function GuestInfoPanel({
         <div className="flex gap-2 pt-2">
           {onEdit && (
             <TouchButton
-              variant="outline"
-              size="sm"
+              intent="outline"
+              touchSize="compact"
               className="flex-1"
               onClick={onEdit}
             >
@@ -275,8 +275,8 @@ export function GuestInfoPanel({
           
           {onMessage && (
             <TouchButton
-              variant="outline"
-              size="sm"
+              intent="outline"
+              touchSize="compact"
               className="flex-1"
               onClick={onMessage}
             >
@@ -287,8 +287,8 @@ export function GuestInfoPanel({
           
           {onViewDocuments && (
             <TouchButton
-              variant="outline"
-              size="sm"
+              intent="outline"
+              touchSize="compact"
               className="flex-1"
               onClick={onViewDocuments}
             >

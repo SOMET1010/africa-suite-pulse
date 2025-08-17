@@ -234,8 +234,8 @@ export function TaskSwipeCards({ tasks, onTaskAction, className }: TaskSwipeCard
               <div className="flex gap-2">
                 {task.status === 'pending' && (
                   <TouchButton
-                    variant="primary"
-                    size="sm"
+                    intent="primary"
+                    touchSize="compact"
                     className="flex-1"
                     onClick={() => onTaskAction(task.id, 'start')}
                   >
@@ -247,16 +247,16 @@ export function TaskSwipeCards({ tasks, onTaskAction, className }: TaskSwipeCard
                 {task.status === 'in_progress' && (
                   <>
                     <TouchButton
-                      variant="outline"
-                      size="sm"
+                      intent="outline"
+                      touchSize="compact"
                       onClick={() => onTaskAction(task.id, 'pause')}
                     >
                       <Pause className="h-4 w-4 mr-1" />
                       Pause
                     </TouchButton>
                     <TouchButton
-                      variant="success"
-                      size="sm"
+                      intent="success"
+                      touchSize="compact"
                       className="flex-1"
                       onClick={() => onTaskAction(task.id, 'complete')}
                     >
@@ -268,8 +268,8 @@ export function TaskSwipeCards({ tasks, onTaskAction, className }: TaskSwipeCard
                 
                 {task.status === 'paused' && (
                   <TouchButton
-                    variant="primary"
-                    size="sm"
+                    intent="primary"
+                    touchSize="compact"
                     className="flex-1"
                     onClick={() => onTaskAction(task.id, 'start')}
                   >
@@ -279,8 +279,8 @@ export function TaskSwipeCards({ tasks, onTaskAction, className }: TaskSwipeCard
                 )}
                 
                 <TouchButton
-                  variant="ghost"
-                  size="sm"
+                  intent="ghost"
+                  touchSize="compact"
                   onClick={() => onTaskAction(task.id, 'photo')}
                 >
                   <Camera className="h-4 w-4" />
