@@ -34,6 +34,7 @@ import HousekeepingPage from "@/pages/HousekeepingPage";
 // Night audit now lazy loaded
 import POSLoginPage from "@/features/pos/auth/POSLoginPage";
 import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
+import POSAfricanPage from "@/pages/POSAfricanPage";
 // Import lazy-loaded components for performance
 import {
   POSPage,
@@ -163,6 +164,7 @@ export function AppRoutes() {
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
         <Route path="pos/mobile-server" element={<RequirePOSAuth requiredRole="pos_server"><POSMobileServerPage /></RequirePOSAuth>} />
+        <Route path="pos/african" element={<RequirePOSAuth requiredRole="pos_server"><POSAfricanPage /></RequirePOSAuth>} />
         {/* Role-based dashboards */}
         <Route path="dashboard/receptionist" element={
           <Suspense fallback={<div>Loading...</div>}>

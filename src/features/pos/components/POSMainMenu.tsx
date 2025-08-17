@@ -20,6 +20,16 @@ import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   {
+    id: "african",
+    title: "POS Africain 🇨🇮",
+    description: "Interface ultra-optimisée style Café de Cocody",
+    icon: ShoppingCart,
+    path: "/pos/african",
+    color: "bg-gradient-to-r from-orange-500 to-green-500",
+    requiredRole: "pos_server",
+    isNew: true
+  },
+  {
     id: "maitre-hotel",
     title: "Maître d'Hôtel",
     description: "Gestion des tables et assignations serveurs",
@@ -217,12 +227,16 @@ export function POSMainMenu() {
         {availableItems.map((item) => (
           <Card 
             key={item.id}
-            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 group"
+            className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 group ${
+              item.isNew ? 'ring-2 ring-orange-300 shadow-lg' : ''
+            }`}
             onClick={() => handleMenuClick(item.path)}
           >
             <CardContent className="p-6">
               <div className="flex flex-col items-center text-center space-y-4">
-                <div className={`w-16 h-16 ${item.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
+                <div className={`w-16 h-16 ${item.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 ${
+                  item.isNew ? 'animate-pulse' : ''
+                }`}>
                   <item.icon className="h-8 w-8 text-white" />
                 </div>
                 
