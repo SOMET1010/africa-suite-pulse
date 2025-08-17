@@ -86,25 +86,25 @@ export default function POSLoginPage() {
         return;
       }
 
-      const authResponse = data[0];
+      const authResponse = data[0] as any; // Backend returns more fields than the TypeScript definition
       const user: POSUser & { session_token: string } = {
-        user_id: '', // Will be set from session
-        pos_user_id: authResponse.pos_user_id,
+        user_id: authResponse.user_id,
+        pos_user_id: authResponse.pos_user_id || '', // Optional field
         display_name: authResponse.display_name,
-        employee_code: authResponse.employee_code,
+        employee_code: authResponse.employee_code || '', // Optional field
         role_name: authResponse.role_name as POSRole,
-        session_token: '' // Will be generated
+        session_token: authResponse.session_token
       };
       setCurrentUser(user);
 
       // Store secure POS session in sessionStorage (more secure than localStorage)
       sessionStorage.setItem("pos_session", JSON.stringify({
-        user_id: user.user_id,
-        display_name: user.display_name,
-        role: user.role_name,
-        org_id: orgId,
-        outlet_id: '',
-        session_token: user.session_token,
+        user_id: authResponse.user_id,
+        display_name: authResponse.display_name,
+        role: authResponse.role_name,
+        org_id: authResponse.org_id,
+        outlet_id: authResponse.outlet_id || '',
+        session_token: authResponse.session_token,
         login_time: new Date().toISOString()
       }));
 
