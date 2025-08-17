@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, TrendingUp, Clock, Users } from 'lucide-react';
+import { Sparkles, TrendingUp, Clock, Users, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useOrgId } from '@/core/auth/useOrg';
 import type { POSProduct, CartItem } from '../types';
 
 interface SmartSuggestionsProps {
@@ -20,8 +22,11 @@ export function SmartSuggestions({
   timeOfDay,
   onAddSuggestion
 }: SmartSuggestionsProps) {
+  const { orgId } = useOrgId();
   const [suggestions, setSuggestions] = useState<POSProduct[]>([]);
   const [suggestionType, setSuggestionType] = useState<'upsell' | 'complement' | 'popular'>('complement');
+  const [isLoading, setIsLoading] = useState(false);
+  const [provider, setProvider] = useState<string>('');
 
   // Données mockées pour les suggestions intelligentes
   const mockProducts: POSProduct[] = [
@@ -76,7 +81,56 @@ export function SmartSuggestions({
     generateSmartSuggestions();
   }, [currentItems, customerCount, timeOfDay]);
 
-  const generateSmartSuggestions = () => {
+  const generateSmartSuggestions = async () => {
+    if (!orgId) return;
+    
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-smart-suggestions', {
+        body: {
+          currentItems,
+          customerCount,
+          timeOfDay,
+          orgId,
+          tableId: selectedTable?.id
+        }
+      });
+
+      if (error) {
+        console.warn('AI suggestions failed, using fallback:', error);
+        generateFallbackSuggestions();
+        return;
+      }
+
+      // Convertir les suggestions IA en format POSProduct
+      const aiSuggestions: POSProduct[] = data.suggestions.map((suggestion: any, index: number) => ({
+        id: `ai-${index}`,
+        name: suggestion.name,
+        code: `AI${index}`,
+        base_price: suggestion.price,
+        category_id: 'suggestions',
+        outlet_id: '',
+        description: suggestion.description,
+        preparation_time: 5,
+        is_active: true,
+        created_at: '',
+        updated_at: '',
+        image_url: '',
+        variants: []
+      }));
+
+      setSuggestions(aiSuggestions);
+      setSuggestionType(data.type);
+      setProvider(data.provider);
+    } catch (error) {
+      console.error('Error generating AI suggestions:', error);
+      generateFallbackSuggestions();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const generateFallbackSuggestions = () => {
     let newSuggestions: POSProduct[] = [];
     let newType: 'upsell' | 'complement' | 'popular' = 'complement';
 
@@ -86,9 +140,6 @@ export function SmartSuggestions({
     );
     const hasBeverage = currentItems.some(item => 
       item.product.category_id === 'beverages'
-    );
-    const hasDessert = currentItems.some(item => 
-      item.product.category_id === 'desserts'
     );
 
     // Suggestions de compléments
@@ -115,8 +166,9 @@ export function SmartSuggestions({
       newType = 'popular';
     }
 
-    setSuggestions(newSuggestions.slice(0, 3)); // Limiter à 3 suggestions
+    setSuggestions(newSuggestions.slice(0, 3));
     setSuggestionType(newType);
+    setProvider('Fallback');
   };
 
   const getSuggestionTitle = () => {
@@ -152,8 +204,9 @@ export function SmartSuggestions({
           <Icon className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-sm">{getSuggestionTitle()}</h3>
           <Badge variant="secondary" className="text-xs">
-            IA
+            {provider || 'IA'}
           </Badge>
+          {isLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
         </div>
         
         <div className="space-y-2">
@@ -199,9 +252,17 @@ export function SmartSuggestions({
             variant="ghost" 
             size="sm"
             onClick={generateSmartSuggestions}
+            disabled={isLoading}
             className="text-xs text-muted-foreground hover:text-primary"
           >
-            Actualiser suggestions
+            {isLoading ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                Génération...
+              </>
+            ) : (
+              'Actualiser suggestions'
+            )}
           </Button>
         </div>
       </div>
