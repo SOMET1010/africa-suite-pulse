@@ -19,6 +19,7 @@ import {
   Activity,
   AlertTriangle,
   Network,
+  Brain,
 } from 'lucide-react';
 import {
   Sidebar,
