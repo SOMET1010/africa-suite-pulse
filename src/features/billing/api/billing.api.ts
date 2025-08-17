@@ -60,7 +60,7 @@ export async function createInvoice(input: CreateInvoiceInput): Promise<BillingA
           status: 'pending'
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (invoiceError) throw invoiceError;
 
@@ -104,7 +104,7 @@ export async function getInvoiceById(invoiceId: string): Promise<BillingApiRespo
           invoice_items (*)
         `)
         .eq('id', invoiceId)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       
@@ -199,7 +199,7 @@ export async function updateInvoice(
         })
         .eq('id', invoiceId)
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
       if (error) throw error;
       

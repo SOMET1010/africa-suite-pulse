@@ -31,7 +31,7 @@ export function useExpressCheckin() {
         .from('reservations')
         .select('*')
         .eq('id', reservationId)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
       
       if (fetchError) throw fetchError;
       
@@ -48,7 +48,7 @@ export function useExpressCheckin() {
           status: 'pending'
         })
         .select()
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
       
       if (invoiceError) throw invoiceError;
       
@@ -103,7 +103,7 @@ export function useCreateCorrectionEntry() {
         .from('invoice_items')
         .select('*')
         .eq('id', params.invoiceItemId)
-        .single();
+        .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
       
       if (fetchError) throw fetchError;
       

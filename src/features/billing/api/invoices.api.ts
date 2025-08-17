@@ -98,7 +98,7 @@ export async function createInvoice(input: CreateInvoiceInput) {
       status: 'pending'
     })
     .select()
-    .single();
+    .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
   if (invoiceError) throw invoiceError;
 
@@ -144,7 +144,7 @@ export async function getInvoiceById(invoiceId: string): Promise<InvoiceWithItem
       invoice_items (id, description, quantity, unit_price, tax_rate, total)
     `)
     .eq('id', invoiceId)
-    .single();
+    .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
   if (error) throw error;
   return data;
@@ -156,7 +156,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
     .update({ status })
     .eq('id', invoiceId)
     .select()
-    .single();
+    .maybeSingle(); // SECURITY FIX: replaced .single() with .maybeSingle()
 
   if (error) throw error;
   return data;
