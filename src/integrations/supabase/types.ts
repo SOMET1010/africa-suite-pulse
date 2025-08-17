@@ -8121,6 +8121,20 @@ export type Database = {
         Args: { p_end_date: string; p_org_id: string; p_start_date: string }
         Returns: Json
       }
+      calculate_reservation_rate: {
+        Args: {
+          p_adults?: number
+          p_arrival_date: string
+          p_departure_date: string
+          p_org_id: string
+          p_room_id: string
+        }
+        Returns: {
+          base_rate: number
+          nights: number
+          total_rate: number
+        }[]
+      }
       calculate_subsidy_amount: {
         Args: {
           p_base_amount: number
@@ -8546,10 +8560,11 @@ export type Database = {
           p_start: string
         }
         Returns: {
+          base_rate: number
+          features: Json
           floor: string
           id: string
           number: string
-          status: string
           type: string
         }[]
       }

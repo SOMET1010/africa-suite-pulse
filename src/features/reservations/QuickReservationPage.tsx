@@ -58,14 +58,13 @@ export default function QuickReservationPage() {
     
     if (dateArrival && dateDeparture && orgId) {
       try {
-        // Temporairement, créer des chambres fictives disponibles
-        // TODO: Remplacer par la vraie logique quand la fonction RPC sera créée
-        const mockRooms = [
-          { id: '1', number: '101', type: 'Standard', floor: '1', base_rate: 50000 },
-          { id: '2', number: '102', type: 'Deluxe', floor: '1', base_rate: 75000 },
-          { id: '3', number: '201', type: 'Suite', floor: '2', base_rate: 100000 },
-        ];
-        setAvailableRooms(mockRooms);
+        const rooms = await reservationsApi.checkAvailability(orgId, {
+          date_arrival: dateArrival,
+          date_departure: dateDeparture,
+          adults: adults || 2,
+          children: 0,
+        });
+        setAvailableRooms(rooms);
       } catch (error) {
         console.error("Error checking availability:", error);
         setAvailableRooms([]);
@@ -91,21 +90,14 @@ export default function QuickReservationPage() {
     if (selectedRoom && dateArrival && dateDeparture && orgId) {
       setIsCalculatingRate(true);
       try {
-        // Temporairement, calculer un tarif simple basé sur les chambres fictives
-        const selectedRoomData = availableRooms.find(room => room.id === selectedRoom);
-        if (selectedRoomData) {
-          const nights = calculateNights(dateArrival, dateDeparture);
-          const totalRate = selectedRoomData.base_rate * nights;
-          
-          const rateResult = {
-            base_rate: selectedRoomData.base_rate,
-            total_rate: totalRate,
-            nights: nights,
-          };
-          
-          setCalculatedRate(rateResult);
-          form.setValue("rate_total", totalRate);
-        }
+        const rateResult = await reservationsApi.calculateRate(
+          orgId,
+          selectedRoom,
+          dateArrival,
+          dateDeparture
+        );
+        setCalculatedRate(rateResult);
+        form.setValue("rate_total", rateResult.total_rate);
       } catch (error) {
         console.error("Error calculating rate:", error);
         setCalculatedRate(null);
