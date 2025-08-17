@@ -85,9 +85,8 @@ export const guestsApi = {
   // Historique des séjours d'un client - VERSION SÉCURISÉE
   async getStayHistory(guestId: string) {
     return supabase
-      .from("guest_stay_history_secure") // SECURITY FIX: Use secure view
-      .select("*")
-      .eq("guest_id", guestId)
+      .rpc("get_guest_stay_history_secure", { p_guest_id: guestId })
+      .returns<any[]>()
       .order("date_arrival", { ascending: false });
   },
 

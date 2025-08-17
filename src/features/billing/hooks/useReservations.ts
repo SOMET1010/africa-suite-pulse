@@ -20,9 +20,8 @@ export function useReservationsForBilling(orgId: string) {
     queryKey: ['reservations-billing', orgId],
     queryFn: async (): Promise<ReservationForBilling[]> => {
       const { data, error } = await supabase
-        .from('reservations_view_arrivals')
-        .select('*')
-        .eq('org_id', orgId)
+        .rpc('get_reservations_arrivals')
+        .returns<ReservationForBilling[]>()
         .order('date_arrival', { ascending: false });
 
       if (error) throw error;
@@ -52,9 +51,8 @@ export function useReservationById(reservationId: string | null) {
       if (!reservationId) return null;
       
       const { data, error } = await supabase
-        .from('reservations_view_arrivals')
-        .select('*')
-        .eq('id', reservationId)
+        .rpc('get_reservations_with_details_secure', { p_reservation_id: reservationId })
+        .returns<ReservationForBilling[]>()
         .maybeSingle();
 
       if (error) throw error;

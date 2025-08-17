@@ -46,10 +46,14 @@ class AnalyticsService {
    * No client-side aggregation - pure database logic
    */
   async getDailyRevenue(fromDate?: Date, toDate?: Date): Promise<DailyRevenueData[]> {
-    let query = supabase
-      .from('v_daily_revenue')
-      .select('*')
-      .order('business_date', { ascending: false });
+    const params = fromDate && toDate ? { 
+      p_start_date: fromDate.toISOString().split('T')[0],
+      p_end_date: toDate.toISOString().split('T')[0]
+    } : {};
+    
+    const { data, error } = await supabase
+      .rpc('get_daily_revenue', params)
+      .returns<DailyRevenueData[]>();
 
     if (fromDate) {
       query = query.gte('business_date', fromDate.toISOString().split('T')[0]);

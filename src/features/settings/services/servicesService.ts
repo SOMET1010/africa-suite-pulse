@@ -84,11 +84,10 @@ export class ServicesService {
 
   // Services
   static async getServices(orgId: string): Promise<Service[]> {
-    // Use the pre-joined view to avoid PostgREST embed ambiguity
+    // Use secure function instead of view
     const { data, error } = await supabase
-      .from('services_with_family' as any)
-      .select('*')
-      .eq('org_id', orgId)
+      .rpc('get_services_with_family')
+      .returns<any[]>()
       .order('family_id, code');
 
     if (error) throw error;
@@ -160,9 +159,8 @@ export class ServicesService {
       if (updateError) throw updateError;
 
       const { data, error } = await supabase
-        .from('services_with_family' as any)
-        .select('*')
-        .eq('id', (updated as any).id)
+        .rpc('get_services_with_family', { p_service_id: (updated as any).id })
+        .returns<any[]>()
         .maybeSingle();
 
       if (error) throw error;

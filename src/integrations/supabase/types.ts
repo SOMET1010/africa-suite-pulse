@@ -382,13 +382,6 @@ export type Database = {
             referencedRelation: "hotel_settings"
             referencedColumns: ["org_id"]
           },
-          {
-            foreignKeyName: "fk_app_users_org_id"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "v_daily_revenue"
-            referencedColumns: ["org_id"]
-          },
         ]
       }
       arrangement_services: {
@@ -448,13 +441,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "arrangement_services_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_with_family"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_arrangement_services_arrangement_id"
             columns: ["arrangement_id"]
             isOneToOne: false
@@ -473,13 +459,6 @@ export type Database = {
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_arrangement_services_service_id"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services_with_family"
             referencedColumns: ["id"]
           },
         ]
@@ -883,13 +862,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "collective_organizations"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "collective_beneficiaries_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["guest_id"]
           },
           {
             foreignKeyName: "collective_beneficiaries_guest_id_fkey"
@@ -2375,13 +2347,6 @@ export type Database = {
             foreignKeyName: "invoices_guest_id_fkey"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["guest_id"]
-          },
-          {
-            foreignKeyName: "invoices_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
             referencedRelation: "guests"
             referencedColumns: ["id"]
           },
@@ -2389,35 +2354,7 @@ export type Database = {
             foreignKeyName: "invoices_reservation_id_fkey"
             columns: ["reservation_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["reservation_id"]
-          },
-          {
-            foreignKeyName: "invoices_reservation_id_fkey"
-            columns: ["reservation_id"]
-            isOneToOne: false
-            referencedRelation: "rack_reservations_enriched"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_reservation_id_fkey"
-            columns: ["reservation_id"]
-            isOneToOne: false
             referencedRelation: "reservations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_reservation_id_fkey"
-            columns: ["reservation_id"]
-            isOneToOne: false
-            referencedRelation: "reservations_view_arrivals"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "invoices_reservation_id_fkey"
-            columns: ["reservation_id"]
-            isOneToOne: false
-            referencedRelation: "reservations_with_details"
             referencedColumns: ["id"]
           },
         ]
@@ -6440,13 +6377,6 @@ export type Database = {
             foreignKeyName: "fk_reservations_guest_id"
             columns: ["guest_id"]
             isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["guest_id"]
-          },
-          {
-            foreignKeyName: "fk_reservations_guest_id"
-            columns: ["guest_id"]
-            isOneToOne: false
             referencedRelation: "guests"
             referencedColumns: ["id"]
           },
@@ -6456,13 +6386,6 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reservations_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["guest_id"]
           },
           {
             foreignKeyName: "reservations_guest_id_fkey"
@@ -7721,256 +7644,6 @@ export type Database = {
         }
         Relationships: []
       }
-      guest_stay_history_secure: {
-        Row: {
-          adults: number | null
-          children: number | null
-          date_arrival: string | null
-          date_departure: string | null
-          email: string | null
-          first_name: string | null
-          guest_id: string | null
-          last_name: string | null
-          nights_count: number | null
-          phone: string | null
-          rate_total: number | null
-          reservation_id: string | null
-          reservation_reference: string | null
-          reservation_status: string | null
-          room_number: string | null
-          room_type: string | null
-        }
-        Relationships: []
-      }
-      housekeeping_tasks_with_staff: {
-        Row: {
-          actual_duration: number | null
-          assigned_staff_name: string | null
-          assigned_staff_role: string | null
-          assigned_staff_status: string | null
-          assigned_to: string | null
-          checklist_items: Json | null
-          completed_at: string | null
-          created_at: string | null
-          created_by: string | null
-          estimated_duration: number | null
-          guest_status: string | null
-          id: string | null
-          linen_change_details: Json | null
-          notes: string | null
-          org_id: string | null
-          priority: string | null
-          quality_notes: string | null
-          quality_score: number | null
-          room_number: string | null
-          scheduled_start: string | null
-          special_instructions: string | null
-          started_at: string | null
-          status: string | null
-          task_type: string | null
-          updated_at: string | null
-        }
-        Relationships: []
-      }
-      rack_reservations_enriched: {
-        Row: {
-          adults: number | null
-          children: number | null
-          date_arrival: string | null
-          date_departure: string | null
-          id: string | null
-          org_id: string | null
-          rate_total: number | null
-          reference: string | null
-          room_floor: string | null
-          room_id: string | null
-          room_number: string | null
-          room_type_code: string | null
-          status: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      reservations_view_arrivals: {
-        Row: {
-          adults: number | null
-          children: number | null
-          date_arrival: string | null
-          guest_name: string | null
-          id: string | null
-          org_id: string | null
-          planned_time: string | null
-          rate_total: number | null
-          reference: string | null
-          room_id: string | null
-          room_number: string | null
-          status: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      reservations_with_details: {
-        Row: {
-          adults: number | null
-          allotment_id: string | null
-          cancellation_policy_id: string | null
-          cancellation_policy_label: string | null
-          checked_in_at: string | null
-          checked_out_at: string | null
-          children: number | null
-          confirmed_at: string | null
-          confirmed_by: string | null
-          created_at: string | null
-          created_by: string | null
-          date_arrival: string | null
-          date_departure: string | null
-          discount_amount: number | null
-          group_billing_mode: string | null
-          group_id: string | null
-          guest_email: string | null
-          guest_id: string | null
-          guest_name: string | null
-          guest_phone: string | null
-          id: string | null
-          is_duplicate_from: string | null
-          notes: string | null
-          org_id: string | null
-          original_rate: number | null
-          planned_time: string | null
-          promotion_code: string | null
-          rate_total: number | null
-          reference: string | null
-          room_id: string | null
-          room_number: string | null
-          room_type: string | null
-          source: string | null
-          source_reference: string | null
-          special_requests: string | null
-          status: string | null
-          tariff_base_rate: number | null
-          tariff_id: string | null
-          tariff_label: string | null
-          updated_at: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_reservations_guest_id"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["guest_id"]
-          },
-          {
-            foreignKeyName: "fk_reservations_guest_id"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_reservations_room_id"
-            columns: ["room_id"]
-            isOneToOne: false
-            referencedRelation: "rooms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reservations_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guest_stay_history_secure"
-            referencedColumns: ["guest_id"]
-          },
-          {
-            foreignKeyName: "reservations_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      room_status_summary: {
-        Row: {
-          completed_tasks: number | null
-          guest_status: string | null
-          in_progress_tasks: number | null
-          last_task_update: string | null
-          org_id: string | null
-          pending_tasks: number | null
-          room_number: string | null
-        }
-        Relationships: []
-      }
-      services_with_family: {
-        Row: {
-          code: string | null
-          cost_price: number | null
-          created_at: string | null
-          description: string | null
-          family_code: string | null
-          family_id: string | null
-          family_label: string | null
-          id: string | null
-          is_active: boolean | null
-          is_free_price: boolean | null
-          label: string | null
-          max_quantity: number | null
-          min_quantity: number | null
-          org_id: string | null
-          price: number | null
-          profit_margin: number | null
-          tags: string[] | null
-          unit: string | null
-          updated_at: string | null
-          vat_rate: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_services_family_id"
-            columns: ["family_id"]
-            isOneToOne: false
-            referencedRelation: "service_families"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "services_family_id_fkey"
-            columns: ["family_id"]
-            isOneToOne: false
-            referencedRelation: "service_families"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      v_daily_revenue: {
-        Row: {
-          arrivals: number | null
-          avg_room_rate: number | null
-          business_date: string | null
-          departures: number | null
-          occupied_rooms: number | null
-          org_id: string | null
-          outstanding_balance: number | null
-          total_payments: number | null
-          total_reservations: number | null
-          total_revenue: number | null
-        }
-        Relationships: []
-      }
     }
     Functions: {
       activate_organization_module: {
@@ -8320,6 +7993,24 @@ export type Database = {
           total_hotels: number
         }[]
       }
+      get_housekeeping_tasks_with_staff: {
+        Args: { p_task_id?: string }
+        Returns: {
+          actual_duration: number
+          assigned_staff_name: string
+          assigned_staff_role: string
+          assigned_staff_status: string
+          assigned_to: string
+          estimated_duration: number
+          id: string
+          notes: string
+          org_id: string
+          priority: string
+          room_number: string
+          status: string
+          task_type: string
+        }[]
+      }
       get_last_fiscal_hash: {
         Args: { p_org_id: string }
         Returns: string
@@ -8366,6 +8057,41 @@ export type Database = {
       get_rack_data_optimized: {
         Args: { p_end_date: string; p_org_id: string; p_start_date: string }
         Returns: Json
+      }
+      get_rack_reservations_enriched: {
+        Args: { p_end_date?: string; p_start_date?: string }
+        Returns: {
+          adults: number
+          children: number
+          date_arrival: string
+          date_departure: string
+          id: string
+          org_id: string
+          rate_total: number
+          reference: string
+          room_floor: string
+          room_id: string
+          room_number: string
+          room_type_code: string
+          status: string
+        }[]
+      }
+      get_reservations_arrivals: {
+        Args: { p_date?: string }
+        Returns: {
+          adults: number
+          children: number
+          date_arrival: string
+          guest_name: string
+          id: string
+          org_id: string
+          planned_time: string
+          rate_total: number
+          reference: string
+          room_id: string
+          room_number: string
+          status: string
+        }[]
       }
       get_reservations_with_details_secure: {
         Args: { p_reservation_id?: string }

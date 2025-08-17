@@ -49,13 +49,13 @@ async function validatePhaseA(): Promise<ValidationReport> {
   let rpc_functions_created = 0;
   
   try {
-    // Test view access
+    // Test secure function access
     const revenueData = await analyticsService.getDailyRevenue();
-    console.log(`✅ v_daily_revenue view: ${revenueData.length} records accessible`);
+    console.log(`✅ get_daily_revenue function: ${revenueData.length} records accessible`);
     views_created = 1;
   } catch (error) {
-    console.log(`❌ v_daily_revenue view: ${error}`);
-    blockers.push('Daily revenue view not accessible');
+    console.log(`❌ get_daily_revenue function: ${error}`);
+    blockers.push('Daily revenue function not accessible');
   }
 
   try {

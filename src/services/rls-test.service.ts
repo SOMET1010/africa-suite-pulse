@@ -32,11 +32,10 @@ class RLSTestService {
     const startTime = Date.now();
 
     try {
-      // Test view access (should only return current org data)
+      // Test secure function access (should only return current org data)
       const { data: revenueData, error: revenueError } = await supabase
-        .from('v_daily_revenue')
-        .select('org_id')
-        .limit(10);
+        .rpc('get_daily_revenue')
+        .returns<any[]>();
 
       if (revenueError) {
         tests.push({

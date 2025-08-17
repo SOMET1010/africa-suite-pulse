@@ -19,11 +19,10 @@ export function useDepartures(orgId: string, dateISO: string) {
       console.log("🔄 Fetching departures with React Query", { orgId, dateISO });
       
       // For now, using the same view as arrivals with departure logic
-      // TODO: Create a dedicated departures view in the database
+      // Using secure function for departures (filtered by date)
       const { data, error } = await supabase
-        .from("reservations_view_arrivals")
-        .select("*")
-        .eq("org_id", orgId)
+        .rpc("get_reservations_arrivals", { p_date: new Date().toISOString().split('T')[0] })
+        .returns<any[]>()
         .eq("date_arrival", dateISO)
         .order("planned_time", { ascending: true, nullsFirst: false });
 
