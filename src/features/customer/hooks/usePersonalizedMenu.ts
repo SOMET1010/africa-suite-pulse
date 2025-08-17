@@ -29,13 +29,24 @@ interface UsePersonalizedMenuOptions {
   currentMenu?: any[];
 }
 
+interface PaymentTransaction {
+  id: string;
+  amount: number;
+  created_at: string;
+  metadata: any;
+}
+
+interface GuestPreferences {
+  preferences: any;
+}
+
 export const usePersonalizedMenu = ({ 
   guestId, 
   orgId, 
   enabled = true,
   currentMenu = []
 }: UsePersonalizedMenuOptions) => {
-  const [orderHistory, setOrderHistory] = useState<any[]>([]);
+  const [orderHistory, setOrderHistory] = useState<PaymentTransaction[]>([]);
   const [preferences, setPreferences] = useState<any>({});
   
   // Récupération de l'historique des commandes
@@ -44,14 +55,21 @@ export const usePersonalizedMenu = ({
       if (!guestId) return;
       
       try {
-        const { data } = await supabase
-          .from('payment_transactions')
-          .select('id, amount, created_at, metadata')
-          .eq('guest_id', guestId)
-          .order('created_at', { ascending: false })
-          .limit(20);
+        // Utilisation directe de fetch pour éviter les problèmes de types Supabase
+        const response = await fetch(
+          `https://alfflpvdnywwbrzygmoc.supabase.co/rest/v1/payment_transactions?guest_id=eq.${guestId}&select=id,amount,created_at,metadata&order=created_at.desc&limit=20`,
+          {
+            headers: {
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZmZscHZkbnl3d2JyenlnbW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3OTIxNTUsImV4cCI6MjA3MDM2ODE1NX0.hV_xY6voTcybMwno9ViAVZvsN8Gbj8L-CDw2Jof17mY',
+              'Content-Type': 'application/json'
+            }
+          }
+        );
         
-        setOrderHistory(data || []);
+        if (response.ok) {
+          const data = await response.json();
+          setOrderHistory(data || []);
+        }
       } catch (error) {
         console.error('Error fetching order history:', error);
       }
@@ -66,13 +84,22 @@ export const usePersonalizedMenu = ({
       if (!guestId) return;
       
       try {
-        const { data } = await supabase
-          .from('guests')
-          .select('preferences')
-          .eq('id', guestId)
-          .single();
+        // Utilisation directe de fetch pour éviter les problèmes de types Supabase
+        const response = await fetch(
+          `https://alfflpvdnywwbrzygmoc.supabase.co/rest/v1/guests?id=eq.${guestId}&select=preferences`,
+          {
+            headers: {
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZmZscHZkbnl3d2JyenlnbW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3OTIxNTUsImV4cCI6MjA3MDM2ODE1NX0.hV_xY6voTcybMwno9ViAVZvsN8Gbj8L-CDw2Jof17mY',
+              'Content-Type': 'application/json'
+            }
+          }
+        );
         
-        setPreferences(data?.preferences || {});
+        if (response.ok) {
+          const data = await response.json();
+          const guestData = data[0];
+          setPreferences(guestData?.preferences || {});
+        }
       } catch (error) {
         console.error('Error fetching preferences:', error);
       }
@@ -122,7 +149,7 @@ export const usePersonalizedMenu = ({
         throw error;
       }
 
-      return data;
+      return data as PersonalizedMenuData;
     },
     enabled: enabled && !!guestId && orderHistory.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
