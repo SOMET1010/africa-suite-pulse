@@ -3,15 +3,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Zap, User, Calendar, MapPin, Save } from "lucide-react";
+import { ArrowLeft, Zap, User, Calendar, MapPin } from "lucide-react";
 import { UnifiedLayout } from "@/core/layout/UnifiedLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LoadingButton } from "@/components/ui/loading-button";
+import { ReservationSuccessModal } from "@/components/reservations/ReservationSuccessModal";
 import { useOrgId } from "@/core/auth/useOrg";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/toast-unified";
 import { reservationsApi } from "@/services/reservations.api";
 import { format, addDays } from "date-fns";
 import type { ReservationInsert } from "@/types/reservation";
@@ -31,9 +33,10 @@ type FormData = z.infer<typeof quickReservationSchema>;
 export default function QuickReservationPage() {
   const navigate = useNavigate();
   const { orgId } = useOrgId();
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableRooms, setAvailableRooms] = useState<any[]>([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdReservation, setCreatedReservation] = useState<any>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(quickReservationSchema),
@@ -76,6 +79,11 @@ export default function QuickReservationPage() {
     setIsSubmitting(true);
     
     try {
+      toast({
+        title: "Création en cours...",
+        description: "Veuillez patienter pendant la création de la réservation.",
+      });
+
       const reservationData: ReservationInsert = {
         org_id: orgId,
         guest_name: data.guest_name,
@@ -90,24 +98,39 @@ export default function QuickReservationPage() {
         source: "walk_in",
       };
       
-      await reservationsApi.create(reservationData);
+      const result = await reservationsApi.create(reservationData);
       
-      toast({
-        title: "Réservation créée rapidement",
-        description: "La réservation a été créée et confirmée avec succès.",
-      });
+      // Enrichir les données pour la modal
+      const selectedRoom = availableRooms.find(room => room.id === data.room_id);
+      const enrichedReservation = {
+        ...result.data,
+        guest_name: data.guest_name,
+        guest_phone: data.guest_phone,
+        date_arrival: data.date_arrival,
+        date_departure: data.date_departure,
+        room_number: selectedRoom?.number,
+        room_type: selectedRoom?.type,
+        rate_total: data.rate_total,
+      };
       
-      navigate("/reservations");
+      setCreatedReservation(enrichedReservation);
+      setShowSuccessModal(true);
+      
     } catch (error) {
       console.error("Error creating reservation:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de créer la réservation. Veuillez réessayer.",
+        title: "Erreur de création",
+        description: "Impossible de créer la réservation. Vérifiez les informations et réessayez.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleViewDetails = () => {
+    setShowSuccessModal(false);
+    navigate("/reservations");
   };
 
   return (
@@ -137,15 +160,14 @@ export default function QuickReservationPage() {
         },
         {
           id: 'save',
-          label: 'Créer & Confirmer',
-          icon: <Save className="h-4 w-4" />,
+          label: isSubmitting ? 'Création...' : 'Créer & Confirmer',
+          icon: <Zap className="h-4 w-4" />,
           onClick: () => form.handleSubmit(onSubmit)(),
           variant: 'primary',
           disabled: isSubmitting,
         },
       ]}
-      className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-      contentClassName="max-w-2xl mx-auto"
+      contentClassName="max-w-4xl mx-auto"
     >
       <div className="space-y-8">
         {/* Header avec icône */}
@@ -159,7 +181,7 @@ export default function QuickReservationPage() {
         </div>
 
         {/* Quick Form */}
-        <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
+        <Card className="shadow-sm border-border bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5" />
@@ -324,6 +346,16 @@ export default function QuickReservationPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de succès */}
+      {createdReservation && (
+        <ReservationSuccessModal
+          open={showSuccessModal}
+          onOpenChange={setShowSuccessModal}
+          reservation={createdReservation}
+          onViewDetails={handleViewDetails}
+        />
+      )}
     </UnifiedLayout>
   );
 }
