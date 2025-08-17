@@ -1,628 +1,144 @@
-import React, { useState, startTransition, Suspense, useEffect } from 'react';
-import { MobileOptimizedLayout, TouchOptimizedCard, ResponsiveGrid } from '@/core/ui/Mobile';
-import { TButton } from '@/core/ui/TButton';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { cn } from '@/core/utils/cn';
-import { 
-  Users, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle2, 
-  CircleDot,
-  Bell,
-  ChefHat,
-  CreditCard,
-  Settings
+import { Input } from '@/components/ui/input';
+import {
+  Clock,
+  Users,
+  Plus,
+  Send,
+  MessageSquare,
+  Utensils,
+  CreditCard
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { usePOSAuth } from '../auth/usePOSAuth';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { usePOSTables } from '@/features/pos/hooks/usePOSData';
-import { useServerTables } from '@/features/pos/hooks/useTableAssignments';
-import { logger } from '@/lib/logger';
-
-interface POSTable {
-  id: string;
-  number: string;
-  status: 'libre' | 'occupee' | 'a_debarrasser' | 'reservee';
-  customer_count: number;
-  server_id?: string;
-  order_total?: number;
-  time_occupied?: string;
-  last_activity?: string;
-  has_pending_orders?: boolean;
-  needs_attention?: boolean;
-}
+import type { CartItem } from '../types';
 
 interface MobileServerInterfaceProps {
-  serverId?: string;
+  items: CartItem[];
+  onAddItem: (productId: string) => void;
+  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onSendToKitchen: () => void;
+  onCheckout: () => void;
+  onAddNote: (note: string) => void;
 }
 
-const statusConfig = {
-  libre: { 
-    icon: CheckCircle2, 
-    label: 'Libre', 
-    color: 'text-success', 
-    priority: 4 
-  },
-  occupee: { 
-    icon: Users, 
-    label: 'Occupée', 
-    color: 'text-warning', 
-    priority: 2 
-  },
-  a_debarrasser: { 
-    icon: AlertTriangle, 
-    label: 'À débarrasser', 
-    color: 'text-destructive', 
-    priority: 1 
-  },
-  reservee: { 
-    icon: CircleDot, 
-    label: 'Réservée', 
-    color: 'text-primary', 
-    priority: 3 
-  }
-};
+export function MobileServerInterface({
+  items,
+  onAddItem,
+  onUpdateQuantity,
+  onSendToKitchen,
+  onCheckout,
+  onAddNote
+}: MobileServerInterfaceProps) {
+  const [quickNote, setQuickNote] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('populaires');
 
-function MobileServerInterfaceInner({ serverId }: MobileServerInterfaceProps) {
-  const { session, loading: authLoading } = usePOSAuth();
-  const { toast } = useToast();
-  const [selectedTable, setSelectedTable] = useState<POSTable | null>(null);
-  const [showNotifications, setShowNotifications] = useState(true);
+  const popularItems = [
+    { id: '1', name: 'Poulet Yassa', price: 3500, code: 'PY001' },
+    { id: '2', name: 'Riz Wolof', price: 2500, code: 'RW002' },
+    { id: '3', name: 'Bissap', price: 800, code: 'BI003' },
+    { id: '4', name: 'Alloco', price: 1500, code: 'AL004' }
+  ];
 
-  // Debug logs (more detailed)
-  logger.debug("MobileServerInterface detailed debug", {
-    session: session ? {
-      user_id: session.user_id,
-      display_name: session.display_name,
-      role: session.role,
-      org_id: session.org_id,
-      outlet_id: session.outlet_id
-    } : null,
-    authLoading,
-    serverId,
-    sessionExists: !!session,
-    hasOrgId: !!session?.org_id,
-    queryEnabled: !!session?.org_id && !authLoading
-  });
-
-  // CRITICAL: Check exact outlet_id match with database
-  logger.debug("Outlet configuration check", {
-    session_outlet: session?.outlet_id,
-    session_org: session?.org_id,
-    expected_outlet_in_db: "9a32d161-7606-4270-9115-6b1ef719f716",
-    should_match: session?.outlet_id === "9a32d161-7606-4270-9115-6b1ef719f716"
-  });
-
-  // Fetch assigned tables for the server first
-  const { data: assignedTables = [], isLoading: assignedTablesLoading, refetch: refetchAssignedTables } = useServerTables(session?.user_id, session?.org_id);
-  
-  // Fetch all tables as fallback
-  const { data: allTables = [], isLoading: allTablesLoading } = usePOSTables(session?.outlet_id, session?.org_id);
-
-  // Auto-assign tables if none exist
-  useEffect(() => {
-    const autoAssignTables = async () => {
-      if (!assignedTablesLoading && !allTablesLoading && assignedTables?.length === 0 && session?.user_id && session?.org_id) {
-        try {
-          logger.debug("Auto-assigning tables for server", { server_id: session.user_id });
-          
-          const { error } = await supabase.rpc('auto_assign_all_tables_to_server', {
-            p_server_id: session.user_id,
-            p_org_id: session.org_id
-          });
-          
-          if (error) {
-            logger.error('Error auto-assigning tables', error);
-            return;
-          }
-          
-          // Refetch to show newly assigned tables
-          await refetchAssignedTables();
-          toast({
-            title: "Tables assignées",
-            description: "Tables automatiquement assignées au serveur"
-          });
-        } catch (error) {
-          logger.error('Error auto-assigning tables', error);
-        }
-      }
-    };
-
-    autoAssignTables();
-  }, [assignedTablesLoading, allTablesLoading, assignedTables?.length, session?.user_id, session?.org_id, refetchAssignedTables]);
-  
-  const { data: tables = [], isLoading, error } = useQuery<POSTable[]>({
-    queryKey: ['pos-tables-processed', session?.org_id, session?.outlet_id, session?.user_id, assignedTables, allTables],
-    queryFn: async (): Promise<POSTable[]> => {
-      logger.debug("Processing tables for server", {
-        org_id: session?.org_id,
-        outlet_id: session?.outlet_id,
-        user_id: session?.user_id,
-        assignedTablesCount: assignedTables.length,
-        allTablesCount: allTables.length
-      });
-
-      // Priority 1: Use assigned tables if available
-      if (assignedTables && assignedTables.length > 0) {
-        const processedTables: POSTable[] = assignedTables.map(assignment => ({
-          id: assignment.table_id,
-          number: assignment.table_number,
-          status: (assignment.status as any) || 'libre',
-          customer_count: 0, // Would come from current orders
-          server_id: session?.user_id,
-          order_total: 0, // Would come from current orders
-          time_occupied: '',
-          last_activity: '',
-          has_pending_orders: false,
-          needs_attention: false,
-        }));
-        
-        logger.debug("Using assigned tables from server assignments", { count: processedTables.length });
-        return processedTables;
-      }
-
-      // Priority 2: Fallback to all tables in organization if no assignments
-      if (allTables && allTables.length > 0) {
-        const processedTables: POSTable[] = allTables.map(table => ({
-          id: table.id,
-          number: table.number || table.table_number,
-          status: (table.status as any) || 'libre',
-          customer_count: 0,
-          server_id: session?.user_id,
-          order_total: 0,
-          time_occupied: '',
-          last_activity: '',
-          has_pending_orders: false,
-          needs_attention: false,
-        }));
-        
-        logger.warn("Using all organization tables (no assignments found)", { count: processedTables.length });
-        return processedTables;
-      }
-
-      // Priority 3: Demo tables as last resort
-      logger.warn("No tables found, using demo tables");
-      return [];
-    },
-    enabled: !!session?.org_id && !authLoading && (!assignedTablesLoading && !allTablesLoading),
-    staleTime: 30000,
-    refetchOnWindowFocus: false
-  });
-
-  // More debug logs
-  logger.debug("Query state", {
-    isLoading,
-    assignedTablesLoading,
-    allTablesLoading,
-    error,
-    tables: tables.length,
-    assignedTables: assignedTables.length,
-    allTables: allTables.length,
-    enabled: !!session?.org_id && !authLoading && (!assignedTablesLoading && !allTablesLoading),
-    authLoading,
-    sessionOrgId: session?.org_id,
-    sessionUserId: session?.user_id
-  });
-
-  // Trier les tables par priorité (urgence d'attention)
-  const sortedTables = [...tables].sort((a, b) => {
-    if (a.needs_attention && !b.needs_attention) return -1;
-    if (!a.needs_attention && b.needs_attention) return 1;
-    return statusConfig[a.status].priority - statusConfig[b.status].priority;
-  });
-
-  if (authLoading) {
-    return <div className="flex justify-center p-4">Chargement de la session...</div>;
-  }
-
-  if (!session) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Session POS requise</h2>
-        <p className="text-muted-foreground mb-4">Vous devez vous connecter au système POS pour accéder aux tables.</p>
-        <div className="space-y-2">
-          <TButton onClick={() => window.location.href = '/pos/login'}>
-            Se connecter au POS
-          </TButton>
-          <TButton 
-            variant="ghost" 
-            onClick={() => {
-              // Create demo session for testing
-              const demoSession = {
-                user_id: "demo-user-123",
-                display_name: "Serveur Démo",
-                role: "pos_server" as const,
-                org_id: "demo-org-456",
-                outlet_id: "demo-outlet-789",
-                session_token: "demo-token-abc",
-                login_time: new Date().toISOString()
-              };
-              sessionStorage.setItem("pos_session", JSON.stringify(demoSession));
-              window.location.reload();
-            }}
-          >
-            Mode Démo (Test)
-          </TButton>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session.org_id) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Organisation manquante</h2>
-        <p className="text-muted-foreground mb-4">Votre session POS n'a pas d'organisation associée.</p>
-        <TButton onClick={() => window.location.href = '/pos/login'}>
-          Se reconnecter
-        </TButton>
-      </div>
-    );
-  }
-
-  if (isLoading || assignedTablesLoading || allTablesLoading) {
-    return <div className="flex justify-center p-4">Chargement des tables...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2 text-destructive">Erreur de chargement</h2>
-        <p className="text-muted-foreground mb-4">Impossible de charger les tables.</p>
-        <TButton 
-          onClick={() => window.location.reload()}
-          variant="ghost"
-        >
-          Réessayer
-        </TButton>
-      </div>
-    );
-  }
-
-  if (tables.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <h2 className="text-xl font-semibold mb-2">Aucune table assignée</h2>
-        <p className="text-muted-foreground mb-4">
-          Aucune table n'est assignée au serveur {session.display_name} (ID: {session.user_id}) 
-          pour aujourd'hui dans l'organisation {session.org_id}.
-        </p>
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <p>Vérifiez que :</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Des tables sont créées dans le système POS</li>
-            <li>Le serveur a des assignations pour aujourd'hui</li>
-            <li>L'outlet_id est correctement configuré</li>
-          </ul>
-        </div>
-        <TButton 
-          onClick={() => window.location.reload()}
-          variant="ghost"
-          className="mt-4"
-        >
-          Actualiser
-        </TButton>
-      </div>
-    );
-  }
-
-  const handleTableSelect = (table: POSTable) => {
-    startTransition(() => {
-      setSelectedTable(table);
-      if (table.status === 'occupee') {
-        // Navigation vers l'interface de commande
-        toast({
-          title: `Table ${table.number}`,
-          description: "Interface de commande en cours de développement",
-        });
-      }
-    });
-  };
-
-  const handleTableAction = async (tableId: string, action: string) => {
-    startTransition(() => {
-      const performAction = async () => {
-        try {
-          let updateData = {};
-          
-          switch (action) {
-            case 'mark_clean':
-              updateData = { 
-                status: 'libre',
-                metadata: { needs_attention: false }
-              };
-              break;
-            case 'mark_attention':
-              // Toggle attention state in metadata
-              updateData = { 
-                metadata: { needs_attention: true }
-              };
-              break;
-          }
-          
-          await supabase
-            .from('pos_tables')
-            .update(updateData)
-            .eq('id', tableId);
-
-          toast({
-            title: "Table mise à jour",
-            description: `Action "${action}" effectuée`,
-          });
-        } catch (error) {
-          toast({
-            title: "Erreur",
-            description: "Impossible de mettre à jour la table",
-            variant: "destructive"
-          });
-        }
-      };
-      
-      performAction();
-    });
-  };
-
-  const getTableStats = () => {
-    const stats = {
-      total: tables.length,
-      libre: tables.filter(t => t.status === 'libre').length,
-      occupee: tables.filter(t => t.status === 'occupee').length,
-      attention: tables.filter(t => t.needs_attention).length,
-      revenue: tables
-        .filter(t => t.order_total)
-        .reduce((sum, t) => sum + (t.order_total || 0), 0)
-    };
-    return stats;
-  };
-
-  const stats = getTableStats();
+  const totalAmount = items.reduce((sum, item) => sum + item.total_price, 0);
 
   return (
-    <MobileOptimizedLayout
-      title="Interface Serveur Mobile"
-      showStatusBar={true}
-      className="bg-gradient-to-br from-background via-background to-primary/5"
-      bottomActions={
-        <div className="grid grid-cols-4 gap-2 p-4 bg-background/95 backdrop-blur border-t border-border/50">
-          <TButton
-            variant="ghost"
-            size="sm"
-            className="flex flex-col gap-1 h-auto py-3"
-          >
-            <ChefHat className="h-5 w-5" />
-            <span className="text-xs">Cuisine</span>
-          </TButton>
-          <TButton
-            variant="ghost"
-            size="sm"
-            className="flex flex-col gap-1 h-auto py-3"
-          >
-            <CreditCard className="h-5 w-5" />
-            <span className="text-xs">Paiement</span>
-          </TButton>
-          <TButton
-            variant="ghost"
-            size="sm"
-            className="flex flex-col gap-1 h-auto py-3"
-            onClick={() => setShowNotifications(!showNotifications)}
-          >
-            <Bell className={cn("h-5 w-5", showNotifications && "text-primary")} />
-            <span className="text-xs">Alertes</span>
-          </TButton>
-          <TButton
-            variant="ghost"
-            size="sm"
-            className="flex flex-col gap-1 h-auto py-3"
-          >
-            <Settings className="h-5 w-5" />
-            <span className="text-xs">Config</span>
-          </TButton>
-        </div>
-      }
-    >
-      {/* Header avec stats rapides */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Bonjour {session?.display_name || 'Serveur'}
-            </h1>
-            <p className="text-muted-foreground">
-              {stats.occupee} table{stats.occupee !== 1 ? 's' : ''} occupée{stats.occupee !== 1 ? 's' : ''}
-            </p>
-          </div>
-          <Avatar className="h-12 w-12 border-2 border-primary/20">
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-              {session?.display_name?.charAt(0) || 'S'}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-
-        {/* Stats en un coup d'œil */}
-        <ResponsiveGrid variant="2-4" className="gap-3">
-          <TouchOptimizedCard className="p-3 bg-gradient-to-r from-success/10 to-success/5 border-success/20">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-background to-muted/20">
+      {/* Header Mobile */}
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b shadow-sm">
+        <div className="p-4">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-8 w-8 text-success" />
-              <div>
-                <p className="text-lg font-bold text-success">{stats.libre}</p>
-                <p className="text-xs text-success/70">Libres</p>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-accent/20 rounded-xl flex items-center justify-center">
+                <Utensils className="h-5 w-5 text-primary" />
               </div>
-            </div>
-          </TouchOptimizedCard>
-          
-          <TouchOptimizedCard className="p-3 bg-gradient-to-r from-warning/10 to-warning/5 border-warning/20">
-            <div className="flex items-center gap-3">
-              <Users className="h-8 w-8 text-warning" />
               <div>
-                <p className="text-lg font-bold text-warning">{stats.occupee}</p>
-                <p className="text-xs text-warning/70">Occupées</p>
-              </div>
-            </div>
-          </TouchOptimizedCard>
-
-          {stats.attention > 0 && (
-            <TouchOptimizedCard className="p-3 bg-gradient-to-r from-destructive/10 to-destructive/5 border-destructive/20">
-              <div className="flex items-center gap-3">
-                <AlertTriangle className="h-8 w-8 text-destructive" />
-                <div>
-                  <p className="text-lg font-bold text-destructive">{stats.attention}</p>
-                  <p className="text-xs text-destructive/70">Attention</p>
+                <h1 className="font-bold text-lg">Interface Serveur</h1>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Users className="h-3 w-3" />
+                  <span>Mobile optimisé</span>
                 </div>
               </div>
-            </TouchOptimizedCard>
-          )}
-
-          <TouchOptimizedCard className="p-3 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-            <div className="flex items-center gap-3">
-              <CreditCard className="h-8 w-8 text-primary" />
-              <div>
-                <p className="text-lg font-bold text-primary">{stats.revenue.toFixed(2)}€</p>
-                <p className="text-xs text-primary/70">CA en cours</p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-muted-foreground">Total</div>
+              <div className="font-bold text-lg text-primary">
+                {totalAmount.toLocaleString()} F
               </div>
             </div>
-          </TouchOptimizedCard>
-        </ResponsiveGrid>
-      </div>
-
-      {/* Alertes importantes */}
-      {showNotifications && stats.attention > 0 && (
-        <div className="mb-6 p-4 bg-gradient-to-r from-destructive/10 to-destructive/5 border border-destructive/20 rounded-xl">
-          <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-            <h3 className="font-semibold text-destructive">Attention requise</h3>
           </div>
-          <p className="text-sm text-destructive/80">
-            {stats.attention} table{stats.attention !== 1 ? 's' : ''} nécessite{stats.attention !== 1 ? 'nt' : ''} votre attention
-          </p>
-        </div>
-      )}
 
-      {/* Liste des tables */}
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground mb-4">
-          Mes Tables ({sortedTables.length})
-        </h2>
-        
-        {sortedTables.map((table) => {
-          const StatusIcon = statusConfig[table.status].icon;
-          
-          return (
-            <TouchOptimizedCard
-              key={table.id}
-              onClick={() => handleTableSelect(table)}
-              className={cn(
-                "relative p-4 border-l-4 transition-all duration-200",
-                table.needs_attention 
-                  ? "border-l-destructive bg-destructive/5 ring-2 ring-destructive/20" 
-                  : "border-l-transparent",
-                selectedTable?.id === table.id && "ring-2 ring-primary/50 bg-primary/5"
-              )}
+          {/* Actions rapides */}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSendToKitchen}
+              disabled={items.length === 0}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10">
-                    <span className="text-lg font-bold text-primary">
-                      {table.number}
-                    </span>
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge 
-                        variant="outline" 
-                        className={cn("text-xs", statusConfig[table.status].color)}
-                      >
-                        <StatusIcon className="h-3 w-3 mr-1" />
-                        {statusConfig[table.status].label}
-                      </Badge>
-                      {table.needs_attention && (
-                        <Badge variant="destructive" className="text-xs animate-pulse">
-                          <AlertTriangle className="h-3 w-3 mr-1" />
-                          Attention
-                        </Badge>
-                      )}
-                      {table.has_pending_orders && (
-                        <Badge variant="secondary" className="text-xs">
-                          <CircleDot className="h-3 w-3 mr-1" />
-                          Commandes
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      {table.customer_count > 0 && (
-                        <span className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          {table.customer_count}
-                        </span>
-                      )}
-                      {table.time_occupied && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {table.time_occupied}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  {table.order_total && (
-                    <p className="text-lg font-bold text-primary">
-                      {table.order_total}€
-                    </p>
-                  )}
-                  {table.last_activity && (
-                    <p className="text-xs text-muted-foreground">
-                      il y a {table.last_activity}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Actions rapides pour les tables nécessitant une attention */}
-              {table.status === 'a_debarrasser' && (
-                <div className="mt-3 pt-3 border-t border-border">
-                  <TButton
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTableAction(table.id, 'mark_clean');
-                    }}
-                    className="text-xs border border-border"
-                  >
-                    <CheckCircle2 className="h-4 w-4 mr-1" />
-                    Marquer comme nettoyée
-                  </TButton>
-                </div>
-              )}
-            </TouchOptimizedCard>
-          );
-        })}
-      </div>
-    </MobileOptimizedLayout>
-  );
-}
-
-// Wrapper with Suspense boundary to handle async operations
-export function MobileServerInterface({ serverId }: MobileServerInterfaceProps) {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-muted-foreground">Chargement de l'interface serveur...</p>
+              <Send className="h-4 w-4 mr-1" />
+              Cuisine
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCheckout}
+              disabled={items.length === 0}
+            >
+              <CreditCard className="h-4 w-4 mr-1" />
+              Encaisser
+            </Button>
+          </div>
         </div>
       </div>
-    }>
-      <MobileServerInterfaceInner serverId={serverId} />
-    </Suspense>
+
+      {/* Products Grid */}
+      <div className="flex-1 overflow-auto p-4">
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {popularItems.map((product) => (
+            <Card
+              key={product.id}
+              className="p-3 cursor-pointer transition-all hover:scale-105 glass-card"
+              onClick={() => onAddItem(product.id)}
+            >
+              <div className="text-center">
+                <h3 className="font-semibold text-sm mb-1">{product.name}</h3>
+                <p className="text-xs text-muted-foreground mb-2">{product.code}</p>
+                <div className="font-bold text-primary">{product.price.toLocaleString()} F</div>
+                <Button size="sm" className="w-full mt-2 h-8">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Ajouter
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Quick Note */}
+      <div className="p-4 border-t bg-white/95">
+        <div className="flex gap-2">
+          <Input
+            placeholder="Note rapide..."
+            value={quickNote}
+            onChange={(e) => setQuickNote(e.target.value)}
+            className="flex-1"
+          />
+          <Button
+            size="sm"
+            onClick={() => {
+              if (quickNote.trim()) {
+                onAddNote(quickNote);
+                setQuickNote('');
+              }
+            }}
+            disabled={!quickNote.trim()}
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
-
-export { MobileServerInterface as default };
