@@ -15,7 +15,7 @@ import { ReservationSuccessModal } from "@/components/reservations/ReservationSu
 import { useOrgId } from "@/core/auth/useOrg";
 import { toast } from "@/components/ui/toast-unified";
 import { reservationsApi } from "@/services/reservations.api";
-import { format, addDays } from "date-fns";
+import { format, addDays, differenceInDays } from "date-fns";
 import type { ReservationInsert } from "@/types/reservation";
 
 const quickReservationSchema = z.object({
@@ -37,6 +37,8 @@ export default function QuickReservationPage() {
   const [availableRooms, setAvailableRooms] = useState<any[]>([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdReservation, setCreatedReservation] = useState<any>(null);
+  const [calculatedRate, setCalculatedRate] = useState<any>(null);
+  const [isCalculatingRate, setIsCalculatingRate] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(quickReservationSchema),
@@ -48,6 +50,7 @@ export default function QuickReservationPage() {
   });
 
   const watchedDates = form.watch(["date_arrival", "date_departure", "adults"]);
+  const selectedRoom = form.watch("room_id");
 
   // Check room availability when dates change
   const checkAvailability = async () => {
@@ -68,10 +71,53 @@ export default function QuickReservationPage() {
     }
   };
 
+  // Calculate nights
+  const calculateNights = (arrival: string, departure: string) => {
+    if (!arrival || !departure) return 0;
+    try {
+      const nights = differenceInDays(new Date(departure), new Date(arrival));
+      return Math.max(0, nights);
+    } catch {
+      return 0;
+    }
+  };
+
+  // Calculate rate when room is selected
+  const calculateRateForRoom = async () => {
+    const [dateArrival, dateDeparture] = watchedDates;
+    
+    if (selectedRoom && dateArrival && dateDeparture && orgId) {
+      setIsCalculatingRate(true);
+      try {
+        const rateResult = await reservationsApi.calculateRate(
+          orgId,
+          selectedRoom,
+          dateArrival,
+          dateDeparture
+        );
+        setCalculatedRate(rateResult);
+        form.setValue("rate_total", rateResult.total_rate);
+      } catch (error) {
+        console.error("Error calculating rate:", error);
+        setCalculatedRate(null);
+      } finally {
+        setIsCalculatingRate(false);
+      }
+    } else {
+      setCalculatedRate(null);
+      form.setValue("rate_total", undefined);
+    }
+  };
+
   // Re-check when dates change
   React.useEffect(() => {
     checkAvailability();
   }, [watchedDates, orgId]);
+
+  // Calculate rate when room or dates change
+  React.useEffect(() => {
+    calculateRateForRoom();
+  }, [selectedRoom, watchedDates, orgId]);
 
   const onSubmit = async (data: FormData) => {
     if (!orgId) return;
@@ -239,49 +285,61 @@ export default function QuickReservationPage() {
                     Séjour
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="date_arrival"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Arrivée *</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="date" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                   <div className="grid grid-cols-3 gap-4">
+                     <FormField
+                       control={form.control}
+                       name="date_arrival"
+                       render={({ field }) => (
+                         <FormItem>
+                           <FormLabel>Arrivée *</FormLabel>
+                           <FormControl>
+                             <Input {...field} type="date" />
+                           </FormControl>
+                           <FormMessage />
+                         </FormItem>
+                       )}
+                     />
 
-                    <FormField
-                      control={form.control}
-                      name="date_departure"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Départ *</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="date" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                     <FormField
+                       control={form.control}
+                       name="date_departure"
+                       render={({ field }) => (
+                         <FormItem>
+                           <FormLabel>Départ *</FormLabel>
+                           <FormControl>
+                             <Input {...field} type="date" />
+                           </FormControl>
+                           <FormMessage />
+                         </FormItem>
+                       )}
+                     />
 
-                    <FormField
-                      control={form.control}
-                      name="adults"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Adultes *</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" min="1" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                     <FormField
+                       control={form.control}
+                       name="adults"
+                       render={({ field }) => (
+                         <FormItem>
+                           <FormLabel>Adultes *</FormLabel>
+                           <FormControl>
+                             <Input {...field} type="number" min="1" />
+                           </FormControl>
+                           <FormMessage />
+                         </FormItem>
+                       )}
+                     />
+                   </div>
+
+                   {/* Night counter */}
+                   {watchedDates[0] && watchedDates[1] && (
+                     <div className="flex items-center justify-center">
+                       <div className="inline-flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-full border border-primary/20">
+                         <Calendar className="h-4 w-4 text-primary" />
+                         <span className="text-sm font-medium text-primary">
+                           {calculateNights(watchedDates[0], watchedDates[1])} nuit{calculateNights(watchedDates[0], watchedDates[1]) > 1 ? 's' : ''}
+                         </span>
+                       </div>
+                     </div>
+                   )}
                 </div>
 
                 {/* Room Selection */}
@@ -318,22 +376,51 @@ export default function QuickReservationPage() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="rate_total"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Tarif total (XOF)</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="number" placeholder="À définir plus tard" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                )}
+                       <FormField
+                         control={form.control}
+                         name="rate_total"
+                         render={({ field }) => (
+                           <FormItem>
+                             <FormLabel>Tarif total (XOF)</FormLabel>
+                             <FormControl>
+                               <Input 
+                                 {...field} 
+                                 type="number" 
+                                 placeholder={isCalculatingRate ? "Calcul..." : "À définir plus tard"}
+                                 disabled={calculatedRate !== null}
+                               />
+                             </FormControl>
+                             <FormMessage />
+                           </FormItem>
+                         )}
+                       />
+                     </div>
+
+                     {/* Rate calculation display */}
+                     {calculatedRate && (
+                       <div className="bg-success/5 border border-success/20 rounded-lg p-4">
+                         <div className="flex items-center gap-2 mb-3">
+                           <div className="w-2 h-2 bg-success rounded-full"></div>
+                           <span className="text-sm font-medium text-success">Calcul automatique</span>
+                         </div>
+                         <div className="space-y-2 text-sm">
+                           <div className="flex justify-between">
+                             <span className="text-muted-foreground">Tarif de base/nuit:</span>
+                             <span className="font-medium">{calculatedRate.base_rate?.toLocaleString()} XOF</span>
+                           </div>
+                           <div className="flex justify-between">
+                             <span className="text-muted-foreground">Nombre de nuits:</span>
+                             <span className="font-medium">{calculatedRate.nights}</span>
+                           </div>
+                           <div className="border-t border-success/20 pt-2 flex justify-between font-semibold">
+                             <span>Total:</span>
+                             <span className="text-success">{calculatedRate.total_rate?.toLocaleString()} XOF</span>
+                           </div>
+                         </div>
+                       </div>
+                     )}
+                   </div>
+                 )}
 
                 {/* Actions intégrées dans le formulaire pour feedback visuel */}
                 <div className="text-center pt-4">
