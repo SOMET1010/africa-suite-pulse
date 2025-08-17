@@ -427,13 +427,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "arrangement_services_arrangement_id_fkey"
-            columns: ["arrangement_id"]
-            isOneToOne: false
-            referencedRelation: "arrangements_with_calculated_price"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "arrangement_services_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
@@ -445,13 +438,6 @@ export type Database = {
             columns: ["arrangement_id"]
             isOneToOne: false
             referencedRelation: "arrangements"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fk_arrangement_services_arrangement_id"
-            columns: ["arrangement_id"]
-            isOneToOne: false
-            referencedRelation: "arrangements_with_calculated_price"
             referencedColumns: ["id"]
           },
           {
@@ -7590,60 +7576,7 @@ export type Database = {
       }
     }
     Views: {
-      arrangements_with_calculated_price: {
-        Row: {
-          base_price: number | null
-          calculated_price: number | null
-          code: string | null
-          created_at: string | null
-          description: string | null
-          id: string | null
-          is_active: boolean | null
-          label: string | null
-          max_nights: number | null
-          min_nights: number | null
-          org_id: string | null
-          services_count: number | null
-          updated_at: string | null
-          valid_from: string | null
-          valid_until: string | null
-        }
-        Insert: {
-          base_price?: number | null
-          calculated_price?: never
-          code?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          label?: string | null
-          max_nights?: number | null
-          min_nights?: number | null
-          org_id?: string | null
-          services_count?: never
-          updated_at?: string | null
-          valid_from?: string | null
-          valid_until?: string | null
-        }
-        Update: {
-          base_price?: number | null
-          calculated_price?: never
-          code?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          label?: string | null
-          max_nights?: number | null
-          min_nights?: number | null
-          org_id?: string | null
-          services_count?: never
-          updated_at?: string | null
-          valid_from?: string | null
-          valid_until?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       activate_organization_module: {
@@ -7882,6 +7815,26 @@ export type Database = {
           p_sequence_number: number
         }
         Returns: string
+      }
+      get_arrangements_with_calculated_price: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          base_price: number
+          calculated_price: number
+          code: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          label: string
+          max_nights: number
+          min_nights: number
+          org_id: string
+          services_count: number
+          updated_at: string
+          valid_from: string
+          valid_until: string
+        }[]
       }
       get_current_pricing_level: {
         Args: { p_outlet_id: string }
