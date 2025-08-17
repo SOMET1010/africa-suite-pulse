@@ -8116,9 +8116,9 @@ export type Database = {
       }
       log_guest_data_access: {
         Args: {
-          access_type: string
-          guest_id: string
-          sensitive_fields?: string[]
+          p_access_type: string
+          p_details?: string[]
+          p_guest_id: string
         }
         Returns: undefined
       }
