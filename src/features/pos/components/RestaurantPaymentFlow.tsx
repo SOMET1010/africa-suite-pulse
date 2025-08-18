@@ -1,7 +1,7 @@
 import { ModernPaymentDialog } from "./ModernPaymentDialog";
 import { SplitBillDialog } from "./SplitBillDialog";
 import { TableTransferDialog } from "./TableTransferDialog";
-import { BillPreviewDialog } from "./BillPreviewDialog";
+import { UnifiedBillDialog } from "./UnifiedBillDialog";
 import type { CartItem, POSTable } from "../types";
 
 interface RestaurantPaymentFlowProps {
@@ -66,24 +66,25 @@ export function RestaurantPaymentFlow({
 
   return (
     <>
-      {/* Bill Preview Dialog (Addition) */}
+      {/* Unified Bill Dialog (Addition + Quick Actions) */}
       {currentOrder && (
-        <BillPreviewDialog
+        <UnifiedBillDialog
           isOpen={isBillPreviewOpen}
           onClose={onCloseBillPreview}
-          onProceedToPayment={onProceedToPayment}
           onSplitBill={() => {
             onCloseBillPreview();
-            // Open split bill dialog logic will be handled by parent
+            // Parent will handle opening split bill dialog
           }}
           currentOrder={currentOrder}
           cartItems={cartItems}
           totals={totals}
+          onPaymentComplete={onPaymentComplete}
         />
       )}
 
-      {/* Payment Dialog */}
-      {currentOrder && (
+      {/* Legacy Payment Dialog - now handled within UnifiedBillDialog */}
+      {/* Keeping for backward compatibility or direct payment scenarios */}
+      {currentOrder && isPaymentOpen && (
         <ModernPaymentDialog
           isOpen={isPaymentOpen}
           onClose={onClosePayment}
