@@ -72,33 +72,46 @@ export default function POSLoginPage() {
     setError(null);
 
     try {
-      // Rate limiting is temporarily disabled in the backend function
+      console.log("🔐 Tentative d'authentification POS", { pin_length: pin.length, orgId });
+      
       const { data, error } = await supabase.rpc("authenticate_pos_user", {
         p_pin: pin,
         p_org_id: orgId
       });
 
-      if (error) throw error;
+      console.log("🔐 Réponse authentification", { data, error, has_data: !!data });
+
+      if (error) {
+        console.error("❌ Erreur RPC:", error);
+        throw error;
+      }
 
       if (!data || data.length === 0) {
-        setError("PIN invalide ou utilisateur inactif");
+        console.warn("⚠️ Aucune donnée retournée - utilisateur non trouvé");
+        setError("PIN invalide ou utilisateur inactif. Vérifiez votre code PIN.");
         setPin("");
         return;
       }
 
-      const authResponse = data[0] as any; // Backend returns more fields than the TypeScript definition
+      const authResponse = data[0] as any;
+      console.log("✅ Utilisateur authentifié:", { 
+        display_name: authResponse.display_name, 
+        role: authResponse.role_name,
+        has_token: !!authResponse.session_token 
+      });
+
       const user: POSUser & { session_token: string } = {
         user_id: authResponse.user_id,
-        pos_user_id: authResponse.pos_user_id || '', // Optional field
+        pos_user_id: authResponse.pos_user_id || '',
         display_name: authResponse.display_name,
-        employee_code: authResponse.employee_code || '', // Optional field
+        employee_code: authResponse.employee_code || '',
         role_name: authResponse.role_name as POSRole,
         session_token: authResponse.session_token
       };
       setCurrentUser(user);
 
-      // Store secure POS session in sessionStorage (more secure than localStorage)
-      sessionStorage.setItem("pos_session", JSON.stringify({
+      // Store secure POS session in sessionStorage
+      const sessionData = {
         user_id: authResponse.user_id,
         display_name: authResponse.display_name,
         role: authResponse.role_name,
@@ -106,13 +119,19 @@ export default function POSLoginPage() {
         outlet_id: authResponse.outlet_id || '',
         session_token: authResponse.session_token,
         login_time: new Date().toISOString()
-      }));
+      };
+      
+      console.log("💾 Sauvegarde session:", { ...sessionData, session_token: '[REDACTED]' });
+      sessionStorage.setItem("pos_session", JSON.stringify(sessionData));
 
       // Navigate to POS
       navigate("/pos");
     } catch (err: unknown) {
+      console.error("❌ Erreur authentification:", err);
       logger.security("POS authentication failed", { error: err, pin: pin.length > 0 ? "[REDACTED]" : "empty" });
-      setError(err instanceof Error ? err.message : "Erreur lors de la connexion");
+      
+      const errorMessage = err instanceof Error ? err.message : "Erreur lors de la connexion";
+      setError(`Échec de connexion: ${errorMessage}`);
       setPin("");
     } finally {
       setLoading(false);
