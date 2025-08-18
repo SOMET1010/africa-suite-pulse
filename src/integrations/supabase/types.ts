@@ -3511,6 +3511,42 @@ export type Database = {
         }
         Relationships: []
       }
+      pos_auth_audit: {
+        Row: {
+          attempt_type: string
+          created_at: string
+          employee_code: string | null
+          failure_reason: string | null
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          org_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          attempt_type: string
+          created_at?: string
+          employee_code?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          org_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          attempt_type?: string
+          created_at?: string
+          employee_code?: string | null
+          failure_reason?: string | null
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          org_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       pos_auth_sessions: {
         Row: {
           created_at: string
@@ -3540,6 +3576,57 @@ export type Database = {
           org_id?: string
           outlet_id?: string | null
           session_token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pos_auth_system: {
+        Row: {
+          created_at: string
+          display_name: string
+          employee_code: string
+          failed_attempts: number
+          id: string
+          is_active: boolean
+          last_login_at: string | null
+          locked_until: string | null
+          metadata: Json | null
+          org_id: string
+          pin_hash: string
+          role_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          employee_code: string
+          failed_attempts?: number
+          id?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          locked_until?: string | null
+          metadata?: Json | null
+          org_id: string
+          pin_hash: string
+          role_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          employee_code?: string
+          failed_attempts?: number
+          id?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          locked_until?: string | null
+          metadata?: Json | null
+          org_id?: string
+          pin_hash?: string
+          role_name?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -5061,6 +5148,59 @@ export type Database = {
           value?: number
         }
         Relationships: []
+      }
+      pos_secure_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          ip_address: unknown | null
+          is_active: boolean
+          last_activity_at: string
+          outlet_id: string | null
+          pos_user_id: string
+          refresh_expires_at: string
+          refresh_token: string
+          session_token: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean
+          last_activity_at?: string
+          outlet_id?: string | null
+          pos_user_id: string
+          refresh_expires_at: string
+          refresh_token: string
+          session_token: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean
+          last_activity_at?: string
+          outlet_id?: string | null
+          pos_user_id?: string
+          refresh_expires_at?: string
+          refresh_token?: string
+          session_token?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_secure_sessions_pos_user_id_fkey"
+            columns: ["pos_user_id"]
+            isOneToOne: false
+            referencedRelation: "pos_auth_system"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pos_sessions: {
         Row: {
@@ -8137,6 +8277,10 @@ export type Database = {
           | { _role: string; _user_id: string }
         Returns: boolean
       }
+      hash_pos_pin: {
+        Args: { pin_text: string }
+        Returns: string
+      }
       is_user_read_only: {
         Args: { _user_id: string }
         Returns: boolean
@@ -8274,6 +8418,21 @@ export type Database = {
           phone: string
         }[]
       }
+      secure_pos_authenticate: {
+        Args: { p_employee_code: string; p_org_id: string; p_pin: string }
+        Returns: {
+          display_name: string
+          employee_code: string
+          expires_at: string
+          pos_user_id: string
+          role_name: string
+          session_token: string
+        }[]
+      }
+      secure_pos_logout: {
+        Args: { p_session_token: string }
+        Returns: undefined
+      }
       start_night_audit: {
         Args: { p_audit_date: string }
         Returns: string
@@ -8315,6 +8474,17 @@ export type Database = {
         Args: { p_amount: number; p_currency_code?: string }
         Returns: boolean
       }
+      validate_pos_secure_session: {
+        Args: { p_session_token: string }
+        Returns: {
+          display_name: string
+          employee_code: string
+          org_id: string
+          outlet_id: string
+          pos_user_id: string
+          role_name: string
+        }[]
+      }
       validate_pos_session: {
         Args: { p_session_token: string }
         Returns: {
@@ -8340,6 +8510,10 @@ export type Database = {
               p_required_role?: string
             }
           | { p_function_name: string; p_org_id?: string; p_user_id?: string }
+        Returns: boolean
+      }
+      verify_pos_pin: {
+        Args: { pin_text: string; stored_hash: string }
         Returns: boolean
       }
     }
