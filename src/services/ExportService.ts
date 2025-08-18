@@ -8,7 +8,7 @@
 // Lazy load des dépendances lourdes pour optimiser le bundle initial
 const html2canvas = () => import('html2canvas').then(m => m.default);
 const jsPDF = () => import('jspdf').then(m => m.default);
-import { toast } from '@/components/ui/toast-unified';
+import { toast } from '@/components/ui/unified-toast';
 
 export type ExportFormat = 'pdf' | 'csv' | 'excel' | 'image' | 'json';
 

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/toast-unified";
+import { toast } from "@/components/ui/unified-toast";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/services/logger.service";
 import type { POSOutlet, POSCategory, POSProduct, POSOrder, POSTable, POSSession, CartItem } from "../types";

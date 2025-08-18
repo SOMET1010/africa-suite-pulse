@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, Package, Check, X, RefreshCw } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/toast-unified';
+import { toast } from '@/components/ui/unified-toast';
 import { cn } from '@/lib/utils';
 
 interface StockAlert {

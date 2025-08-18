@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/toast-unified";
+import { toast } from "@/components/ui/unified-toast";
 
 export interface POSTicketData {
   order: {

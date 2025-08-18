@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { LoadingButton } from "@/components/ui/loading-button";
 import { ReservationSuccessModal } from "@/components/reservations/ReservationSuccessModal";
 import { useOrgId } from "@/core/auth/useOrg";
-import { toast } from "@/components/ui/toast-unified";
+import { toast } from "@/components/ui/unified-toast";
 import { reservationsApi } from "@/services/reservations.api";
 import { guestsApi } from "@/services/guests.api";
 import { format, addDays, differenceInDays } from "date-fns";
