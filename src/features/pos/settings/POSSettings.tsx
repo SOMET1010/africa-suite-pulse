@@ -22,6 +22,10 @@ import { FiscalArchiveManager } from "../components/FiscalArchiveManager";
 import { FiscalJournalViewer } from "../components/FiscalJournalViewer";
 import { FNEIntegrationPanel } from "../components/FNEIntegrationPanel";
 import EnhancedProductManagement from "../components/EnhancedProductManagement";
+import { RegulatoryConfigModule } from "./RegulatoryConfigModule";
+import { BusinessProgrammingInterface } from "./BusinessProgrammingInterface";
+import { SupervisionInterface } from "./SupervisionInterface";
+import { HardwareConfigModule } from "./HardwareConfigModule";
 import type { POSCategory } from "../types";
 
 export function POSSettings() {
@@ -193,19 +197,34 @@ export function POSSettings() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-11">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="general">Général</TabsTrigger>
-          <TabsTrigger value="products">Produits</TabsTrigger>
-          <TabsTrigger value="categories">Catégories</TabsTrigger>
-          <TabsTrigger value="keyboards">Claviers</TabsTrigger>
-          <TabsTrigger value="fiscal">Fiscal</TabsTrigger>
-          <TabsTrigger value="journal">Journal ISCA</TabsTrigger>
-          <TabsTrigger value="fne">FNE DGI</TabsTrigger>
-          <TabsTrigger value="payment">Paiements</TabsTrigger>
-          <TabsTrigger value="taxes">Taxes</TabsTrigger>
-          <TabsTrigger value="receipt">Reçus</TabsTrigger>
-          <TabsTrigger value="printer">Imprimante</TabsTrigger>
+          <TabsTrigger value="regulatory">Réglementaire</TabsTrigger>
+          <TabsTrigger value="business">Métier</TabsTrigger>
+          <TabsTrigger value="supervision">Supervision</TabsTrigger>
+          <TabsTrigger value="hardware">Matériel</TabsTrigger>
+          <TabsTrigger value="advanced">Avancé</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="regulatory" className="space-y-4">
+          <RegulatoryConfigModule />
+        </TabsContent>
+
+        <TabsContent value="business" className="space-y-4">
+          <BusinessProgrammingInterface />
+        </TabsContent>
+
+        <TabsContent value="supervision" className="space-y-4">
+          <SupervisionInterface />
+        </TabsContent>
+
+        <TabsContent value="hardware" className="space-y-4">
+          <HardwareConfigModule />
+        </TabsContent>
+
+        <TabsContent value="advanced" className="space-y-4">
+          {/* Keep existing advanced tabs */}
+        </TabsContent>
 
         <TabsContent value="general" className="space-y-4">
           <Card>
