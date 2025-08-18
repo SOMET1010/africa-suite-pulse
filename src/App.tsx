@@ -3,9 +3,9 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ToastProvider } from '@/components/ui/toast-provider';
 
 // Import the complete routing system
 import { AppRoutes } from '@/routes';
@@ -41,8 +41,9 @@ function App() {
           <BrowserRouter>
             <OrgProvider>
               <POSAuthProvider>
-                <AppRoutes />
-                <Toaster />
+                <ToastProvider>
+                  <AppRoutes />
+                </ToastProvider>
               </POSAuthProvider>
             </OrgProvider>
           </BrowserRouter>

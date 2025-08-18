@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "@/components/ui/toast-unified";
+import { toast } from "@/components/ui/unified-toast";
 import type { POSCategory } from "../types";
 
 interface ImportExportDialogProps {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MessageCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/toast-unified';
+import { toast } from '@/components/ui/unified-toast';
 
 interface WhatsAppButtonProps {
   reservationId: string;

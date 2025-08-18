@@ -1,5 +1,5 @@
 import { Outlet, Route, Routes } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import Dashboard from "@/pages/Dashboard";
 import Index from "@/pages/Index";
 import ArrivalsPage from "@/pages/ArrivalsPage";
@@ -81,6 +81,17 @@ function Layout() {
 }
 
 export function AppRoutes() {
+  // Use optimized routes
+  const OptimizedRoutes = lazy(() => import("@/routes-optimized").then(m => ({ default: m.AppRoutes })));
+  
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-pearl flex items-center justify-center">Chargement...</div>}>
+      <OptimizedRoutes />
+    </Suspense>
+  );
+}
+
+export function AppRoutesLegacy() {
   return (
     <Routes>
       <Route path="/welcome" element={<AuthLanding />} />

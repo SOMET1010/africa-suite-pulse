@@ -1,7 +1,7 @@
 import React from 'react';
-import { DashboardChartsReal } from './DashboardChartsReal';
+import { DashboardCharts as DashboardChartsLazy } from './DashboardChartsLazy';
 
-// Version avec vrais charts
+// Version optimisée avec lazy loading
 export function DashboardCharts() {
-  return <DashboardChartsReal />;
+  return <DashboardChartsLazy />;
 }

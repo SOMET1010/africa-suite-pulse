@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { QrCode, Copy, ExternalLink } from "lucide-react";
-import { toast } from "@/components/ui/toast-unified";
+import { toast } from "@/components/ui/unified-toast";
 import { QRCodeSVG } from "qrcode.react";
 
 interface FNEQRCodeProps {

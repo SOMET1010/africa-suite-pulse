@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Printer, Eye, Copy } from "lucide-react";
 import { usePOSTicketPrinting } from "../hooks/usePOSTicketPrinting";
 import { FNETicketSection } from "./FNETicketSection";
-import { toast } from "@/components/ui/toast-unified";
+import { toast } from "@/components/ui/unified-toast";
 
 interface OrderTicketPreviewProps {
   orderId: string;

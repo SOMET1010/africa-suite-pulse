@@ -4,21 +4,20 @@ import { QueryClient } from '@tanstack/react-query';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Cache optimisé pour le rack - 5 minutes par défaut
-      staleTime: 5 * 60 * 1000,
-      // Garde en cache plus longtemps pour éviter les re-fetch
-      gcTime: 15 * 60 * 1000, // Augmenté de 10 à 15 minutes
+      // Cache optimisé selon la charte - 1 minute stale, 5 minutes GC
+      staleTime: 60 * 1000, // 1 minute
+      gcTime: 5 * 60 * 1000, // 5 minutes
       // Retry stratégique pour éviter les surcharges
       retry: (failureCount, error: any) => {
         // Ne pas retry les erreurs 4xx (bad request, unauthorized, etc.)
         if (error?.status >= 400 && error?.status < 500) return false;
-        return failureCount < 1;
+        return failureCount < 2; // Max 2 retries
       },
       // Performance optimisée - pas de refetch sur focus
       refetchOnWindowFocus: false,
-      // Reconnect intelligent avec throttling
+      // Reconnect intelligent
       refetchOnReconnect: 'always',
-      // Background refetch désactivé par défaut (activé per query si nécessaire)
+      // Background refetch désactivé par défaut
       refetchInterval: false,
       // Smart mounting - évite les refetch inutiles
       refetchOnMount: (query) => {
@@ -29,7 +28,7 @@ export const queryClient = new QueryClient({
     mutations: {
       // Retry les mutations échouées 1 fois seulement
       retry: 1,
-      // Timeout optimisé pour les mutations
+      // Network mode online pour éviter les mutations hors ligne
       networkMode: 'online',
     },
   },

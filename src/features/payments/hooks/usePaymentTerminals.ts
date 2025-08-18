@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useToast } from "@/components/ui/toast-unified";
+import { useToast } from "@/components/ui/unified-toast";
 import { useDebouncedCallback } from "use-debounce";
 import { getErrorMessage } from "@/utils/errorHandling";
 import type { PaymentTerminal, PaymentTerminalInsert } from "@/types/payments";
