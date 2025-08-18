@@ -20,6 +20,7 @@ import {
 import { logger } from '@/lib/logger';
 import { CashVisualizer } from '@/components/pos/CashVisualizer';
 import { usePOSPayment } from '../hooks/usePOSPayment';
+import { ChangeManagementDialog } from './ChangeManagementDialog';
 import type { CartItem, POSOrder } from '../types';
 
 interface ModernPaymentDialogProps {
@@ -56,6 +57,8 @@ export function ModernPaymentDialog({
     validatePayment,
     getChangeAmount,
     printTicketManually,
+    completeChangeManagement,
+    finalizePaymentWithPrinting,
     isProcessing,
     isPrinting
   } = usePOSPayment(order.org_id);
@@ -111,11 +114,21 @@ export function ModernPaymentDialog({
         reference: paymentState.reference
       });
 
-      onPaymentComplete();
-      onClose();
+      // Don't close dialog immediately if change management is required
+      if (paymentState.changeManagementStep !== 'required') {
+        onPaymentComplete();
+        onClose();
+      }
     } catch (error) {
       // Error is handled in the hook
     }
+  };
+
+  const handleChangeManagementComplete = () => {
+    completeChangeManagement();
+    finalizePaymentWithPrinting(order.id, paymentState.pendingInvoice);
+    onPaymentComplete();
+    onClose();
   };
 
   const quickAmounts = [
@@ -392,6 +405,16 @@ export function ModernPaymentDialog({
           </div>
         </div>
       </DialogContent>
+
+      {/* Change Management Dialog */}
+      <ChangeManagementDialog
+        isOpen={paymentState.changeManagementStep === 'required'}
+        onClose={() => {}}
+        onConfirmChange={handleChangeManagementComplete}
+        amountReceived={paymentState.amountReceived}
+        totalAmount={totals.total}
+        changeAmount={getChangeAmount(totals.total)}
+      />
     </Dialog>
   );
 }

@@ -14,6 +14,8 @@ interface PaymentState {
   reference?: string;
   isProcessing: boolean;
   printStatus?: 'idle' | 'printing' | 'success' | 'failed';
+  changeManagementStep?: 'none' | 'required' | 'completed';
+  pendingInvoice?: any;
 }
 
 interface ProcessPaymentInput {
@@ -37,7 +39,9 @@ export function usePOSPayment(orgId: string) {
     amountReceived: 0,
     reference: '',
     isProcessing: false,
-    printStatus: 'idle'
+    printStatus: 'idle',
+    changeManagementStep: 'none',
+    pendingInvoice: null
   });
 
   const queryClient = useQueryClient();
@@ -108,35 +112,28 @@ export function usePOSPayment(orgId: string) {
       // 3. Complete the order
       await completeOrderMutation.mutateAsync(input.orderId);
 
-      // 4. Attempt automatic ticket printing
-      setPaymentState(prev => ({ ...prev, printStatus: 'printing' }));
+      // 4. Check if change management is needed for cash payments
+      const selectedMethod = paymentMethods.find(m => m.id === input.methodId);
+      const changeAmount = getChangeAmount(input.totals.total);
       
-      try {
-        printTicket({ orderId: input.orderId });
-        setPaymentState(prev => ({ ...prev, printStatus: 'success' }));
+      if (selectedMethod?.kind === 'cash' && changeAmount > 0) {
+        // Cash payment with change - require change management
+        setPaymentState(prev => ({ 
+          ...prev, 
+          isProcessing: false, 
+          changeManagementStep: 'required',
+          pendingInvoice: invoice,
+          printStatus: 'idle'
+        }));
         
         toast({
           title: "Paiement réussi",
-          description: `Commande payée et ticket imprimé. Facture: ${invoice.id}`,
+          description: `Commande payée. Gérez la monnaie à rendre: ${changeAmount} FCFA`,
         });
-      } catch (printError) {
-        logger.warn('Automatic printing failed', { printError, orderId: input.orderId });
-        setPaymentState(prev => ({ ...prev, printStatus: 'failed' }));
-        
-        toast({
-          title: "Paiement réussi",
-          description: `Commande payée avec succès. Facture: ${invoice.id}. Impression échouée - utilisez le bouton d'impression manuelle.`,
-        });
+      } else {
+        // No change needed - proceed with printing
+        await finalizePaymentWithPrinting(input.orderId, invoice);
       }
-
-      // Reset payment state (keep print status for UI feedback)
-      setPaymentState(prev => ({
-        selectedMethodId: '',
-        amountReceived: 0,
-        reference: '',
-        isProcessing: false,
-        printStatus: prev.printStatus
-      }));
 
       return { invoice, success: true };
 
@@ -190,6 +187,45 @@ export function usePOSPayment(orgId: string) {
     return 0;
   };
 
+  // Finalize payment with printing (after change management)
+  const finalizePaymentWithPrinting = async (orderId: string, invoice?: any) => {
+    setPaymentState(prev => ({ ...prev, printStatus: 'printing' }));
+    
+    try {
+      printTicket({ orderId });
+      setPaymentState(prev => ({ ...prev, printStatus: 'success' }));
+      
+      toast({
+        title: "Ticket imprimé",
+        description: `Commande finalisée et ticket imprimé. Facture: ${invoice?.id || 'N/A'}`,
+      });
+    } catch (printError) {
+      logger.warn('Automatic printing failed', { printError, orderId });
+      setPaymentState(prev => ({ ...prev, printStatus: 'failed' }));
+      
+      toast({
+        title: "Impression échouée",
+        description: `Commande finalisée. Facture: ${invoice?.id || 'N/A'}. Utilisez l'impression manuelle.`,
+      });
+    }
+  };
+
+  // Complete change management and finalize payment
+  const completeChangeManagement = () => {
+    const { pendingInvoice } = paymentState;
+    setPaymentState(prev => ({ 
+      ...prev, 
+      changeManagementStep: 'completed',
+      selectedMethodId: '',
+      amountReceived: 0,
+      reference: '',
+      pendingInvoice: null
+    }));
+    
+    // Find the current order ID - we need to pass it from the dialog
+    // For now, we'll need to modify the dialog to pass the orderId
+  };
+
   // Manual print function
   const printTicketManually = (orderId: string) => {
     setPaymentState(prev => ({ ...prev, printStatus: 'printing' }));
@@ -205,6 +241,8 @@ export function usePOSPayment(orgId: string) {
     validatePayment,
     getChangeAmount,
     printTicketManually,
+    completeChangeManagement,
+    finalizePaymentWithPrinting,
     isProcessing: paymentState.isProcessing || createTransactionMutation.isPending || completeOrderMutation.isPending,
     isPrinting: isPrinting || paymentState.printStatus === 'printing'
   };
