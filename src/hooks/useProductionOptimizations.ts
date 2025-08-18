@@ -30,6 +30,9 @@ export function useProductionOptimizations() {
     // Performance monitoring
     setupPerformanceMonitoring();
     
+    // Network error handling
+    setupNetworkErrorHandling();
+    
     return () => {
       // Cleanup
       if (typeof window !== 'undefined') {
@@ -275,6 +278,39 @@ export function useErrorMonitoring() {
 /**
  * Memory monitoring hook
  */
+/**
+ * Network error handling setup
+ */
+function setupNetworkErrorHandling() {
+  if (typeof window === 'undefined') return;
+  
+  let failedRequests = 0;
+  const maxFailures = 3;
+  
+  // Monitor fetch failures
+  const originalFetch = window.fetch;
+  window.fetch = async (...args) => {
+    try {
+      const response = await originalFetch(...args);
+      if (!response.ok && response.status >= 500) {
+        failedRequests++;
+        if (failedRequests >= maxFailures) {
+          logger.warn('Multiple network failures detected', { count: failedRequests });
+        }
+      } else {
+        failedRequests = Math.max(0, failedRequests - 1);
+      }
+      return response;
+    } catch (error) {
+      failedRequests++;
+      if (failedRequests >= maxFailures) {
+        logger.error('Network connectivity issues', { error: (error as Error).message });
+      }
+      throw error;
+    }
+  };
+}
+
 export function useMemoryMonitoring() {
   useEffect(() => {
     if (typeof window === 'undefined' || !(performance as any).memory) return;
