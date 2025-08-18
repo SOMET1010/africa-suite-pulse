@@ -44,24 +44,29 @@ export function RoomChargeDialog({
     
     setIsLoading(true);
     try {
+      // Recherche d'une réservation active pour cette chambre
       const { data, error } = await supabase
         .from('reservations')
-        .select('id, status')
+        .select(`
+          id, status, guest_id,
+          guests(first_name, last_name, email),
+          rooms(number)
+        `)
+        .eq('rooms.number', roomNumber)
         .eq('status', 'present')
-        .limit(1)
         .maybeSingle();
       
-      if (error) {
+      if (error || !data) {
         toast.error("Aucune réservation active trouvée pour cette chambre");
         return;
       }
       
       setReservation(data);
-      setGuestName(`Client Chambre ${roomNumber}`);
+      setGuestName(`${data.guests?.first_name || ''} ${data.guests?.last_name || ''}`.trim() || `Client Chambre ${roomNumber}`);
       
       toast.success(`Réservation trouvée - Chambre ${roomNumber} - Client présent`);
     } catch (error) {
-      
+      console.error('Search reservation error:', error);
       toast.error("Erreur lors de la recherche de la réservation");
     } finally {
       setIsLoading(false);
@@ -82,14 +87,31 @@ export function RoomChargeDialog({
           `${item.product_name} x${item.quantity} = ${item.total_price.toLocaleString()} XOF`
         ).join('\n');
 
-      // Process room charge
+      // Créer la room charge dans la base de données
+      const { data: roomCharge, error } = await supabase
+        .from('room_charges')
+        .insert({
+          room_id: reservation.room_id,
+          guest_id: reservation.guest_id,
+          amount: amount,
+          description: description,
+          charge_date: new Date().toISOString(),
+          status: 'pending',
+          guest_signature: signature,
+          order_data: { items: orderItems }
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
       toast.success(`Room Charge créé - ${amount.toLocaleString()} XOF facturée à la chambre ${roomNumber}`);
 
       onSuccess();
       onOpenChange(false);
       resetForm();
     } catch (error) {
-      
+      console.error('Process room charge error:', error);
       toast.error("Erreur lors du traitement du Room Charge");
     } finally {
       setIsLoading(false);
