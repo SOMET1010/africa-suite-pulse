@@ -7748,6 +7748,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_user_role_safe: {
+        Args: { p_role: string; p_user_id: string }
+        Returns: boolean
+      }
       cleanup_old_fne_logs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -8106,6 +8110,10 @@ export type Database = {
       }
       get_user_org_id_for_views: {
         Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_user_org_id_safe: {
+        Args: { p_user_id: string }
         Returns: string
       }
       has_permission: {
