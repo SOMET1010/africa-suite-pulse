@@ -32,7 +32,7 @@ import OperationsPage from "@/pages/OperationsPage";
 import MaintenancePage from "@/pages/MaintenancePage";
 import HousekeepingPage from "@/pages/HousekeepingPage";
 // Night audit now lazy loaded
-import POSLoginPage from "@/features/pos/auth/POSLoginPage";
+import POSLoginSecurePage from "@/pages/POSLoginSecurePage";
 import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
 import POSAfricanPage from "@/pages/POSAfricanPage";
 // Import lazy-loaded components for performance
@@ -96,7 +96,7 @@ export function AppRoutesLegacy() {
     <Routes>
       <Route path="/welcome" element={<AuthLanding />} />
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/pos/login" element={<POSLoginPage />} />
+      <Route path="/pos/login" element={<POSLoginSecurePage />} />
       {/* Special pages that need direct auth without Layout wrapper */}
       <Route index element={<RequireAuth><Index /></RequireAuth>} />
       

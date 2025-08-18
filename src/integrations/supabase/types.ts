@@ -7753,15 +7753,12 @@ export type Database = {
         Returns: string
       }
       authenticate_pos_user: {
-        Args:
-          | { p_org_id: string; p_pin: string }
-          | { p_org_id: string; p_pin: string; p_user_id: string }
+        Args: { p_org_id: string; p_pin: string; p_user_id: string }
         Returns: {
           display_name: string
-          org_id: string
-          role: string
-          session_token: string
-          user_id: string
+          employee_code: string
+          pos_user_id: string
+          role_name: string
         }[]
       }
       auto_assign_all_tables_to_server: {

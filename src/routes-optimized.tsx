@@ -10,7 +10,7 @@ import Index from "@/pages/Index";
 import AuthPage from "@/pages/AuthPage";
 import AuthLanding from "@/pages/AuthLanding";
 import NotFoundPage from "@/pages/NotFoundPage";
-import POSLoginPage from "@/features/pos/auth/POSLoginPage";
+import POSLoginSecurePage from "@/pages/POSLoginSecurePage";
 
 // ===== CORE BUSINESS ROUTES (Lazy-loaded for performance) =====
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -103,7 +103,8 @@ export function AppRoutes() {
       {/* ===== PUBLIC ROUTES ===== */}
       <Route path="/welcome" element={<AuthLanding />} />
       <Route path="/auth" element={<AuthPage />} />
-      <Route path="/pos/login" element={<POSLoginPage />} />
+      <Route path="/pos/login" element={<POSLoginSecurePage />} />
+      <Route path="/pos/login-secure" element={<POSLoginSecurePage />} />
       
       {/* ===== ENTRY POINT ===== */}
       <Route index element={<RequireAuth><Index /></RequireAuth>} />
