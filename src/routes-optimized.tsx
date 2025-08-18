@@ -125,6 +125,31 @@ export function AppRoutes() {
         </RequireAuth>
       } />
       
+      {/* ===== ROLE-BASED DASHBOARDS ===== */}
+      <Route path="dashboard/receptionist" element={
+        <RequireAuth>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <ReceptionistDashboard />
+          </Suspense>
+        </RequireAuth>
+      } />
+      
+      <Route path="dashboard/server" element={
+        <RequireAuth>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <ServerDashboard />
+          </Suspense>
+        </RequireAuth>
+      } />
+      
+      <Route path="dashboard/manager" element={
+        <RequireAuth>
+          <Suspense fallback={<DashboardSkeleton />}>
+            <ManagerDashboard />
+          </Suspense>
+        </RequireAuth>
+      } />
+      
       {/* ===== RACK & RESERVATIONS ===== */}
       <Route path="reservations" element={
         <RequireAuth>
