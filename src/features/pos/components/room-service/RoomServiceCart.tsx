@@ -29,6 +29,15 @@ interface CartTotals {
   total: number;
 }
 
+// Mock reservation type for room service
+interface ReservationForBilling {
+  id: string;
+  room_number: string;
+  guest_name: string;
+  adults: number;
+  children: number;
+}
+
 interface RoomServiceCartProps {
   items: LocalCartItem[];
   totals: CartTotals;

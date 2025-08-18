@@ -1,8 +1,24 @@
 import { useState, useCallback } from "react";
 import { toast } from "@/hooks/use-toast";
-import type { CartItem } from "../../types";
-import type { ReservationForBilling } from "@/features/billing/hooks/useReservations";
 import type { DeliveryOptions } from "./RoomServiceDeliveryOptions";
+
+// Local types for room service
+interface LocalCartItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+}
+
+interface ReservationForBilling {
+  id: string;
+  room_number: string;
+  guest_name: string;
+  adults: number;
+  children: number;
+}
 
 interface UseRoomServiceLogicProps {
   reservation: ReservationForBilling | null;
@@ -17,7 +33,7 @@ interface CartTotals {
 }
 
 export function useRoomServiceLogic({ reservation }: UseRoomServiceLogicProps) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<LocalCartItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [deliveryOptions, setDeliveryOptions] = useState<DeliveryOptions>({
     priority: 'normal',
@@ -53,7 +69,7 @@ export function useRoomServiceLogic({ reservation }: UseRoomServiceLogicProps) {
   const totals = calculateTotals();
 
   const handleAddToCart = useCallback((product: any) => {
-    const newItem: CartItem = {
+    const newItem: LocalCartItem = {
       id: `${product.id}-${Date.now()}`,
       product_id: product.id,
       product_name: product.name,
