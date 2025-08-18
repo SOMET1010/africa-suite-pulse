@@ -8267,6 +8267,10 @@ export type Database = {
         Args: { p_audit_date: string }
         Returns: string
       }
+      test_final_pos_auth: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       update_audit_checkpoint: {
         Args: {
           p_checkpoint_id: string
