@@ -7948,6 +7948,10 @@ export type Database = {
         }
         Returns: string
       }
+      ensure_pos_roles: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       generate_fiscal_archive: {
         Args: {
           p_archive_type: string
@@ -8433,6 +8437,10 @@ export type Database = {
       secure_pos_logout: {
         Args: { p_session_token: string }
         Returns: undefined
+      }
+      simple_pos_hash: {
+        Args: { pin_text: string }
+        Returns: string
       }
       start_night_audit: {
         Args: { p_audit_date: string }
