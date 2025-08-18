@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/ui/toast-provider';
 
 // Import the complete routing system
-import { AppRoutes } from '@/routes';
+import { AppRoutes } from '@/routes-optimized';
 
 // Core auth
 import { OrgProvider } from '@/core/auth/OrgProvider';

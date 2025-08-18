@@ -169,22 +169,22 @@ export class GlobalSearchService {
       {
         id: 'new-guest',
         title: 'Nouveau Client',
-        action: () => window.location.href = '/guests/new'
+        route: '/guests/new'
       },
       {
         id: 'new-reservation',
         title: 'Nouvelle Réservation',
-        action: () => window.location.href = '/rack/new-reservation'
+        route: '/rack/new-reservation'
       },
       {
         id: 'pos-order',
         title: 'Commande Restaurant',
-        action: () => window.location.href = '/pos'
+        route: '/pos'
       },
       {
         id: 'housekeeping',
         title: 'Ménage',
-        action: () => window.location.href = '/housekeeping'
+        route: '/housekeeping'
       }
     ];
   }

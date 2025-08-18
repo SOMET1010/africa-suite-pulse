@@ -165,7 +165,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   handleGoHome = () => {
     logger.audit('Navigation to home triggered by error boundary');
-    window.location.href = '/';
+    window.location.replace('/');
   };
 
   renderError = () => {

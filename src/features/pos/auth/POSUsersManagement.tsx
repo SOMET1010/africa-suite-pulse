@@ -8,6 +8,7 @@ import { useOrgId } from "@/core/auth/useOrg";
 import { User, Clock, LogOut, Plus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
+import { useNavigate } from "react-router-dom";
 
 interface POSUser {
   id: string;
@@ -29,6 +30,7 @@ export default function POSUsersManagement() {
   const [loading, setLoading] = useState(true);
   const { session, isManager } = usePOSAuth();
   const { orgId } = useOrgId();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (orgId) {
@@ -248,7 +250,7 @@ export default function POSUsersManagement() {
                   {roleLabels[session.role]} • Connecté depuis {new Date(session.login_time).toLocaleString()}
                 </p>
               </div>
-              <Button variant="outline" size="sm" onClick={() => window.location.href = "/pos/login"}>
+              <Button variant="outline" size="sm" onClick={() => navigate("/pos/login")}>
                 <LogOut className="w-4 h-4 mr-2" />
                 Changer d'utilisateur
               </Button>
