@@ -7614,8 +7614,8 @@ export type Database = {
       }
       authenticate_pos_user: {
         Args:
+          | { p_org_id: string; p_pin: string }
           | { p_org_id: string; p_pin: string; p_user_id: string }
-          | { p_org_id?: string; p_pin: string }
         Returns: {
           display_name: string
           employee_code: string
@@ -8006,6 +8006,17 @@ export type Database = {
           org_id: string
           setting_key: string
           setting_value: Json
+        }[]
+      }
+      get_pos_user_safe: {
+        Args: { p_user_id: string }
+        Returns: {
+          display_name: string
+          is_active: boolean
+          org_id: string
+          outlet_id: string
+          role_name: string
+          user_id: string
         }[]
       }
       get_rack_data_optimized: {
