@@ -37,22 +37,10 @@ export function usePOSAuth() {
       
       logger.debug("POS auth initialization - SINGLE INIT");
       
-      // Check for existing POS session using secure validation
-      const storedSession = sessionStorage.getItem("pos_session");
-      if (storedSession) {
-        logger.debug("POS session found in storage");
-        try {
-          const parsedSession = JSON.parse(storedSession) as POSSession;
-          validateStoredSession(parsedSession);
-        } catch (error) {
-          logger.error("Error parsing POS session", error);
-          clearSession();
-          updateGlobalLoading(false);
-        }
-      } else {
-        logger.debug("No POS session found");
-        updateGlobalLoading(false);
-      }
+      // Clear any existing session to force fresh login
+      logger.debug("Clearing existing POS session for fresh login");
+      clearSession();
+      updateGlobalLoading(false);
     }
     
     // Cleanup function
