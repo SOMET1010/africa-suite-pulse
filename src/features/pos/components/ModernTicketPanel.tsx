@@ -350,11 +350,11 @@ export function ModernTicketPanel({
           <Button
             onClick={onCheckout}
             disabled={items.length === 0}
-            className="w-full h-12 text-base font-semibold shadow-soft transition-elegant hover:scale-[1.02]"
+            className="w-full h-12 text-base font-semibold shadow-soft transition-elegant hover:scale-[1.02] bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
             size="lg"
           >
             <CreditCard className="h-4 w-4 mr-2" />
-            Encaisser {totals.total.toLocaleString()} F
+            Demander l'addition
           </Button>
 
           <div className="grid grid-cols-2 gap-2">
