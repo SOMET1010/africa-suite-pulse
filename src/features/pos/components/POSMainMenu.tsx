@@ -14,14 +14,25 @@ import {
   ClipboardList,
   LogOut,
   Calendar,
-  Clock
+  Clock,
+  Utensils
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   {
+    id: "room-service",
+    title: "Room Service 🛎️",
+    description: "Commandes en chambre avec livraison",
+    icon: Utensils,
+    path: "/pos/room-service",
+    color: "bg-gradient-to-r from-orange-500 to-amber-500",
+    requiredRole: "pos_server",
+    isNew: true
+  },
+  {
     id: "african",
-    title: "POS Africain 🇨🇮",
+    title: "POS Africain 🇨🇮", 
     description: "Interface ultra-optimisée style Café de Cocody",
     icon: ShoppingCart,
     path: "/pos/african",
