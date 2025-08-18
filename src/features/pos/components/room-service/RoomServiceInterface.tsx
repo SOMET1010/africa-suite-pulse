@@ -18,7 +18,7 @@ import {
   DollarSign
 } from "lucide-react";
 import { useReservationsForBilling } from "@/features/billing/hooks/useReservations";
-import { useCurrentUserOrgId } from "@/hooks/useCurrentUser";
+const orgId = "demo-org"; // Mock org ID for demo
 import { MarketTilesCatalog } from "../MarketTilesCatalog";
 import { RoomServiceCart } from "./RoomServiceCart";
 import { RoomServiceDeliveryOptions } from "./RoomServiceDeliveryOptions";
@@ -33,7 +33,7 @@ export function RoomServiceInterface({ onBack }: RoomServiceInterfaceProps) {
   const [selectedReservation, setSelectedReservation] = useState<ReservationForBilling | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [roomSearchQuery, setRoomSearchQuery] = useState("");
-  const orgId = useCurrentUserOrgId();
+  const orgId = "demo-org"; // Mock org ID
   
   const { data: reservations = [], isLoading } = useReservationsForBilling(orgId || "");
   

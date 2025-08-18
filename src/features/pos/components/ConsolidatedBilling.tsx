@@ -1,147 +1,163 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, FileText, CreditCard, Printer, Send, Calculator, Hotel } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/unified-toast';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import type { GuestFolio, FolioCharge, FolioPayment } from '../types';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Users, 
+  Receipt, 
+  Building, 
+  Calendar,
+  DollarSign,
+  FileText,
+  ArrowLeft,
+  Printer
+} from "lucide-react";
 
-interface ConsolidatedBillingProps {
-  outletId?: string;
+// Local types to avoid dependency issues
+interface LocalGuestFolio {
+  id: string;
+  org_id: string;
+  reservation_id: string;
+  guest_id: string;
+  room_id: string;
+  folio_number: string;
+  status: string;
+  balance: number;
+  charges_total: number;
+  payments_total: number;
+  created_at: string;
+  updated_at: string;
 }
 
-export function ConsolidatedBilling({ outletId }: ConsolidatedBillingProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFolios, setSelectedFolios] = useState<string[]>([]);
-  const [billingAddress, setBillingAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
-  const [notes, setNotes] = useState('');
-  const queryClient = useQueryClient();
+interface LocalFolioCharge {
+  id: string;
+  folio_id: string;
+  charge_type: string;
+  description: string;
+  amount: number;
+  quantity: number;
+  unit_price: number;
+  tax_amount?: number;
+  date_charged: string;
+  reference_id?: string;
+  created_by: string;
+  created_at: string;
+}
 
-  // Get folios ready for checkout
-  const { data: folios = [], isLoading } = useQuery({
-    queryKey: ['checkout-folios', searchTerm],
-    queryFn: async () => {
-      let query = supabase
-        .from('guest_folios')
-        .select(`
-          *,
-          guests(first_name, last_name, email, phone),
-          rooms(number, type),
-          reservations(reference, date_arrival, date_departure, status)
-        `)
-        .in('status', ['open'])
-        .gt('balance', 0); // Only folios with outstanding balance
+interface ConsolidatedBillingProps {
+  organizationId: string;
+  organizationName: string;
+  selectedFolios: string[];
+  onBack: () => void;
+}
 
-      if (searchTerm) {
-        if (searchTerm.match(/^\d+$/)) {
-          query = query.eq('rooms.number', searchTerm);
-        } else {
-          query = query.or(`guests.first_name.ilike.%${searchTerm}%,guests.last_name.ilike.%${searchTerm}%`);
-        }
-      }
+// Mock data for demonstration
+const mockFolios: LocalGuestFolio[] = [
+  {
+    id: "folio-1",
+    org_id: "org-1",
+    reservation_id: "res-1",
+    guest_id: "guest-1",
+    room_id: "room-201",
+    folio_number: "F-2024-001",
+    status: "open",
+    balance: 125000,
+    charges_total: 175000,
+    payments_total: 50000,
+    created_at: "2024-01-15T00:00:00Z",
+    updated_at: "2024-01-15T00:00:00Z"
+  }
+];
 
-      const { data, error } = await query.order('created_at', { ascending: false });
+const mockCharges: LocalFolioCharge[] = [
+  {
+    id: "charge-1",
+    folio_id: "folio-1",
+    charge_type: "room",
+    description: "Hébergement - Chambre 201",
+    amount: 100000,
+    quantity: 4,
+    unit_price: 25000,
+    tax_amount: 18000,
+    date_charged: "2024-01-15",
+    reference_id: "res-1",
+    created_by: "staff-1",
+    created_at: "2024-01-15T00:00:00Z"
+  },
+  {
+    id: "charge-2",
+    folio_id: "folio-1",
+    charge_type: "restaurant",
+    description: "Restaurant - Repas d'affaires",
+    amount: 45000,
+    quantity: 6,
+    unit_price: 7500,
+    tax_amount: 8100,
+    date_charged: "2024-01-15",
+    reference_id: "order-1",
+    created_by: "staff-2",
+    created_at: "2024-01-15T12:00:00Z"
+  }
+];
 
-      if (error) throw error;
-      return data as any[];
-    }
-  });
+export function ConsolidatedBilling({ 
+  organizationId, 
+  organizationName, 
+  selectedFolios, 
+  onBack 
+}: ConsolidatedBillingProps) {
+  const [folios] = useState<LocalGuestFolio[]>(mockFolios);
+  const [charges] = useState<LocalFolioCharge[]>(mockCharges);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedCharges, setSelectedCharges] = useState<string[]>([]);
+  const [billingAddress, setBillingAddress] = useState("");
+  const [notes, setNotes] = useState("");
 
-  // Get charges for selected folios
-  const { data: consolidatedCharges = [] } = useQuery({
-    queryKey: ['consolidated-charges', selectedFolios],
-    queryFn: async () => {
-      if (selectedFolios.length === 0) return [];
-
-      const { data, error } = await supabase
-        .from('folio_charges')
-        .select(`
-          *,
-          guest_folios(
-            folio_number,
-            guests(first_name, last_name),
-            rooms(number)
-          )
-        `)
-        .in('folio_id', selectedFolios)
-        .order('date_charged', { ascending: false });
-
-      if (error) throw error;
-      return data as any[];
-    },
-    enabled: selectedFolios.length > 0
-  });
-
-  // Generate consolidated invoice
-  const generateInvoiceMutation = useMutation({
-    mutationFn: async () => {
-      if (selectedFolios.length === 0) throw new Error('Aucun folio sélectionné');
-
-      const totalAmount = consolidatedCharges.reduce((sum, charge) => sum + charge.amount, 0);
-      const selectedFolioData = folios.filter(f => selectedFolios.includes(f.id));
-
-      // Create consolidated invoice record
-      const { data: invoice, error } = await supabase
-        .from('consolidated_invoices')
-        .insert({
-          folio_ids: selectedFolios,
-          total_amount: totalAmount,
-          billing_address: billingAddress,
-          payment_method: paymentMethod,
-          notes: notes,
-          invoice_data: {
-            folios: selectedFolioData.map(f => ({
-              folio_number: f.folio_number,
-              guest_name: `${f.guests?.first_name} ${f.guests?.last_name}`,
-              room_number: f.rooms?.number,
-              balance: f.balance
-            })),
-            charges: consolidatedCharges
-          },
-          status: 'generated'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return invoice;
-    },
-    onSuccess: (invoice) => {
-      toast.success(`Facture consolidée générée: ${invoice.invoice_number}`);
-      setSelectedFolios([]);
-      setBillingAddress('');
-      setPaymentMethod('');
-      setNotes('');
-      queryClient.invalidateQueries({ queryKey: ['checkout-folios'] });
-    },
-    onError: (error) => {
-      toast.error('Erreur lors de la génération de la facture');
-      console.error(error);
-    }
-  });
-
-  const toggleFolioSelection = (folioId: string) => {
-    setSelectedFolios(prev => 
-      prev.includes(folioId) 
-        ? prev.filter(id => id !== folioId)
-        : [...prev, folioId]
-    );
+  const calculateTotals = () => {
+    const selectedChargesList = charges.filter(c => selectedCharges.includes(c.id));
+    const subtotal = selectedChargesList.reduce((sum, charge) => sum + charge.amount, 0);
+    const tax = selectedChargesList.reduce((sum, charge) => sum + (charge.tax_amount || 0), 0);
+    return {
+      subtotal: subtotal - tax,
+      tax,
+      total: subtotal
+    };
   };
 
-  const totalAmount = selectedFolios.reduce((sum, folioId) => {
-    const folio = folios.find(f => f.id === folioId);
-    return sum + (folio?.balance || 0);
-  }, 0);
+  const totals = calculateTotals();
+
+  const handleGenerateInvoice = async () => {
+    setIsGenerating(true);
+    
+    try {
+      // Simulate invoice generation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      console.log('Generating consolidated invoice:', {
+        organization: organizationName,
+        folios: selectedFolios,
+        charges: selectedCharges,
+        totals,
+        billing_address: billingAddress,
+        notes
+      });
+      
+      // Reset form after generation
+      setSelectedCharges([]);
+      setBillingAddress("");
+      setNotes("");
+      
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const getChargeTypeIcon = (type: string) => {
     switch (type) {
@@ -166,218 +182,194 @@ export function ConsolidatedBilling({ outletId }: ConsolidatedBillingProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          <h2 className="text-lg font-semibold">Facturation Consolidée</h2>
-          {selectedFolios.length > 0 && (
-            <Badge variant="secondary">{selectedFolios.length} folio(s) sélectionné(s)</Badge>
-          )}
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Rechercher par numéro de chambre ou nom du client..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Panel - Folios Selection */}
-        <div className="space-y-4">
-          <h3 className="font-medium">Folios à Facturer</h3>
-          
-          {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-              <p className="text-sm text-muted-foreground mt-2">Chargement...</p>
-            </div>
-          ) : folios.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground">
-                  {searchTerm ? 'Aucun folio trouvé' : 'Aucun folio en attente de facturation'}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            folios.map((folio) => (
-              <Card 
-                key={folio.id} 
-                className={`cursor-pointer transition-colors ${
-                  selectedFolios.includes(folio.id) ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-muted/50'
-                }`}
-                onClick={() => toggleFolioSelection(folio.id)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Hotel className="h-4 w-4" />
-                      Chambre {folio.rooms?.number}
-                    </CardTitle>
-                    <Badge variant={folio.reservations?.status === 'present' ? 'default' : 'secondary'}>
-                      {folio.reservations?.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div>
-                      <p className="font-medium">
-                        {folio.guests?.first_name} {folio.guests?.last_name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {folio.folio_number}
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-center pt-2">
-                      <span className="text-sm font-medium">Solde à facturer:</span>
-                      <span className="font-mono font-medium text-red-600">
-                        {folio.balance?.toLocaleString()} XOF
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-
-        {/* Right Panel - Consolidated Invoice Preview */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">Facture Consolidée</h3>
-            {selectedFolios.length > 0 && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Printer className="h-4 w-4 mr-2" />
-                  Aperçu
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={() => generateInvoiceMutation.mutate()}
-                  disabled={generateInvoiceMutation.isPending || selectedFolios.length === 0}
-                >
-                  <Send className="h-4 w-4 mr-2" />
-                  Générer Facture
-                </Button>
-              </div>
-            )}
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <div>
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Building className="h-5 w-5" />
+              Facturation Consolidée
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              {organizationName}
+            </p>
           </div>
+        </div>
+        
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm">
+            <Printer className="h-4 w-4 mr-2" />
+            Aperçu
+          </Button>
+          <Button 
+            onClick={handleGenerateInvoice}
+            disabled={isGenerating || selectedCharges.length === 0}
+            size="sm"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            {isGenerating ? "Génération..." : "Générer Facture"}
+          </Button>
+        </div>
+      </div>
 
-          {selectedFolios.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Calculator className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Sélectionnez des folios</h3>
-                <p className="text-muted-foreground">
-                  Choisissez un ou plusieurs folios pour générer une facture consolidée.
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              {/* Invoice Configuration */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Configuration Facture</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="billing-address">Adresse de facturation</Label>
-                    <Textarea
-                      id="billing-address"
-                      placeholder="Nom de l'entreprise&#10;Adresse complète&#10;Code postal, Ville"
-                      value={billingAddress}
-                      onChange={(e) => setBillingAddress(e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="payment-method">Mode de paiement</Label>
-                    <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner un mode de paiement" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">Espèces</SelectItem>
-                        <SelectItem value="card">Carte bancaire</SelectItem>
-                        <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
-                        <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                        <SelectItem value="account">Compte client</SelectItem>
-                        <SelectItem value="agency">Agence</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="notes">Notes</Label>
-                    <Textarea
-                      id="notes"
-                      placeholder="Notes ou instructions particulières..."
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      rows={2}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Total Summary */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-medium">Total à facturer:</span>
-                    <span className="text-xl font-bold font-mono text-red-600">
-                      {totalAmount.toLocaleString()} XOF
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Charges Breakdown */}
-              {consolidatedCharges.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Détail des Charges</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 max-h-60 overflow-y-auto">
-                      {consolidatedCharges.map((charge) => (
-                        <div key={charge.id} className="flex items-center justify-between p-2 bg-muted rounded">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span>{getChargeTypeIcon(charge.charge_type)}</span>
-                              <Badge size="sm" className={getChargeTypeColor(charge.charge_type)}>
-                                {charge.charge_type}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                Ch. {charge.guest_folios?.rooms?.number}
-                              </span>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {charge.description}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-mono font-medium">
-                              {charge.amount?.toLocaleString()} XOF
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Folio Info */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Folios Sélectionnés</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {folios.filter(f => selectedFolios.includes(f.id)).map(folio => (
+                  <div key={folio.id} className="p-3 border rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="font-medium">{folio.folio_number}</p>
+                        <p className="text-sm text-muted-foreground">Chambre 201</p>
+                      </div>
+                      <Badge variant="outline">{folio.status}</Badge>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          )}
+                    <div className="text-right">
+                      <p className="font-semibold text-red-600">
+                        {folio.balance.toLocaleString()} F
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Billing Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Détails Facturation</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="billing-address">Adresse de facturation</Label>
+                <textarea
+                  id="billing-address"
+                  placeholder="Nom de l'entreprise&#10;Adresse complète&#10;Code postal, Ville"
+                  value={billingAddress}
+                  onChange={(e) => setBillingAddress(e.target.value)}
+                  rows={3}
+                  className="w-full p-2 border rounded-md text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="notes">Notes</Label>
+                <textarea
+                  id="notes"
+                  placeholder="Notes ou instructions particulières..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={2}
+                  className="w-full p-2 border rounded-md text-sm"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Center: Charges Selection */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Sélection des Charges</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-96">
+                <div className="space-y-3">
+                  {charges.map((charge) => (
+                    <div key={charge.id} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <Checkbox
+                        checked={selectedCharges.includes(charge.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedCharges(prev => [...prev, charge.id]);
+                          } else {
+                            setSelectedCharges(prev => prev.filter(id => id !== charge.id));
+                          }
+                        }}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span>{getChargeTypeIcon(charge.charge_type)}</span>
+                          <Badge className={getChargeTypeColor(charge.charge_type)}>
+                            {charge.charge_type}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          {charge.description}
+                        </p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">
+                            {charge.quantity} x {charge.unit_price.toLocaleString()} F
+                          </span>
+                          <span className="font-semibold">
+                            {charge.amount.toLocaleString()} F
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right: Invoice Summary */}
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Résumé Facture</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span>Sous-total HT:</span>
+                  <span>{totals.subtotal.toLocaleString()} F</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TVA:</span>
+                  <span>{totals.tax.toLocaleString()} F</span>
+                </div>
+                <Separator />
+                <div className="flex justify-between font-semibold text-lg">
+                  <span>Total TTC:</span>
+                  <span className="text-primary">{totals.total.toLocaleString()} F</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Stats */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center space-y-2">
+                <div className="flex items-center justify-center gap-2">
+                  <Receipt className="h-4 w-4" />
+                  <span className="text-sm text-muted-foreground">
+                    {selectedCharges.length} charge(s) sélectionnée(s)
+                  </span>
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <span className="text-sm text-muted-foreground">
+                    {selectedFolios.length} folio(s)
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

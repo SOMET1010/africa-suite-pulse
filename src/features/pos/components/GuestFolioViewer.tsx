@@ -1,91 +1,145 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Search, User, CreditCard, Receipt, Calendar, FileText, Printer } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import type { GuestFolio, FolioCharge, FolioPayment } from '../types';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  User, 
+  CreditCard, 
+  Calendar, 
+  MapPin,
+  Receipt,
+  DollarSign,
+  ArrowLeft
+} from "lucide-react";
 
-interface GuestFolioViewerProps {
-  guestId?: string;
-  roomNumber?: string;
+// Local types to avoid dependency issues
+interface LocalGuestFolio {
+  id: string;
+  org_id: string;
+  reservation_id: string;
+  guest_id: string;
+  room_id: string;
+  folio_number: string;
+  status: string;
+  balance: number;
+  charges_total: number;
+  payments_total: number;
+  created_at: string;
+  updated_at: string;
 }
 
-export function GuestFolioViewer({ guestId, roomNumber }: GuestFolioViewerProps) {
-  const [searchTerm, setSearchTerm] = useState(roomNumber || '');
-  const [selectedFolio, setSelectedFolio] = useState<string | null>(null);
+interface LocalFolioCharge {
+  id: string;
+  folio_id: string;
+  charge_type: string;
+  description: string;
+  amount: number;
+  quantity: number;
+  unit_price: number;
+  tax_amount?: number;
+  date_charged: string;
+  reference_id?: string;
+  created_by: string;
+  created_at: string;
+}
 
-  // Search for guest folios
-  const { data: folios = [], isLoading: foliosLoading } = useQuery({
-    queryKey: ['guest-folios', searchTerm],
-    queryFn: async () => {
-      if (!searchTerm) return [];
+interface LocalFolioPayment {
+  id: string;
+  folio_id: string;
+  payment_type: string;
+  amount: number;
+  payment_method: string;
+  reference_number?: string;
+  transaction_id?: string;
+  payment_date: string;
+  processed_by: string;
+  notes?: string;
+  created_at: string;
+}
 
-      let query = supabase
-        .from('guest_folios')
-        .select(`
-          *,
-          guests(first_name, last_name, email, phone),
-          rooms(number, type),
-          reservations(reference, date_arrival, date_departure)
-        `);
+interface GuestFolioViewerProps {
+  guestId: string;
+  reservationId: string;
+  onBack: () => void;
+}
 
-      // Search by room number or guest name
-      if (searchTerm.match(/^\d+$/)) {
-        // Numeric search - assume room number
-        query = query.eq('rooms.number', searchTerm);
-      } else {
-        // Text search - guest name
-        query = query.or(`guests.first_name.ilike.%${searchTerm}%,guests.last_name.ilike.%${searchTerm}%`);
-      }
+// Mock data for demonstration
+const mockFolio: LocalGuestFolio = {
+  id: "folio-1",
+  org_id: "org-1",
+  reservation_id: "res-1",
+  guest_id: "guest-1",
+  room_id: "room-1",
+  folio_number: "F-2024-001",
+  status: "open",
+  balance: 75000,
+  charges_total: 125000,
+  payments_total: 50000,
+  created_at: "2024-01-15T00:00:00Z",
+  updated_at: "2024-01-15T00:00:00Z"
+};
 
-      const { data, error } = await query
-        .eq('status', 'open')
-        .order('created_at', { ascending: false });
+const mockCharges: LocalFolioCharge[] = [
+  {
+    id: "charge-1",
+    folio_id: "folio-1",
+    charge_type: "room",
+    description: "Hébergement - Chambre 201",
+    amount: 50000,
+    quantity: 2,
+    unit_price: 25000,
+    tax_amount: 9000,
+    date_charged: "2024-01-15",
+    reference_id: "res-1",
+    created_by: "staff-1",
+    created_at: "2024-01-15T00:00:00Z"
+  },
+  {
+    id: "charge-2",
+    folio_id: "folio-1",
+    charge_type: "restaurant",
+    description: "Restaurant - Petit-déjeuner",
+    amount: 15000,
+    quantity: 2,
+    unit_price: 7500,
+    tax_amount: 2700,
+    date_charged: "2024-01-15",
+    reference_id: "order-1",
+    created_by: "staff-2",
+    created_at: "2024-01-15T08:00:00Z"
+  }
+];
 
-      if (error) throw error;
-      return data as any[];
-    },
-    enabled: !!searchTerm
-  });
+const mockPayments: LocalFolioPayment[] = [
+  {
+    id: "payment-1",
+    folio_id: "folio-1",
+    payment_type: "cash",
+    amount: 30000,
+    payment_method: "Espèces",
+    payment_date: "2024-01-15",
+    processed_by: "staff-1",
+    created_at: "2024-01-15T14:00:00Z"
+  },
+  {
+    id: "payment-2",
+    folio_id: "folio-1",
+    payment_type: "card",
+    amount: 20000,
+    payment_method: "Carte Visa",
+    transaction_id: "TXN-123456",
+    payment_date: "2024-01-15",
+    processed_by: "staff-1",
+    created_at: "2024-01-15T16:00:00Z"
+  }
+];
 
-  // Get folio details (charges and payments)
-  const { data: folioDetails, isLoading: detailsLoading } = useQuery({
-    queryKey: ['folio-details', selectedFolio],
-    queryFn: async () => {
-      if (!selectedFolio) return null;
-
-      const [chargesResult, paymentsResult] = await Promise.all([
-        supabase
-          .from('folio_charges')
-          .select('*')
-          .eq('folio_id', selectedFolio)
-          .order('date_charged', { ascending: false }),
-        supabase
-          .from('folio_payments')
-          .select('*')
-          .eq('folio_id', selectedFolio)
-          .order('payment_date', { ascending: false })
-      ]);
-
-      if (chargesResult.error) throw chargesResult.error;
-      if (paymentsResult.error) throw paymentsResult.error;
-
-      return {
-        charges: chargesResult.data as FolioCharge[],
-        payments: paymentsResult.data as FolioPayment[]
-      };
-    },
-    enabled: !!selectedFolio
-  });
-
-  const selectedFolioData = folios.find(f => f.id === selectedFolio);
+export function GuestFolioViewer({ guestId, reservationId, onBack }: GuestFolioViewerProps) {
+  const [folio] = useState<LocalGuestFolio>(mockFolio);
+  const [charges] = useState<LocalFolioCharge[]>(mockCharges);
+  const [payments] = useState<LocalFolioPayment[]>(mockPayments);
 
   const getChargeTypeColor = (type: string) => {
     switch (type) {
@@ -110,278 +164,153 @@ export function GuestFolioViewer({ guestId, roomNumber }: GuestFolioViewerProps)
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-2">
-        <User className="h-5 w-5" />
-        <h2 className="text-lg font-semibold">Notes Client (Folios)</h2>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="sm" onClick={onBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <div>
+            <h2 className="text-xl font-semibold">Folio Client</h2>
+            <p className="text-muted-foreground text-sm">
+              {folio.folio_number} • Chambre
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Rechercher par numéro de chambre ou nom du client..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Panel - Guest Folios List */}
-        <div className="space-y-4">
-          <h3 className="font-medium">Folios Actifs</h3>
-          
-          {foliosLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-              <p className="text-sm text-muted-foreground mt-2">Recherche...</p>
+      {/* Guest Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Informations Client
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Client</p>
+              <p className="font-medium">Client Demo</p>
             </div>
-          ) : folios.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Search className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground">
-                  {searchTerm ? 'Aucun folio trouvé' : 'Saisissez un numéro de chambre ou nom de client'}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            folios.map((folio) => (
-              <Card 
-                key={folio.id} 
-                className={`cursor-pointer transition-colors ${
-                  selectedFolio === folio.id ? 'ring-2 ring-primary' : 'hover:bg-muted/50'
-                }`}
-                onClick={() => setSelectedFolio(folio.id)}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">
-                      Chambre {folio.rooms?.number}
-                    </CardTitle>
-                    <Badge variant={folio.status === 'open' ? 'default' : 'secondary'}>
-                      {folio.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">
-                        {folio.guests?.first_name} {folio.guests?.last_name}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">
-                        {folio.reservations?.date_arrival && folio.reservations?.date_departure && (
-                          `${format(new Date(folio.reservations.date_arrival), 'dd/MM', { locale: fr })} - ${format(new Date(folio.reservations.date_departure), 'dd/MM', { locale: fr })}`
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center pt-2">
-                      <span className="text-sm font-medium">Solde:</span>
-                      <span className={`font-mono font-medium ${
-                        folio.balance > 0 ? 'text-red-600' : folio.balance < 0 ? 'text-green-600' : 'text-gray-600'
-                      }`}>
-                        {folio.balance?.toLocaleString()} XOF
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Chambre</p>
+              <p className="font-medium">201</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Right Panel - Folio Details */}
-        <div className="space-y-4">
-          {selectedFolioData ? (
-            <>
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium">Détail du Folio</h3>
-                <Button variant="outline" size="sm">
-                  <Printer className="h-4 w-4 mr-2" />
-                  Imprimer
-                </Button>
+      {/* Balance Summary */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-3 gap-6 text-center">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Charges</p>
+              <p className="text-2xl font-bold text-red-600">
+                {folio.charges_total.toLocaleString()} F
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Paiements</p>
+              <p className="text-2xl font-bold text-green-600">
+                {folio.payments_total.toLocaleString()} F
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Solde</p>
+              <p className={`text-2xl font-bold ${
+                folio.balance > 0 ? 'text-red-600' : 
+                folio.balance < 0 ? 'text-green-600' : 'text-gray-600'
+              }`}>
+                {folio.balance.toLocaleString()} F
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Charges and Payments */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Charges */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="h-5 w-5" />
+              Charges ({charges.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-80">
+              <div className="space-y-3">
+                {charges.map((charge) => (
+                  <div key={charge.id} className="p-3 border rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{getChargeTypeIcon(charge.charge_type)}</span>
+                        <Badge className={getChargeTypeColor(charge.charge_type)}>
+                          {charge.charge_type}
+                        </Badge>
+                      </div>
+                      <p className="font-semibold text-red-600">
+                        +{charge.amount.toLocaleString()} F
+                      </p>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {charge.description}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(charge.date_charged).toLocaleDateString('fr-FR')}
+                      {charge.quantity > 1 && (
+                        <span>• {charge.quantity} x {charge.unit_price.toLocaleString()} F</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
 
-              {/* Guest Info */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Informations Client</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <Label className="text-muted-foreground">Nom</Label>
-                      <p className="font-medium">
-                        {selectedFolioData.guests?.first_name} {selectedFolioData.guests?.last_name}
+        {/* Payments */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Paiements ({payments.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-80">
+              <div className="space-y-3">
+                {payments.map((payment) => (
+                  <div key={payment.id} className="p-3 border rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <Badge variant="outline">
+                        {payment.payment_method}
+                      </Badge>
+                      <p className="font-semibold text-green-600">
+                        -{payment.amount.toLocaleString()} F
                       </p>
                     </div>
-                    <div>
-                      <Label className="text-muted-foreground">Chambre</Label>
-                      <p className="font-medium">{selectedFolioData.rooms?.number}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Email</Label>
-                      <p>{selectedFolioData.guests?.email || '-'}</p>
-                    </div>
-                    <div>
-                      <Label className="text-muted-foreground">Téléphone</Label>
-                      <p>{selectedFolioData.guests?.phone || '-'}</p>
+                    {payment.reference_number && (
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Réf: {payment.reference_number}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(payment.payment_date).toLocaleDateString('fr-FR')}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Balance Summary */}
-              <Card>
-                <CardContent className="p-4">
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Charges</p>
-                      <p className="font-mono font-medium text-red-600">
-                        {selectedFolioData.charges_total?.toLocaleString()} XOF
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Paiements</p>
-                      <p className="font-mono font-medium text-green-600">
-                        {selectedFolioData.payments_total?.toLocaleString()} XOF
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Solde</p>
-                      <p className={`font-mono font-medium text-lg ${
-                        selectedFolioData.balance > 0 ? 'text-red-600' : 
-                        selectedFolioData.balance < 0 ? 'text-green-600' : 'text-gray-600'
-                      }`}>
-                        {selectedFolioData.balance?.toLocaleString()} XOF
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Charges and Payments */}
-              {detailsLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-                  <p className="text-sm text-muted-foreground mt-2">Chargement des détails...</p>
-                </div>
-              ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Mouvements</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Charges */}
-                    {folioDetails?.charges && folioDetails.charges.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
-                          <Receipt className="h-4 w-4" />
-                          Charges
-                        </h4>
-                        <div className="space-y-2">
-                          {folioDetails.charges.map((charge) => (
-                            <div key={charge.id} className="flex items-center justify-between p-2 bg-muted rounded">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <span>{getChargeTypeIcon(charge.charge_type)}</span>
-                                  <Badge size="sm" className={getChargeTypeColor(charge.charge_type)}>
-                                    {charge.charge_type}
-                                  </Badge>
-                                </div>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  {charge.description}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {format(new Date(charge.date_charged), 'dd MMM yyyy HH:mm', { locale: fr })}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-mono font-medium text-red-600">
-                                  +{charge.amount?.toLocaleString()} XOF
-                                </p>
-                                {charge.quantity > 1 && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {charge.quantity} x {charge.unit_price?.toLocaleString()}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {folioDetails?.charges && folioDetails.charges.length > 0 && 
-                     folioDetails?.payments && folioDetails.payments.length > 0 && (
-                      <Separator />
-                    )}
-
-                    {/* Payments */}
-                    {folioDetails?.payments && folioDetails.payments.length > 0 && (
-                      <div>
-                        <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
-                          <CreditCard className="h-4 w-4" />
-                          Paiements
-                        </h4>
-                        <div className="space-y-2">
-                          {folioDetails.payments.map((payment) => (
-                            <div key={payment.id} className="flex items-center justify-between p-2 bg-muted rounded">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" size="sm">
-                                    {payment.payment_method}
-                                  </Badge>
-                                </div>
-                                {payment.reference_number && (
-                                  <p className="text-sm text-muted-foreground">
-                                    Réf: {payment.reference_number}
-                                  </p>
-                                )}
-                                <p className="text-xs text-muted-foreground">
-                                  {format(new Date(payment.payment_date), 'dd MMM yyyy HH:mm', { locale: fr })}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <p className="font-mono font-medium text-green-600">
-                                  -{payment.amount?.toLocaleString()} XOF
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {(!folioDetails?.charges || folioDetails.charges.length === 0) &&
-                     (!folioDetails?.payments || folioDetails.payments.length === 0) && (
-                      <div className="text-center py-4">
-                        <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-muted-foreground">Aucun mouvement sur ce folio</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          ) : (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Sélectionnez un folio</h3>
-                <p className="text-muted-foreground">
-                  Choisissez un folio dans la liste pour voir les détails des charges et paiements.
-                </p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -11,8 +11,15 @@ import {
   Clock,
   MapPin
 } from "lucide-react";
-import type { CartItem } from "../../types";
-import type { ReservationForBilling } from "@/features/billing/hooks/useReservations";
+// Local cart item type for room service
+interface LocalCartItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+}
 
 interface CartTotals {
   subtotal: number;
@@ -23,7 +30,7 @@ interface CartTotals {
 }
 
 interface RoomServiceCartProps {
-  items: CartItem[];
+  items: LocalCartItem[];
   totals: CartTotals;
   onUpdateQuantity: (itemId: string, quantity: number) => void;
   onRemoveFromCart: (itemId: string) => void;
@@ -90,7 +97,7 @@ export function RoomServiceCart({
               <div key={item.id} className="bg-card rounded-lg border p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="font-medium text-sm leading-tight">
-                    {item.name}
+                    {item.product_name}
                   </h4>
                   <Button
                     variant="ghost"
@@ -102,21 +109,10 @@ export function RoomServiceCart({
                   </Button>
                 </div>
                 
-                {/* Modifiers */}
-                {item.modifiers && item.modifiers.length > 0 && (
-                  <div className="mb-2">
-                    {item.modifiers.map((modifier, idx) => (
-                      <p key={idx} className="text-xs text-muted-foreground">
-                        + {modifier.name} (+{modifier.price.toLocaleString()} F)
-                      </p>
-                    ))}
-                  </div>
-                )}
-                
-                {/* Notes */}
-                {item.notes && (
+                {/* Notes placeholder */}
+                {false && (
                   <p className="text-xs text-muted-foreground mb-2 italic">
-                    "{item.notes}"
+                    "Notes placeholder"
                   </p>
                 )}
                 

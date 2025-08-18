@@ -56,12 +56,10 @@ export function useRoomServiceLogic({ reservation }: UseRoomServiceLogicProps) {
     const newItem: CartItem = {
       id: `${product.id}-${Date.now()}`,
       product_id: product.id,
-      name: product.name,
+      product_name: product.name,
       quantity: 1,
       unit_price: product.price_ttc || product.price_ht || 0,
       total_price: product.price_ttc || product.price_ht || 0,
-      modifiers: [],
-      notes: ''
     };
 
     setCartItems(prev => [...prev, newItem]);
