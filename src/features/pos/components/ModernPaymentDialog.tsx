@@ -12,7 +12,10 @@ import {
   Banknote, 
   Smartphone, 
   Calculator,
-  Loader2
+  Loader2,
+  Printer,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { CashVisualizer } from '@/components/pos/CashVisualizer';
@@ -52,7 +55,9 @@ export function ModernPaymentDialog({
     processPayment,
     validatePayment,
     getChangeAmount,
-    isProcessing
+    printTicketManually,
+    isProcessing,
+    isPrinting
   } = usePOSPayment(order.org_id);
 
   // Set default payment method
@@ -320,6 +325,36 @@ export function ModernPaymentDialog({
               <p className="text-sm text-muted-foreground">
                 Insérez ou présentez la carte bancaire au terminal
               </p>
+            </div>
+          )}
+
+          {/* Print Status Display */}
+          {paymentState.printStatus === 'failed' && (
+            <div className="bg-orange-50 border border-orange-200 p-3 rounded-lg flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <div className="flex-1">
+                <p className="text-sm text-orange-800">Impression automatique échouée</p>
+                <p className="text-xs text-orange-600">Utilisez le bouton d'impression manuelle ci-dessous</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => printTicketManually(order.id)}
+                disabled={isPrinting}
+              >
+                {isPrinting ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <Printer className="h-3 w-3" />
+                )}
+              </Button>
+            </div>
+          )}
+
+          {paymentState.printStatus === 'success' && (
+            <div className="bg-green-50 border border-green-200 p-3 rounded-lg flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <p className="text-sm text-green-800">Ticket imprimé avec succès</p>
             </div>
           )}
 

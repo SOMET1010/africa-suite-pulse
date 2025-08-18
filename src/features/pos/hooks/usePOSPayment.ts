@@ -6,12 +6,14 @@ import { usePaymentMethods, useCreatePaymentTransaction } from '@/queries/paymen
 import type { CartItem } from '../types';
 import { logger } from '@/services/logger.service';
 import { getErrorMessage } from '@/utils/errorHandling';
+import { usePOSTicketPrinting } from './usePOSTicketPrinting';
 
 interface PaymentState {
   selectedMethodId: string;
   amountReceived: number;
   reference?: string;
   isProcessing: boolean;
+  printStatus?: 'idle' | 'printing' | 'success' | 'failed';
 }
 
 interface ProcessPaymentInput {
@@ -34,7 +36,8 @@ export function usePOSPayment(orgId: string) {
     selectedMethodId: '',
     amountReceived: 0,
     reference: '',
-    isProcessing: false
+    isProcessing: false,
+    printStatus: 'idle'
   });
 
   const queryClient = useQueryClient();
@@ -43,6 +46,9 @@ export function usePOSPayment(orgId: string) {
   // Fetch payment methods
   const { data: paymentMethods = [], isLoading: loadingMethods } = usePaymentMethods(orgId);
   const createTransactionMutation = useCreatePaymentTransaction();
+  
+  // Ticket printing
+  const { printTicket, isPrinting } = usePOSTicketPrinting();
 
   // Complete order mutation
   const completeOrderMutation = useMutation({
@@ -102,18 +108,35 @@ export function usePOSPayment(orgId: string) {
       // 3. Complete the order
       await completeOrderMutation.mutateAsync(input.orderId);
 
-      toast({
-        title: "Paiement réussi",
-        description: `Commande payée avec succès. Facture: ${invoice.id}`,
-      });
+      // 4. Attempt automatic ticket printing
+      setPaymentState(prev => ({ ...prev, printStatus: 'printing' }));
+      
+      try {
+        printTicket({ orderId: input.orderId });
+        setPaymentState(prev => ({ ...prev, printStatus: 'success' }));
+        
+        toast({
+          title: "Paiement réussi",
+          description: `Commande payée et ticket imprimé. Facture: ${invoice.id}`,
+        });
+      } catch (printError) {
+        logger.warn('Automatic printing failed', { printError, orderId: input.orderId });
+        setPaymentState(prev => ({ ...prev, printStatus: 'failed' }));
+        
+        toast({
+          title: "Paiement réussi",
+          description: `Commande payée avec succès. Facture: ${invoice.id}. Impression échouée - utilisez le bouton d'impression manuelle.`,
+        });
+      }
 
-      // Reset payment state
-      setPaymentState({
+      // Reset payment state (keep print status for UI feedback)
+      setPaymentState(prev => ({
         selectedMethodId: '',
         amountReceived: 0,
         reference: '',
-        isProcessing: false
-      });
+        isProcessing: false,
+        printStatus: prev.printStatus
+      }));
 
       return { invoice, success: true };
 
@@ -126,7 +149,7 @@ export function usePOSPayment(orgId: string) {
         variant: "destructive",
       });
 
-      setPaymentState(prev => ({ ...prev, isProcessing: false }));
+      setPaymentState(prev => ({ ...prev, isProcessing: false, printStatus: 'idle' }));
       throw error;
     }
   };
@@ -167,6 +190,12 @@ export function usePOSPayment(orgId: string) {
     return 0;
   };
 
+  // Manual print function
+  const printTicketManually = (orderId: string) => {
+    setPaymentState(prev => ({ ...prev, printStatus: 'printing' }));
+    printTicket({ orderId });
+  };
+
   return {
     paymentState,
     updatePaymentState,
@@ -175,6 +204,8 @@ export function usePOSPayment(orgId: string) {
     processPayment,
     validatePayment,
     getChangeAmount,
-    isProcessing: paymentState.isProcessing || createTransactionMutation.isPending || completeOrderMutation.isPending
+    printTicketManually,
+    isProcessing: paymentState.isProcessing || createTransactionMutation.isPending || completeOrderMutation.isPending,
+    isPrinting: isPrinting || paymentState.printStatus === 'printing'
   };
 }
