@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, X, CheckCircle, AlertTriangle, Info, ExternalLink } from 'lucide-react';
+import { Bell, X, CheckCircle, AlertTriangle, Info, ExternalLink, Plus, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { useRealtimeNotifications, NotificationData } from '../hooks/useRealtimeNotifications';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { useNavigate } from 'react-router-dom';
 
 const NOTIFICATION_ICONS = {
   reservation: Info,
@@ -33,10 +34,11 @@ interface NotificationItemProps {
 
 function NotificationItem({ notification, onMarkAsRead, onRemove, onAction }: NotificationItemProps) {
   const Icon = NOTIFICATION_ICONS[notification.type];
+  const navigate = useNavigate();
   
   const handleAction = () => {
     if (notification.action_url) {
-      window.location.href = notification.action_url;
+      navigate(notification.action_url);
     } else if (onAction) {
       onAction(notification);
     }
@@ -117,6 +119,7 @@ function NotificationItem({ notification, onMarkAsRead, onRemove, onAction }: No
 }
 
 export function EnhancedNotificationCenter() {
+  const navigate = useNavigate();
   const {
     notifications,
     unreadCount,
@@ -130,20 +133,20 @@ export function EnhancedNotificationCenter() {
     switch (notification.type) {
       case 'reservation':
         if (notification.context_id) {
-          window.location.href = `/reservations/${notification.context_id}`;
+          navigate(`/reservations/${notification.context_id}`);
         } else {
-          window.location.href = '/rack';
+          navigate('/rack');
         }
         break;
       case 'payment':
         if (notification.context_id) {
-          window.location.href = `/payments/${notification.context_id}`;
+          navigate(`/payments/${notification.context_id}`);
         } else {
-          window.location.href = '/payments';
+          navigate('/payments');
         }
         break;
       case 'maintenance':
-        window.location.href = '/maintenance';
+        navigate('/maintenance');
         break;
       default:
         logger.warn('No default action for notification type', { type: notification.type });
@@ -233,18 +236,20 @@ export function EnhancedNotificationCenter() {
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => window.location.href = '/rack/new-reservation'}
+                onClick={() => navigate('/rack/new-reservation')}
                 className="h-6 px-2 text-xs"
               >
-                Nouvelle réservation
+                <Plus className="w-3 h-3 mr-1" />
+                Réservation
               </Button>
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => window.location.href = '/guests/new'}
+                onClick={() => navigate('/guests/new')}
                 className="h-6 px-2 text-xs"
               >
-                Nouveau client
+                <UserPlus className="w-3 h-3 mr-1" />
+                Client
               </Button>
             </div>
           </div>

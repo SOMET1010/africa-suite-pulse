@@ -3,6 +3,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StatusBar } from './StatusBar';
+import { Link } from 'react-router-dom';
 
 interface PageLayoutProps {
   children: React.ReactNode;
@@ -35,7 +36,9 @@ export function PageLayout({
           <Breadcrumb className="mb-6">
             <BreadcrumbList className="text-sm text-muted-foreground font-premium">
               <BreadcrumbItem>
-                <BreadcrumbLink href="/">Accueil</BreadcrumbLink>
+                <BreadcrumbLink asChild>
+                  <Link to="/">Accueil</Link>
+                </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator>
                 <Crown className="h-3 w-3 accent-gold" />

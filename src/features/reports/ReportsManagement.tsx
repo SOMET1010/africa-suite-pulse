@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ReportTemplateEditor } from "./components/ReportTemplateEditor";
@@ -12,6 +13,7 @@ import { ClosurePanel } from "./components/ClosurePanel";
 import { getErrorMessage } from "@/utils/errorHandling";
 
 export default function ReportsManagement() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("daily");
   const { data: templates, isLoading } = useReportTemplates();
   const { generateReport, isGenerating } = useReportGeneration();
@@ -82,28 +84,30 @@ export default function ReportsManagement() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="/reports/daily" className="block">
-                  <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                    <CardContent className="p-6 text-center">
-                      <FileText className="w-8 h-8 mx-auto mb-4 text-primary" />
-                      <h3 className="font-medium mb-2">Rapports quotidiens</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Arrivées, départs, clients présents, No-Shows et occupation
-                      </p>
-                    </CardContent>
-                  </Card>
-                </a>
-                <a href="/reports/closure" className="block">
-                  <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-                    <CardContent className="p-6 text-center">
-                      <ShieldCheck className="w-8 h-8 mx-auto mb-4 text-primary" />
-                      <h3 className="font-medium mb-2">Rapports de clôture</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Pré-clôture, Z POS, main courante et export SYSCOHADA
-                      </p>
-                    </CardContent>
-                  </Card>
-                </a>
+                <Card 
+                  className="hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => navigate('/reports/daily')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <FileText className="w-8 h-8 mx-auto mb-4 text-primary" />
+                    <h3 className="font-medium mb-2">Rapports quotidiens</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Arrivées, départs, clients présents, No-Shows et occupation
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card 
+                  className="hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => navigate('/reports/closure')}
+                >
+                  <CardContent className="p-6 text-center">
+                    <ShieldCheck className="w-8 h-8 mx-auto mb-4 text-primary" />
+                    <h3 className="font-medium mb-2">Rapports de clôture</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Pré-clôture, Z POS, main courante et export SYSCOHADA
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
