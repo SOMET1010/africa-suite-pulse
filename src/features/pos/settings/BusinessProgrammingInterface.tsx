@@ -1,585 +1,537 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { ChefHat, Clock, Percent, Utensils, Plus, Edit, Trash2, Copy, DragHandleDots2 } from "lucide-react";
-import { useSystemSettings } from "../hooks/useSystemSettings";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Plus, Edit, Trash2, Clock, Percent, GripVertical, Save, Copy } from 'lucide-react';
+
+interface MenuCategory {
+  id: string;
+  name: string;
+  order: number;
+  items: MenuItem[];
+}
 
 interface MenuItem {
   id: string;
   name: string;
-  description: string;
   price: number;
+  description?: string;
   category: string;
-  ingredients: string[];
+  modifiers: string[];
   allergens: string[];
-  preparationTime: number;
-  isAvailable: boolean;
-  variations: MenuVariation[];
+  available: boolean;
 }
 
-interface MenuVariation {
+interface PricingRule {
   id: string;
   name: string;
-  priceModifier: number;
-  isDefault: boolean;
-}
-
-interface PriceRule {
-  id: string;
-  name: string;
-  type: 'happy_hour' | 'promotion' | 'time_based' | 'volume';
+  type: 'happy_hour' | 'promotion' | 'bulk' | 'time_based';
+  conditions: Record<string, any>;
   discount: number;
-  conditions: any;
-  isActive: boolean;
-  schedule?: {
-    days: string[];
-    startTime: string;
-    endTime: string;
-  };
+  active: boolean;
+  startDate: string;
+  endDate: string;
 }
 
 interface BusinessTemplate {
   id: string;
   name: string;
-  type: 'restaurant' | 'fast_food' | 'bar' | 'collectivity';
+  type: 'restaurant' | 'fast_food' | 'bar' | 'cafe';
   description: string;
-  defaultSettings: any;
-  isSelected: boolean;
+  categories: MenuCategory[];
+  defaultPricing: PricingRule[];
 }
 
 export function BusinessProgrammingInterface() {
-  const { settings, updateSetting, saveSettings, isSaving } = useSystemSettings();
-  const [activeTab, setActiveTab] = useState("menus");
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("");
-
-  const getSetting = (key: string, defaultValue: any = "") => {
-    const setting = settings.find(s => s.setting_key === key);
-    return setting ? setting.setting_value : defaultValue;
-  };
-
-  const handleSettingChange = (key: string, value: any) => {
-    updateSetting(key, value);
-  };
-
-  // Templates de configuration métier
-  const businessTemplates: BusinessTemplate[] = [
+  const [activeTemplate, setActiveTemplate] = useState<BusinessTemplate | null>(null);
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([
     {
-      id: "restaurant",
-      name: "Restaurant traditionnel",
-      type: "restaurant",
-      description: "Service à table, carte variée, service complet",
-      defaultSettings: {
-        tableService: true,
-        kitchenPrinting: true,
-        multiCourse: true,
-        reservations: true
-      },
-      isSelected: getSetting('business_template', '') === 'restaurant'
-    },
-    {
-      id: "fast_food",
-      name: "Fast Food",
-      type: "fast_food",
-      description: "Service rapide, commandes au comptoir, préparation rapide",
-      defaultSettings: {
-        tableService: false,
-        quickOrders: true,
-        takeAway: true,
-        simpleMenu: true
-      },
-      isSelected: getSetting('business_template', '') === 'fast_food'
-    },
-    {
-      id: "bar",
-      name: "Bar / Café",
-      type: "bar",
-      description: "Boissons, snacking, ambiance décontractée",
-      defaultSettings: {
-        drinkFocus: true,
-        happyHour: true,
-        quickService: true,
-        barTabs: true
-      },
-      isSelected: getSetting('business_template', '') === 'bar'
-    },
-    {
-      id: "collectivity",
-      name: "Restauration collective",
-      type: "collectivity",
-      description: "Cantines, self-service, gestion de bénéficiaires",
-      defaultSettings: {
-        selfService: true,
-        beneficiaryManagement: true,
-        subsidies: true,
-        menuPlanning: true
-      },
-      isSelected: getSetting('business_template', '') === 'collectivity'
-    }
-  ];
-
-  // Données exemple pour les menus
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    {
-      id: "1",
-      name: "Thieboudienne",
-      description: "Riz au poisson, légumes variés, sauce rouge traditionnelle",
-      price: 2500,
-      category: "Plats principaux",
-      ingredients: ["Riz", "Poisson", "Légumes", "Tomates", "Oignons"],
-      allergens: ["Poisson"],
-      preparationTime: 30,
-      isAvailable: true,
-      variations: [
-        { id: "v1", name: "Poisson blanc", priceModifier: 0, isDefault: true },
-        { id: "v2", name: "Poisson rouge", priceModifier: 500, isDefault: false }
+      id: '1',
+      name: 'Entrées',
+      order: 1,
+      items: [
+        {
+          id: '1-1',
+          name: 'Salade Caesar',
+          price: 12.50,
+          description: 'Salade romaine, croûtons, parmesan, sauce caesar',
+          category: '1',
+          modifiers: ['sans_croûtons', 'extra_parmesan'],
+          allergens: ['gluten', 'oeufs', 'lactose'],
+          available: true
+        }
       ]
     }
   ]);
-
-  const [priceRules, setPriceRules] = useState<PriceRule[]>([
+  const [pricingRules, setPricingRules] = useState<PricingRule[]>([
     {
-      id: "1",
-      name: "Happy Hour",
-      type: "happy_hour",
+      id: '1',
+      name: 'Happy Hour',
+      type: 'happy_hour',
+      conditions: { timeStart: '17:00', timeEnd: '19:00', days: [1,2,3,4,5] },
       discount: 20,
-      conditions: { categories: ["Boissons"], minItems: 1 },
-      isActive: true,
-      schedule: {
-        days: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"],
-        startTime: "17:00",
-        endTime: "19:00"
-      }
+      active: true,
+      startDate: '2024-01-01',
+      endDate: '2024-12-31'
     }
   ]);
 
-  const applyBusinessTemplate = (templateId: string) => {
-    const template = businessTemplates.find(t => t.id === templateId);
-    if (!template) return;
+  const businessTemplates: BusinessTemplate[] = [
+    {
+      id: 'restaurant',
+      name: 'Restaurant Traditionnel',
+      type: 'restaurant',
+      description: 'Menu structuré avec entrées, plats, desserts',
+      categories: [
+        { id: 'entrees', name: 'Entrées', order: 1, items: [] },
+        { id: 'plats', name: 'Plats Principaux', order: 2, items: [] },
+        { id: 'desserts', name: 'Desserts', order: 3, items: [] },
+        { id: 'boissons', name: 'Boissons', order: 4, items: [] }
+      ],
+      defaultPricing: []
+    },
+    {
+      id: 'fast_food',
+      name: 'Fast Food',
+      type: 'fast_food',
+      description: 'Menus, burgers, accompagnements',
+      categories: [
+        { id: 'menus', name: 'Menus', order: 1, items: [] },
+        { id: 'burgers', name: 'Burgers', order: 2, items: [] },
+        { id: 'accompagnements', name: 'Accompagnements', order: 3, items: [] },
+        { id: 'boissons', name: 'Boissons', order: 4, items: [] }
+      ],
+      defaultPricing: []
+    },
+    {
+      id: 'bar',
+      name: 'Bar / Café',
+      type: 'bar',
+      description: 'Boissons, cocktails, petite restauration',
+      categories: [
+        { id: 'cocktails', name: 'Cocktails', order: 1, items: [] },
+        { id: 'bieres', name: 'Bières', order: 2, items: [] },
+        { id: 'vins', name: 'Vins', order: 3, items: [] },
+        { id: 'soft', name: 'Boissons Sans Alcool', order: 4, items: [] },
+        { id: 'snacks', name: 'Snacks', order: 5, items: [] }
+      ],
+      defaultPricing: []
+    }
+  ];
 
-    handleSettingChange('business_template', templateId);
-    
-    // Appliquer les paramètres par défaut du template
-    Object.entries(template.defaultSettings).forEach(([key, value]) => {
-      handleSettingChange(`template_${key}`, value);
-    });
-
-    setSelectedTemplate(templateId);
+  const handleApplyTemplate = (template: BusinessTemplate) => {
+    setActiveTemplate(template);
+    setMenuCategories(template.categories);
+    setPricingRules(template.defaultPricing);
   };
 
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return;
+  const addCategory = () => {
+    const newCategory: MenuCategory = {
+      id: Date.now().toString(),
+      name: 'Nouvelle Catégorie',
+      order: menuCategories.length + 1,
+      items: []
+    };
+    setMenuCategories([...menuCategories, newCategory]);
+  };
 
-    const items = Array.from(menuItems);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+  const addMenuItem = (categoryId: string) => {
+    const newItem: MenuItem = {
+      id: Date.now().toString(),
+      name: 'Nouvel Article',
+      price: 0,
+      category: categoryId,
+      modifiers: [],
+      allergens: [],
+      available: true
+    };
+    
+    setMenuCategories(categories => 
+      categories.map(cat => 
+        cat.id === categoryId 
+          ? { ...cat, items: [...cat.items, newItem] }
+          : cat
+      )
+    );
+  };
 
-    setMenuItems(items);
+  const addPricingRule = () => {
+    const newRule: PricingRule = {
+      id: Date.now().toString(),
+      name: 'Nouvelle Règle',
+      type: 'promotion',
+      conditions: {},
+      discount: 0,
+      active: false,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    };
+    setPricingRules([...pricingRules, newRule]);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ChefHat className="h-8 w-8 text-primary" />
-          <div>
-            <h2 className="text-2xl font-bold">Interface de Programmation Métier</h2>
-            <p className="text-muted-foreground">
-              Configuration des menus, prix et modèles d'affaires
-            </p>
-          </div>
+        <div>
+          <h2 className="text-2xl font-bold">Interface de Programmation Métier</h2>
+          <p className="text-muted-foreground">Configuration avancée des menus et tarification</p>
         </div>
-        <Button onClick={saveSettings} disabled={isSaving}>
-          {isSaving ? "Sauvegarde..." : "Sauvegarder"}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Copy className="w-4 h-4 mr-2" />
+            Dupliquer Config
+          </Button>
+          <Button>
+            <Save className="w-4 h-4 mr-2" />
+            Sauvegarder
+          </Button>
+        </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs defaultValue="templates" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="templates">Templates Métier</TabsTrigger>
-          <TabsTrigger value="menus">Configurateur Menus</TabsTrigger>
-          <TabsTrigger value="pricing">Prix Dynamiques</TabsTrigger>
-          <TabsTrigger value="modifications">Modifications</TabsTrigger>
+          <TabsTrigger value="menu">Configuration Menu</TabsTrigger>
+          <TabsTrigger value="pricing">Tarification Dynamique</TabsTrigger>
+          <TabsTrigger value="modifiers">Modifications & Options</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="templates" className="space-y-4">
+        <TabsContent value="templates" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Utensils className="w-5 h-5" />
-                Templates de Configuration
-              </CardTitle>
+              <CardTitle>Templates de Configuration</CardTitle>
+              <CardDescription>
+                Utilisez un template prédéfini selon votre type d'établissement
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {businessTemplates.map((template) => (
-                  <Card 
-                    key={template.id} 
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      template.isSelected ? 'ring-2 ring-primary' : ''
-                    }`}
-                    onClick={() => applyBusinessTemplate(template.id)}
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{template.name}</CardTitle>
-                        {template.isSelected && (
-                          <Badge className="bg-primary">Sélectionné</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{template.description}</p>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <div className="space-y-2">
-                        {Object.entries(template.defaultSettings).map(([key, value]) => (
-                          <div key={key} className="flex justify-between items-center text-sm">
-                            <span className="capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
-                            <Badge variant={value ? "default" : "secondary"}>
-                              {value ? "Activé" : "Désactivé"}
-                            </Badge>
-                          </div>
-                        ))}
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {businessTemplates.map(template => (
+                  <Card key={template.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-semibold">{template.name}</h3>
+                          <Badge variant="outline">{template.type}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{template.description}</p>
+                        <div className="text-xs text-muted-foreground">
+                          {template.categories.length} catégories configurées
+                        </div>
+                        <Button 
+                          size="sm" 
+                          className="w-full"
+                          onClick={() => handleApplyTemplate(template)}
+                        >
+                          Appliquer ce Template
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
                 ))}
               </div>
-
-              {selectedTemplate && (
-                <div className="border rounded-lg p-4 bg-muted/50">
-                  <h4 className="font-medium mb-2">Configuration appliquée</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Le template "{businessTemplates.find(t => t.id === selectedTemplate)?.name}" 
-                    a été appliqué avec ses paramètres par défaut.
-                  </p>
+              
+              {activeTemplate && (
+                <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="font-medium text-green-800">
+                      Template "{activeTemplate.name}" appliqué avec succès
+                    </span>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="menus" className="space-y-4">
+        <TabsContent value="menu" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ChefHat className="w-5 h-5" />
-                Configurateur de Menus
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium">Articles du menu</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Glissez-déposez pour réorganiser, configurez variations et accompagnements
-                  </p>
-                </div>
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Nouvel Article
+              <CardTitle className="flex items-center justify-between">
+                Configuration du Menu
+                <Button onClick={addCategory}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Ajouter Catégorie
                 </Button>
-              </div>
-
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="menu-items">
-                  {(provided) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className="space-y-3"
-                    >
-                      {menuItems.map((item, index) => (
-                        <Draggable key={item.id} draggableId={item.id} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className="border rounded-lg p-4 bg-card"
-                            >
-                              <div className="flex items-start gap-4">
-                                <div
-                                  {...provided.dragHandleProps}
-                                  className="mt-2 text-muted-foreground hover:text-foreground cursor-grab"
-                                >
-                                  <GripVertical className="w-4 h-4" />
-                                </div>
-                                
-                                <div className="flex-1">
-                                  <div className="flex items-start justify-between mb-2">
-                                    <div>
-                                      <h5 className="font-medium">{item.name}</h5>
-                                      <p className="text-sm text-muted-foreground">{item.description}</p>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <Badge>{item.price} FCFA</Badge>
-                                      <Switch checked={item.isAvailable} />
-                                    </div>
-                                  </div>
-
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                    <div>
-                                      <span className="text-muted-foreground">Catégorie:</span>
-                                      <p>{item.category}</p>
-                                    </div>
-                                    <div>
-                                      <span className="text-muted-foreground">Temps préparation:</span>
-                                      <p>{item.preparationTime} min</p>
-                                    </div>
-                                    <div>
-                                      <span className="text-muted-foreground">Allergènes:</span>
-                                      <p>{item.allergens.join(", ") || "Aucun"}</p>
-                                    </div>
-                                    <div>
-                                      <span className="text-muted-foreground">Variations:</span>
-                                      <p>{item.variations.length} option(s)</p>
-                                    </div>
-                                  </div>
-
-                                  {item.variations.length > 0 && (
-                                    <div className="mt-3 pt-3 border-t">
-                                      <p className="text-sm font-medium mb-2">Variations disponibles:</p>
-                                      <div className="flex flex-wrap gap-2">
-                                        {item.variations.map((variation) => (
-                                          <Badge 
-                                            key={variation.id} 
-                                            variant={variation.isDefault ? "default" : "outline"}
-                                          >
-                                            {variation.name} 
-                                            {variation.priceModifier !== 0 && 
-                                              ` (${variation.priceModifier > 0 ? '+' : ''}${variation.priceModifier} FCFA)`
-                                            }
-                                          </Badge>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-
-                                <div className="flex gap-2">
-                                  <Button variant="outline" size="sm">
-                                    <Edit className="w-4 h-4" />
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    <Copy className="w-4 h-4" />
-                                  </Button>
-                                  <Button variant="outline" size="sm">
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pricing" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Percent className="w-5 h-5" />
-                Prix Dynamiques
               </CardTitle>
+              <CardDescription>
+                Organisez vos articles par catégories avec drag & drop
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium">Règles de prix</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Configurez les promotions, happy hours et prix par période
-                  </p>
-                </div>
-                <Button className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Nouvelle Règle
-                </Button>
-              </div>
-
-              <div className="space-y-4">
-                {priceRules.map((rule) => (
-                  <div key={rule.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h5 className="font-medium">{rule.name}</h5>
-                          <Badge variant={rule.isActive ? "default" : "secondary"}>
-                            {rule.isActive ? "Actif" : "Inactif"}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Remise de {rule.discount}% - Type: {rule.type}
-                        </p>
+            <CardContent className="space-y-4">
+              {menuCategories.map(category => (
+                <Card key={category.id} className="border-l-4 border-primary">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="w-4 h-4 text-muted-foreground cursor-move" />
+                        <Input 
+                          value={category.name}
+                          className="font-semibold border-none px-0 focus-visible:ring-0"
+                          onChange={(e) => {
+                            setMenuCategories(categories =>
+                              categories.map(cat =>
+                                cat.id === category.id
+                                  ? { ...cat, name: e.target.value }
+                                  : cat
+                              )
+                            );
+                          }}
+                        />
+                        <Badge variant="secondary">{category.items.length} articles</Badge>
                       </div>
                       <div className="flex gap-2">
-                        <Switch checked={rule.isActive} />
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => addMenuItem(category.id)}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Article
+                        </Button>
+                        <Button size="sm" variant="outline">
                           <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-
-                    {rule.schedule && (
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Jours:</span>
-                          <p>{rule.schedule.days.join(", ")}</p>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                      {category.items.map(item => (
+                        <div key={item.id} className="p-3 border rounded-lg space-y-2">
+                          <div className="flex items-center justify-between">
+                            <Input 
+                              value={item.name}
+                              className="border-none px-0 font-medium focus-visible:ring-0"
+                            />
+                            <div className="flex items-center gap-2">
+                              <Input 
+                                type="number"
+                                value={item.price}
+                                className="w-20 text-right"
+                                step="0.01"
+                              />
+                              <span className="text-sm text-muted-foreground">€</span>
+                              <Switch checked={item.available} />
+                            </div>
+                          </div>
+                          {item.description && (
+                            <p className="text-xs text-muted-foreground">{item.description}</p>
+                          )}
+                          <div className="flex flex-wrap gap-1">
+                            {item.allergens.map(allergen => (
+                              <Badge key={allergen} variant="destructive" className="text-xs">
+                                {allergen}
+                              </Badge>
+                            ))}
+                            {item.modifiers.map(modifier => (
+                              <Badge key={modifier} variant="secondary" className="text-xs">
+                                {modifier}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-muted-foreground">Heures:</span>
-                          <p>{rule.schedule.startTime} - {rule.schedule.endTime}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Conditions:</span>
-                          <p>{Object.entries(rule.conditions).map(([k, v]) => `${k}: ${v}`).join(", ")}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <h4 className="font-medium">Configuration globale des prix</h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Arrondi automatique</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Arrondir les prix au multiple de 25 FCFA
-                      </p>
+                      ))}
                     </div>
-                    <Switch
-                      checked={getSetting('auto_price_rounding', false)}
-                      onCheckedChange={(checked) => handleSettingChange('auto_price_rounding', checked)}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label>Prix dégressifs</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Remises automatiques selon la quantité
-                      </p>
-                    </div>
-                    <Switch
-                      checked={getSetting('volume_discounts', false)}
-                      onCheckedChange={(checked) => handleSettingChange('volume_discounts', checked)}
-                    />
-                  </div>
-                </div>
-              </div>
+                  </CardContent>
+                </Card>
+              ))}
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="modifications" className="space-y-4">
+        <TabsContent value="pricing" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Edit className="w-5 h-5" />
-                Système de Modifications
+              <CardTitle className="flex items-center justify-between">
+                Tarification Dynamique
+                <Button onClick={addPricingRule}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Nouvelle Règle
+                </Button>
               </CardTitle>
+              <CardDescription>
+                Gérez les promotions, happy hours et tarifs spéciaux
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pricingRules.map(rule => (
+                <Card key={rule.id} className="border-l-4 border-orange-500">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-3 flex-1">
+                        <div className="flex items-center gap-3">
+                          <Input 
+                            value={rule.name}
+                            className="border-none px-0 font-semibold focus-visible:ring-0"
+                          />
+                          <Badge variant="outline">
+                            {rule.type === 'happy_hour' && <Clock className="w-3 h-3 mr-1" />}
+                            {rule.type === 'promotion' && <Percent className="w-3 h-3 mr-1" />}
+                            {rule.type}
+                          </Badge>
+                          <Switch checked={rule.active} />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                          <div>
+                            <Label className="text-xs">Type de remise</Label>
+                            <Select value={rule.type}>
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="happy_hour">Happy Hour</SelectItem>
+                                <SelectItem value="promotion">Promotion</SelectItem>
+                                <SelectItem value="bulk">Achat Groupé</SelectItem>
+                                <SelectItem value="time_based">Horaire</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div>
+                            <Label className="text-xs">Remise (%)</Label>
+                            <Input 
+                              type="number"
+                              value={rule.discount}
+                              min="0"
+                              max="100"
+                            />
+                          </div>
+                          
+                          <div>
+                            <Label className="text-xs">Date début</Label>
+                            <Input type="date" value={rule.startDate} />
+                          </div>
+                          
+                          <div>
+                            <Label className="text-xs">Date fin</Label>
+                            <Input type="date" value={rule.endDate} />
+                          </div>
+                        </div>
+                        
+                        {rule.type === 'happy_hour' && (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs">Heure début</Label>
+                              <Input type="time" defaultValue="17:00" />
+                            </div>
+                            <div>
+                              <Label className="text-xs">Heure fin</Label>
+                              <Input type="time" defaultValue="19:00" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex gap-2 ml-4">
+                        <Button size="sm" variant="outline">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button size="sm" variant="destructive">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="modifiers" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Modifications & Options</CardTitle>
+              <CardDescription>
+                Configurez les options de personnalisation des articles
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="modification_prefix">Préfixe des modifications</Label>
-                  <Input
-                    id="modification_prefix"
-                    value={getSetting('modification_prefix', 'SANS')}
-                    onChange={(e) => handleSettingChange('modification_prefix', e.target.value)}
-                    placeholder="SANS, AVEC, PLUS"
-                  />
-                </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Modificateurs</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {[
+                      { name: 'Sans Gluten', price: 0, category: 'Allergie' },
+                      { name: 'Extra Fromage', price: 2.50, category: 'Supplément' },
+                      { name: 'Sauce à Part', price: 0, category: 'Préparation' },
+                      { name: 'Bien Cuit', price: 0, category: 'Cuisson' }
+                    ].map((modifier, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 border rounded">
+                        <div>
+                          <span className="font-medium">{modifier.name}</span>
+                          <Badge variant="outline" className="ml-2 text-xs">{modifier.category}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm">{modifier.price > 0 ? `+${modifier.price}€` : 'Gratuit'}</span>
+                          <Button size="sm" variant="outline">
+                            <Edit className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <Button variant="outline" className="w-full">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter un Modificateur
+                    </Button>
+                  </CardContent>
+                </Card>
 
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Gestion des allergènes</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Alertes automatiques pour les allergènes déclarés
-                    </p>
-                  </div>
-                  <Switch
-                    checked={getSetting('allergen_alerts', true)}
-                    onCheckedChange={(checked) => handleSettingChange('allergen_alerts', checked)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Modifications payantes</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Autoriser des modifications avec supplément de prix
-                    </p>
-                  </div>
-                  <Switch
-                    checked={getSetting('paid_modifications', true)}
-                    onCheckedChange={(checked) => handleSettingChange('paid_modifications', checked)}
-                  />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Accompagnements automatiques</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Proposer automatiquement des accompagnements
-                    </p>
-                  </div>
-                  <Switch
-                    checked={getSetting('auto_sides', false)}
-                    onCheckedChange={(checked) => handleSettingChange('auto_sides', checked)}
-                  />
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Allergènes</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {[
+                      'Gluten', 'Lactose', 'Œufs', 'Fruits à coque', 
+                      'Arachides', 'Poisson', 'Crustacés', 'Soja'
+                    ].map(allergen => (
+                      <div key={allergen} className="flex items-center justify-between p-2 border rounded">
+                        <span className="font-medium">{allergen}</span>
+                        <Switch />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
               </div>
 
-              <Separator />
-
-              <div>
-                <h4 className="font-medium mb-3">Modifications prédéfinies</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {[
-                    "Sans oignon", "Sans piment", "Peu salé", "Bien cuit", "Saignant", 
-                    "Avec supplément légumes", "Double portion", "Sauce à part"
-                  ].map((mod) => (
-                    <div key={mod} className="flex items-center justify-between p-3 border rounded">
-                      <span className="text-sm">{mod}</span>
-                      <Switch defaultChecked />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="custom_modifications">Modifications personnalisées</Label>
-                <Textarea
-                  id="custom_modifications"
-                  value={getSetting('custom_modifications', '')}
-                  onChange={(e) => handleSettingChange('custom_modifications', e.target.value)}
-                  placeholder="Une modification par ligne..."
-                  rows={4}
-                />
-                <p className="text-sm text-muted-foreground mt-1">
-                  Saisissez une modification par ligne. Utilisez "+" pour les suppléments payants.
-                </p>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Templates de Modifications</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[
+                      { name: 'Burger', mods: ['Cuisson', 'Fromage', 'Sauce'] },
+                      { name: 'Pizza', mods: ['Pâte', 'Garniture', 'Taille'] },
+                      { name: 'Salade', mods: ['Sauce', 'Allergènes', 'Extras'] }
+                    ].map(template => (
+                      <div key={template.name} className="p-3 border rounded-lg">
+                        <h4 className="font-medium mb-2">{template.name}</h4>
+                        <div className="space-y-1">
+                          {template.mods.map(mod => (
+                            <Badge key={mod} variant="secondary" className="text-xs mr-1">{mod}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </CardContent>
           </Card>
         </TabsContent>
