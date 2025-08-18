@@ -1,9 +1,15 @@
 import { ModernPaymentDialog } from "./ModernPaymentDialog";
 import { SplitBillDialog } from "./SplitBillDialog";
 import { TableTransferDialog } from "./TableTransferDialog";
+import { BillPreviewDialog } from "./BillPreviewDialog";
 import type { CartItem, POSTable } from "../types";
 
 interface RestaurantPaymentFlowProps {
+  // Bill preview dialog (addition)
+  isBillPreviewOpen: boolean;
+  onCloseBillPreview: () => void;
+  onProceedToPayment: () => void;
+
   // Payment dialog
   isPaymentOpen: boolean;
   onClosePayment: () => void;
@@ -30,6 +36,9 @@ interface RestaurantPaymentFlowProps {
 }
 
 export function RestaurantPaymentFlow({
+  isBillPreviewOpen,
+  onCloseBillPreview,
+  onProceedToPayment,
   isPaymentOpen,
   onClosePayment,
   currentOrder,
@@ -57,6 +66,22 @@ export function RestaurantPaymentFlow({
 
   return (
     <>
+      {/* Bill Preview Dialog (Addition) */}
+      {currentOrder && (
+        <BillPreviewDialog
+          isOpen={isBillPreviewOpen}
+          onClose={onCloseBillPreview}
+          onProceedToPayment={onProceedToPayment}
+          onSplitBill={() => {
+            onCloseBillPreview();
+            // Open split bill dialog logic will be handled by parent
+          }}
+          currentOrder={currentOrder}
+          cartItems={cartItems}
+          totals={totals}
+        />
+      )}
+
       {/* Payment Dialog */}
       {currentOrder && (
         <ModernPaymentDialog

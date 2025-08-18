@@ -276,6 +276,9 @@ export function RestaurantPOSLayout() {
 
         {/* Payment Flow Dialogs */}
         <RestaurantPaymentFlow
+          isBillPreviewOpen={logic.isBillPreviewOpen}
+          onCloseBillPreview={() => logic.setIsBillPreviewOpen(false)}
+          onProceedToPayment={logic.handleProceedToPayment}
           isPaymentOpen={logic.isPaymentOpen}
           onClosePayment={() => logic.setIsPaymentOpen(false)}
           currentOrder={logic.orderState.currentOrder}

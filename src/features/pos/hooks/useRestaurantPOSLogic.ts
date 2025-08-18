@@ -22,6 +22,7 @@ export function useRestaurantPOSLogic({
   selectedTable, 
   customerCount 
 }: UseRestaurantPOSLogicProps) {
+  const [isBillPreviewOpen, setIsBillPreviewOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isSplitBillOpen, setIsSplitBillOpen] = useState(false);
   const [isTableTransferOpen, setIsTableTransferOpen] = useState(false);
@@ -152,6 +153,12 @@ export function useRestaurantPOSLogic({
       return;
     }
     
+    // En restauration: d'abord l'addition, puis le paiement
+    setIsBillPreviewOpen(true);
+  };
+
+  const handleProceedToPayment = () => {
+    setIsBillPreviewOpen(false);
     setIsPaymentOpen(true);
   };
 
@@ -230,12 +237,14 @@ export function useRestaurantPOSLogic({
   return {
     // State
     orderState,
+    isBillPreviewOpen,
     isPaymentOpen,
     isSplitBillOpen,
     isTableTransferOpen,
     discountApplied,
 
     // Setters
+    setIsBillPreviewOpen,
     setIsPaymentOpen,
     setIsSplitBillOpen,
     setIsTableTransferOpen,
@@ -249,6 +258,7 @@ export function useRestaurantPOSLogic({
     handleSplitBill,
     handleTransferTable,
     handleCheckout,
+    handleProceedToPayment,
     handleApplyDiscount,
     handleRoomCharge,
     handleSelectPrinter,
