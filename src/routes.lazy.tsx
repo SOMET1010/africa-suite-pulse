@@ -11,9 +11,9 @@ export const MobileServerInterface = lazy(() => import('@/features/pos/component
 export const POSReportsPage = lazy(() => import('@/features/pos/components/POSReportsPage').then(m => ({ default: m.POSReportsPage })));
 
 // Dashboard Modules - Data-heavy components with charts
-export const ManagerDashboard = lazy(() => import('@/features/dashboards').then(m => ({ default: m.ManagerDashboard })));
-export const ReceptionistDashboard = lazy(() => import('@/features/dashboards').then(m => ({ default: m.ReceptionistDashboard })));
-export const ServerDashboard = lazy(() => import('@/features/dashboards').then(m => ({ default: m.ServerDashboard })));
+export const ManagerDashboard = lazy(() => import('@/features/dashboards/ManagerDashboard').then(m => ({ default: m.ManagerDashboard })));
+export const ReceptionistDashboard = lazy(() => import('@/features/dashboards/ReceptionistDashboard').then(m => ({ default: m.ReceptionistDashboard })));
+export const ServerDashboard = lazy(() => import('@/features/dashboards/ServerDashboard').then(m => ({ default: m.ServerDashboard })));
 
 // Reports - Heavy data processing and export functionality
 export const DailyReportsPage = lazy(() => import('@/features/reports/daily/DailyReportsPage'));
