@@ -1,21 +1,13 @@
 import React from 'react';
 import RequirePOSAuth from '@/features/pos/auth/RequirePOSAuth';
-import { DirectSaleInterface } from '@/features/pos/components/DirectSaleInterface';
+import { ProfessionalPOSInterface } from '@/features/pos/components/ProfessionalPOSInterface';
 
-// Template simplifié spécifiquement pour restaurant africain
 export default function POSAfricanPage() {
-  const defaultStaff = {
-    id: 'african-staff-1',
-    name: 'Restaurant Africain',
-    role: 'server' as const,
-    initials: 'RA'
-  };
-
   return (
     <RequirePOSAuth requiredRole="pos_server">
-      <DirectSaleInterface 
-        staff={defaultStaff}
-        onBack={() => {}} // Mode simplifié sans retour
+      <ProfessionalPOSInterface 
+        serverId="african-server-1"
+        outletId="african-restaurant-main"
       />
     </RequirePOSAuth>
   );
