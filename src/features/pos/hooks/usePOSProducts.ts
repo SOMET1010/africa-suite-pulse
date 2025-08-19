@@ -54,7 +54,7 @@ export function usePOSCategories(outletId?: string) {
         .select('*')
         .eq('outlet_id', outletId)
         .eq('is_active', true)
-        .order('display_order', { ascending: true });
+        .order('name', { ascending: true });
 
       if (error) {
         console.error('❌ [usePOSCategories] Error:', error);
