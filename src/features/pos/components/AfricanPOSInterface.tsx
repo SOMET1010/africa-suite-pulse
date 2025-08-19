@@ -203,6 +203,14 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
     toast.success('→ Cuisine');
   }, [currentOrder, selectedTable]);
 
+  const handlePayment = useCallback(() => {
+    if (currentOrder.length === 0) {
+      toast.error('Aucun article');
+      return;
+    }
+    toast.success('💳 Paiement');
+  }, [currentOrder]);
+
   // Calcul du total de la commande
   const orderTotal = currentOrder.reduce((sum, item) => sum + item.totalPrice, 0);
 
@@ -270,14 +278,6 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
     
     toast.success('📄 Addition imprimée');
   }, [currentOrder, selectedTable, customerCount, orderTotal, session]);
-
-  const handlePayment = useCallback(() => {
-    if (currentOrder.length === 0) {
-      toast.error('Aucun article');
-      return;
-    }
-    toast.success('💳 Paiement');
-  }, [currentOrder]);
 
   // Plan de salle visuel simplifié
   const TablePlan = () => (
