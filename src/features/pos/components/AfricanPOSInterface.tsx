@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Plus, Minus, Trash2, CreditCard, ChefHat, Users, MapPin, Smartphone, Grid3X3, Keyboard } from 'lucide-react';
+import { Plus, Minus, Trash2, CreditCard, ChefHat, Users, MapPin, Smartphone, Grid3X3, Keyboard, Receipt } from 'lucide-react';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
 import { usePOSAuthContext } from '../auth/POSAuthProvider';
@@ -92,19 +92,23 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
           e.preventDefault();
           clearOrder();
           break;
-        case 'F2': // Paiement
+        case 'F2': // Addition
+          e.preventDefault();
+          printReceipt();
+          break;
+        case 'F3': // Paiement
           e.preventDefault();
           handlePayment();
           break;
-        case 'F3': // Cuisine
+        case 'F4': // Cuisine
           e.preventDefault();
           sendToKitchen();
           break;
-        case 'F4': // Plan salle
+        case 'F5': // Plan salle
           e.preventDefault();
           setShowTablePlan(!showTablePlan);
           break;
-        case 'F5': // Mode stress
+        case 'F6': // Mode stress
           e.preventDefault();
           setIsStressMode(!isStressMode);
           break;
@@ -199,6 +203,74 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
     toast.success('→ Cuisine');
   }, [currentOrder, selectedTable]);
 
+  // Calcul du total de la commande
+  const orderTotal = currentOrder.reduce((sum, item) => sum + item.totalPrice, 0);
+
+  const printReceipt = useCallback(() => {
+    if (currentOrder.length === 0) {
+      toast.error('Aucun article à imprimer');
+      return;
+    }
+    
+    // Création du contenu de l'addition
+    const receiptContent = `
+      
+      =============================
+           CAFÉ DE COCODY
+      =============================
+      
+      Table: ${selectedTable?.table_number || 'À emporter'}
+      Clients: ${customerCount}
+      Date: ${new Date().toLocaleDateString('fr-FR')}
+      Heure: ${new Date().toLocaleTimeString('fr-FR')}
+      Serveur: ${session?.display_name}
+      
+      -----------------------------
+      
+      ${currentOrder.map(item => 
+        `${item.product.name}
+         ${item.quantity} x ${item.unitPrice.toLocaleString()} FCFA = ${item.totalPrice.toLocaleString()} FCFA`
+      ).join('\n      ')}
+      
+      -----------------------------
+      
+      TOTAL: ${orderTotal.toLocaleString()} FCFA
+      
+      =============================
+      Merci de votre visite !
+      =============================
+    `;
+    
+    // Impression directe ou ouverture dans une nouvelle fenêtre
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Addition - Table ${selectedTable?.table_number || 'À emporter'}</title>
+            <style>
+              body { 
+                font-family: 'Courier New', monospace; 
+                font-size: 12px; 
+                line-height: 1.4;
+                margin: 20px;
+                white-space: pre-line;
+              }
+              @media print {
+                body { margin: 0; }
+              }
+            </style>
+          </head>
+          <body>${receiptContent}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+    
+    toast.success('📄 Addition imprimée');
+  }, [currentOrder, selectedTable, customerCount, orderTotal, session]);
+
   const handlePayment = useCallback(() => {
     if (currentOrder.length === 0) {
       toast.error('Aucun article');
@@ -206,8 +278,6 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
     }
     toast.success('💳 Paiement');
   }, [currentOrder]);
-
-  const orderTotal = currentOrder.reduce((sum, item) => sum + item.totalPrice, 0);
 
   // Plan de salle visuel simplifié
   const TablePlan = () => (
@@ -306,13 +376,13 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
             <div className="text-3xl font-bold">{orderTotal.toLocaleString()} FCFA</div>
           </div>
           
-          <Button
-            variant={isStressMode ? "secondary" : "outline"}
-            onClick={() => setIsStressMode(!isStressMode)}
-            className="text-sm"
-          >
-            {isStressMode ? "🔥 STRESS" : "😌 NORMAL"} (F5)
-          </Button>
+            <Button
+              variant={isStressMode ? "secondary" : "outline"}
+              onClick={() => setIsStressMode(!isStressMode)}
+              className="text-sm"
+            >
+              {isStressMode ? "🔥 STRESS" : "😌 NORMAL"} (F6)
+            </Button>
         </div>
       </div>
 
@@ -389,11 +459,13 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
           {/* Actions rapides */}
           <div className="p-4 space-y-2 border-t">
             <Button 
-              onClick={clearOrder} 
+              onClick={printReceipt} 
+              disabled={currentOrder.length === 0}
               variant="outline" 
-              className="w-full h-12 text-lg"
+              className="w-full h-12 text-lg border-2 border-primary"
             >
-              🔄 Nouveau (F1)
+              <Receipt className="h-5 w-5 mr-2" />
+              Addition (F2)
             </Button>
             <Button 
               onClick={sendToKitchen} 
@@ -401,7 +473,7 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               className="w-full h-12 text-lg bg-success hover:bg-success/90"
             >
               <ChefHat className="h-5 w-5 mr-2" />
-              Cuisine (F3)
+              Cuisine (F4)
             </Button>
           </div>
         </div>
@@ -506,7 +578,18 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               <span className="text-4xl font-bold text-primary">{orderTotal.toLocaleString()} FCFA</span>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
+              <Button
+                onClick={printReceipt}
+                disabled={currentOrder.length === 0}
+                size="lg"
+                variant="outline"
+                className="h-16 text-lg border-2 border-primary"
+              >
+                <Receipt className="h-6 w-6 mr-2" />
+                ADDITION (F2)
+              </Button>
+              
               <Button
                 onClick={handlePayment}
                 disabled={currentOrder.length === 0}
@@ -514,7 +597,7 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
                 className="h-16 text-lg bg-success hover:bg-success/90"
               >
                 <CreditCard className="h-6 w-6 mr-2" />
-                ESPÈCES (F2)
+                ESPÈCES (F3)
               </Button>
               
               <Button
@@ -540,11 +623,22 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               </Button>
             </div>
 
+            {/* Bouton Nouveau ticket */}
+            <div className="mt-4">
+              <Button 
+                onClick={clearOrder} 
+                variant="outline" 
+                className="w-full h-12 text-lg"
+              >
+                🔄 Nouveau Ticket (F1)
+              </Button>
+            </div>
+
             {/* Aide raccourcis */}
             <div className="mt-4 text-center text-sm text-muted-foreground bg-muted/30 p-3 rounded">
               <div className="grid grid-cols-2 gap-2">
-                <div>F1: Nouveau • F2: Payer • F3: Cuisine • F4: Plan salle</div>
-                <div>+/-: Clients • Enter: Ajouter • Esc: Effacer • F5: Mode</div>
+                <div>F1: Nouveau • F2: Addition • F3: Payer • F4: Cuisine • F5: Plan salle</div>
+                <div>+/-: Clients • Enter: Ajouter • Esc: Effacer • F6: Mode</div>
               </div>
             </div>
           </div>
