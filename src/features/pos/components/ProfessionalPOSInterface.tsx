@@ -114,9 +114,9 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
     }
     
     const posProduct = {
-      id: product.code,
+      id: product.code,          // Map code to id
       name: product.name,
-      price: product.price,
+      base_price: product.price, // Map price to base_price
       category: product.category,
       image_url: product.image_url
     };
