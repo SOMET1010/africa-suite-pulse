@@ -1,13 +1,10 @@
-import { ProfessionalPOSInterface } from "@/features/pos/components/ProfessionalPOSInterface";
-import { POSLayout } from '@/core/layout/POSLayout';
+import { SimplePOSInterface } from "@/features/pos/components/SimplePOSInterface";
 
 export default function POSTerminalPage() {
   return (
-    <POSLayout title="Terminal POS" showStatusBar={true}>
-      <ProfessionalPOSInterface 
-        serverId="terminal-server-1"
-        outletId="main-terminal"
-      />
-    </POSLayout>
+    <SimplePOSInterface 
+      serverId="536fde63-3eb2-444d-a1bb-bdbe9f4dfd83"
+      outletId="fe3b78ca-a951-49ab-b01d-335b92220a9e"
+    />
   );
 }
