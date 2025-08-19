@@ -116,6 +116,7 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
     const posProduct = {
       id: product.code,          // Map code to id
       name: product.name,
+      code: product.code,        // Add missing code property
       base_price: product.price, // Map price to base_price
       category: product.category,
       image_url: product.image_url
