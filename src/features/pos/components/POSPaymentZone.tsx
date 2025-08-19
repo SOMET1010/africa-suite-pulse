@@ -3,10 +3,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { POSFloorPlan } from './POSFloorPlan';
 import { 
   CreditCard, Smartphone, DollarSign, Calculator, 
   Percent, Home, MapPin, Trash2, Settings,
-  Grid3X3, History, Clock
+  Grid3X3, History, Clock, Maximize2, Minimize2
 } from 'lucide-react';
 
 interface POSPaymentZoneProps {
@@ -18,26 +19,30 @@ interface POSPaymentZoneProps {
   };
   cartItems: any[];
   selectedTable: any;
+  onSelectTable: (table: any) => void;
   onClearOrder: () => void;
   onApplyDiscount: (type: 'percentage' | 'amount', value: number) => void;
   onShowBillPreview: () => void;
   onSendToKitchen: () => void;
   showFloorPlan: boolean;
   onToggleFloorPlan: () => void;
-  FloorPlanComponent: React.ComponentType;
+  showFloorPlanFullScreen: boolean;
+  onToggleFloorPlanFullScreen: () => void;
 }
 
 export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
   totals,
   cartItems,
   selectedTable,
+  onSelectTable,
   onClearOrder,
   onApplyDiscount,
   onShowBillPreview,
   onSendToKitchen,
   showFloorPlan,
   onToggleFloorPlan,
-  FloorPlanComponent
+  showFloorPlanFullScreen,
+  onToggleFloorPlanFullScreen
 }) => {
   const [calculatorDisplay, setCalculatorDisplay] = useState('0');
   const [discountValue, setDiscountValue] = useState('');
@@ -102,11 +107,25 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
       </div>
 
       {/* Plan de salle miniature */}
-      {showFloorPlan && (
+      {showFloorPlan && !showFloorPlanFullScreen && (
         <div className="border-b bg-card">
           <div className="p-3">
-            <h4 className="text-sm font-bold mb-2 text-center">TABLES</h4>
-            <FloorPlanComponent />
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-sm font-bold">TABLES</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToggleFloorPlanFullScreen}
+                className="h-6 w-6 p-0"
+              >
+                <Maximize2 className="h-3 w-3" />
+              </Button>
+            </div>
+            <POSFloorPlan 
+              selectedTable={selectedTable}
+              onSelectTable={onSelectTable}
+              isFullScreen={false}
+            />
           </div>
         </div>
       )}

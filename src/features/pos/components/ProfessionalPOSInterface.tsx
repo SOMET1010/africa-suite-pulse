@@ -16,6 +16,7 @@ import { RestaurantPaymentFlow } from './RestaurantPaymentFlow';
 import { POSProductGrid } from './POSProductGrid';
 import { POSOrderZone } from './POSOrderZone';
 import { POSPaymentZone } from './POSPaymentZone';
+import { POSFloorPlan } from './POSFloorPlan';
 
 // Import des images de produits africains
 import attiekeImage from '@/assets/attieke-poisson.jpg';
@@ -61,6 +62,7 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
   const [selectedCategory, setSelectedCategory] = useState('Tous');
   const [productCode, setProductCode] = useState('');
   const [showFloorPlan, setShowFloorPlan] = useState(false);
+  const [showFloorPlanFullScreen, setShowFloorPlanFullScreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Utilisation de la logique restaurant existante
@@ -214,7 +216,17 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
           break;
         case 'F4': // Plan salle
           e.preventDefault();
-          setShowFloorPlan(!showFloorPlan);
+          if (showFloorPlanFullScreen) {
+            setShowFloorPlanFullScreen(false);
+          } else {
+            setShowFloorPlan(!showFloorPlan);
+          }
+          break;
+        case 'Escape':
+          if (showFloorPlanFullScreen) {
+            e.preventDefault();
+            setShowFloorPlanFullScreen(false);
+          }
           break;
         case 'Enter':
           e.preventDefault();
@@ -233,6 +245,34 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
 
   return (
     <div className="h-screen flex flex-col bg-muted/30">
+      {/* Overlay fullscreen pour plan de salle */}
+      {showFloorPlanFullScreen && (
+        <div className="fixed inset-0 z-50 bg-background">
+          <div className="h-full flex flex-col">
+            <div className="h-16 bg-card border-b flex items-center justify-between px-6">
+              <h2 className="text-xl font-bold">Plan de Salle - Vue Complète</h2>
+              <div className="flex items-center gap-4">
+                <div className="text-sm text-muted-foreground">Appuyez sur Échap ou F4 pour fermer</div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowFloorPlanFullScreen(false)}
+                >
+                  Fermer
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 p-6">
+              <POSFloorPlan
+                selectedTable={selectedTable}
+                onSelectTable={setSelectedTable}
+                isFullScreen={true}
+                onToggleFullScreen={() => setShowFloorPlanFullScreen(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header professionnel */}
       <div className="h-16 bg-gradient-to-r from-primary to-primary-hover text-primary-foreground flex items-center justify-between px-6 shadow-lg">
         <div className="flex items-center gap-6">
@@ -307,13 +347,15 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
             totals={totals}
             cartItems={cartItems}
             selectedTable={selectedTable}
+            onSelectTable={setSelectedTable}
             onClearOrder={clearOrder}
             onApplyDiscount={handleApplyDiscount}
             onShowBillPreview={showBillPreview}
             onSendToKitchen={sendToKitchen}
             showFloorPlan={showFloorPlan}
             onToggleFloorPlan={() => setShowFloorPlan(!showFloorPlan)}
-            FloorPlanComponent={FloorPlanMini}
+            showFloorPlanFullScreen={showFloorPlanFullScreen}
+            onToggleFloorPlanFullScreen={() => setShowFloorPlanFullScreen(true)}
           />
         </div>
       </div>
