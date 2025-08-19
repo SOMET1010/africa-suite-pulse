@@ -5,9 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { 
   Users, MapPin, Clock, CreditCard, 
   ArrowRight, RotateCcw, Maximize2, Minimize2,
-  ChefHat, Bell
+  ChefHat, Bell, Settings
 } from 'lucide-react';
 import { useServerTables } from '../hooks/useTableAssignments';
+import { AdvancedFloorPlan } from './AdvancedFloorPlan';
 
 interface POSFloorPlanProps {
   selectedTable: any;
@@ -40,6 +41,27 @@ export const POSFloorPlan: React.FC<POSFloorPlanProps> = ({
   onToggleFullScreen
 }) => {
   const { data: serverTables } = useServerTables('server-1', 'org-1');
+  const [useAdvancedMode, setUseAdvancedMode] = useState(true);
+
+  // Mock server data for advanced mode
+  const mockServers = [
+    { id: 'srv1', name: 'Marie Dubois', tables_assigned: 4, max_tables: 6, workload_percentage: 75, status: 'active' as const, handy_battery: 85 },
+    { id: 'srv2', name: 'Jean Martin', tables_assigned: 5, max_tables: 5, workload_percentage: 90, status: 'busy' as const, handy_battery: 45 },
+    { id: 'srv3', name: 'Sophie Laurent', tables_assigned: 3, max_tables: 6, workload_percentage: 60, status: 'active' as const, handy_battery: 70 }
+  ];
+
+  if (useAdvancedMode) {
+    return (
+      <AdvancedFloorPlan
+        selectedTable={selectedTable}
+        onSelectTable={onSelectTable}
+        servers={mockServers}
+        isFullScreen={isFullScreen}
+        onToggleFullScreen={onToggleFullScreen}
+        showServerWorkload={true}
+      />
+    );
+  }
   
   // Mock tables data with enhanced status system
   const [tables, setTables] = useState<TableData[]>([

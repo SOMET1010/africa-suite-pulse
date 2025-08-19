@@ -4,9 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, CheckCircle, ChefHat, AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Clock, CheckCircle, ChefHat, AlertCircle, Settings, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { KitchenStationDisplay } from "./KitchenStationDisplay";
+import { RealTimeCommunicationHub } from "./RealTimeCommunicationHub";
 
 interface KitchenOrder {
   id: string;
@@ -30,6 +33,8 @@ interface KitchenOrder {
 export function KitchenDisplay() {
   const [orders, setOrders] = useState<KitchenOrder[]>([]);
   const [selectedTab, setSelectedTab] = useState('all');
+  const [displayMode, setDisplayMode] = useState<'traditional' | 'stations' | 'communication'>('traditional');
+  const [orientation, setOrientation] = useState<'horizontal' | 'vertical'>('horizontal');
   
 
   useEffect(() => {
@@ -141,14 +146,46 @@ export function KitchenDisplay() {
     return `${hours}h${minutes}min`;
   };
 
+  // Mode switching logic
+  if (displayMode === 'stations') {
+    return <KitchenStationDisplay displayMode="multi" orientation={orientation} />;
+  }
+
+  if (displayMode === 'communication') {
+    return <RealTimeCommunicationHub userRole="kitchen" userId="kitchen-1" userName="Chef Principal" />;
+  }
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <ChefHat className="h-8 w-8 text-primary" />
             <h1 className="text-3xl font-bold">Cuisine</h1>
+            
+            {/* Display mode selector */}
+            <Select value={displayMode} onValueChange={(value: any) => setDisplayMode(value)}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="traditional">Vue traditionnelle</SelectItem>
+                <SelectItem value="stations">Stations spécialisées</SelectItem>
+                <SelectItem value="communication">Communication</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            {/* Orientation toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setOrientation(prev => prev === 'horizontal' ? 'vertical' : 'horizontal')}
+            >
+              <Monitor className="h-4 w-4 mr-2" />
+              {orientation === 'horizontal' ? 'Horizontal' : 'Vertical'}
+            </Button>
           </div>
+          
           <div className="flex items-center gap-4">
             <Badge variant="secondary" className="text-lg px-3 py-1">
               {orders.length} commande(s) active(s)
