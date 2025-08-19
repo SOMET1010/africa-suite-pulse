@@ -81,13 +81,13 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
   serverId, 
   outletId 
 }) => {
-  const { session } = usePOSAuthContext();
+  const { session, loading, error: authError } = usePOSAuthContext();
   const { formatCurrency } = useCurrency();
   
   // Hooks pour récupérer les données réelles
-  const { data: products = [], isLoading: productsLoading } = usePOSProducts(outletId);
-  const { data: categories = [], isLoading: categoriesLoading } = usePOSCategories(outletId);
-  const { data: tables = [], isLoading: tablesLoading } = usePOSTables(outletId);
+  const { data: products = [], isLoading: productsLoading, error: productsError } = usePOSProducts(outletId);
+  const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = usePOSCategories(outletId);
+  const { data: tables = [], isLoading: tablesLoading, error: tablesError } = usePOSTables(outletId);
   
   // États principaux
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -328,12 +328,51 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
     toast.success('Remise supprimée', { duration: 1000 });
   }, []);
 
-  if (productsLoading || categoriesLoading || tablesLoading) {
+  if (loading || productsLoading || categoriesLoading || tablesLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gradient-to-br from-orange-50 to-red-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-orange-500 mx-auto mb-4"></div>
           <p className="text-lg font-medium text-gray-700">Préparation du restaurant...</p>
+          {authError && (
+            <p className="text-red-600 text-sm mt-2">Erreur: {authError}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="h-8 w-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Erreur d'authentification</h2>
+          <p className="text-gray-600 mb-4">{authError}</p>
+          <Button onClick={() => window.location.href = '/pos/login-secure'}>
+            Retourner à la connexion
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (productsError || categoriesError || tablesError) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UtensilsCrossed className="h-8 w-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Erreur de chargement</h2>
+          <p className="text-gray-600 mb-4">
+            Impossible de charger les données du restaurant.
+          </p>
+          <Button onClick={() => window.location.reload()}>
+            Réessayer
+          </Button>
         </div>
       </div>
     );

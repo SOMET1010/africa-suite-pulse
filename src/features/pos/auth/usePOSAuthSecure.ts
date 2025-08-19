@@ -98,8 +98,16 @@ export function usePOSAuthSecure() {
         p_session_token: storedSession.session_token
       });
 
-      if (error || !data || data.length === 0) {
-        logger.warn("POS Secure session invalid or expired", { error });
+      if (error) {
+        logger.warn("POS Secure session validation error", { error });
+        setError(`Erreur de validation: ${error.message || 'Session invalide'}`);
+        clearSession();
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        logger.warn("POS Secure session invalid or expired - no data returned");
+        setError("Session expirée ou invalide");
         clearSession();
         return;
       }
