@@ -43,7 +43,7 @@ export function KitchenMessagesSelector({
         .select('*')
         .eq('is_active', true)
         .order('category', { ascending: true })
-        .order('display_order', { ascending: true });
+        .order('name', { ascending: true });
 
       if (error) throw error;
       return data as KitchenMessage[];
