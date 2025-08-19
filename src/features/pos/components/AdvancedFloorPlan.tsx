@@ -1,294 +1,198 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Users, Clock, AlertTriangle, CreditCard, ChefHat, 
-  Bell, Maximize2, Minimize2, RotateCcw, ArrowRight,
-  UserCheck, Timer, TrendingUp, Utensils
+  Users, MapPin, Clock, CreditCard, ArrowRight, RotateCcw, 
+  Maximize2, Minimize2, ChefHat, Bell, Settings, Wifi, WifiOff,
+  Battery, BatteryLow, AlertTriangle, CheckCircle, Timer
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-interface TableStatus {
+interface TableData {
   id: string;
   number: string;
-  capacity: number;
-  section: string;
   status: 'available' | 'occupied' | 'reserved' | 'billing' | 'payment' | 'neglected' | 'attention';
+  seats: number;
+  section?: string;
   server_id?: string;
-  server_name?: string;
-  server_workload?: number; // 0-100%
-  occupancy_time?: number; // minutes
-  current_order?: {
+  occupancy_time?: number; // in minutes
+  last_activity?: string;
+  currentOrder?: {
     id: string;
     total: number;
     items_count: number;
     created_at: string;
-    kitchen_status: 'none' | 'sent' | 'preparing' | 'ready';
-    last_activity: string;
+    needs_kitchen: boolean;
     bill_requested: boolean;
-    special_requests?: string[];
+    stage: 'nouveau' | 'preparation' | 'pret' | 'servi';
   };
-  guest_count?: number;
-  estimated_departure?: string;
-  vip_status?: boolean;
-  notes?: string;
 }
 
-interface ServerInfo {
+interface Server {
   id: string;
   name: string;
   tables_assigned: number;
   max_tables: number;
   workload_percentage: number;
-  status: 'active' | 'busy' | 'break';
+  status: 'active' | 'busy' | 'break' | 'offline';
   handy_battery?: number;
+  last_activity?: string;
 }
 
 interface AdvancedFloorPlanProps {
-  selectedTable?: TableStatus;
-  onSelectTable: (table: TableStatus) => void;
-  servers: ServerInfo[];
+  selectedTable: any;
+  onSelectTable: (table: any) => void;
+  servers: Server[];
   isFullScreen?: boolean;
   onToggleFullScreen?: () => void;
   showServerWorkload?: boolean;
 }
 
-export function AdvancedFloorPlan({ 
-  selectedTable, 
-  onSelectTable, 
-  servers = [],
+export const AdvancedFloorPlan: React.FC<AdvancedFloorPlanProps> = ({
+  selectedTable,
+  onSelectTable,
+  servers,
   isFullScreen = false,
   onToggleFullScreen,
   showServerWorkload = true
-}: AdvancedFloorPlanProps) {
-  const [tables, setTables] = useState<TableStatus[]>([]);
-  const [selectedSection, setSelectedSection] = useState<string>('all');
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Mock enhanced data
-  useEffect(() => {
-    const mockTables: TableStatus[] = [
-      {
-        id: '1',
-        number: '01',
-        capacity: 4,
-        section: 'Terrasse',
-        status: 'available',
-      },
-      {
-        id: '2',
-        number: '02',
-        capacity: 2,
-        section: 'Terrasse',
-        status: 'occupied',
-        server_id: 'srv1',
-        server_name: 'Marie',
-        server_workload: 75,
-        occupancy_time: 45,
-        guest_count: 2,
-        current_order: {
-          id: 'ord1',
-          total: 35000,
-          items_count: 3,
-          created_at: new Date(Date.now() - 45 * 60000).toISOString(),
-          kitchen_status: 'ready',
-          last_activity: new Date(Date.now() - 5 * 60000).toISOString(),
-          bill_requested: false,
-          special_requests: ['Sans gluten']
-        }
-      },
-      {
-        id: '3',
-        number: '03',
-        capacity: 6,
-        section: 'Salle',
-        status: 'neglected',
-        server_id: 'srv2',
-        server_name: 'Jean',
-        server_workload: 90,
-        occupancy_time: 95, // Plus de 90 minutes = négligée
-        guest_count: 4,
-        current_order: {
-          id: 'ord2',
-          total: 78000,
-          items_count: 6,
-          created_at: new Date(Date.now() - 95 * 60000).toISOString(),
-          kitchen_status: 'none',
-          last_activity: new Date(Date.now() - 25 * 60000).toISOString(),
-          bill_requested: false
-        }
-      },
-      {
-        id: '4',
-        number: '04',
-        capacity: 4,
-        section: 'Salle',
-        status: 'billing',
-        server_id: 'srv1',
-        server_name: 'Marie',
-        server_workload: 75,
-        occupancy_time: 67,
-        guest_count: 3,
-        current_order: {
-          id: 'ord3',
-          total: 52000,
-          items_count: 4,
-          created_at: new Date(Date.now() - 67 * 60000).toISOString(),
-          kitchen_status: 'none',
-          last_activity: new Date(Date.now() - 2 * 60000).toISOString(),
-          bill_requested: true
-        }
-      },
-      {
-        id: '5',
-        number: '05',
-        capacity: 8,
-        section: 'VIP',
-        status: 'attention',
-        server_id: 'srv3',
-        server_name: 'Sophie',
-        server_workload: 60,
-        occupancy_time: 30,
-        guest_count: 6,
-        vip_status: true,
-        current_order: {
-          id: 'ord4',
-          total: 125000,
-          items_count: 8,
-          created_at: new Date(Date.now() - 30 * 60000).toISOString(),
-          kitchen_status: 'preparing',
-          last_activity: new Date(Date.now() - 1 * 60000).toISOString(),
-          bill_requested: false,
-          special_requests: ['Client VIP', 'Service personnalisé']
-        },
-        notes: 'Anniversaire - dessert offert'
-      },
-      {
-        id: '6',
-        number: '06',
-        capacity: 2,
-        section: 'Bar',
-        status: 'payment',
-        server_id: 'srv2',
-        server_name: 'Jean',
-        occupancy_time: 40,
-        guest_count: 1,
-        current_order: {
-          id: 'ord5',
-          total: 18000,
-          items_count: 2,
-          created_at: new Date(Date.now() - 40 * 60000).toISOString(),
-          kitchen_status: 'none',
-          last_activity: new Date().toISOString(),
-          bill_requested: true
-        }
+}) => {
+  const [tables, setTables] = useState<TableData[]>([
+    { 
+      id: '1', number: '1', status: 'available', seats: 4, section: 'A',
+      occupancy_time: 0, last_activity: new Date().toISOString()
+    },
+    { 
+      id: '2', number: '2', status: 'occupied', seats: 2, section: 'A', server_id: 'srv1',
+      occupancy_time: 45, last_activity: new Date(Date.now() - 45 * 60000).toISOString(),
+      currentOrder: { 
+        id: 'ord1', total: 45000, items_count: 3, created_at: '2024-01-20T10:30:00Z', 
+        needs_kitchen: false, bill_requested: false, stage: 'preparation'
       }
-    ];
-    setTables(mockTables);
-  }, []);
+    },
+    { 
+      id: '3', number: '3', status: 'neglected', seats: 6, section: 'A', server_id: 'srv2',
+      occupancy_time: 95, last_activity: new Date(Date.now() - 95 * 60000).toISOString(),
+      currentOrder: { 
+        id: 'ord2', total: 78000, items_count: 5, created_at: '2024-01-20T09:30:00Z', 
+        needs_kitchen: false, bill_requested: true, stage: 'pret'
+      }
+    },
+    { 
+      id: '4', number: '4', status: 'reserved', seats: 4, section: 'A',
+      occupancy_time: 0, last_activity: new Date().toISOString()
+    },
+    { 
+      id: '5', number: '5', status: 'attention', seats: 2, section: 'B', server_id: 'srv3',
+      occupancy_time: 25, last_activity: new Date(Date.now() - 25 * 60000).toISOString(),
+      currentOrder: { 
+        id: 'ord3', total: 32000, items_count: 2, created_at: '2024-01-20T11:15:00Z', 
+        needs_kitchen: true, bill_requested: false, stage: 'nouveau'
+      }
+    },
+    { 
+      id: '6', number: '6', status: 'available', seats: 8, section: 'B',
+      occupancy_time: 0, last_activity: new Date().toISOString()
+    },
+    { 
+      id: '7', number: '7', status: 'billing', seats: 4, section: 'B', server_id: 'srv1',
+      occupancy_time: 75, last_activity: new Date(Date.now() - 75 * 60000).toISOString(),
+      currentOrder: { 
+        id: 'ord4', total: 125000, items_count: 6, created_at: '2024-01-20T10:00:00Z', 
+        needs_kitchen: false, bill_requested: true, stage: 'servi'
+      }
+    },
+    { 
+      id: '8', number: '8', status: 'available', seats: 2, section: 'B',
+      occupancy_time: 0, last_activity: new Date().toISOString()
+    }
+  ]);
 
-  // Real-time updates
+  const [selectedSection, setSelectedSection] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'tables' | 'servers'>('tables');
+  const sections = ['all', 'A', 'B', 'C'];
+
+  // Real-time updates simulation
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-      
-      // Update occupancy times
-      setTables(prev => prev.map(table => ({
-        ...table,
-        occupancy_time: table.status === 'occupied' || table.status === 'billing' || table.status === 'neglected' || table.status === 'attention'
-          ? (table.occupancy_time || 0) + 1/60 // Add 1 second as fraction of minute
-          : table.occupancy_time
-      })));
-
-      // Check for neglected tables (over 90 minutes)
+    const interval = setInterval(() => {
       setTables(prev => prev.map(table => {
-        if ((table.status === 'occupied' || table.status === 'attention') && 
-            table.occupancy_time && table.occupancy_time > 90) {
-          return { ...table, status: 'neglected' as const };
+        if (table.status === 'occupied' || table.status === 'neglected' || table.status === 'attention') {
+          const newOccupancyTime = (table.occupancy_time || 0) + 1;
+          let newStatus = table.status;
+          
+          // Auto-detect neglected tables (more than 90 minutes)
+          if (newOccupancyTime > 90 && table.status === 'occupied') {
+            newStatus = 'neglected';
+          }
+          
+          return { ...table, occupancy_time: newOccupancyTime, status: newStatus };
         }
         return table;
       }));
-    }, 1000);
+    }, 60000); // Update every minute
 
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, []);
 
-  const sections = ['all', 'Terrasse', 'Salle', 'VIP', 'Bar'];
-  
-  const getTableStatusColor = (table: TableStatus) => {
-    const baseColors = {
-      available: 'bg-green-100 border-green-500 text-green-800 hover:bg-green-200',
-      occupied: 'bg-blue-100 border-blue-500 text-blue-800 hover:bg-blue-200',
-      reserved: 'bg-yellow-100 border-yellow-500 text-yellow-800 hover:bg-yellow-200',
-      billing: 'bg-orange-100 border-orange-500 text-orange-800 hover:bg-orange-200',
-      payment: 'bg-purple-100 border-purple-500 text-purple-800 hover:bg-purple-200',
-      neglected: 'bg-red-100 border-red-500 text-red-800 hover:bg-red-200 animate-pulse',
-      attention: 'bg-indigo-100 border-indigo-500 text-indigo-800 hover:bg-indigo-200'
-    };
-
-    let colorClass = baseColors[table.status];
-    
-    // VIP styling
-    if (table.vip_status) {
-      colorClass += ' ring-2 ring-yellow-400';
+  const getTableStatusColor = (status: TableData['status']) => {
+    switch (status) {
+      case 'available': return 'bg-green-100 border-green-500 text-green-800 hover:bg-green-200';
+      case 'occupied': return 'bg-blue-100 border-blue-500 text-blue-800 hover:bg-blue-200';
+      case 'reserved': return 'bg-yellow-100 border-yellow-500 text-yellow-800 hover:bg-yellow-200';
+      case 'billing': return 'bg-orange-100 border-orange-500 text-orange-800 hover:bg-orange-200';
+      case 'payment': return 'bg-purple-100 border-purple-500 text-purple-800 hover:bg-purple-200';
+      case 'neglected': return 'bg-red-100 border-red-500 text-red-800 hover:bg-red-200 animate-pulse';
+      case 'attention': return 'bg-amber-100 border-amber-500 text-amber-800 hover:bg-amber-200';
+      default: return 'bg-gray-100 border-gray-300 text-gray-600';
     }
-    
-    // Kitchen status overlay
-    if (table.current_order?.kitchen_status === 'ready') {
-      colorClass += ' ring-2 ring-green-400 ring-offset-1';
-    }
-    
-    return colorClass;
   };
 
-  const getStatusIcon = (table: TableStatus) => {
+  const getStatusIcon = (table: TableData) => {
     switch (table.status) {
-      case 'available': return null;
+      case 'available': return <CheckCircle className="h-3 w-3" />;
       case 'occupied': return <Users className="h-3 w-3" />;
       case 'reserved': return <Clock className="h-3 w-3" />;
       case 'billing': return <Bell className="h-3 w-3" />;
       case 'payment': return <CreditCard className="h-3 w-3" />;
-      case 'neglected': return <AlertTriangle className="h-3 w-3 animate-bounce" />;
-      case 'attention': return <UserCheck className="h-3 w-3" />;
+      case 'neglected': return <AlertTriangle className="h-3 w-3" />;
+      case 'attention': return <Timer className="h-3 w-3" />;
       default: return null;
     }
   };
 
-  const getKitchenStatusIcon = (status: string) => {
+  const getStatusText = (status: TableData['status']) => {
     switch (status) {
-      case 'sent': return <ChefHat className="h-3 w-3 text-yellow-600" />;
-      case 'preparing': return <Timer className="h-3 w-3 text-blue-600 animate-spin" />;
-      case 'ready': return <Utensils className="h-3 w-3 text-green-600 animate-pulse" />;
-      default: return null;
+      case 'available': return 'Libre';
+      case 'occupied': return 'Occupée';
+      case 'reserved': return 'Réservée';
+      case 'billing': return 'Addition';
+      case 'payment': return 'Paiement';
+      case 'neglected': return 'Négligée';
+      case 'attention': return 'Attention';
+      default: return 'Inconnu';
     }
   };
 
-  const getStatusText = (status: TableStatus['status']) => {
-    const statusLabels = {
-      available: 'Libre',
-      occupied: 'Occupée',
-      reserved: 'Réservée',
-      billing: 'Addition',
-      payment: 'Paiement',
-      neglected: 'Négligée',
-      attention: 'Attention'
-    };
-    return statusLabels[status];
+  const getServerById = (serverId: string) => {
+    return servers.find(s => s.id === serverId);
   };
 
-  const formatOccupancyTime = (minutes?: number) => {
-    if (!minutes) return '';
-            const hours = Math.floor(minutes / 60);
-            const mins = Math.floor(minutes % 60);
-            return hours > 0 ? `${hours}h${mins.toString().padStart(2, '0')}` : `${mins}min`;
+  const getServerStatusColor = (status: Server['status']) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 border-green-500 text-green-800';
+      case 'busy': return 'bg-orange-100 border-orange-500 text-orange-800';
+      case 'break': return 'bg-yellow-100 border-yellow-500 text-yellow-800';
+      case 'offline': return 'bg-gray-100 border-gray-500 text-gray-800';
+      default: return 'bg-gray-100 border-gray-300 text-gray-600';
+    }
   };
 
-  const getServerWorkloadColor = (workload: number) => {
-    if (workload >= 90) return 'text-red-600';
-    if (workload >= 75) return 'text-orange-600';
-    if (workload >= 50) return 'text-yellow-600';
-    return 'text-green-600';
+  const formatOccupancyTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0) {
+      return `${hours}h${mins.toString().padStart(2, '0')}`;
+    }
+    return `${mins}min`;
   };
 
   const filteredTables = selectedSection === 'all' 
@@ -296,215 +200,221 @@ export function AdvancedFloorPlan({
     : tables.filter(table => table.section === selectedSection);
 
   const gridCols = isFullScreen ? 'grid-cols-6' : 'grid-cols-4';
-  const cardSize = isFullScreen ? 'min-h-32' : 'min-h-20';
+  const cardSize = isFullScreen ? 'min-h-28' : 'min-h-20';
 
   return (
-    <div className="h-full flex flex-col bg-background">
-      {/* Header */}
-      <div className="bg-primary text-primary-foreground p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl font-bold">Plan de Salle - Temps Réel</h2>
-            <div className="flex gap-2">
-              {sections.map(section => (
-                <Button
-                  key={section}
-                  variant={selectedSection === section ? "secondary" : "ghost"}
-                  size="sm"
-                  onClick={() => setSelectedSection(section)}
-                  className="text-primary-foreground"
-                >
-                  {section === 'all' ? 'Toutes' : section}
-                </Button>
-              ))}
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <div className="text-sm opacity-75">Tables occupées</div>
-              <div className="text-xl font-bold">
-                {tables.filter(t => ['occupied', 'billing', 'payment', 'neglected', 'attention'].includes(t.status)).length}
-                /{tables.length}
-              </div>
-            </div>
-            
-            {onToggleFullScreen && (
+    <Card className={`${isFullScreen ? 'h-full' : ''} bg-background`}>
+      <CardContent className="p-4">
+        {/* Header avec contrôles */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-2">
+            {/* Mode selector */}
+            <div className="flex gap-1 p-1 bg-muted rounded">
               <Button
-                variant="ghost"
+                variant={viewMode === 'tables' ? "default" : "ghost"}
                 size="sm"
-                onClick={onToggleFullScreen}
-                className="text-primary-foreground"
+                onClick={() => setViewMode('tables')}
+                className="h-7 px-3 text-xs"
               >
-                {isFullScreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                <MapPin className="h-3 w-3 mr-1" />
+                Tables
               </Button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-hidden flex">
-        {/* Floor plan */}
-        <div className="flex-1 p-4">
-          {/* Status legend */}
-          {isFullScreen && (
-            <div className="mb-4 p-3 bg-muted rounded-lg">
-              <div className="flex flex-wrap gap-3 text-sm">
-                <Badge className="bg-green-100 text-green-800">Libre</Badge>
-                <Badge className="bg-blue-100 text-blue-800">Occupée</Badge>
-                <Badge className="bg-yellow-100 text-yellow-800">Réservée</Badge>
-                <Badge className="bg-orange-100 text-orange-800">Addition</Badge>
-                <Badge className="bg-purple-100 text-purple-800">Paiement</Badge>
-                <Badge className="bg-red-100 text-red-800">Négligée (>90min)</Badge>
-                <Badge className="bg-indigo-100 text-indigo-800">Attention requise</Badge>
-              </div>
-            </div>
-          )}
-
-          {/* Tables grid */}
-          <div className={cn("grid gap-3 h-full", gridCols)}>
-            {filteredTables.map(table => (
-              <Button
-                key={table.id}
-                variant="outline"
-                onClick={() => onSelectTable(table)}
-                className={cn(
-                  cardSize,
-                  "p-3 border-2 transition-all duration-200 flex flex-col items-center justify-center",
-                  getTableStatusColor(table),
-                  selectedTable?.id === table.id && "ring-2 ring-primary ring-offset-2"
-                )}
-              >
-                <div className="flex flex-col items-center gap-1 text-xs w-full">
-                  {/* Table number and icons */}
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-sm">T{table.number}</span>
-                    {getStatusIcon(table)}
-                    {table.vip_status && <span className="text-yellow-600">👑</span>}
-                    {table.current_order?.kitchen_status && getKitchenStatusIcon(table.current_order.kitchen_status)}
-                  </div>
-                  
-                  {/* Capacity and guest count */}
-                  <div className="text-[10px] opacity-75">
-                    {table.guest_count ? `${table.guest_count}/${table.capacity}` : `${table.capacity} places`}
-                  </div>
-                  
-                  {/* Occupancy time for occupied tables */}
-                  {table.occupancy_time && isFullScreen && (
-                    <div className={cn(
-                      "text-[10px] font-medium",
-                      table.occupancy_time > 90 ? "text-red-600" : 
-                      table.occupancy_time > 60 ? "text-orange-600" : "text-blue-600"
-                    )}>
-                      ⏱️ {formatOccupancyTime(table.occupancy_time)}
-                    </div>
-                  )}
-                  
-                  {/* Order total */}
-                  {table.current_order && isFullScreen && (
-                    <div className="text-[10px] font-medium">
-                      {table.current_order.total.toLocaleString()} F
-                    </div>
-                  )}
-                  
-                  {/* Server name and workload */}
-                  {table.server_name && isFullScreen && showServerWorkload && (
-                    <div className="text-[10px] flex items-center gap-1">
-                      <span>{table.server_name}</span>
-                      {table.server_workload && (
-                        <TrendingUp className={cn("h-2 w-2", getServerWorkloadColor(table.server_workload))} />
-                      )}
-                    </div>
-                  )}
-                  
-                  {/* Status text for compact mode */}
-                  {!isFullScreen && (
-                    <div className="text-[10px]">{getStatusText(table.status)}</div>
-                  )}
-                </div>
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Server sidebar */}
-        {isFullScreen && showServerWorkload && (
-          <div className="w-80 bg-muted/50 p-4 border-l">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <UserCheck className="h-5 w-5" />
-              Serveurs - Charge de travail
-            </h3>
-            
-            <div className="space-y-3">
-              {servers.map(server => (
-                <Card key={server.id}>
-                  <CardContent className="p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">{server.name}</span>
-                      <Badge variant={server.status === 'active' ? 'default' : 'secondary'}>
-                        {server.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="text-sm text-muted-foreground mb-2">
-                      Tables: {server.tables_assigned}/{server.max_tables}
-                    </div>
-                    
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={cn(
-                          "h-2 rounded-full transition-all",
-                          server.workload_percentage >= 90 ? "bg-red-500" :
-                          server.workload_percentage >= 75 ? "bg-orange-500" :
-                          server.workload_percentage >= 50 ? "bg-yellow-500" : "bg-green-500"
-                        )}
-                        style={{ width: `${server.workload_percentage}%` }}
-                      />
-                    </div>
-                    
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Charge: {server.workload_percentage}%
-                      {server.handy_battery && ` • Handy: ${server.handy_battery}%`}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Selected table actions */}
-      {selectedTable && isFullScreen && (
-        <div className="bg-muted p-4 border-t">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-bold text-lg flex items-center gap-2">
-                Table {selectedTable.number}
-                {selectedTable.vip_status && <span className="text-yellow-600">👑 VIP</span>}
-                <Badge variant="outline">{getStatusText(selectedTable.status)}</Badge>
-              </h4>
-              
-              <div className="text-sm text-muted-foreground flex items-center gap-4">
-                {selectedTable.server_name && (
-                  <span>Serveur: {selectedTable.server_name}</span>
-                )}
-                {selectedTable.occupancy_time && (
-                  <span>Durée: {formatOccupancyTime(selectedTable.occupancy_time)}</span>
-                )}
-                {selectedTable.current_order && (
-                  <span>Total: {selectedTable.current_order.total.toLocaleString()} F</span>
-                )}
-              </div>
-              
-              {selectedTable.notes && (
-                <div className="text-sm text-blue-600 mt-1">
-                  📝 {selectedTable.notes}
-                </div>
+              {showServerWorkload && (
+                <Button
+                  variant={viewMode === 'servers' ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode('servers')}
+                  className="h-7 px-3 text-xs"
+                >
+                  <Users className="h-3 w-3 mr-1" />
+                  Serveurs
+                </Button>
               )}
             </div>
-            
-            <div className="flex gap-2">
+
+            {/* Section filters */}
+            {viewMode === 'tables' && (
+              <div className="flex gap-1">
+                {sections.map(section => (
+                  <Button
+                    key={section}
+                    variant={selectedSection === section ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSelectedSection(section)}
+                    className="h-7 px-2 text-xs"
+                  >
+                    {section === 'all' ? 'Toutes' : `Zone ${section}`}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {onToggleFullScreen && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleFullScreen}
+              className="h-7 w-7 p-0"
+            >
+              {isFullScreen ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
+            </Button>
+          )}
+        </div>
+
+        {/* Légende des statuts */}
+        {isFullScreen && viewMode === 'tables' && (
+          <div className="flex flex-wrap gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
+            <Badge className="bg-green-100 text-green-800 border-green-500">Libre</Badge>
+            <Badge className="bg-blue-100 text-blue-800 border-blue-500">Occupée</Badge>
+            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-500">Réservée</Badge>
+            <Badge className="bg-orange-100 text-orange-800 border-orange-500">Addition</Badge>
+            <Badge className="bg-purple-100 text-purple-800 border-purple-500">Paiement</Badge>
+            <Badge className="bg-red-100 text-red-800 border-red-500">Négligée</Badge>
+            <Badge className="bg-amber-100 text-amber-800 border-amber-500">Attention</Badge>
+          </div>
+        )}
+
+        {/* Vue Tables */}
+        {viewMode === 'tables' && (
+          <div className={`grid ${gridCols} gap-3`}>
+            {filteredTables.map((table) => {
+              const server = table.server_id ? getServerById(table.server_id) : null;
+              
+              return (
+                <Button
+                  key={table.id}
+                  variant="outline"
+                  onClick={() => onSelectTable(table)}
+                  className={`
+                    ${cardSize} p-3 border-2 transition-all duration-200
+                    ${getTableStatusColor(table.status)}
+                    ${selectedTable?.id === table.id ? 'ring-2 ring-primary ring-offset-1' : ''}
+                    ${table.currentOrder?.needs_kitchen ? 'shadow-lg' : ''}
+                  `}
+                >
+                  <div className="flex flex-col items-center justify-center gap-1 text-xs w-full">
+                    {/* Header avec numéro table et statut */}
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-bold text-sm">T{table.number}</span>
+                      <div className="flex items-center gap-1">
+                        {getStatusIcon(table)}
+                        {table.currentOrder?.needs_kitchen && (
+                          <ChefHat className="h-3 w-3 text-orange-600" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Info places et temps */}
+                    <div className="flex items-center justify-between w-full text-[10px] opacity-75">
+                      <span>{table.seats} places</span>
+                      {table.occupancy_time && table.occupancy_time > 0 && (
+                        <span className={`font-medium ${table.occupancy_time > 90 ? 'text-red-600' : ''}`}>
+                          {formatOccupancyTime(table.occupancy_time)}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Serveur assigné */}
+                    {server && isFullScreen && (
+                      <div className="text-[9px] text-center opacity-60 truncate w-full">
+                        {server.name}
+                      </div>
+                    )}
+                    
+                    {/* Détails commande */}
+                    {table.currentOrder && isFullScreen && (
+                      <div className="text-[10px] text-center w-full">
+                        <div className="flex items-center justify-between">
+                          <span>{table.currentOrder.items_count} art.</span>
+                          <Badge variant="outline" className="h-4 px-1 text-[8px]">
+                            {table.currentOrder.stage}
+                          </Badge>
+                        </div>
+                        <div className="font-medium mt-1">
+                          {table.currentOrder.total.toLocaleString()} F
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Statut simple en mode compact */}
+                    {!isFullScreen && (
+                      <div className="text-[9px] opacity-75">
+                        {getStatusText(table.status)}
+                      </div>
+                    )}
+                  </div>
+                </Button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Vue Serveurs */}
+        {viewMode === 'servers' && showServerWorkload && (
+          <div className={`grid ${gridCols} gap-3`}>
+            {servers.map((server) => {
+              const assignedTables = tables.filter(t => t.server_id === server.id);
+              const workloadColor = server.workload_percentage > 85 ? 'text-red-600' : 
+                                   server.workload_percentage > 70 ? 'text-orange-600' : 'text-green-600';
+              
+              return (
+                <Card key={server.id} className={`${cardSize} p-3 ${getServerStatusColor(server.status)} border-2`}>
+                  <div className="flex flex-col items-center justify-center gap-1 text-xs h-full">
+                    {/* Nom serveur et statut */}
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-bold text-xs truncate">{server.name}</span>
+                      <div className="flex items-center gap-1">
+                        {server.status === 'offline' ? 
+                          <WifiOff className="h-3 w-3" /> : 
+                          <Wifi className="h-3 w-3" />
+                        }
+                        {server.handy_battery && server.handy_battery < 20 ? (
+                          <BatteryLow className="h-3 w-3 text-red-500" />
+                        ) : (
+                          <Battery className="h-3 w-3" />
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Charge de travail */}
+                    <div className="text-center w-full">
+                      <div className={`text-sm font-bold ${workloadColor}`}>
+                        {server.workload_percentage}%
+                      </div>
+                      <div className="text-[10px] opacity-75">
+                        {server.tables_assigned}/{server.max_tables} tables
+                      </div>
+                    </div>
+                    
+                    {/* Batterie Handy */}
+                    {server.handy_battery && isFullScreen && (
+                      <div className="text-[9px] opacity-60">
+                        Handy: {server.handy_battery}%
+                      </div>
+                    )}
+                    
+                    {/* Tables assignées */}
+                    {isFullScreen && assignedTables.length > 0 && (
+                      <div className="text-[9px] text-center opacity-60">
+                        T{assignedTables.map(t => t.number).join(', ')}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Actions rapides */}
+        {isFullScreen && selectedTable && viewMode === 'tables' && (
+          <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+            <h4 className="text-sm font-bold mb-3 flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Table {selectedTable.number} - Actions Rapides
+            </h4>
+            <div className="flex gap-2 flex-wrap">
               <Button size="sm" variant="outline">
                 <ArrowRight className="h-3 w-3 mr-1" />
                 Transférer
@@ -513,22 +423,46 @@ export function AdvancedFloorPlan({
                 <RotateCcw className="h-3 w-3 mr-1" />
                 Libérer
               </Button>
-              {selectedTable.current_order?.kitchen_status === 'ready' && (
-                <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                  <Utensils className="h-3 w-3 mr-1" />
-                  Service prêt
+              <Button size="sm" variant="outline">
+                <Users className="h-3 w-3 mr-1" />
+                Assigner Serveur
+              </Button>
+              {selectedTable.currentOrder?.needs_kitchen && (
+                <Button size="sm" className="bg-orange-600 hover:bg-orange-700 text-white">
+                  <ChefHat className="h-3 w-3 mr-1" />
+                  Alerter Cuisine
                 </Button>
               )}
               {selectedTable.status === 'neglected' && (
-                <Button size="sm" variant="destructive">
+                <Button size="sm" className="bg-red-600 hover:bg-red-700 text-white">
                   <AlertTriangle className="h-3 w-3 mr-1" />
-                  Attention urgente
+                  Action Urgente
                 </Button>
               )}
             </div>
+            
+            {/* Informations détaillées */}
+            {selectedTable.currentOrder && (
+              <div className="mt-3 p-3 bg-background rounded border">
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="font-medium">Commande:</span> #{selectedTable.currentOrder.id}
+                  </div>
+                  <div>
+                    <span className="font-medium">Stage:</span> {selectedTable.currentOrder.stage}
+                  </div>
+                  <div>
+                    <span className="font-medium">Articles:</span> {selectedTable.currentOrder.items_count}
+                  </div>
+                  <div>
+                    <span className="font-medium">Total:</span> {selectedTable.currentOrder.total.toLocaleString()} F
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
-}
+};
