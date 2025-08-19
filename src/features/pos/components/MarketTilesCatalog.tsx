@@ -131,6 +131,8 @@ export function MarketTilesCatalog({
     estimatedTime?: number;
     soundAlert: boolean;
     template?: string;
+    orderMode: any;
+    tableInfo?: any;
   }) => {
     if (selectedProduct) {
       console.log('Kitchen messages:', data);
