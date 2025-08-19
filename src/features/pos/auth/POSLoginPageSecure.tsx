@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { usePOSAuthSecure } from './usePOSAuthSecure';
+import { EmployeeSelector } from '../components/EmployeeSelector';
 import { Shield, Lock, User, Clock, AlertTriangle, CheckCircle2, LogOut, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -234,20 +234,16 @@ export default function POSLoginPageSecure() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Code Employé */}
+          {/* Sélecteur d'Employé */}
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center space-x-2">
               <User className="w-4 h-4" />
-              <span>Code Employé</span>
+              <span>Employé</span>
             </label>
-            <Input
-              type="text"
-              placeholder="Votre code employé"
+            <EmployeeSelector
               value={employeeCode}
-              onChange={(e) => setEmployeeCode(e.target.value.toUpperCase())}
+              onValueChange={setEmployeeCode}
               disabled={loading || isAuthenticating}
-              className="text-center text-lg font-mono"
-              maxLength={10}
             />
           </div>
 
