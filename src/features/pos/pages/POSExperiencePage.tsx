@@ -1,12 +1,12 @@
 import { POSLayout } from '@/core/layout/POSLayout';
-import { ProfessionalPOSInterface } from '../components/ProfessionalPOSInterface';
+import { RestaurantPOSInterface } from '../components/RestaurantPOSInterface';
 
 export default function POSExperiencePage() {
   return (
     <POSLayout title="POS Restaurant - Expérience Améliorée" showStatusBar={true}>
-      <ProfessionalPOSInterface 
+      <RestaurantPOSInterface 
         serverId="experience-server-1"
-        outletId="main-restaurant"
+        outletId="fe3b78ca-a951-49ab-b01d-335b92220a9e"
       />
     </POSLayout>
   );
