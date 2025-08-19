@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { usePOSAuth } from "@/features/pos/auth/usePOSAuth";
+import { usePOSAuthContext } from './POSAuthProvider';
 import { supabase } from "@/integrations/supabase/client";
 import { useOrgId } from "@/core/auth/useOrg";
 import { User, Clock, LogOut, Plus } from "lucide-react";
@@ -28,7 +28,7 @@ const roleLabels: Record<string, string> = {
 export default function POSUsersManagement() {
   const [users, setUsers] = useState<POSUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session, isManager } = usePOSAuth();
+  const { session, isManager } = usePOSAuthContext();
   const { orgId } = useOrgId();
   const navigate = useNavigate();
 

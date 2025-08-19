@@ -2,7 +2,7 @@ import { useState, useEffect, startTransition } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { usePOSAuth } from "../auth/usePOSAuth";
+import { usePOSAuthContext } from "../auth/POSAuthProvider";
 import { 
   ShoppingCart, 
   ChefHat, 
@@ -133,7 +133,7 @@ const menuItems = [
 ];
 
 export function POSMainMenu() {
-  const { session, logout, hasRole } = usePOSAuth();
+  const { session, logout, hasRole } = usePOSAuthContext();
   const navigate = useNavigate();
 
   const availableItems = menuItems.filter(item => 

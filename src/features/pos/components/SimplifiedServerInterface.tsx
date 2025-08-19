@@ -7,7 +7,7 @@ import { Plus, Minus, Trash2, CreditCard, ChefHat, RotateCcw, Search, Table } fr
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
-import { usePOSAuth } from '../auth/usePOSAuth';
+import { usePOSAuthContext } from '../auth/POSAuthProvider';
 import { toast } from 'sonner';
 
 interface SimplifiedServerInterfaceProps {
@@ -27,7 +27,7 @@ export const SimplifiedServerInterface: React.FC<SimplifiedServerInterfaceProps>
   serverId, 
   outletId 
 }) => {
-  const { session } = usePOSAuth();
+  const { session } = usePOSAuthContext();
   const { data: serverTables = [], error: tablesError } = useServerTables(serverId, session?.org_id);
   const { data: categories = [], error: categoriesError } = usePOSCategories(outletId);
   const { data: products = [], error: productsError } = usePOSProducts(outletId);

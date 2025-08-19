@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { POSLayout } from '@/core/layout/POSLayout';
 import { ArrowLeft, ShoppingCart, Plus, Minus, CreditCard, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { usePOSAuth } from "../auth/usePOSAuth";
+import { usePOSAuthContext } from "../auth/POSAuthProvider";
 import { logger } from "@/lib/logger";
 import { useToast } from "@/hooks/use-toast";
 
@@ -53,7 +53,7 @@ const mockProducts: Product[] = [
 
 export default function POSTerminalPage() {
   const navigate = useNavigate();
-  const { session } = usePOSAuth();
+  const { session } = usePOSAuthContext();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>("1");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);

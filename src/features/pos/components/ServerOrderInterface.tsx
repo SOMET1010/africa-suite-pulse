@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
-import { usePOSAuth } from '../auth/usePOSAuth';
+import { usePOSAuthContext } from '../auth/POSAuthProvider';
 import { toast } from 'sonner';
 
 interface ServerOrderInterfaceProps {
@@ -36,7 +36,7 @@ export const ServerOrderInterface: React.FC<ServerOrderInterfaceProps> = ({
   serverId, 
   outletId 
 }) => {
-  const { session } = usePOSAuth();
+  const { session } = usePOSAuthContext();
   const { data: serverTables = [], error: tablesError } = useServerTables(serverId, session?.org_id);
   const { data: categories = [], error: categoriesError } = usePOSCategories(outletId);
   const { data: products = [], error: productsError } = usePOSProducts(outletId);

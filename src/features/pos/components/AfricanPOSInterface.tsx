@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Plus, Minus, Trash2, CreditCard, ChefHat, Users, MapPin, Smartphone, Grid3X3, Keyboard } from 'lucide-react';
 import { useServerTables } from '../hooks/useTableAssignments';
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
-import { usePOSAuth } from '../auth/usePOSAuth';
+import { usePOSAuthContext } from '../auth/POSAuthProvider';
 import { toast } from 'sonner';
 import { VisualProductKeyboard } from './VisualProductKeyboard';
 
@@ -54,7 +54,7 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
   serverId, 
   outletId 
 }) => {
-  const { session } = usePOSAuth();
+  const { session } = usePOSAuthContext();
   const { data: serverTables = [] } = useServerTables(serverId, session?.org_id);
   
   const [selectedTable, setSelectedTable] = useState<any>(null);
