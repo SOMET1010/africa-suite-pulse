@@ -55,8 +55,15 @@ export function useRestaurantPOSLogic({
   };
 
   const handleAddToCart = (product: any, quantity: number = 1) => {
+    console.log("🐛 [DEBUG] handleAddToCart called", { 
+      product: product.name, 
+      hasCurrentOrder: !!orderState.currentOrder,
+      hasSelectedTable: !!selectedTable
+    });
+    
     if (!orderState.currentOrder) {
       if (!selectedTable) {
+        console.log("🐛 [DEBUG] No table selected");
         toast({
           title: "Table requise",
           description: "Sélectionnez une table avant d'ajouter des articles",
@@ -65,12 +72,15 @@ export function useRestaurantPOSLogic({
         return;
       }
       
+      console.log("🐛 [DEBUG] Creating order and scheduling item add");
       orderState.actions.createOrder(customerCount);
       
       setTimeout(() => {
+        console.log("🐛 [DEBUG] Adding item after order creation delay");
         orderState.actions.addItem(product, quantity);
       }, 100);
     } else {
+      console.log("🐛 [DEBUG] Adding item to existing order");
       orderState.actions.addItem(product, quantity);
     }
 

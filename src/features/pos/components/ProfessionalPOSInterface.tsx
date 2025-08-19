@@ -109,7 +109,14 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
 
   // Actions principales
   const addToOrder = useCallback(async (product: any, quantity: number = 1) => {
+    console.log("🐛 [DEBUG] addToOrder called", { 
+      product: product.name, 
+      currentOrder: !!currentOrder, 
+      selectedTable: !!selectedTable 
+    });
+    
     if (!currentOrder && selectedTable) {
+      console.log("🐛 [DEBUG] No current order, creating new one");
       handleNewOrder();
     }
     
@@ -122,6 +129,7 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
       image_url: product.image_url
     };
     
+    console.log("🐛 [DEBUG] Calling handleAddToCart", { posProduct });
     handleAddToCart(posProduct, quantity);
     toast.success(`${product.name} ajouté`, { duration: 1000 });
   }, [currentOrder, selectedTable, handleNewOrder, handleAddToCart]);
