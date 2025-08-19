@@ -16,6 +16,7 @@ import {
 import { usePOSProducts, usePOSCategories } from '../hooks/usePOSProducts';
 import { usePOSTables } from '../hooks/usePOSTables';
 import { usePOSAuthContext } from '../auth/POSAuthProvider';
+import { usePOSMetrics } from '../hooks/usePOSMetrics';
 import { toast } from 'sonner';
 import { useCurrency } from '@/hooks/useCurrency';
 
@@ -88,6 +89,9 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
   const { data: products = [], isLoading: productsLoading, error: productsError } = usePOSProducts(outletId);
   const { data: categories = [], isLoading: categoriesLoading, error: categoriesError } = usePOSCategories(outletId);
   const { data: tables = [], isLoading: tablesLoading, error: tablesError } = usePOSTables(outletId);
+  
+  // Hook pour les métriques POS
+  const { metrics, addAlert } = usePOSMetrics(outletId);
   
   // États principaux
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -228,7 +232,12 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
       setCart(prev => [...prev, newItem]);
       toast.success(`${product.name} ajouté`, { duration: 1500 });
     }
-  }, [cart]);
+    
+    // Track metrics for high volume monitoring
+    if (metrics.ordersPerMinute > 5) {
+      addAlert('high_volume', 'medium', `Volume élevé détecté: ${metrics.ordersPerMinute.toFixed(1)} commandes/min`);
+    }
+  }, [cart, metrics, addAlert]);
 
   const updateQuantity = useCallback((id: string, newQuantity: number) => {
     if (newQuantity <= 0) {
