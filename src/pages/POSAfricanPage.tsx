@@ -6,8 +6,8 @@ export default function POSAfricanPage() {
   return (
     <RequirePOSAuth requiredRole="pos_server">
       <ProfessionalPOSInterface 
-        serverId="african-server-1"
-        outletId="african-restaurant-main"
+        serverId="536fde63-3eb2-444d-a1bb-bdbe9f4dfd83"
+        outletId="fe3b78ca-a951-49ab-b01d-335b92220a9e"
       />
     </RequirePOSAuth>
   );
