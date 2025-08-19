@@ -6,7 +6,7 @@ import { lazy } from 'react';
 // POS System - Heavy components with complex state management
 export const POSPage = lazy(() => import('@/features/pos/POSPage'));
 export const POSKitchenPage = lazy(() => import('@/features/pos/pages/POSKitchenPage').then(m => ({ default: m.default })));
-export const RestaurantPOSLayout = lazy(() => import('@/features/pos/components/RestaurantPOSLayout').then(m => ({ default: m.RestaurantPOSLayout })));
+// Removed: RestaurantPOSLayout - replaced by direct ProfessionalPOSInterface usage
 // Removed: MobileServerInterface - consolidated into ProfessionalPOSInterface
 export const POSReportsPage = lazy(() => import('@/features/pos/components/POSReportsPage').then(m => ({ default: m.POSReportsPage })));
 
