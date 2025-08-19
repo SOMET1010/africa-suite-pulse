@@ -65,15 +65,18 @@ export function useRestaurantPOSLogic({
         return;
       }
       
-      // Créer la commande de manière synchrone et attendre qu'elle soit terminée
-      await orderState.actions.createOrder(customerCount);
-      
-      // Attendre un court délai pour s'assurer que l'état est mis à jour
-      await new Promise(resolve => setTimeout(resolve, 50));
+      try {
+        // Créer la commande et attendre qu'elle soit terminée
+        await orderState.actions.createOrder(customerCount);
+        // Ajouter l'article à la nouvelle commande
+        await orderState.actions.addItem(product, quantity);
+      } catch (error) {
+        console.error("Erreur lors de la création de commande:", error);
+      }
+    } else {
+      // Ajouter l'article à la commande existante
+      await orderState.actions.addItem(product, quantity);
     }
-    
-    // Ajouter l'article à la commande
-    orderState.actions.addItem(product, quantity);
 
     // Retour haptique sur mobile
     if (navigator.vibrate) {

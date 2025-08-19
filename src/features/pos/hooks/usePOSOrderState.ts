@@ -322,15 +322,27 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
 
   // Actions exposées
   const actions = {
-    createOrder: (customerCount: number) => createOrderMutation.mutate({ customerCount }),
+    createOrder: async (customerCount: number) => {
+      return new Promise((resolve, reject) => {
+        createOrderMutation.mutate({ customerCount }, {
+          onSuccess: (data) => resolve(data),
+          onError: (error) => reject(error)
+        });
+      });
+    },
     addItem: (product: any, quantity: number = 1, specialInstructions?: string) => {
-      addItemMutation.mutate({
-        productId: product.id,
-        productName: product.name,
-        productCode: product.code,
-        quantity,
-        unitPrice: product.base_price,
-        specialInstructions
+      return new Promise((resolve, reject) => {
+        addItemMutation.mutate({
+          productId: product.id,
+          productName: product.name,
+          productCode: product.code,
+          quantity,
+          unitPrice: product.base_price,
+          specialInstructions
+        }, {
+          onSuccess: (data) => resolve(data),
+          onError: (error) => reject(error)
+        });
       });
     },
     updateQuantity: (itemId: string, quantity: number, unitPrice: number) => {
