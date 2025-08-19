@@ -7,16 +7,7 @@ import {
   ChefHat, Receipt, Clock, Send 
 } from 'lucide-react';
 
-interface CartItem {
-  id: string;
-  product_id: string;
-  product_name: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  status: string;
-  special_instructions?: string;
-}
+import { CartItem } from '../types';
 
 interface POSOrderZoneProps {
   cartItems: CartItem[];
@@ -166,7 +157,7 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
-                  <h4 className="font-bold text-base">{item.product_name}</h4>
+                  <h4 className="font-bold text-base">{item.product?.name || item.product_name}</h4>
                   <div className="text-sm text-muted-foreground">
                     {item.unit_price.toLocaleString()} F/unité
                   </div>
@@ -174,9 +165,9 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
                 
                 <Badge 
                   variant="outline" 
-                  className={`text-xs ${getStatusColor(item.status)}`}
+                  className={`text-xs ${getStatusColor(item.status || 'pending')}`}
                 >
-                  {getStatusLabel(item.status)}
+                  {getStatusLabel(item.status || 'pending')}
                 </Badge>
               </div>
 
@@ -194,7 +185,7 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
                     variant="outline"
                     size="sm"
                     className="h-8 w-8 p-0"
-                    onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1)}
+                    onClick={() => onUpdateQuantity(item.product_id || item.id, item.quantity - 1)}
                     disabled={item.quantity <= 1}
                   >
                     <Minus className="h-3 w-3" />
@@ -208,7 +199,7 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
                     variant="outline"
                     size="sm"
                     className="h-8 w-8 p-0"
-                    onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1)}
+                    onClick={() => onUpdateQuantity(item.product_id || item.id, item.quantity + 1)}
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
@@ -217,7 +208,7 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                    onClick={() => onRemoveFromCart(item.product_id)}
+                    onClick={() => onRemoveFromCart(item.product_id || item.id)}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -225,7 +216,7 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
 
                 <div className="text-right">
                   <span className="text-lg font-bold text-primary">
-                    {item.total_price.toLocaleString()} F
+                    {(item.total_price || (item.unit_price * item.quantity)).toLocaleString()} F
                   </span>
                 </div>
               </div>
