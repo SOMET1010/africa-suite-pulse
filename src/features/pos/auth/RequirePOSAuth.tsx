@@ -1,4 +1,5 @@
-import { usePOSAuth, POSRole } from "./usePOSAuth";
+import { usePOSAuthContext } from "./POSAuthProvider";
+import { POSRole } from "./usePOSAuthSecure";
 import { Navigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ShieldX } from "lucide-react";
@@ -10,7 +11,7 @@ interface RequirePOSAuthProps {
 }
 
 export default function RequirePOSAuth({ children, requiredRole }: RequirePOSAuthProps) {
-  const { session, loading, hasRole } = usePOSAuth();
+  const { session, loading, hasRole } = usePOSAuthContext();
 
   if (loading) {
     return (
@@ -57,7 +58,7 @@ export default function RequirePOSAuth({ children, requiredRole }: RequirePOSAut
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-muted-foreground">Votre rôle :</span>
                   <span className="font-medium text-foreground">
-                    {roleLabels[session.role as POSRole] || session.role}
+                    {roleLabels[session.role_name as POSRole] || session.role_name}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">

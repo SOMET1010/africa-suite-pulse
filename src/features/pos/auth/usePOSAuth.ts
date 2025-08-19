@@ -31,15 +31,10 @@ export function usePOSAuth() {
     sessionListeners.add(setSession);
     loadingListeners.add(setLoading);
     
-    // Initialisation globale une seule fois
-    if (!hasGloballyInitialized && !isGloballyValidating) {
+    // Ancien système désactivé - utiliser POSAuthProvider avec usePOSAuthSecure
+    if (!hasGloballyInitialized) {
       hasGloballyInitialized = true;
-      
-      logger.debug("POS auth initialization - SINGLE INIT");
-      
-      // Clear any existing session to force fresh login
-      logger.debug("Clearing existing POS session for fresh login");
-      clearSession();
+      logger.debug("POS auth (legacy) - initialization disabled, use POSAuthProvider instead");
       updateGlobalLoading(false);
     }
     

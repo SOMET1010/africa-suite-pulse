@@ -2,7 +2,7 @@ import React from 'react';
 import RequirePOSAuth from '@/features/pos/auth/RequirePOSAuth';
 import { AfricanPOSInterface } from '@/features/pos/components/AfricanPOSInterface';
 import { ModernOutletSelector } from '@/features/pos/components/ModernOutletSelector';
-import { usePOSAuth } from '@/features/pos/auth/usePOSAuth';
+import { usePOSAuthContext } from '@/features/pos/auth/POSAuthProvider';
 import { usePOSOutlets } from '@/features/pos/hooks/usePOSData';
 import { POSLayout } from '@/core/layout/POSLayout';
 
@@ -15,7 +15,7 @@ export default function POSAfricanPage() {
 }
 
 function POSAfricanContent() {
-  const { session, updateOutlet } = usePOSAuth();
+  const { session, updateOutlet } = usePOSAuthContext();
   const { data: outlets = [], isLoading } = usePOSOutlets();
   
   // Si pas d'outlet_id, montrer le sélecteur d'outlet
@@ -43,8 +43,8 @@ function POSAfricanContent() {
     );
   }
 
-  // Si pas de user_id (ne devrait pas arriver après RequirePOSAuth)
-  if (!session?.user_id) {
+  // Si pas de pos_user_id (ne devrait pas arriver après RequirePOSAuth)
+  if (!session?.pos_user_id) {
     return (
       <POSLayout title="Erreur" showStatusBar={true}>
         <div className="flex items-center justify-center h-[50vh]">
@@ -60,7 +60,7 @@ function POSAfricanContent() {
   // Interface POS Africain en mode plein écran
   return (
     <AfricanPOSInterface 
-      serverId={session.user_id} 
+      serverId={session.pos_user_id} 
       outletId={session.outlet_id} 
     />
   );

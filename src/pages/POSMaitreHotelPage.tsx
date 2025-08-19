@@ -2,7 +2,7 @@ import React from 'react';
 import RequirePOSAuth from '@/features/pos/auth/RequirePOSAuth';
 import { MaitreHotelDashboard } from '@/features/pos/components/MaitreHotelDashboard';
 import { ModernOutletSelector } from '@/features/pos/components/ModernOutletSelector';
-import { usePOSAuth } from '@/features/pos/auth/usePOSAuth';
+import { usePOSAuthContext } from '@/features/pos/auth/POSAuthProvider';
 import { usePOSOutlets } from '@/features/pos/hooks/usePOSData';
 import { POSLayout } from '@/core/layout/POSLayout';
 
@@ -15,7 +15,7 @@ export default function POSMaitreHotelPage() {
 }
 
 function POSMaitreHotelContent() {
-  const { session, updateOutlet } = usePOSAuth();
+  const { session, updateOutlet } = usePOSAuthContext();
   const { data: outlets = [], isLoading } = usePOSOutlets();
   
   if (isLoading) {
