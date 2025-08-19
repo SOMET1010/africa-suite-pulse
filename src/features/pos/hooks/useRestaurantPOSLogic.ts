@@ -54,16 +54,9 @@ export function useRestaurantPOSLogic({
     orderState.actions.createOrder(customerCount);
   };
 
-  const handleAddToCart = (product: any, quantity: number = 1) => {
-    console.log("🐛 [DEBUG] handleAddToCart called", { 
-      product: product.name, 
-      hasCurrentOrder: !!orderState.currentOrder,
-      hasSelectedTable: !!selectedTable
-    });
-    
+  const handleAddToCart = async (product: any, quantity: number = 1) => {
     if (!orderState.currentOrder) {
       if (!selectedTable) {
-        console.log("🐛 [DEBUG] No table selected");
         toast({
           title: "Table requise",
           description: "Sélectionnez une table avant d'ajouter des articles",
@@ -72,17 +65,15 @@ export function useRestaurantPOSLogic({
         return;
       }
       
-      console.log("🐛 [DEBUG] Creating order and scheduling item add");
-      orderState.actions.createOrder(customerCount);
+      // Créer la commande de manière synchrone et attendre qu'elle soit terminée
+      await orderState.actions.createOrder(customerCount);
       
-      setTimeout(() => {
-        console.log("🐛 [DEBUG] Adding item after order creation delay");
-        orderState.actions.addItem(product, quantity);
-      }, 100);
-    } else {
-      console.log("🐛 [DEBUG] Adding item to existing order");
-      orderState.actions.addItem(product, quantity);
+      // Attendre un court délai pour s'assurer que l'état est mis à jour
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
+    
+    // Ajouter l'article à la commande
+    orderState.actions.addItem(product, quantity);
 
     // Retour haptique sur mobile
     if (navigator.vibrate) {

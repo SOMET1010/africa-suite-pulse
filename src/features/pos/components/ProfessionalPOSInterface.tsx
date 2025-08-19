@@ -109,30 +109,18 @@ export const ProfessionalPOSInterface: React.FC<ProfessionalPOSInterfaceProps> =
 
   // Actions principales
   const addToOrder = useCallback(async (product: any, quantity: number = 1) => {
-    console.log("🐛 [DEBUG] addToOrder called", { 
-      product: product.name, 
-      currentOrder: !!currentOrder, 
-      selectedTable: !!selectedTable 
-    });
-    
-    if (!currentOrder && selectedTable) {
-      console.log("🐛 [DEBUG] No current order, creating new one");
-      handleNewOrder();
-    }
-    
     const posProduct = {
-      id: product.code,          // Map code to id
+      id: product.code,
       name: product.name,
-      code: product.code,        // Add missing code property
-      base_price: product.price, // Map price to base_price
+      code: product.code,
+      base_price: product.price,
       category: product.category,
       image_url: product.image_url
     };
     
-    console.log("🐛 [DEBUG] Calling handleAddToCart", { posProduct });
-    handleAddToCart(posProduct, quantity);
+    await handleAddToCart(posProduct, quantity);
     toast.success(`${product.name} ajouté`, { duration: 1000 });
-  }, [currentOrder, selectedTable, handleNewOrder, handleAddToCart]);
+  }, [handleAddToCart]);
 
   const addProductByCode = useCallback(() => {
     const product = AFRICAN_PRODUCTS.find(p => p.code === productCode.trim());
