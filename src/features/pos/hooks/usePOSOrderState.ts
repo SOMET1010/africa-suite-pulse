@@ -39,7 +39,7 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
         .from("pos_orders")
         .select(`
           *,
-          pos_order_items!inner(
+          pos_order_items(
             *,
             pos_products(*)
           )
@@ -268,7 +268,11 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
 
   // Synchroniser l'état local avec les données de la base
   useEffect(() => {
+    console.log("🐛 [DEBUG] Sync effect triggered", { existingOrder, loadingOrder });
+    
     if (existingOrder) {
+      console.log("🐛 [DEBUG] Processing existing order", existingOrder);
+      
       const cartItems: CartItem[] = existingOrder.pos_order_items?.map((item: any) => ({
         id: item.id,
         order_id: item.order_id,
@@ -284,6 +288,8 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
         product: item.pos_products || {},
         fireRound: 1
       })) || [];
+
+      console.log("🐛 [DEBUG] Cart items processed", cartItems);
 
       setOrderState({
         currentOrder: {
@@ -311,6 +317,7 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
         error: null
       });
     } else if (!loadingOrder) {
+      console.log("🐛 [DEBUG] No existing order, clearing state");
       setOrderState({
         currentOrder: null,
         cartItems: [],
@@ -323,14 +330,22 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
   // Actions exposées
   const actions = {
     createOrder: async (customerCount: number) => {
+      console.log("🐛 [DEBUG] createOrder called", { customerCount, selectedOutlet, selectedTable });
       return new Promise((resolve, reject) => {
         createOrderMutation.mutate({ customerCount }, {
-          onSuccess: (data) => resolve(data),
-          onError: (error) => reject(error)
+          onSuccess: (data) => {
+            console.log("🐛 [DEBUG] createOrder SUCCESS", data);
+            resolve(data);
+          },
+          onError: (error) => {
+            console.error("🐛 [DEBUG] createOrder ERROR", error);
+            reject(error);
+          }
         });
       });
     },
     addItem: (product: any, quantity: number = 1, specialInstructions?: string) => {
+      console.log("🐛 [DEBUG] addItem called", { product, quantity, currentOrder: orderState.currentOrder });
       return new Promise((resolve, reject) => {
         addItemMutation.mutate({
           productId: product.id,
@@ -340,8 +355,14 @@ export function usePOSOrderState({ selectedOutlet, selectedTable }: POSOrderStat
           unitPrice: product.base_price,
           specialInstructions
         }, {
-          onSuccess: (data) => resolve(data),
-          onError: (error) => reject(error)
+          onSuccess: (data) => {
+            console.log("🐛 [DEBUG] addItem SUCCESS", data);
+            resolve(data);
+          },
+          onError: (error) => {
+            console.error("🐛 [DEBUG] addItem ERROR", error);
+            reject(error);
+          }
         });
       });
     },
