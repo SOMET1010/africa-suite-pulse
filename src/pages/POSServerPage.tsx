@@ -1,6 +1,6 @@
 import React from 'react';
 import RequirePOSAuth from '@/features/pos/auth/RequirePOSAuth';
-import { SimplifiedServerInterface } from '@/features/pos/components/SimplifiedServerInterface';
+import { ProfessionalPOSInterface } from '@/features/pos/components/ProfessionalPOSInterface';
 import { ModernOutletSelector } from '@/features/pos/components/ModernOutletSelector';
 import { usePOSAuthContext } from '@/features/pos/auth/POSAuthProvider';
 import { usePOSOutlets } from '@/features/pos/hooks/usePOSData';
@@ -58,11 +58,9 @@ function POSServerContent() {
   }
 
   return (
-    <POSLayout title="Interface Serveur" showStatusBar={true}>
-      <SimplifiedServerInterface 
-        serverId={session.pos_user_id} 
-        outletId={session.outlet_id} 
-      />
-    </POSLayout>
+    <ProfessionalPOSInterface 
+      serverId={session.pos_user_id} 
+      outletId={session.outlet_id} 
+    />
   );
 }

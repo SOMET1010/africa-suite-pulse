@@ -7,7 +7,7 @@ import { lazy } from 'react';
 export const POSPage = lazy(() => import('@/features/pos/POSPage'));
 export const POSKitchenPage = lazy(() => import('@/features/pos/pages/POSKitchenPage').then(m => ({ default: m.default })));
 export const RestaurantPOSLayout = lazy(() => import('@/features/pos/components/RestaurantPOSLayout').then(m => ({ default: m.RestaurantPOSLayout })));
-export const MobileServerInterface = lazy(() => import('@/features/pos/components/MobileServerInterface').then(m => ({ default: m.MobileServerInterface })));
+// Removed: MobileServerInterface - consolidated into ProfessionalPOSInterface
 export const POSReportsPage = lazy(() => import('@/features/pos/components/POSReportsPage').then(m => ({ default: m.POSReportsPage })));
 
 // Dashboard Modules - Data-heavy components with charts
@@ -45,7 +45,7 @@ export const POSServerPage = lazy(() => import('@/pages/POSServerPage'));
 export const POSCustomersPage = lazy(() => import('@/pages/POSCustomersPage'));
 export const POSKitchen = lazy(() => import('@/pages/POSKitchen'));
 export const POSReports = lazy(() => import('@/pages/POSReports'));
-export const POSMobileServerPage = lazy(() => import('@/pages/POSMobileServerPage'));
+// Removed: POSMobileServerPage - consolidated into RestaurantPOSLayout
 
 // Business Intelligence Dashboard  
 export const UnifiedBIDashboard = lazy(() => import('@/pages/UnifiedBIDashboard'));

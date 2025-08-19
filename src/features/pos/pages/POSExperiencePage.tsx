@@ -1,10 +1,10 @@
 import { POSLayout } from '@/core/layout/POSLayout';
-import { EnhancedRestaurantPOSLayout } from '../components/EnhancedRestaurantPOSLayout';
+import { RestaurantPOSLayout } from '../components/RestaurantPOSLayout';
 
 export default function POSExperiencePage() {
   return (
     <POSLayout title="POS Restaurant - Expérience Améliorée" showStatusBar={true}>
-      <EnhancedRestaurantPOSLayout />
+      <RestaurantPOSLayout />
     </POSLayout>
   );
 }

@@ -48,7 +48,7 @@ import {
   POSCustomersPage,
   POSKitchen,
   POSReports,
-  POSMobileServerPage,
+  // POSMobileServerPage removed - consolidated
   DailyReportsPage,
   AdvancedAnalytics,
   SystemSettingsPage,
@@ -174,7 +174,7 @@ export function AppRoutesLegacy() {
         <Route path="pos/settings" element={<RequirePOSAuth requiredRole="pos_manager"><POSSettingsPage /></RequirePOSAuth>} />
         <Route path="pos/kitchen" element={<RequirePOSAuth requiredRole="pos_server"><POSKitchen /></RequirePOSAuth>} />
         <Route path="pos/reports" element={<RequirePOSAuth requiredRole="pos_manager"><POSReports /></RequirePOSAuth>} />
-        <Route path="pos/mobile-server" element={<RequirePOSAuth requiredRole="pos_server"><POSMobileServerPage /></RequirePOSAuth>} />
+        {/* Route pos/mobile-server removed - consolidated into main POS layout */}
         <Route path="pos/african" element={<RequirePOSAuth requiredRole="pos_server"><POSAfricanPage /></RequirePOSAuth>} />
         {/* Role-based dashboards */}
         <Route path="dashboard/receptionist" element={

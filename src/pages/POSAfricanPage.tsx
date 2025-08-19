@@ -1,6 +1,6 @@
 import React from 'react';
 import RequirePOSAuth from '@/features/pos/auth/RequirePOSAuth';
-import { AfricanPOSInterface } from '@/features/pos/components/AfricanPOSInterface';
+import { ProfessionalPOSInterface } from '@/features/pos/components/ProfessionalPOSInterface';
 import { ModernOutletSelector } from '@/features/pos/components/ModernOutletSelector';
 import { usePOSAuthContext } from '@/features/pos/auth/POSAuthProvider';
 import { usePOSOutlets } from '@/features/pos/hooks/usePOSData';
@@ -59,7 +59,7 @@ function POSAfricanContent() {
 
   // Interface POS Africain en mode plein écran
   return (
-    <AfricanPOSInterface 
+    <ProfessionalPOSInterface 
       serverId={session.pos_user_id} 
       outletId={session.outlet_id} 
     />

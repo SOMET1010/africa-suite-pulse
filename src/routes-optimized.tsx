@@ -67,7 +67,7 @@ import {
   POSCustomersPage,
   POSKitchen,
   POSReports,
-  POSMobileServerPage,
+  // POSMobileServerPage removed - consolidated
   DailyReportsPage,
   AdvancedAnalytics,
   CardexPage,
