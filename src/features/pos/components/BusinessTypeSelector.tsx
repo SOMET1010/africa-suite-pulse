@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Settings } from 'lucide-react';
+import { ArrowRight, Settings, Package } from 'lucide-react';
 import { BUSINESS_TYPES, type BusinessType } from '@/types/collectivites';
+import { BusinessModuleIntegration, getBusinessTypeModules } from './BusinessModuleIntegration';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface BusinessTypeSelectorProps {
   onBusinessTypeSelect: (businessType: string) => void;
@@ -12,6 +14,7 @@ interface BusinessTypeSelectorProps {
 
 export function BusinessTypeSelector({ onBusinessTypeSelect, onSettings }: BusinessTypeSelectorProps) {
   const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
+  const [showModuleDialog, setShowModuleDialog] = useState(false);
 
   useEffect(() => {
     // Restore from session storage
@@ -24,7 +27,13 @@ export function BusinessTypeSelector({ onBusinessTypeSelect, onSettings }: Busin
   const handleBusinessTypeSelect = (businessType: BusinessType) => {
     setSelectedBusinessType(businessType.id);
     sessionStorage.setItem('pos_business_type', businessType.id);
-    onBusinessTypeSelect(businessType.id);
+    setShowModuleDialog(true);
+  };
+
+  const handleContinue = () => {
+    if (selectedBusinessType) {
+      onBusinessTypeSelect(selectedBusinessType);
+    }
   };
 
   return (
@@ -61,14 +70,18 @@ export function BusinessTypeSelector({ onBusinessTypeSelect, onSettings }: Busin
                     </Badge>
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    {businessType.name}
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    {businessType.description}
-                  </p>
-                </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      {businessType.name}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-3">
+                      {businessType.description}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Package className="h-3 w-3" />
+                      {getBusinessTypeModules(businessType.id as any).length} modules spécialisés
+                    </div>
+                  </div>
               </CardContent>
             </Card>
           ))}
@@ -79,7 +92,7 @@ export function BusinessTypeSelector({ onBusinessTypeSelect, onSettings }: Busin
           <div className="flex justify-center gap-4">
             <Button
               size="lg"
-              onClick={() => onBusinessTypeSelect(selectedBusinessType)}
+              onClick={handleContinue}
               className="px-8"
             >
               Continuer
@@ -130,6 +143,57 @@ export function BusinessTypeSelector({ onBusinessTypeSelect, onSettings }: Busin
           </div>
         </div>
       </div>
+
+      {/* Module Activation Dialog */}
+      <Dialog open={showModuleDialog} onOpenChange={setShowModuleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Configuration des modules</DialogTitle>
+            <DialogDescription>
+              Activation des modules spécialisés pour votre activité
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Package className="h-8 w-8 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Des modules optimisés pour votre type d'activité seront configurés automatiquement.
+              </p>
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowModuleDialog(false);
+                  handleContinue();
+                }}
+              >
+                Ignorer
+              </Button>
+              <Button onClick={() => {
+                setShowModuleDialog(false);
+                handleContinue();
+              }}>
+                Configurer les modules
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Business Module Integration */}
+      {selectedBusinessType && (
+        <BusinessModuleIntegration 
+          businessType={selectedBusinessType as any}
+          onModulesActivated={() => {
+            // Modules activated successfully
+          }}
+        />
+      )}
     </div>
   );
 }
