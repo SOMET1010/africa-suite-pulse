@@ -149,7 +149,7 @@ export function usePOSAuthSecure() {
     updateGlobalSession(null);
     sessionStorage.removeItem("pos_secure_session");
     isValidating = false;
-    hasInitialized = false;
+    // NE PAS remettre hasInitialized = false pour éviter la boucle récursive
     setError(null);
   };
 
