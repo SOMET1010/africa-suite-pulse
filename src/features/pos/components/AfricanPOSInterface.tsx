@@ -9,6 +9,8 @@ import { usePOSProducts, usePOSCategories } from '../hooks/usePOSData';
 import { usePOSAuthContext } from '../auth/POSAuthProvider';
 import { toast } from 'sonner';
 import { VisualProductKeyboard } from './VisualProductKeyboard';
+import { useRestaurantPOSLogic } from '../hooks/useRestaurantPOSLogic';
+import { RestaurantPaymentFlow } from './RestaurantPaymentFlow';
 
 // Import des images de produits africains
 import attiekeImage from '@/assets/attieke-poisson.jpg';
@@ -58,7 +60,6 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
   const { data: serverTables = [] } = useServerTables(serverId, session?.org_id);
   
   const [selectedTable, setSelectedTable] = useState<any>(null);
-  const [currentOrder, setCurrentOrder] = useState<OrderItem[]>([]);
   const [productCode, setProductCode] = useState('');
   const [showTablePlan, setShowTablePlan] = useState(false);
   const [customerCount, setCustomerCount] = useState(1);
@@ -66,6 +67,41 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
 
   // Interface en mode "stress" - Ultra simplifiée
   const [isStressMode, setIsStressMode] = useState(true);
+
+  // Utilisation de la logique restaurant existante
+  const {
+    orderState,
+    isBillPreviewOpen,
+    isPaymentOpen,
+    isSplitBillOpen,
+    isTableTransferOpen,
+    handleNewOrder,
+    handleAddToCart,
+    handleUpdateQuantity,
+    handleRemoveFromCart,
+    handleSendToKitchen,
+    handleCheckout,
+    handleProceedToPayment,
+    calculateTotals,
+    clearOrderOnly
+  } = useRestaurantPOSLogic({
+    selectedOutlet: { 
+      id: outletId,
+      org_id: session?.org_id || '',
+      code: 'AFRICAN',
+      name: 'POS Africain',
+      outlet_type: 'restaurant',
+      is_active: true,
+      settings: {},
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+    selectedTable,
+    customerCount
+  });
+
+  const { cartItems, currentOrder: restaurantOrder } = orderState;
+  const totals = calculateTotals();
 
   // Raccourcis clavier optimisés pour serveurs africains
   useEffect(() => {
@@ -94,11 +130,11 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
           break;
         case 'F2': // Addition
           e.preventDefault();
-          printReceipt();
+          showBillPreview();
           break;
-        case 'F3': // Paiement
+        case 'F3': // Paiement direct (legacy)
           e.preventDefault();
-          handlePayment();
+          showBillPreview();
           break;
         case 'F4': // Cuisine
           e.preventDefault();
@@ -127,34 +163,25 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [productCode, showTablePlan, isStressMode]);
 
-  // Actions principales
-  const addToOrder = useCallback((product: any, quantity: number = 1) => {
-    setCurrentOrder(prev => {
-      const existingItem = prev.find(item => item.product.code === product.code);
-      if (existingItem) {
-        return prev.map(item =>
-          item.product.code === product.code
-            ? {
-                ...item,
-                quantity: item.quantity + quantity,
-                totalPrice: (item.quantity + quantity) * item.unitPrice
-              }
-            : item
-        );
-      } else {
-        return [...prev, {
-          id: Math.random().toString(36).substr(2, 9),
-          product,
-          quantity,
-          unitPrice: product.price,
-          totalPrice: product.price * quantity
-        }];
-      }
-    });
+  // Actions principales adaptées à la logique restaurant
+  const addToOrder = useCallback(async (product: any, quantity: number = 1) => {
+    // Créer un ordre si nécessaire
+    if (!restaurantOrder && selectedTable) {
+      handleNewOrder();
+    }
     
-    // Feedback sonore et visuel
+    // Convertir le produit africain au format attendu
+    const posProduct = {
+      id: product.code,
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      image_url: product.image_url
+    };
+    
+    handleAddToCart(posProduct, quantity);
     toast.success(`${product.name} ajouté`, { duration: 1000 });
-  }, []);
+  }, [restaurantOrder, selectedTable, handleNewOrder, handleAddToCart]);
 
   const addProductByCode = useCallback(() => {
     const product = AFRICAN_PRODUCTS.find(p => p.code === productCode.trim());
@@ -169,30 +196,21 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
 
   const updateQuantity = useCallback((itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      setCurrentOrder(prev => prev.filter(item => item.id !== itemId));
+      handleRemoveFromCart(itemId);
       return;
     }
-    setCurrentOrder(prev =>
-      prev.map(item =>
-        item.id === itemId
-          ? {
-              ...item,
-              quantity: newQuantity,
-              totalPrice: newQuantity * item.unitPrice
-            }
-          : item
-      )
-    );
-  }, []);
+    handleUpdateQuantity(itemId, newQuantity);
+  }, [handleRemoveFromCart, handleUpdateQuantity]);
 
   const clearOrder = useCallback(() => {
-    setCurrentOrder([]);
+    clearOrderOnly();
     setProductCode('');
+    setSelectedTable(null);
     toast.success("Nouveau ticket");
-  }, []);
+  }, [clearOrderOnly]);
 
   const sendToKitchen = useCallback(() => {
-    if (currentOrder.length === 0) {
+    if (cartItems.length === 0) {
       toast.error('Aucun article');
       return;
     }
@@ -200,84 +218,26 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
       toast.error('Sélectionner table');
       return;
     }
-    toast.success('→ Cuisine');
-  }, [currentOrder, selectedTable]);
+    handleSendToKitchen();
+  }, [cartItems, selectedTable, handleSendToKitchen]);
 
-  const handlePayment = useCallback(() => {
-    if (currentOrder.length === 0) {
-      toast.error('Aucun article');
+  // Fonction pour l'addition (F2) - Ouvre le dialog d'aperçu
+  const showBillPreview = useCallback(() => {
+    if (cartItems.length === 0) {
+      toast.error('Aucun article pour l\'addition');
       return;
     }
-    toast.success('💳 Paiement');
-  }, [currentOrder]);
+    if (!selectedTable) {
+      toast.error('Sélectionner une table');
+      return;
+    }
+    handleCheckout(); // Ouvre l'UnifiedBillDialog
+  }, [cartItems, selectedTable, handleCheckout]);
 
   // Calcul du total de la commande
-  const orderTotal = currentOrder.reduce((sum, item) => sum + item.totalPrice, 0);
+  const orderTotal = totals.total;
 
-  const printReceipt = useCallback(() => {
-    if (currentOrder.length === 0) {
-      toast.error('Aucun article à imprimer');
-      return;
-    }
-    
-    // Création du contenu de l'addition
-    const receiptContent = `
-      
-      =============================
-           CAFÉ DE COCODY
-      =============================
-      
-      Table: ${selectedTable?.table_number || 'À emporter'}
-      Clients: ${customerCount}
-      Date: ${new Date().toLocaleDateString('fr-FR')}
-      Heure: ${new Date().toLocaleTimeString('fr-FR')}
-      Serveur: ${session?.display_name}
-      
-      -----------------------------
-      
-      ${currentOrder.map(item => 
-        `${item.product.name}
-         ${item.quantity} x ${item.unitPrice.toLocaleString()} FCFA = ${item.totalPrice.toLocaleString()} FCFA`
-      ).join('\n      ')}
-      
-      -----------------------------
-      
-      TOTAL: ${orderTotal.toLocaleString()} FCFA
-      
-      =============================
-      Merci de votre visite !
-      =============================
-    `;
-    
-    // Impression directe ou ouverture dans une nouvelle fenêtre
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Addition - Table ${selectedTable?.table_number || 'À emporter'}</title>
-            <style>
-              body { 
-                font-family: 'Courier New', monospace; 
-                font-size: 12px; 
-                line-height: 1.4;
-                margin: 20px;
-                white-space: pre-line;
-              }
-              @media print {
-                body { margin: 0; }
-              }
-            </style>
-          </head>
-          <body>${receiptContent}</body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
-    
-    toast.success('📄 Addition imprimée');
-  }, [currentOrder, selectedTable, customerCount, orderTotal, session]);
+  // Cette fonction n'est plus utilisée - remplacée par showBillPreview
 
   // Plan de salle visuel simplifié
   const TablePlan = () => (
@@ -459,17 +419,17 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
           {/* Actions rapides */}
           <div className="p-4 space-y-2 border-t">
             <Button 
-              onClick={printReceipt} 
-              disabled={currentOrder.length === 0}
+              onClick={showBillPreview} 
+              disabled={cartItems.length === 0}
               variant="outline" 
               className="w-full h-12 text-lg border-2 border-primary"
             >
               <Receipt className="h-5 w-5 mr-2" />
-              Addition (F2)
+              ADDITION (F2)
             </Button>
             <Button 
               onClick={sendToKitchen} 
-              disabled={!selectedTable || currentOrder.length === 0}
+              disabled={!selectedTable || cartItems.length === 0}
               className="w-full h-12 text-lg bg-success hover:bg-success/90"
             >
               <ChefHat className="h-5 w-5 mr-2" />
@@ -486,7 +446,7 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               <h3 className="text-xl font-bold">📝 COMMANDE</h3>
               <div className="flex items-center gap-4">
                 <Badge variant="outline" className="text-lg px-3 py-1">
-                  {currentOrder.length} article{currentOrder.length > 1 ? 's' : ''}
+                  {cartItems.length} article{cartItems.length > 1 ? 's' : ''}
                 </Badge>
                 <div className="flex items-center gap-2">
                   <Button
@@ -512,7 +472,7 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
 
           {/* Liste articles */}
           <div className="flex-1 overflow-y-auto p-4">
-            {currentOrder.length === 0 ? (
+            {cartItems.length === 0 ? (
               <div className="text-center text-muted-foreground py-12">
                 <div className="text-6xl mb-4">🍽️</div>
                 <p className="text-xl">Commande vide</p>
@@ -520,13 +480,13 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               </div>
             ) : (
               <div className="space-y-3">
-                {currentOrder.map((item) => (
+                {cartItems.map((item) => (
                   <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="font-bold text-lg">{item.product.name}</div>
+                        <div className="font-bold text-lg">{item.product_name}</div>
                         <div className="text-sm text-muted-foreground">
-                          Code: {item.product.code} • {item.unitPrice.toLocaleString()} FCFA/unité
+                          {item.unit_price.toLocaleString()} FCFA/unité
                         </div>
                       </div>
                       
@@ -541,24 +501,24 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
                             <Minus className="h-4 w-4" />
                           </Button>
                           <span className="w-12 text-center font-bold text-xl">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="h-10 w-10 p-0"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                             className="h-10 w-10 p-0"
+                           >
+                             <Plus className="h-4 w-4" />
+                           </Button>
                         </div>
                         
                         <div className="text-right">
-                          <div className="font-bold text-lg">{item.totalPrice.toLocaleString()} FCFA</div>
+                          <div className="font-bold text-lg">{item.total_price.toLocaleString()} FCFA</div>
                         </div>
                         
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setCurrentOrder(prev => prev.filter(i => i.id !== item.id))}
+                          onClick={() => handleRemoveFromCart(item.id)}
                           className="h-10 w-10 p-0 text-destructive hover:bg-destructive/10"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -580,8 +540,8 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
 
             <div className="grid grid-cols-4 gap-4">
               <Button
-                onClick={printReceipt}
-                disabled={currentOrder.length === 0}
+                onClick={showBillPreview}
+                disabled={cartItems.length === 0}
                 size="lg"
                 variant="outline"
                 className="h-16 text-lg border-2 border-primary"
@@ -591,8 +551,8 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               </Button>
               
               <Button
-                onClick={handlePayment}
-                disabled={currentOrder.length === 0}
+                onClick={showBillPreview}
+                disabled={cartItems.length === 0}
                 size="lg"
                 className="h-16 text-lg bg-success hover:bg-success/90"
               >
@@ -601,8 +561,8 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               </Button>
               
               <Button
-                onClick={handlePayment}
-                disabled={currentOrder.length === 0}
+                onClick={showBillPreview}
+                disabled={cartItems.length === 0}
                 size="lg"
                 variant="outline"
                 className="h-16 text-lg border-2"
@@ -612,8 +572,8 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
               </Button>
               
               <Button
-                onClick={handlePayment}
-                disabled={currentOrder.length === 0}
+                onClick={showBillPreview}
+                disabled={cartItems.length === 0}
                 size="lg"
                 variant="outline"
                 className="h-16 text-lg border-2"
@@ -644,6 +604,28 @@ export const AfricanPOSInterface: React.FC<AfricanPOSInterfaceProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Restaurant Payment Flow */}
+      <RestaurantPaymentFlow
+        isBillPreviewOpen={isBillPreviewOpen}
+        onCloseBillPreview={() => {}}
+        onProceedToPayment={handleProceedToPayment}
+        isPaymentOpen={isPaymentOpen}
+        onClosePayment={() => {}}
+        currentOrder={restaurantOrder}
+        cartItems={cartItems}
+        totals={totals}
+        onPaymentComplete={() => {
+          clearOrder();
+          setSelectedTable(null);
+        }}
+        isSplitBillOpen={isSplitBillOpen}
+        onCloseSplitBill={() => {}}
+        isTableTransferOpen={isTableTransferOpen}
+        onCloseTableTransfer={() => {}}
+        selectedTable={selectedTable}
+        selectedOutlet={{ id: outletId }}
+      />
     </div>
   );
 };
