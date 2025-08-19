@@ -123,9 +123,17 @@ export function MarketTilesCatalog({
     }
   };
 
-  const handleKitchenMessagesConfirm = (messages: string[], customMessage?: string) => {
+  const handleKitchenMessagesConfirm = (data: {
+    messages: string[];
+    customMessage?: string;
+    priority: 'normal' | 'urgent' | 'critical';
+    workstation?: string;
+    estimatedTime?: number;
+    soundAlert: boolean;
+    template?: string;
+  }) => {
     if (selectedProduct) {
-      // Add product with kitchen messages
+      console.log('Kitchen messages:', data);
       onAddToCart(selectedProduct, 1);
       setSelectedProduct(null);
     }
