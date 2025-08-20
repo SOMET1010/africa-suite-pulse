@@ -182,10 +182,9 @@ export function CustomerLoyaltyPanel({ onCustomerSelect, onRewardApply }: Custom
                   <div className="flex items-center gap-4">
                     <Avatar className="h-16 w-16">
                       <AvatarFallback>
-                        <AvatarInitials 
-                          name={`${selectedCustomer.firstName} ${selectedCustomer.lastName}`}
-                          className="text-lg"
-                        />
+                        <div className="text-lg font-medium">
+                          {`${selectedCustomer.firstName} ${selectedCustomer.lastName}`.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">

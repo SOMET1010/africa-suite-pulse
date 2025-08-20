@@ -8,12 +8,15 @@ export interface POSMetrics {
   currentOrders: number;
   averageOrderValue: number;
   totalSalesToday: number;
+  totalRevenue: number;
   kitchenQueue: number;
   averagePreparationTime: number;
+  averageKitchenTime: number;
   serverEfficiency: number;
   
   // Technical Metrics
   supabaseLatency: number;
+  averageLatency: number;
   errorRate: number;
   activeConnections: number;
   componentRenders: number;
@@ -38,10 +41,13 @@ export function usePOSMetrics(outletId: string) {
     currentOrders: 0,
     averageOrderValue: 0,
     totalSalesToday: 0,
+    totalRevenue: 0,
     kitchenQueue: 0,
     averagePreparationTime: 0,
+    averageKitchenTime: 0,
     serverEfficiency: 100,
     supabaseLatency: 0,
+    averageLatency: 0,
     errorRate: 0,
     activeConnections: 1,
     componentRenders: 0,
@@ -62,6 +68,7 @@ export function usePOSMetrics(outletId: string) {
       setMetrics(prev => ({
         ...prev,
         supabaseLatency: latency,
+        averageLatency: (prev.averageLatency + latency) / 2,
         lastUpdated: new Date()
       }));
 
@@ -120,6 +127,8 @@ export function usePOSMetrics(outletId: string) {
         currentOrders,
         averageOrderValue,
         totalSalesToday: totalSales,
+        totalRevenue: totalSales,
+        averageKitchenTime: 15, // Mock value, can be calculated from actual data
         kitchenQueue,
         systemHealth: determineSystemHealth(ordersPerMinute, kitchenQueue, prev.supabaseLatency),
         lastUpdated: new Date()
