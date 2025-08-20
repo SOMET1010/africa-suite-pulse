@@ -29,19 +29,90 @@ interface CustomerLoyaltyPanelProps {
 export function CustomerLoyaltyPanel({ onCustomerSelect, onRewardApply }: CustomerLoyaltyPanelProps) {
   const {
     customers,
-    isLoadingCustomers,
+    isLoading,
     selectedCustomer,
     setSelectedCustomer,
-    transactions,
-    rewards,
-    addPoints,
-    redeemReward,
-    searchCustomers,
-    getTierBenefits
+    activities,
+    stats,
+    awardPoints,
+    redeemPoints,
+    refresh
   } = useCustomerLoyalty();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showNewCustomer, setShowNewCustomer] = useState(false);
+
+  // Mock helper functions
+  const searchCustomers = (query: string) => {
+    return customers.filter(customer => 
+      `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(query.toLowerCase()) ||
+      customer.email.toLowerCase().includes(query.toLowerCase()) ||
+      (customer.phone && customer.phone.includes(query))
+    );
+  };
+
+  const getTierBenefits = (tier: string) => {
+    const tiers = {
+      bronze: {
+        name: 'Bronze',
+        color: 'text-amber-600',
+        bgColor: 'bg-amber-50',
+        benefits: ['5% de réduction', 'Points sur achats', 'Offres spéciales']
+      },
+      silver: {
+        name: 'Argent',
+        color: 'text-gray-600',
+        bgColor: 'bg-gray-50',
+        benefits: ['10% de réduction', 'Livraison gratuite', 'Support prioritaire']
+      },
+      gold: {
+        name: 'Or',
+        color: 'text-yellow-600',
+        bgColor: 'bg-yellow-50',
+        benefits: ['15% de réduction', 'Accès VIP', 'Cadeaux exclusifs']
+      },
+      platinum: {
+        name: 'Platine',
+        color: 'text-purple-600',
+        bgColor: 'bg-purple-50',
+        benefits: ['20% de réduction', 'Service personnalisé', 'Événements privés']
+      }
+    };
+    return tiers[tier as keyof typeof tiers] || tiers.bronze;
+  };
+
+  const rewards = [
+    {
+      id: '1',
+      name: 'Boisson Gratuite',
+      description: 'Une boisson de votre choix offerte',
+      pointsCost: 100,
+      isActive: true,
+      restrictions: ['Valable 30 jours']
+    },
+    {
+      id: '2',
+      name: 'Dessert Gratuit',
+      description: 'Un dessert au choix avec votre commande',
+      pointsCost: 150,
+      isActive: true,
+      restrictions: ['Minimum 2 plats']
+    },
+    {
+      id: '3',
+      name: 'Réduction 20%',
+      description: 'Réduction de 20% sur votre prochaine commande',
+      pointsCost: 250,
+      isActive: true,
+      restrictions: ['Maximum 50.000 FCFA']
+    }
+  ];
+
+  const transactions = activities.map(activity => ({
+    ...activity,
+    transactionType: activity.type === 'points_earned' ? 'Gain' : 'Utilisation',
+    createdAt: activity.date
+  }));
 
   const filteredCustomers = searchQuery ? searchCustomers(searchQuery) : customers.slice(0, 20);
 
@@ -50,16 +121,15 @@ export function CustomerLoyaltyPanel({ onCustomerSelect, onRewardApply }: Custom
     onCustomerSelect?.(customer);
   };
 
-  const handleRewardRedeem = (reward: any) => {
+  const handleRewardRedeem = async (reward: any) => {
     if (!selectedCustomer) return;
     
-    redeemReward({
-      customerId: selectedCustomer.id,
-      rewardId: reward.id,
-      pointsCost: reward.pointsCost
-    });
-    
-    onRewardApply?.(reward);
+    try {
+      await redeemPoints(selectedCustomer.id, reward.pointsCost, `Reward: ${reward.name}`);
+      onRewardApply?.(reward);
+    } catch (error) {
+      console.error('Failed to redeem reward:', error);
+    }
   };
 
   return (

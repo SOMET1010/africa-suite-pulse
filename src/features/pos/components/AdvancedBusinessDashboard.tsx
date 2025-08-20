@@ -221,15 +221,15 @@ export function AdvancedBusinessDashboard() {
                       <div>
                         <p className="font-medium">{item.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          Stock: {item.current_stock} | Min: {item.min_stock_level}
+                          Stock: {item.currentStock} | Min: {item.minStock}
                         </p>
                       </div>
                       <div className="text-right">
                         <Badge 
-                          variant={item.priority === 'urgent' ? 'destructive' : 
-                                  item.priority === 'high' ? 'default' : 'secondary'}
+                          variant={item.urgency === 'high' ? 'destructive' : 
+                                  item.urgency === 'medium' ? 'default' : 'secondary'}
                         >
-                          {item.priority}
+                          {item.urgency}
                         </Badge>
                         <p className="text-sm mt-1">
                           Suggéré: {item.suggestedQuantity}
