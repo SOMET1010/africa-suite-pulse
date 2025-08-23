@@ -44,6 +44,7 @@ const AdvancedReservationPage = lazy(() => import("@/pages/AdvancedReservationPa
 const BillingPageWrapper = lazy(() => import("@/pages/BillingPageWrapper"));
 const SubscriptionsPage = lazy(() => import("@/pages/SubscriptionsPage"));
 const ModuleMarketplacePage = lazy(() => import("@/pages/ModuleMarketplacePage"));
+const PresentationRoute = lazy(() => import("@/pages/PresentationRoute"));
 
 // ===== LAZY-LOADED COMPONENTS FROM routes.lazy =====
 // Import these as lazy components instead
@@ -370,6 +371,14 @@ export function AppRoutes() {
         <RequireAuth>
           <Suspense fallback={<DataSkeleton />}>
             <DiscoveryPage />
+          </Suspense>
+        </RequireAuth>
+      } />
+      
+      <Route path="presentation" element={
+        <RequireAuth>
+          <Suspense fallback={<DataSkeleton />}>
+            <PresentationRoute />
           </Suspense>
         </RequireAuth>
       } />
