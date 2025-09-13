@@ -166,7 +166,7 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
           <Button
             onClick={handleApplyDiscount}
             disabled={!discountValue || cartItems.length === 0}
-            className="w-full h-8"
+            className="w-full tap-target press-feedback"
             size="sm"
           >
             Appliquer remise
@@ -185,18 +185,18 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
           <Input
             value={calculatorDisplay}
             readOnly
-            className="text-center text-lg font-mono h-10"
+            className="text-center text-lg font-mono tap-target"
           />
         </div>
         
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-3 gap-2 touch-spacing">
           {numpadButtons.flat().map((btn) => (
             <Button
               key={btn}
               variant="outline"
               size="sm"
               onClick={() => handleNumpadClick(btn)}
-              className="h-10 font-mono"
+              className="tap-target font-mono press-feedback transition-elegant"
             >
               {btn === '←' ? '⌫' : btn}
             </Button>
@@ -208,11 +208,11 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
       <div className="flex-1 p-4 bg-card">
         <h4 className="text-sm font-bold mb-3 text-center">PAIEMENT</h4>
         
-        <div className="space-y-3">
+        <div className="space-y-3 touch-spacing">
           <Button
             onClick={onShowBillPreview}
             disabled={cartItems.length === 0 || !selectedTable}
-            className="w-full h-12 bg-green-600 hover:bg-green-700 text-white"
+            className="w-full tap-target bg-success hover:bg-success/90 text-success-foreground press-feedback"
           >
             <DollarSign className="h-4 w-4 mr-2" />
             ESPÈCES
@@ -221,7 +221,7 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
           <Button
             onClick={onShowBillPreview}
             disabled={cartItems.length === 0 || !selectedTable}
-            className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full tap-target bg-info hover:bg-info/90 text-info-foreground press-feedback"
           >
             <CreditCard className="h-4 w-4 mr-2" />
             CARTE
@@ -230,7 +230,7 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
           <Button
             onClick={onShowBillPreview}
             disabled={cartItems.length === 0 || !selectedTable}
-            className="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white"
+            className="w-full tap-target bg-warning hover:bg-warning/90 text-warning-foreground press-feedback"
           >
             <Smartphone className="h-4 w-4 mr-2" />
             MOBILE MONEY
@@ -240,13 +240,13 @@ export const POSPaymentZone: React.FC<POSPaymentZoneProps> = ({
 
       {/* Raccourcis en bas */}
       <div className="p-4 border-t bg-muted/30">
-        <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" size="sm" className="h-8">
-            <History className="h-3 w-3 mr-1" />
+        <div className="grid grid-cols-2 gap-3 touch-spacing">
+          <Button variant="outline" size="sm" className="tap-target press-feedback">
+            <History className="h-4 w-4 mr-2" />
             Historique
           </Button>
-          <Button variant="outline" size="sm" className="h-8">
-            <Settings className="h-3 w-3 mr-1" />
+          <Button variant="outline" size="sm" className="tap-target press-feedback">
+            <Settings className="h-4 w-4 mr-2" />
             Paramètres
           </Button>
         </div>
