@@ -1,0 +1,248 @@
+{
+  "name": "Africa Suite Pulse - ERP Hôtelier Africain",
+  "short_name": "Africa Suite",
+  "description": "Solution ERP complète pour l'hôtellerie et la restauration en Afrique. Optimisée pour les connexions mobiles africaines avec support offline.",
+  "version": "2.0.0-african",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#8B4513",
+  "background_color": "#FFF8DC",
+  "lang": "fr-FR",
+  "dir": "ltr",
+  
+  "icons": [
+    {
+      "src": "/icons/african-icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/african-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "categories": [
+    "business",
+    "productivity",
+    "finance",
+    "utilities"
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Point de Vente",
+      "short_name": "POS",
+      "description": "Accès rapide au point de vente optimisé mobile",
+      "url": "/pos",
+      "icons": [
+        {
+          "src": "/icons/shortcut-pos-african.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Réservations",
+      "short_name": "Réservations",
+      "description": "Gestion des réservations hôtelières",
+      "url": "/reservations",
+      "icons": [
+        {
+          "src": "/icons/shortcut-reservations-african.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Tableau de bord avec thème africain",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/shortcut-dashboard-african.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Mode Hors Ligne",
+      "short_name": "Offline",
+      "description": "Accès aux données en cache pour connexions instables",
+      "url": "/offline",
+      "icons": [
+        {
+          "src": "/icons/shortcut-offline-african.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "african_optimizations": {
+    "data_saver_mode": true,
+    "offline_first": true,
+    "low_bandwidth_support": true,
+    "mobile_money_integration": true,
+    "multi_language_support": ["fr", "en", "wo", "bm", "ar"],
+    "local_currencies": ["XOF", "XAF", "GHS", "NGN", "KES", "UGX", "TZS", "ZAR", "MAD", "EGP", "DZD", "TND"],
+    "connection_types": ["2g", "3g", "4g", "wifi"],
+    "device_support": {
+      "low_end_devices": true,
+      "limited_memory": true,
+      "small_screens": true,
+      "touch_optimized": true,
+      "gesture_navigation": true
+    },
+    "cultural_features": {
+      "bogolan_patterns": true,
+      "kita_motifs": true,
+      "earth_color_palette": true,
+      "african_typography": true,
+      "local_time_formats": true,
+      "regional_preferences": true
+    }
+  },
+  
+  "features": [
+    "offline-support",
+    "background-sync",
+    "push-notifications",
+    "geolocation",
+    "camera",
+    "payment-request",
+    "web-share",
+    "file-system-access",
+    "data-saver-mode",
+    "intelligent-prefetch",
+    "adaptive-compression"
+  ],
+  
+  "permissions": [
+    "geolocation",
+    "notifications",
+    "camera",
+    "background-sync",
+    "payment-handler",
+    "storage"
+  ],
+  
+  "offline_enabled": true,
+  "prefer_related_applications": false,
+  
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", "text/csv", "application/json"]
+        }
+      ]
+    }
+  },
+  
+  "file_handlers": [
+    {
+      "action": "/import",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"],
+        "application/vnd.ms-excel": [".xls", ".xlsx"]
+      }
+    }
+  ],
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+africasuite",
+      "url": "/handle?protocol=%s"
+    }
+  ],
+  
+  "background": {
+    "service_worker": "sw-african-optimized.js",
+    "type": "module"
+  },
+  
+  "gcm_sender_id": "103953800507",
+  "gcm_user_visible_only": true,
+  
+  "update_url": "https://api.africasuite.com/pwa/update",
+  "minimum_chrome_version": "88",
+  
+  "author": "Africa Suite Team",
+  "homepage_url": "https://africasuite.com",
+  "support_url": "https://support.africasuite.com",
+  "privacy_policy": "https://africasuite.com/privacy",
+  "terms_of_service": "https://africasuite.com/terms",
+  
+  "version_name": "2.0.0 - Édition Africaine Optimisée"
+}
+

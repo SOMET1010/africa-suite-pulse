@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "africasuite.fullname" . }}
+  labels:
+    {{- include "africasuite.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.africasuite.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "africasuite.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      labels:
+        {{- include "africasuite.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "africasuite.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.africasuite.image.repository }}:{{ .Values.africasuite.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.africasuite.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.africasuite.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.africasuite.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.africasuite.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.africasuite.resources | nindent 12 }}
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.africasuite.env.NODE_ENV | quote }}
+            - name: DEPLOYMENT_MODE
+              value: {{ .Values.global.deploymentMode | quote }}
+            {{- if .Values.postgresql.enabled }}
+            - name: POSTGRES_HOST
+              value: {{ include "africasuite.postgresql.fullname" . }}
+            - name: POSTGRES_DB
+              value: {{ .Values.postgresql.auth.database }}
+            - name: POSTGRES_USER
+              value: {{ .Values.postgresql.auth.username }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "africasuite.postgresql.secretName" . }}
+                  key: password
+            {{- end }}
+            {{- if .Values.redis.enabled }}
+            - name: REDIS_HOST
+              value: {{ include "africasuite.redis.fullname" . }}-master
+            {{- end }}
+            {{- if .Values.minio.enabled }}
+            - name: MINIO_ENDPOINT
+              value: {{ include "africasuite.minio.fullname" . }}:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "africasuite.minio.secretName" . }}
+                  key: root-user
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "africasuite.minio.secretName" . }}
+                  key: root-password
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "africasuite.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

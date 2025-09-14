@@ -1,0 +1,114 @@
+graph TB
+    %% Couche d'orchestration
+    subgraph "🎯 Couche d'Orchestration"
+        MAS[Manus Agent System<br/>🤖 Orchestrateur Principal]
+        QM[Queue Manager<br/>📋 Gestionnaire de Tâches]
+        SM[Scheduler<br/>⏰ Planificateur]
+        MM[Metrics Monitor<br/>📊 Surveillance]
+    end
+
+    %% Agents spécialisés
+    subgraph "🧠 Agents Spécialisés IA"
+        SA[Sales Analyst<br/>📈 Analyste des Ventes<br/>• Tendances saisonnières<br/>• Plats populaires<br/>• Prédictions demande]
+        
+        PO[Pricing Optimizer<br/>💰 Optimiseur de Prix<br/>• Analyse concurrentielle<br/>• Ajustement régional<br/>• Optimisation marges]
+        
+        MP[Maintenance Predictor<br/>🔧 Prédicteur Maintenance<br/>• Prédiction pannes<br/>• Optimisation stocks<br/>• Maintenance préventive]
+        
+        RG[Report Generator<br/>📄 Générateur Rapports<br/>• Rapports financiers<br/>• Insights culturels<br/>• Tableaux de bord]
+        
+        PA[Process Automator<br/>⚙️ Automatiseur Processus<br/>• Commandes récurrentes<br/>• Gestion stocks<br/>• Optimisation workflows]
+    end
+
+    %% Sources de données
+    subgraph "💾 Sources de Données"
+        SB[(Supabase<br/>🗄️ Base Moderne)]
+        EL[(Elyx Legacy<br/>🏛️ Données Existantes)]
+        EXT[APIs Externes<br/>🌐 Données Marché]
+    end
+
+    %% Intelligence artificielle
+    subgraph "🧠 Intelligence Artificielle"
+        MAPI[Manus AI API<br/>🤖 Moteur IA]
+        NLP[Traitement Langage<br/>📝 Analyse Textuelle]
+        ML[Machine Learning<br/>🎯 Apprentissage]
+        CV[Computer Vision<br/>👁️ Analyse Images]
+    end
+
+    %% Actions et sorties
+    subgraph "🎯 Actions & Sorties"
+        NOT[Notifications<br/>📧 Alertes Intelligentes]
+        UPD[Mises à Jour<br/>🔄 Optimisations Auto]
+        REP[Rapports<br/>📊 Insights Avancés]
+        AUTO[Automatisations<br/>⚡ Actions Autonomes]
+    end
+
+    %% Interface utilisateur
+    subgraph "🖥️ Interface Utilisateur"
+        DASH[Dashboard Agents<br/>📱 Contrôle & Monitoring]
+        MOB[Interface Mobile<br/>📱 Optimisée Afrique]
+        WEB[Application Web<br/>💻 Thème Africain]
+    end
+
+    %% Connexions principales
+    MAS --> QM
+    MAS --> SM
+    MAS --> MM
+    
+    QM --> SA
+    QM --> PO
+    QM --> MP
+    QM --> RG
+    QM --> PA
+    
+    %% Sources vers agents
+    SB --> SA
+    SB --> PO
+    SB --> MP
+    EL --> SA
+    EL --> PO
+    EXT --> PO
+    
+    %% IA vers agents
+    MAPI --> SA
+    MAPI --> PO
+    MAPI --> MP
+    MAPI --> RG
+    MAPI --> PA
+    
+    NLP --> RG
+    ML --> SA
+    ML --> MP
+    CV --> RG
+    
+    %% Agents vers actions
+    SA --> NOT
+    SA --> REP
+    PO --> UPD
+    PO --> NOT
+    MP --> NOT
+    MP --> AUTO
+    RG --> REP
+    PA --> AUTO
+    PA --> UPD
+    
+    %% Interface
+    DASH --> MAS
+    MOB --> MAS
+    WEB --> MAS
+    
+    %% Styles
+    classDef orchestration fill:#e8f4f8,stroke:#2563eb,stroke-width:2px
+    classDef agents fill:#f0f9ff,stroke:#0ea5e9,stroke-width:2px
+    classDef data fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+    classDef ai fill:#f3e8ff,stroke:#8b5cf6,stroke-width:2px
+    classDef actions fill:#dcfce7,stroke:#22c55e,stroke-width:2px
+    classDef ui fill:#fce7f3,stroke:#ec4899,stroke-width:2px
+    
+    class MAS,QM,SM,MM orchestration
+    class SA,PO,MP,RG,PA agents
+    class SB,EL,EXT data
+    class MAPI,NLP,ML,CV ai
+    class NOT,UPD,REP,AUTO actions
+    class DASH,MOB,WEB ui
+

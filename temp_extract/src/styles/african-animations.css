@@ -1,0 +1,601 @@
+/* African Animations & Transitions */
+/* Animations inspirées de la culture africaine */
+
+/* Variables d'animation */
+:root {
+  --african-duration-fast: 0.2s;
+  --african-duration-normal: 0.4s;
+  --african-duration-slow: 0.6s;
+  --african-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --african-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --african-easing-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Animations de base inspirées des danses africaines */
+
+/* Animation Kizomba - Mouvement fluide et sensuel */
+@keyframes african-kizomba {
+  0% {
+    transform: translateX(-20px) rotate(-2deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateX(10px) rotate(1deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Animation Azonto - Mouvement rythmé et énergique */
+@keyframes african-azonto {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-10px) scale(1.05);
+  }
+  50% {
+    transform: translateY(-5px) scale(1.02);
+  }
+  75% {
+    transform: translateY(-15px) scale(1.08);
+  }
+}
+
+/* Animation Makossa - Mouvement de hanches */
+@keyframes african-makossa {
+  0% {
+    transform: translateX(0) skewX(0deg);
+  }
+  25% {
+    transform: translateX(5px) skewX(2deg);
+  }
+  50% {
+    transform: translateX(0) skewX(0deg);
+  }
+  75% {
+    transform: translateX(-5px) skewX(-2deg);
+  }
+  100% {
+    transform: translateX(0) skewX(0deg);
+  }
+}
+
+/* Animation Coupé-Décalé - Mouvement saccadé et dynamique */
+@keyframes african-coupe-decale {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+  20% {
+    transform: scale(1.1) rotate(5deg);
+    filter: hue-rotate(20deg);
+  }
+  40% {
+    transform: scale(0.95) rotate(-3deg);
+    filter: hue-rotate(40deg);
+  }
+  60% {
+    transform: scale(1.05) rotate(2deg);
+    filter: hue-rotate(60deg);
+  }
+  80% {
+    transform: scale(0.98) rotate(-1deg);
+    filter: hue-rotate(80deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: hue-rotate(0deg);
+  }
+}
+
+/* Animation Ndombolo - Mouvement de taille */
+@keyframes african-ndombolo {
+  0%, 100% {
+    transform: scaleX(1) scaleY(1);
+  }
+  33% {
+    transform: scaleX(1.1) scaleY(0.9);
+  }
+  66% {
+    transform: scaleX(0.9) scaleY(1.1);
+  }
+}
+
+/* Animation Soukous - Mouvement fluide et continu */
+@keyframes african-soukous {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(-8px) rotate(2deg);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-12px) rotate(0deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-8px) rotate(-2deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+}
+
+/* Animations inspirées des éléments naturels africains */
+
+/* Animation Baobab - Croissance majestueuse */
+@keyframes african-baobab-grow {
+  0% {
+    transform: scale(0.1) translateY(100%);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0.7) translateY(20%);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animation Savane - Ondulation comme l'herbe */
+@keyframes african-savane-wave {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(2deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(0deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(-2deg) scale(1.02);
+  }
+}
+
+/* Animation Soleil - Rayonnement */
+@keyframes african-sun-rays {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 20px rgba(255, 215, 0, 0.2);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 0 40px rgba(255, 215, 0, 0);
+    transform: scale(1);
+  }
+}
+
+/* Animation Fleuve - Écoulement */
+@keyframes african-river-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Animations de chargement africaines */
+
+/* Chargement Djembé - Pulsation rythmée */
+@keyframes african-djembe-pulse {
+  0%, 100% {
+    transform: scale(1);
+    background: #8B4513;
+  }
+  25% {
+    transform: scale(1.2);
+    background: #D2691E;
+  }
+  50% {
+    transform: scale(1.4);
+    background: #FFD700;
+  }
+  75% {
+    transform: scale(1.2);
+    background: #D2691E;
+  }
+}
+
+/* Chargement Kente - Tissage */
+@keyframes african-kente-weave {
+  0% {
+    background-position: 0% 0%;
+    transform: translateX(-100%);
+  }
+  50% {
+    background-position: 50% 50%;
+    transform: translateX(0%);
+  }
+  100% {
+    background-position: 100% 100%;
+    transform: translateX(100%);
+  }
+}
+
+/* Chargement Bogolan - Motifs qui apparaissent */
+@keyframes african-bogolan-pattern {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  25% {
+    clip-path: circle(25% at 50% 50%);
+  }
+  50% {
+    clip-path: circle(50% at 50% 50%);
+  }
+  75% {
+    clip-path: circle(75% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(100% at 50% 50%);
+  }
+}
+
+/* Animations de transition de page */
+
+/* Transition Harmattan - Vent du désert */
+@keyframes african-harmattan-enter {
+  0% {
+    transform: translateX(100%) skewX(10deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+  50% {
+    transform: translateX(20%) skewX(2deg);
+    opacity: 0.7;
+    filter: blur(2px);
+  }
+  100% {
+    transform: translateX(0) skewX(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
+
+@keyframes african-harmattan-exit {
+  0% {
+    transform: translateX(0) skewX(0deg);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  50% {
+    transform: translateX(-20%) skewX(-2deg);
+    opacity: 0.7;
+    filter: blur(2px);
+  }
+  100% {
+    transform: translateX(-100%) skewX(-10deg);
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+/* Transition Tornado - Tourbillon */
+@keyframes african-tornado {
+  0% {
+    transform: rotate(0deg) scale(0.1);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(180deg) scale(0.7);
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Animations de notification africaines */
+
+/* Notification Tam-tam - Appel traditionnel */
+@keyframes african-tamtam-call {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(139, 69, 19, 0.7);
+  }
+  25% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(139, 69, 19, 0.5);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 20px rgba(139, 69, 19, 0.3);
+  }
+  75% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 30px rgba(139, 69, 19, 0.1);
+  }
+}
+
+/* Notification Griots - Message important */
+@keyframes african-griot-message {
+  0% {
+    transform: translateY(-100%) rotate(-10deg);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(20%) rotate(5deg);
+    opacity: 0.8;
+  }
+  40% {
+    transform: translateY(-10%) rotate(-2deg);
+    opacity: 0.9;
+  }
+  60% {
+    transform: translateY(5%) rotate(1deg);
+    opacity: 0.95;
+  }
+  80% {
+    transform: translateY(-2%) rotate(-0.5deg);
+    opacity: 0.98;
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Animations de boutons africains */
+
+/* Bouton Adinkra - Symboles akan */
+@keyframes african-adinkra-hover {
+  0% {
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: scale(1.05);
+  }
+  100% {
+    background-position: 0% 50%;
+    transform: scale(1);
+  }
+}
+
+/* Bouton Wax - Tissus colorés */
+@keyframes african-wax-press {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(0.95) rotate(1deg);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+}
+
+/* Classes d'animation prêtes à utiliser */
+
+/* Animations d'entrée */
+.african-enter-kizomba {
+  animation: african-kizomba var(--african-duration-slow) var(--african-easing);
+}
+
+.african-enter-azonto {
+  animation: african-azonto var(--african-duration-normal) var(--african-easing-bounce);
+}
+
+.african-enter-baobab {
+  animation: african-baobab-grow var(--african-duration-slow) var(--african-easing-elastic);
+}
+
+.african-enter-harmattan {
+  animation: african-harmattan-enter var(--african-duration-normal) var(--african-easing);
+}
+
+.african-enter-tornado {
+  animation: african-tornado var(--african-duration-slow) var(--african-easing-elastic);
+}
+
+/* Animations de survol */
+.african-hover-makossa:hover {
+  animation: african-makossa 1s var(--african-easing) infinite;
+}
+
+.african-hover-ndombolo:hover {
+  animation: african-ndombolo 0.8s var(--african-easing) infinite;
+}
+
+.african-hover-soukous:hover {
+  animation: african-soukous 1.2s var(--african-easing) infinite;
+}
+
+.african-hover-savane:hover {
+  animation: african-savane-wave 2s var(--african-easing) infinite;
+}
+
+.african-hover-sun:hover {
+  animation: african-sun-rays 1.5s var(--african-easing) infinite;
+}
+
+/* Animations de chargement */
+.african-loading-djembe {
+  animation: african-djembe-pulse 1s var(--african-easing) infinite;
+}
+
+.african-loading-kente {
+  animation: african-kente-weave 2s linear infinite;
+  background: linear-gradient(45deg, #FFD700, #8B4513, #D2691E, #228B22);
+  background-size: 400% 400%;
+}
+
+.african-loading-bogolan {
+  animation: african-bogolan-pattern 1.5s var(--african-easing) infinite;
+}
+
+/* Animations de notification */
+.african-notify-tamtam {
+  animation: african-tamtam-call 2s var(--african-easing) infinite;
+}
+
+.african-notify-griot {
+  animation: african-griot-message var(--african-duration-slow) var(--african-easing-bounce);
+}
+
+/* Animations de boutons */
+.african-button-adinkra {
+  background: linear-gradient(45deg, #8B4513, #D2691E, #FFD700, #228B22);
+  background-size: 400% 400%;
+  transition: all var(--african-duration-normal) var(--african-easing);
+}
+
+.african-button-adinkra:hover {
+  animation: african-adinkra-hover 1s var(--african-easing) infinite;
+}
+
+.african-button-wax:active {
+  animation: african-wax-press var(--african-duration-fast) var(--african-easing);
+}
+
+/* Animations continues pour éléments décoratifs */
+.african-continuous-flow {
+  animation: african-river-flow 4s linear infinite;
+  background: linear-gradient(45deg, #87CEEB, #4682B4, #1E90FF, #87CEEB);
+  background-size: 400% 400%;
+}
+
+.african-continuous-coupe-decale {
+  animation: african-coupe-decale 3s var(--african-easing) infinite;
+}
+
+/* Animations responsives */
+@media (prefers-reduced-motion: reduce) {
+  .african-enter-kizomba,
+  .african-enter-azonto,
+  .african-enter-baobab,
+  .african-enter-harmattan,
+  .african-enter-tornado,
+  .african-hover-makossa:hover,
+  .african-hover-ndombolo:hover,
+  .african-hover-soukous:hover,
+  .african-hover-savane:hover,
+  .african-hover-sun:hover,
+  .african-loading-djembe,
+  .african-loading-kente,
+  .african-loading-bogolan,
+  .african-notify-tamtam,
+  .african-notify-griot,
+  .african-button-adinkra:hover,
+  .african-button-wax:active,
+  .african-continuous-flow,
+  .african-continuous-coupe-decale {
+    animation: none;
+  }
+}
+
+/* Animations optimisées pour mobile */
+@media (max-width: 768px) {
+  :root {
+    --african-duration-fast: 0.15s;
+    --african-duration-normal: 0.3s;
+    --african-duration-slow: 0.45s;
+  }
+  
+  .african-mobile-optimized {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}
+
+/* Animations pour les états de connexion */
+.african-online-pulse {
+  animation: african-sun-rays 2s var(--african-easing) infinite;
+}
+
+.african-offline-fade {
+  animation: african-harmattan-exit var(--african-duration-slow) var(--african-easing);
+  opacity: 0.5;
+  filter: grayscale(50%);
+}
+
+/* Animations pour les transitions de thème */
+.african-theme-transition {
+  transition: all var(--african-duration-normal) var(--african-easing);
+}
+
+.african-theme-dark-enter {
+  animation: african-tornado var(--african-duration-slow) var(--african-easing);
+}
+
+.african-theme-light-enter {
+  animation: african-sun-rays var(--african-duration-normal) var(--african-easing);
+}
+
+/* Animations pour les graphiques et données */
+.african-chart-animate {
+  animation: african-baobab-grow var(--african-duration-slow) var(--african-easing);
+}
+
+.african-data-flow {
+  animation: african-river-flow 3s linear infinite;
+}
+
+/* Animations pour les formulaires */
+.african-form-focus {
+  animation: african-sun-rays 0.5s var(--african-easing);
+}
+
+.african-form-error {
+  animation: african-makossa 0.5s var(--african-easing) 3;
+}
+
+.african-form-success {
+  animation: african-azonto var(--african-duration-normal) var(--african-easing-bounce);
+}
+
+/* Animations pour les cartes et conteneurs */
+.african-card-reveal {
+  animation: african-bogolan-pattern var(--african-duration-slow) var(--african-easing);
+}
+
+.african-card-hover {
+  transition: all var(--african-duration-normal) var(--african-easing);
+}
+
+.african-card-hover:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(139, 69, 19, 0.2);
+}
+
+/* Animations pour les listes et menus */
+.african-list-item-enter {
+  animation: african-harmattan-enter var(--african-duration-normal) var(--african-easing);
+}
+
+.african-menu-slide {
+  animation: african-kizomba var(--african-duration-normal) var(--african-easing);
+}
+
+/* Animations pour les modales et popups */
+.african-modal-backdrop {
+  animation: african-bogolan-pattern var(--african-duration-normal) var(--african-easing);
+}
+
+.african-popup-bounce {
+  animation: african-griot-message var(--african-duration-slow) var(--african-easing-bounce);
+}
+

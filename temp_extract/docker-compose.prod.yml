@@ -1,0 +1,251 @@
+version: '3.8'
+
+services:
+  # AfricaSuite Application
+  africasuite:
+    image: africasuite/africasuite:latest
+    container_name: africasuite_app
+    restart: unless-stopped
+    environment:
+      # Deployment
+      DEPLOYMENT_MODE: selfhosted
+      NODE_ENV: production
+      
+      # Database
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: africasuite
+      POSTGRES_USER: africasuite
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      
+      # Cache
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      
+      # Storage
+      MINIO_HOST: minio
+      MINIO_PORT: 9000
+      MINIO_USER: ${MINIO_USER}
+      MINIO_PASSWORD: ${MINIO_PASSWORD}
+      
+      # Security
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      
+      # Features
+      ENABLE_MULTISITE: ${ENABLE_MULTISITE:-false}
+      ENABLE_CLOUD_SYNC: ${ENABLE_CLOUD_SYNC:-false}
+      CLOUD_ENDPOINT: ${CLOUD_ENDPOINT:-}
+      
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/uploads:/app/uploads
+      - ./ssl:/etc/ssl/private:ro
+      - ./logs:/var/log/africasuite
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    networks:
+      - africasuite_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: africasuite_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: africasuite
+      POSTGRES_USER: africasuite
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=fr_FR.UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+      - ./docker/init-scripts:/docker-entrypoint-initdb.d:ro
+    networks:
+      - africasuite_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U africasuite -d africasuite"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      postgres
+      -c log_statement=all
+      -c log_min_duration_statement=0
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: africasuite_redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - africasuite_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: africasuite_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+      MINIO_REGION_NAME: af-west-1
+      MINIO_BROWSER_REDIRECT_URL: https://${DOMAIN}/minio/
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - africasuite_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy (Optionnel)
+  nginx:
+    image: nginx:alpine
+    container_name: africasuite_nginx
+    restart: unless-stopped
+    profiles: ["with-nginx"]
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/ssl/private:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - africasuite
+    networks:
+      - africasuite_network
+
+  # Backup Service
+  backup:
+    image: africasuite/backup:latest
+    container_name: africasuite_backup
+    restart: unless-stopped
+    profiles: ["with-backup"]
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: africasuite
+      POSTGRES_USER: africasuite
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BACKUP_SCHEDULE: ${BACKUP_SCHEDULE:-0 2 * * *}  # 2h du matin
+      BACKUP_RETENTION: ${BACKUP_RETENTION:-30}  # 30 jours
+      CLOUD_BACKUP: ${CLOUD_BACKUP:-false}
+      RCLONE_CONFIG: ${RCLONE_CONFIG:-}
+    volumes:
+      - ./backups:/backups
+      - ./data:/data:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - postgres
+    networks:
+      - africasuite_network
+
+  # Monitoring (Optionnel)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: africasuite_prometheus
+    restart: unless-stopped
+    profiles: ["with-monitoring"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    networks:
+      - africasuite_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: africasuite_grafana
+    restart: unless-stopped
+    profiles: ["with-monitoring"]
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - africasuite_network
+
+# Volumes persistants
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  prometheus_data:
+    driver: local
+    profiles: ["with-monitoring"]
+  grafana_data:
+    driver: local
+    profiles: ["with-monitoring"]
+
+# Réseau isolé
+networks:
+  africasuite_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

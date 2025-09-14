@@ -1,0 +1,391 @@
+/**
+ * Styles CSS Globaux - Thème Africain Authentique
+ * Styles de base et classes utilitaires pour le thème africain
+ */
+
+/* Import des polices Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&display=swap');
+
+/* Variables CSS pour le thème africain */
+:root {
+  /* Polices */
+  --african-font-heading: 'Playfair Display', Georgia, serif;
+  --african-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --african-font-accent: 'Kalam', 'Comic Sans MS', cursive;
+  --african-font-mono: 'JetBrains Mono', 'Fira Code', Monaco, Consolas, monospace;
+}
+
+/* Styles de base pour le thème africain */
+.african-theme {
+  /* Appliquer la police de base */
+  font-family: var(--african-font-body);
+  
+  /* Arrière-plan avec dégradé subtil */
+  background: linear-gradient(135deg, 
+    var(--african-neutral-50) 0%, 
+    var(--african-neutral-100) 100%);
+  
+  /* Transition fluide pour tous les changements */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Styles pour les titres avec police africaine */
+.african-theme h1,
+.african-theme h2,
+.african-theme h3,
+.african-theme h4,
+.african-theme h5,
+.african-theme h6,
+.african-theme .font-heading {
+  font-family: var(--african-font-heading);
+  color: var(--african-primary-700);
+}
+
+/* Motifs de fond selon l'intensité */
+.african-theme.african-pattern-light::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMCAyMEwyMCAwTDQwIDIwTDIwIDQwWiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMDMiLz4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIzIiBmaWxsPSIjOEI0NTEzIiBvcGFjaXR5PSIwLjAyIi8+Cjwvc3ZnPgo=");
+  background-repeat: repeat;
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.5;
+}
+
+.african-theme.african-pattern-medium::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMCAyMEwyMCAwTDQwIDIwTDIwIDQwWiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMDUiLz4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIzIiBmaWxsPSIjOEI0NTEzIiBvcGFjaXR5PSIwLjA0Ii8+Cjwvc3ZnPgo=");
+  background-repeat: repeat;
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.7;
+}
+
+.african-theme.african-pattern-strong::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMCAyMEwyMCAwTDQwIDIwTDIwIDQwWiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMDgiLz4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIzIiBmaWxsPSIjOEI0NTEzIiBvcGFjaXR5PSIwLjA2Ii8+Cjwvc3ZnPgo=");
+  background-repeat: repeat;
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 1;
+}
+
+/* Classes utilitaires pour les couleurs africaines */
+.text-african-primary { color: var(--african-primary-500); }
+.text-african-secondary { color: var(--african-secondary-400); }
+.text-african-accent { color: var(--african-accent-500); }
+.text-african-earth { color: var(--african-earth-clay); }
+.text-african-success { color: var(--african-success-500); }
+.text-african-warning { color: var(--african-warning-500); }
+.text-african-error { color: var(--african-error-500); }
+
+.bg-african-primary { background-color: var(--african-primary-500); }
+.bg-african-secondary { background-color: var(--african-secondary-400); }
+.bg-african-accent { background-color: var(--african-accent-500); }
+.bg-african-earth { background-color: var(--african-earth-clay); }
+
+/* Bordures africaines */
+.border-african-primary { border-color: var(--african-primary-500); }
+.border-african-secondary { border-color: var(--african-secondary-400); }
+.border-african-accent { border-color: var(--african-accent-500); }
+
+/* Classes pour les motifs */
+.african-pattern-overlay {
+  position: relative;
+}
+
+.african-pattern-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMCAyMEwyMCAwTDQwIDIwTDIwIDQwWiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMyIvPgogIDxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjMiIGZpbGw9IiM4QjQ1MTMiIG9wYWNpdHk9IjAuNCIvPgo8L3N2Zz4K");
+  background-repeat: repeat;
+  background-size: 40px 40px;
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.african-pattern-overlay-light::before {
+  opacity: 0.03;
+}
+
+.african-pattern-overlay-medium::before {
+  opacity: 0.06;
+}
+
+.african-pattern-overlay-strong::before {
+  opacity: 0.1;
+}
+
+/* Motif Kita */
+.african-pattern-kita {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTUgMEwzMCAxNUwxNSAzMEwwIDE1WiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMyIvPgogIDxjaXJjbGUgY3g9IjE1IiBjeT0iMTUiIHI9IjIiIGZpbGw9IiNEQUE1MjAiIG9wYWNpdHk9IjAuNCIvPgo8L3N2Zz4K");
+  background-repeat: repeat;
+  background-size: 30px 30px;
+}
+
+.african-pattern-kita-light {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTUgMEwzMCAxNUwxNSAzMEwwIDE1WiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMSIvPgogIDxjaXJjbGUgY3g9IjE1IiBjeT0iMTUiIHI9IjIiIGZpbGw9IiNEQUE1MjAiIG9wYWNpdHk9IjAuMTUiLz4KPC9zdmc+Cg==");
+  background-repeat: repeat;
+  background-size: 30px 30px;
+}
+
+.african-pattern-kita-medium {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAiIGhlaWdodD0iMzAiIHZpZXdCb3g9IjAgMCAzMCAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMTUgMEwzMCAxNUwxNSAzMEwwIDE1WiIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMiIvPgogIDxjaXJjbGUgY3g9IjE1IiBjeT0iMTUiIHI9IjIiIGZpbGw9IiNEQUE1MjAiIG9wYWNpdHk9IjAuMjUiLz4KPC9zdmc+Cg==");
+  background-repeat: repeat;
+  background-size: 30px 30px;
+}
+
+/* Bordures avec motifs */
+.african-border-pattern {
+  border-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cGF0aCBkPSJNMCAwTDIwIDIwTTIwIDBMMCAyMCIgc3Ryb2tlPSIjRDI2OTFFIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9IjAuNCIvPgogIDxjaXJjbGUgY3g9IjEwIiBjeT0iMTAiIHI9IjIiIGZpbGw9IiM4QjQ1MTMiIG9wYWNpdHk9IjAuMyIvPgo8L3N2Zz4K") 1;
+  border-image-repeat: repeat;
+}
+
+/* Animations africaines */
+@keyframes african-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+@keyframes african-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--african-primary-500);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--african-primary-500), 0 0 30px var(--african-primary-400);
+  }
+}
+
+@keyframes african-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Classes d'animation */
+.african-pulse {
+  animation: african-pulse 2s ease-in-out infinite;
+}
+
+.african-glow {
+  animation: african-glow 3s ease-in-out infinite;
+}
+
+.african-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--african-primary-200),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: african-shimmer 2s ease-in-out infinite;
+}
+
+/* Styles pour les cartes africaines */
+.african-card {
+  background: linear-gradient(135deg, 
+    var(--african-neutral-50) 0%, 
+    var(--african-neutral-100) 100%);
+  border: 1px solid var(--african-neutral-200);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(139, 69, 19, 0.1), 0 1px 2px 0 rgba(139, 69, 19, 0.06);
+  transition: all 0.3s ease-in-out;
+}
+
+.african-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(139, 69, 19, 0.1), 0 2px 4px -1px rgba(139, 69, 19, 0.06);
+  border-color: var(--african-primary-300);
+}
+
+/* Styles pour les boutons africains */
+.african-button {
+  font-family: var(--african-font-body);
+  font-weight: 500;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.african-button:hover {
+  transform: translateY(-1px);
+}
+
+.african-button:active {
+  transform: scale(0.95);
+}
+
+/* Effet de brillance pour les boutons */
+.african-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease-in-out;
+}
+
+.african-button:hover::before {
+  left: 100%;
+}
+
+/* Styles responsive pour mobile */
+@media (max-width: 768px) {
+  .african-theme {
+    font-size: 14px;
+  }
+  
+  .african-theme h1 { font-size: 1.875rem; }
+  .african-theme h2 { font-size: 1.5rem; }
+  .african-theme h3 { font-size: 1.25rem; }
+  .african-theme h4 { font-size: 1.125rem; }
+  
+  /* Réduire l'intensité des motifs sur mobile */
+  .african-theme.african-pattern-light::before,
+  .african-theme.african-pattern-medium::before {
+    opacity: 0.3;
+  }
+  
+  .african-theme.african-pattern-strong::before {
+    opacity: 0.5;
+  }
+}
+
+/* Mode sombre pour le thème africain */
+.african-theme.dark {
+  background: linear-gradient(135deg, 
+    var(--african-neutral-900) 0%, 
+    var(--african-neutral-800) 100%);
+}
+
+.african-theme.dark h1,
+.african-theme.dark h2,
+.african-theme.dark h3,
+.african-theme.dark h4,
+.african-theme.dark h5,
+.african-theme.dark h6 {
+  color: var(--african-primary-400);
+}
+
+/* Styles pour les éléments de navigation */
+.african-nav {
+  background: linear-gradient(135deg, 
+    var(--african-primary-500) 0%, 
+    var(--african-primary-600) 100%);
+  border-bottom: 2px solid var(--african-primary-700);
+}
+
+.african-nav-item {
+  color: var(--african-neutral-50);
+  transition: all 0.2s ease-in-out;
+}
+
+.african-nav-item:hover {
+  color: var(--african-secondary-200);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.african-nav-item.active {
+  color: var(--african-secondary-300);
+  background-color: rgba(255, 255, 255, 0.15);
+  border-bottom: 2px solid var(--african-secondary-300);
+}
+
+/* Styles pour les formulaires */
+.african-input {
+  font-family: var(--african-font-body);
+  border: 1px solid var(--african-neutral-300);
+  border-radius: 0.375rem;
+  background-color: var(--african-neutral-50);
+  transition: all 0.2s ease-in-out;
+}
+
+.african-input:focus {
+  outline: none;
+  border-color: var(--african-primary-500);
+  box-shadow: 0 0 0 3px rgba(210, 105, 30, 0.1);
+  background-color: var(--african-neutral-25, var(--african-neutral-50));
+}
+
+.african-input::placeholder {
+  color: var(--african-neutral-400);
+}
+
+/* Styles pour les alertes */
+.african-alert {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border-left: 4px solid;
+}
+
+.african-alert-success {
+  background-color: var(--african-success-50);
+  border-left-color: var(--african-success-500);
+  color: var(--african-success-800);
+}
+
+.african-alert-warning {
+  background-color: var(--african-warning-50);
+  border-left-color: var(--african-warning-500);
+  color: var(--african-warning-800);
+}
+
+.african-alert-error {
+  background-color: var(--african-error-50);
+  border-left-color: var(--african-error-500);
+  color: var(--african-error-800);
+}
+
+/* Utilitaires de spacing africain */
+.african-spacing-xs { margin: 0.25rem; }
+.african-spacing-sm { margin: 0.5rem; }
+.african-spacing-md { margin: 1rem; }
+.african-spacing-lg { margin: 1.5rem; }
+.african-spacing-xl { margin: 2rem; }
+
+.african-padding-xs { padding: 0.25rem; }
+.african-padding-sm { padding: 0.5rem; }
+.african-padding-md { padding: 1rem; }
+.african-padding-lg { padding: 1.5rem; }
+.african-padding-xl { padding: 2rem; }
+

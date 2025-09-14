@@ -1,0 +1,81 @@
+project_id = "alfflpvdnywwbrzygmoc"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbound_emails]
+enabled = false
+
+[smtp]
+enabled = false
+
+[auth]
+enabled = true
+external_url = "http://localhost:3000"
+additional_redirect_urls = ["https://lovable.dev", "https://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+enable_confirmations = false
+
+[edge_functions]
+enabled = true
+port = 54324
+
+[functions.generate-report]
+verify_jwt = true
+
+[functions.report-scheduler]
+verify_jwt = true
+
+[functions.advanced-analytics]
+verify_jwt = true
+
+[functions.generate-insights]
+verify_jwt = true
+
+[functions.send-reservation-email]
+verify_jwt = false
+
+[functions.generate-reservation-pdf]
+verify_jwt = false
+
+[functions.duplicate-reservation]
+verify_jwt = false
+
+[functions.calculate-tariff]
+verify_jwt = false
+
+[functions.generate-police-form]
+verify_jwt = false
+
+[functions.generate-room-card]
+verify_jwt = false
+
+[functions.generate-stay-program]
+verify_jwt = false
+
+[functions.scan-document]
+verify_jwt = false
+
+[functions.pre-closure-check]
+verify_jwt = true
+
+[functions.pos-z-report]
+verify_jwt = true
+
+[functions.syscohada-export]
+verify_jwt = true
+
+[functions.translate-text]
+verify_jwt = false
