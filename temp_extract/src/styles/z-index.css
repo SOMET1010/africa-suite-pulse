@@ -1,0 +1,85 @@
+/* Z-Index Hierarchy System - AfricaSuite PMS
+   Prevents overlapping conflicts between UI elements
+*/
+
+@layer base {
+  :root {
+    /* Base z-index hierarchy (in order of precedence) */
+    --z-base: 0;                    /* Normal content flow */
+    --z-dropdown: 10;               /* Basic dropdowns, tooltips */
+    --z-sticky: 20;                 /* Sticky headers, navigation */
+    --z-sidebar: 30;                /* Sidebar elements */
+    --z-header: 40;                 /* Main header/status bar */
+    --z-navigation: 50;             /* Mobile bottom navigation */
+    --z-overlay: 60;                /* Bottom action bars, floating elements */
+    --z-modal: 70;                  /* Modals, dialogs */
+    --z-toast: 80;                  /* Toast notifications */
+    --z-tooltip: 90;                /* High priority tooltips */
+    --z-maximum: 100;               /* Emergency override (use sparingly) */
+    
+    /* Mobile safe area adjustments */
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --mobile-nav-height: 70px;
+    --bottom-action-height: 80px;
+  }
+}
+
+/* Utility classes for consistent z-index usage */
+.z-base { z-index: var(--z-base); }
+.z-dropdown { z-index: var(--z-dropdown); }
+.z-sticky { z-index: var(--z-sticky); }
+.z-sidebar { z-index: var(--z-sidebar); }
+.z-header { z-index: var(--z-header); }
+.z-navigation { z-index: var(--z-navigation); }
+.z-overlay { z-index: var(--z-overlay); }
+.z-modal { z-index: var(--z-modal); }
+.z-toast { z-index: var(--z-toast); }
+.z-tooltip { z-index: var(--z-tooltip); }
+.z-maximum { z-index: var(--z-maximum); }
+
+/* Safe area utilities for mobile */
+.safe-area-inset-b {
+  padding-bottom: calc(var(--safe-area-bottom) + 0.5rem);
+}
+
+.mobile-nav-space {
+  padding-bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom));
+}
+
+.bottom-action-space {
+  padding-bottom: calc(var(--bottom-action-height) + var(--safe-area-bottom));
+}
+
+/* Positioning zones to avoid conflicts */
+.floating-bottom-left {
+  position: fixed;
+  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 1rem);
+  left: 1rem;
+  z-index: var(--z-overlay);
+}
+
+.floating-bottom-right {
+  position: fixed;
+  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 1rem);
+  right: 1rem;
+  z-index: var(--z-overlay);
+}
+
+.floating-bottom-center {
+  position: fixed;
+  bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-overlay);
+}
+
+/* Enhanced mobile adjustments */
+@media (max-width: 1024px) {
+  .lg-hidden-floating {
+    display: none;
+  }
+  
+  .mobile-adjusted-bottom {
+    bottom: calc(var(--mobile-nav-height) + var(--safe-area-bottom) + 1rem);
+  }
+}

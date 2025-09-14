@@ -1,0 +1,554 @@
+/* African Mobile Responsive Styles */
+/* Optimisations pour les appareils mobiles africains */
+
+/* Variables pour les breakpoints africains */
+:root {
+  --mobile-small: 320px;  /* Smartphones basiques */
+  --mobile-medium: 375px; /* Smartphones standards */
+  --mobile-large: 414px;  /* Smartphones premium */
+  --tablet-small: 768px;  /* Tablettes 7-8" */
+  --tablet-large: 1024px; /* Tablettes 10-12" */
+  
+  /* Couleurs adaptées aux écrans mobiles */
+  --african-primary-mobile: #8B4513;
+  --african-secondary-mobile: #D2691E;
+  --african-accent-mobile: #FFD700;
+  --african-text-mobile: #2D1810;
+  --african-bg-mobile: #FFF8F0;
+}
+
+/* Optimisations générales pour mobile */
+@media (max-width: 768px) {
+  /* Amélioration de la lisibilité sur petits écrans */
+  body {
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  /* Espacement optimisé pour le touch */
+  .african-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px;
+    margin: 8px 0;
+  }
+  
+  /* Navigation mobile africaine */
+  .african-mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--african-primary-mobile), var(--african-secondary-mobile));
+    padding: 12px 0;
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(139, 69, 19, 0.3);
+  }
+  
+  .african-mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    color: white;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+  
+  .african-mobile-nav-item:hover,
+  .african-mobile-nav-item.active {
+    background: rgba(255, 215, 0, 0.2);
+    border-radius: 12px;
+    transform: translateY(-2px);
+  }
+  
+  .african-mobile-nav-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+}
+
+/* Smartphones basiques (320px) */
+@media (max-width: 320px) {
+  .african-container {
+    padding: 8px;
+  }
+  
+  .african-card {
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .african-title {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+  
+  .african-subtitle {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .african-text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
+/* Smartphones standards (375px) */
+@media (min-width: 321px) and (max-width: 375px) {
+  .african-container {
+    padding: 12px;
+  }
+  
+  .african-card {
+    margin: 12px 0;
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .african-title {
+    font-size: 20px;
+    line-height: 1.4;
+  }
+  
+  .african-subtitle {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .african-text {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+}
+
+/* Smartphones premium (414px) */
+@media (min-width: 376px) and (max-width: 414px) {
+  .african-container {
+    padding: 16px;
+  }
+  
+  .african-card {
+    margin: 16px 0;
+    padding: 20px;
+    border-radius: 16px;
+  }
+  
+  .african-title {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+  
+  .african-subtitle {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  
+  .african-text {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+}
+
+/* Tablettes (768px+) */
+@media (min-width: 768px) {
+  .african-mobile-nav {
+    display: none;
+  }
+  
+  .african-desktop-nav {
+    display: flex;
+  }
+  
+  .african-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .african-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+}
+
+/* Animations africaines pour mobile */
+@keyframes african-slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes african-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes african-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Classes d'animation */
+.african-animate-slide-up {
+  animation: african-slide-up 0.6s ease-out;
+}
+
+.african-animate-fade-in {
+  animation: african-fade-in 0.4s ease-out;
+}
+
+.african-animate-bounce {
+  animation: african-bounce 1s ease-in-out;
+}
+
+/* Optimisations pour les connexions lentes */
+@media (prefers-reduced-motion: reduce) {
+  .african-animate-slide-up,
+  .african-animate-fade-in,
+  .african-animate-bounce {
+    animation: none;
+  }
+  
+  * {
+    transition: none !important;
+  }
+}
+
+/* Mode sombre adapté aux conditions d'éclairage africaines */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --african-primary-mobile: #D2691E;
+    --african-secondary-mobile: #FFD700;
+    --african-accent-mobile: #8B4513;
+    --african-text-mobile: #FFF8F0;
+    --african-bg-mobile: #2D1810;
+  }
+  
+  .african-card {
+    background: rgba(45, 24, 16, 0.9);
+    border: 1px solid rgba(210, 105, 30, 0.3);
+  }
+}
+
+/* Optimisations pour les écrans haute densité */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .african-icon {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Styles pour les gestes tactiles */
+.african-swipeable {
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+
+.african-pinch-zoom {
+  touch-action: pinch-zoom;
+}
+
+.african-no-touch {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Optimisations pour les claviers virtuels */
+@media (max-height: 500px) and (orientation: landscape) {
+  .african-mobile-nav {
+    display: none;
+  }
+  
+  .african-container {
+    padding-bottom: 60px;
+  }
+}
+
+/* Styles pour les notifications push africaines */
+.african-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--african-primary-mobile), var(--african-secondary-mobile));
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.4);
+  z-index: 9999;
+  animation: african-slide-up 0.5s ease-out;
+  max-width: calc(100vw - 40px);
+}
+
+.african-notification.success {
+  background: linear-gradient(135deg, #228B22, #32CD32);
+}
+
+.african-notification.warning {
+  background: linear-gradient(135deg, #FF8C00, #FFD700);
+}
+
+.african-notification.error {
+  background: linear-gradient(135deg, #DC143C, #FF6347);
+}
+
+/* Optimisations pour les performances sur mobile */
+.african-gpu-accelerated {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+.african-smooth-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Styles pour les modales mobiles africaines */
+.african-modal-mobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(45, 24, 16, 0.8);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 20px;
+}
+
+.african-modal-content-mobile {
+  background: var(--african-bg-mobile);
+  border-radius: 20px 20px 0 0;
+  padding: 24px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: african-slide-up 0.4s ease-out;
+}
+
+/* Styles pour les formulaires mobiles africains */
+.african-form-mobile {
+  padding: 20px;
+}
+
+.african-input-mobile {
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--african-secondary-mobile);
+  border-radius: 12px;
+  font-size: 16px;
+  background: var(--african-bg-mobile);
+  color: var(--african-text-mobile);
+  margin-bottom: 16px;
+}
+
+.african-input-mobile:focus {
+  outline: none;
+  border-color: var(--african-accent-mobile);
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
+.african-button-mobile {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--african-primary-mobile), var(--african-secondary-mobile));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.african-button-mobile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+}
+
+.african-button-mobile:active {
+  transform: translateY(0);
+}
+
+/* Styles pour les listes mobiles africaines */
+.african-list-mobile {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.african-list-item-mobile {
+  padding: 16px;
+  border-bottom: 1px solid rgba(210, 105, 30, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s ease;
+}
+
+.african-list-item-mobile:hover {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.african-list-item-mobile:last-child {
+  border-bottom: none;
+}
+
+/* Styles pour les cartes de statistiques mobiles */
+.african-stat-card-mobile {
+  background: linear-gradient(135deg, var(--african-primary-mobile), var(--african-secondary-mobile));
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 32px rgba(139, 69, 19, 0.2);
+}
+
+.african-stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.african-stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Optimisations pour les images africaines sur mobile */
+.african-image-mobile {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  loading: lazy;
+}
+
+.african-avatar-mobile {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid var(--african-accent-mobile);
+  object-fit: cover;
+}
+
+/* Styles pour les badges africains */
+.african-badge-mobile {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--african-accent-mobile);
+  color: var(--african-text-mobile);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.african-badge-mobile.success {
+  background: #32CD32;
+  color: white;
+}
+
+.african-badge-mobile.warning {
+  background: #FFD700;
+  color: #2D1810;
+}
+
+.african-badge-mobile.error {
+  background: #FF6347;
+  color: white;
+}
+
+/* Styles pour les onglets mobiles africains */
+.african-tabs-mobile {
+  display: flex;
+  background: rgba(210, 105, 30, 0.1);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.african-tab-mobile {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--african-text-mobile);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.african-tab-mobile.active {
+  background: var(--african-primary-mobile);
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+}
+
+/* Styles pour les alertes mobiles africaines */
+.african-alert-mobile {
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.african-alert-mobile.info {
+  background: rgba(135, 206, 235, 0.1);
+  border-left: 4px solid #87CEEB;
+}
+
+.african-alert-mobile.success {
+  background: rgba(50, 205, 50, 0.1);
+  border-left: 4px solid #32CD32;
+}
+
+.african-alert-mobile.warning {
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 4px solid #FFD700;
+}
+
+.african-alert-mobile.error {
+  background: rgba(255, 99, 71, 0.1);
+  border-left: 4px solid #FF6347;
+}
+

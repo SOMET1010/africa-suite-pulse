@@ -1,0 +1,53 @@
+-- AUDIT DE SÉCURITÉ CRITIQUE - Phase 1
+-- Correction des fonctions sans search_path sécurisé
+
+-- 1. Sécuriser toutes les fonctions SECURITY DEFINER
+ALTER FUNCTION public.get_organization_settings() SET search_path TO 'public';
+ALTER FUNCTION public.calculate_nights_count() SET search_path TO 'public';
+ALTER FUNCTION public.add_loyalty_points(uuid, uuid, integer, text, text, uuid, text) SET search_path TO 'public';
+ALTER FUNCTION public.handle_reservation_checkout_loyalty() SET search_path TO 'public';
+ALTER FUNCTION public.calculate_next_maintenance_date(uuid) SET search_path TO 'public';
+ALTER FUNCTION public.get_hotel_health_summary() SET search_path TO 'public';
+ALTER FUNCTION public.update_spare_parts_stock() SET search_path TO 'public';
+ALTER FUNCTION public.generate_maintenance_request_number() SET search_path TO 'public';
+ALTER FUNCTION public.update_next_maintenance_date() SET search_path TO 'public';
+ALTER FUNCTION public.has_permission(text) SET search_path TO 'public';
+ALTER FUNCTION public.update_hotel_health_status() SET search_path TO 'public';
+ALTER FUNCTION public.generate_pos_order_number() SET search_path TO 'public';
+ALTER FUNCTION public.generate_pos_session_number() SET search_path TO 'public';
+ALTER FUNCTION public.get_current_user_role() SET search_path TO 'public';
+ALTER FUNCTION public.generate_customer_code() SET search_path TO 'public';
+ALTER FUNCTION public.generate_customer_invoice_number() SET search_path TO 'public';
+ALTER FUNCTION public.upsert_organization_setting(text, jsonb) SET search_path TO 'public';
+ALTER FUNCTION public.can_access_view_data() SET search_path TO 'public';
+ALTER FUNCTION public.update_customer_loyalty_tier(uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.update_customer_balance() SET search_path TO 'public';
+ALTER FUNCTION public.trg_audit_log() SET search_path TO 'public';
+ALTER FUNCTION public.assign_housekeeping_task(uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.complete_housekeeping_task(uuid, integer, integer, text) SET search_path TO 'public';
+ALTER FUNCTION public.calculate_composed_product_cost(uuid) SET search_path TO 'public';
+ALTER FUNCTION public.validate_table_function_access(text, uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.complete_night_audit(uuid) SET search_path TO 'public';
+ALTER FUNCTION public.has_role(uuid, text) SET search_path TO 'public';
+ALTER FUNCTION public.enforce_read_only() SET search_path TO 'public';
+ALTER FUNCTION public.is_user_read_only(uuid) SET search_path TO 'public';
+ALTER FUNCTION public.start_night_audit(date) SET search_path TO 'public';
+ALTER FUNCTION public.update_audit_checkpoint(uuid, text, jsonb, text) SET search_path TO 'public';
+ALTER FUNCTION public.calculate_net_quantity() SET search_path TO 'public';
+ALTER FUNCTION public.calculate_composed_product_cost_with_waste(uuid) SET search_path TO 'public';
+ALTER FUNCTION public.validate_payment_amount(numeric, text) SET search_path TO 'public';
+ALTER FUNCTION public.validate_pos_session(text) SET search_path TO 'public';
+ALTER FUNCTION public.logout_pos_session(text) SET search_path TO 'public';
+ALTER FUNCTION public.audit_row_changes() SET search_path TO 'public';
+ALTER FUNCTION public.check_rate_limit(text, text, integer, integer) SET search_path TO 'public';
+ALTER FUNCTION public.activate_organization_module(uuid, text, text, integer) SET search_path TO 'public';
+ALTER FUNCTION public.update_pos_stock_quantity() SET search_path TO 'public';
+ALTER FUNCTION public.get_current_pricing_level(uuid) SET search_path TO 'public';
+ALTER FUNCTION public.assign_table_to_server(uuid, uuid, uuid) SET search_path TO 'public';
+ALTER FUNCTION public.calculate_promotional_price(uuid, numeric, integer, text) SET search_path TO 'public';
+ALTER FUNCTION public.log_guest_data_access(uuid, text, text[]) SET search_path TO 'public';
+ALTER FUNCTION public.calculate_subsidy_amount(uuid, numeric, text) SET search_path TO 'public';
+ALTER FUNCTION public.get_hotel_health_summary_v2() SET search_path TO 'public';
+ALTER FUNCTION public.trigger_log_guest_access() SET search_path TO 'public';
+ALTER FUNCTION public.prevent_bulk_guest_export() SET search_path TO 'public';
+ALTER FUNCTION public.check_guest_access_rate_limit() SET search_path TO 'public';
