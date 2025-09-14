@@ -1,0 +1,782 @@
+/**
+ * Système de Design Africain Complet - Africa Suite Pulse
+ * Design authentique avec motifs bogolan, kita et palette terre
+ */
+
+/* === VARIABLES CSS AFRICAINES === */
+:root {
+  /* Palette de couleurs terre africaine */
+  --african-earth-50: #fef7ed;
+  --african-earth-100: #fdebd3;
+  --african-earth-200: #fbd3a5;
+  --african-earth-300: #f8b56d;
+  --african-earth-400: #f59332;
+  --african-earth-500: #f2750a;
+  --african-earth-600: #e35d05;
+  --african-earth-700: #bc4508;
+  --african-earth-800: #973710;
+  --african-earth-900: #7c2d12;
+  --african-earth-950: #431407;
+
+  /* Couleurs terre cuite */
+  --african-terracotta-50: #fef2f2;
+  --african-terracotta-100: #fee2e2;
+  --african-terracotta-200: #fecaca;
+  --african-terracotta-300: #fca5a5;
+  --african-terracotta-400: #f87171;
+  --african-terracotta-500: #ef4444;
+  --african-terracotta-600: #dc2626;
+  --african-terracotta-700: #b91c1c;
+  --african-terracotta-800: #991b1b;
+  --african-terracotta-900: #7f1d1d;
+  --african-terracotta-950: #450a0a;
+
+  /* Couleurs ocre */
+  --african-ochre-50: #fffbeb;
+  --african-ochre-100: #fef3c7;
+  --african-ochre-200: #fde68a;
+  --african-ochre-300: #fcd34d;
+  --african-ochre-400: #fbbf24;
+  --african-ochre-500: #f59e0b;
+  --african-ochre-600: #d97706;
+  --african-ochre-700: #b45309;
+  --african-ochre-800: #92400e;
+  --african-ochre-900: #78350f;
+  --african-ochre-950: #451a03;
+
+  /* Couleurs safran */
+  --african-saffron-50: #fff7ed;
+  --african-saffron-100: #ffedd5;
+  --african-saffron-200: #fed7aa;
+  --african-saffron-300: #fdba74;
+  --african-saffron-400: #fb923c;
+  --african-saffron-500: #f97316;
+  --african-saffron-600: #ea580c;
+  --african-saffron-700: #c2410c;
+  --african-saffron-800: #9a3412;
+  --african-saffron-900: #7c2d12;
+  --african-saffron-950: #431407;
+
+  /* Couleurs neutres africaines */
+  --african-neutral-50: #fafaf9;
+  --african-neutral-100: #f5f5f4;
+  --african-neutral-200: #e7e5e4;
+  --african-neutral-300: #d6d3d1;
+  --african-neutral-400: #a8a29e;
+  --african-neutral-500: #78716c;
+  --african-neutral-600: #57534e;
+  --african-neutral-700: #44403c;
+  --african-neutral-800: #292524;
+  --african-neutral-900: #1c1917;
+  --african-neutral-950: #0c0a09;
+
+  /* Typographie africaine */
+  --african-font-display: 'Playfair Display', 'Times New Roman', serif;
+  --african-font-body: 'Inter', 'Segoe UI', sans-serif;
+  --african-font-accent: 'Kalam', 'Comic Sans MS', cursive;
+  --african-font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Espacements harmonieux */
+  --african-space-xs: 0.25rem;
+  --african-space-sm: 0.5rem;
+  --african-space-md: 1rem;
+  --african-space-lg: 1.5rem;
+  --african-space-xl: 2rem;
+  --african-space-2xl: 3rem;
+  --african-space-3xl: 4rem;
+
+  /* Rayons de bordure organiques */
+  --african-radius-sm: 0.375rem;
+  --african-radius-md: 0.5rem;
+  --african-radius-lg: 0.75rem;
+  --african-radius-xl: 1rem;
+  --african-radius-2xl: 1.5rem;
+  --african-radius-full: 9999px;
+
+  /* Ombres naturelles */
+  --african-shadow-sm: 0 1px 2px 0 rgba(139, 69, 19, 0.05);
+  --african-shadow-md: 0 4px 6px -1px rgba(139, 69, 19, 0.1), 0 2px 4px -1px rgba(139, 69, 19, 0.06);
+  --african-shadow-lg: 0 10px 15px -3px rgba(139, 69, 19, 0.1), 0 4px 6px -2px rgba(139, 69, 19, 0.05);
+  --african-shadow-xl: 0 20px 25px -5px rgba(139, 69, 19, 0.1), 0 10px 10px -5px rgba(139, 69, 19, 0.04);
+  --african-shadow-2xl: 0 25px 50px -12px rgba(139, 69, 19, 0.25);
+
+  /* Transitions fluides */
+  --african-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --african-transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --african-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index système */
+  --african-z-dropdown: 1000;
+  --african-z-sticky: 1020;
+  --african-z-fixed: 1030;
+  --african-z-modal-backdrop: 1040;
+  --african-z-modal: 1050;
+  --african-z-popover: 1060;
+  --african-z-tooltip: 1070;
+  --african-z-toast: 1080;
+}
+
+/* === MOTIFS AFRICAINS === */
+
+/* Motif Bogolan (Mali) */
+.african-pattern-bogolan {
+  background-image: 
+    linear-gradient(45deg, var(--african-earth-800) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--african-earth-800) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--african-earth-700) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--african-earth-700) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.african-pattern-bogolan-subtle {
+  background-image: 
+    linear-gradient(45deg, var(--african-earth-100) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--african-earth-100) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--african-earth-200) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--african-earth-200) 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+}
+
+/* Motif Kita (Géométrique ouest-africain) */
+.african-pattern-kita {
+  background-image: 
+    radial-gradient(circle at 25% 25%, var(--african-terracotta-600) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, var(--african-ochre-600) 2px, transparent 2px),
+    radial-gradient(circle at 25% 75%, var(--african-saffron-600) 1px, transparent 1px),
+    radial-gradient(circle at 75% 25%, var(--african-earth-600) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.african-pattern-kita-subtle {
+  background-image: 
+    radial-gradient(circle at 25% 25%, var(--african-terracotta-200) 1px, transparent 1px),
+    radial-gradient(circle at 75% 75%, var(--african-ochre-200) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Motif Adinkra (Ghana) */
+.african-pattern-adinkra {
+  background-image: 
+    repeating-conic-gradient(from 0deg at 50% 50%, 
+      var(--african-earth-600) 0deg 45deg, 
+      transparent 45deg 90deg,
+      var(--african-terracotta-600) 90deg 135deg,
+      transparent 135deg 180deg,
+      var(--african-ochre-600) 180deg 225deg,
+      transparent 225deg 270deg,
+      var(--african-saffron-600) 270deg 315deg,
+      transparent 315deg 360deg);
+  background-size: 60px 60px;
+}
+
+/* Motif Wax (Tissu africain) */
+.african-pattern-wax {
+  background: 
+    radial-gradient(ellipse at center, var(--african-earth-500) 0%, transparent 50%),
+    radial-gradient(ellipse at center, var(--african-terracotta-500) 0%, transparent 50%),
+    radial-gradient(ellipse at center, var(--african-ochre-500) 0%, transparent 50%);
+  background-size: 40px 40px, 60px 60px, 80px 80px;
+  background-position: 0 0, 20px 20px, 40px 40px;
+}
+
+/* === COMPOSANTS DE BASE === */
+
+/* Conteneur principal africain */
+.african-container {
+  background: linear-gradient(135deg, 
+    var(--african-earth-50) 0%, 
+    var(--african-ochre-50) 50%, 
+    var(--african-saffron-50) 100%);
+  border-radius: var(--african-radius-2xl);
+  box-shadow: var(--african-shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.african-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--african-pattern-bogolan-subtle);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Cartes africaines */
+.african-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--african-earth-200);
+  border-radius: var(--african-radius-xl);
+  box-shadow: var(--african-shadow-md);
+  transition: all var(--african-transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.african-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    var(--african-earth-500), 
+    var(--african-terracotta-500), 
+    var(--african-ochre-500), 
+    var(--african-saffron-500));
+}
+
+.african-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--african-shadow-lg);
+  border-color: var(--african-earth-300);
+}
+
+.african-card:active {
+  transform: translateY(0);
+}
+
+/* Boutons africains */
+.african-button {
+  background: linear-gradient(135deg, 
+    var(--african-earth-600), 
+    var(--african-terracotta-600));
+  color: white;
+  border: none;
+  border-radius: var(--african-radius-lg);
+  padding: var(--african-space-sm) var(--african-space-lg);
+  font-family: var(--african-font-body);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all var(--african-transition-normal);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--african-shadow-sm);
+}
+
+.african-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left var(--african-transition-fast);
+}
+
+.african-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--african-shadow-md);
+}
+
+.african-button:hover::before {
+  left: 100%;
+}
+
+.african-button:active {
+  transform: translateY(0);
+}
+
+.african-button:focus {
+  outline: 2px solid var(--african-ochre-400);
+  outline-offset: 2px;
+}
+
+/* Variantes de boutons */
+.african-button-secondary {
+  background: linear-gradient(135deg, 
+    var(--african-ochre-500), 
+    var(--african-saffron-500));
+}
+
+.african-button-outline {
+  background: transparent;
+  color: var(--african-earth-700);
+  border: 2px solid var(--african-earth-300);
+}
+
+.african-button-outline:hover {
+  background: var(--african-earth-50);
+  border-color: var(--african-earth-400);
+}
+
+.african-button-ghost {
+  background: transparent;
+  color: var(--african-earth-600);
+  box-shadow: none;
+}
+
+.african-button-ghost:hover {
+  background: var(--african-earth-100);
+}
+
+/* Inputs africains */
+.african-input {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--african-earth-200);
+  border-radius: var(--african-radius-md);
+  padding: var(--african-space-sm) var(--african-space-md);
+  font-family: var(--african-font-body);
+  font-size: 0.875rem;
+  color: var(--african-neutral-800);
+  transition: all var(--african-transition-normal);
+  width: 100%;
+}
+
+.african-input:focus {
+  outline: none;
+  border-color: var(--african-earth-400);
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+  background: white;
+}
+
+.african-input::placeholder {
+  color: var(--african-neutral-400);
+  font-style: italic;
+}
+
+/* Labels africains */
+.african-label {
+  font-family: var(--african-font-body);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--african-earth-700);
+  margin-bottom: var(--african-space-xs);
+  display: block;
+}
+
+/* Badges africains */
+.african-badge {
+  background: linear-gradient(135deg, 
+    var(--african-ochre-500), 
+    var(--african-saffron-500));
+  color: white;
+  padding: var(--african-space-xs) var(--african-space-sm);
+  border-radius: var(--african-radius-full);
+  font-family: var(--african-font-body);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--african-space-xs);
+}
+
+.african-badge-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.african-badge-warning {
+  background: linear-gradient(135deg, var(--african-ochre-500), var(--african-ochre-600));
+}
+
+.african-badge-error {
+  background: linear-gradient(135deg, var(--african-terracotta-500), var(--african-terracotta-600));
+}
+
+/* Alertes africaines */
+.african-alert {
+  border-radius: var(--african-radius-lg);
+  padding: var(--african-space-md);
+  border-left: 4px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.african-alert::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: var(--african-pattern-kita-subtle);
+  opacity: 0.3;
+}
+
+.african-alert-info {
+  background: var(--african-earth-50);
+  border-left-color: var(--african-earth-500);
+  color: var(--african-earth-800);
+}
+
+.african-alert-success {
+  background: #f0fdf4;
+  border-left-color: #10b981;
+  color: #065f46;
+}
+
+.african-alert-warning {
+  background: var(--african-ochre-50);
+  border-left-color: var(--african-ochre-500);
+  color: var(--african-ochre-800);
+}
+
+.african-alert-error {
+  background: var(--african-terracotta-50);
+  border-left-color: var(--african-terracotta-500);
+  color: var(--african-terracotta-800);
+}
+
+/* === ANIMATIONS AFRICAINES === */
+
+/* Animation de pulsation (comme un tambour) */
+@keyframes african-pulse {
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.05); 
+    opacity: 0.8; 
+  }
+}
+
+.african-pulse {
+  animation: african-pulse 2s ease-in-out infinite;
+}
+
+/* Animation de danse (mouvement fluide) */
+@keyframes african-dance {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg); 
+  }
+  25% { 
+    transform: translateY(-5px) rotate(1deg); 
+  }
+  50% { 
+    transform: translateY(0) rotate(0deg); 
+  }
+  75% { 
+    transform: translateY(-3px) rotate(-1deg); 
+  }
+}
+
+.african-dance {
+  animation: african-dance 3s ease-in-out infinite;
+}
+
+/* Animation de soleil levant */
+@keyframes african-sunrise {
+  0% { 
+    transform: translateY(20px) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-5px) scale(1.1);
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.african-sunrise {
+  animation: african-sunrise 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Animation de tissage */
+@keyframes african-weave {
+  0% { 
+    background-position: 0 0; 
+  }
+  100% { 
+    background-position: 40px 40px; 
+  }
+}
+
+.african-weave {
+  animation: african-weave 4s linear infinite;
+}
+
+/* Animation de scintillement (comme des étoiles) */
+@keyframes african-sparkle {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.african-sparkle {
+  animation: african-sparkle 1.5s ease-in-out infinite;
+}
+
+/* === MICRO-INTERACTIONS === */
+
+/* Effet de survol avec motif */
+.african-hover-pattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.african-hover-pattern::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--african-pattern-kita-subtle);
+  opacity: 0;
+  transition: all var(--african-transition-normal);
+}
+
+.african-hover-pattern:hover::after {
+  left: 0;
+  opacity: 0.1;
+}
+
+/* Effet de clic avec ondulation */
+.african-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.african-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(139, 69, 19, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.african-ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* === ACCESSIBILITÉ === */
+
+/* Focus visible amélioré */
+.african-focus-visible:focus-visible {
+  outline: 3px solid var(--african-ochre-400);
+  outline-offset: 2px;
+  border-radius: var(--african-radius-sm);
+}
+
+/* Réduction de mouvement */
+@media (prefers-reduced-motion: reduce) {
+  .african-pulse,
+  .african-dance,
+  .african-sunrise,
+  .african-weave,
+  .african-sparkle {
+    animation: none;
+  }
+  
+  .african-button,
+  .african-card,
+  .african-input {
+    transition: none;
+  }
+}
+
+/* Contraste élevé */
+@media (prefers-contrast: high) {
+  .african-card {
+    border-width: 3px;
+    border-color: var(--african-neutral-800);
+  }
+  
+  .african-button {
+    border: 2px solid var(--african-neutral-900);
+  }
+  
+  .african-input {
+    border-width: 3px;
+  }
+}
+
+/* Mode sombre africain */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --african-bg-primary: var(--african-neutral-900);
+    --african-bg-secondary: var(--african-neutral-800);
+    --african-text-primary: var(--african-neutral-100);
+    --african-text-secondary: var(--african-neutral-300);
+  }
+  
+  .african-container {
+    background: linear-gradient(135deg, 
+      var(--african-neutral-900) 0%, 
+      var(--african-neutral-800) 50%, 
+      var(--african-neutral-700) 100%);
+  }
+  
+  .african-card {
+    background: rgba(41, 37, 36, 0.95);
+    border-color: var(--african-neutral-600);
+    color: var(--african-neutral-100);
+  }
+  
+  .african-input {
+    background: var(--african-neutral-800);
+    border-color: var(--african-neutral-600);
+    color: var(--african-neutral-100);
+  }
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Mobile first */
+@media (max-width: 640px) {
+  :root {
+    --african-space-xs: 0.125rem;
+    --african-space-sm: 0.25rem;
+    --african-space-md: 0.5rem;
+    --african-space-lg: 0.75rem;
+    --african-space-xl: 1rem;
+  }
+  
+  .african-button {
+    padding: var(--african-space-md) var(--african-space-lg);
+    font-size: 1rem;
+    min-height: 44px; /* Accessibilité tactile */
+  }
+  
+  .african-input {
+    padding: var(--african-space-md);
+    font-size: 1rem;
+    min-height: 44px;
+  }
+  
+  .african-card {
+    margin: var(--african-space-sm);
+    border-radius: var(--african-radius-lg);
+  }
+}
+
+/* Tablette */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .african-container {
+    padding: var(--african-space-xl);
+  }
+  
+  .african-card {
+    margin: var(--african-space-md);
+  }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+  .african-container {
+    padding: var(--african-space-2xl);
+  }
+  
+  .african-card:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* === UTILITAIRES === */
+
+/* Espacement */
+.african-p-xs { padding: var(--african-space-xs); }
+.african-p-sm { padding: var(--african-space-sm); }
+.african-p-md { padding: var(--african-space-md); }
+.african-p-lg { padding: var(--african-space-lg); }
+.african-p-xl { padding: var(--african-space-xl); }
+
+.african-m-xs { margin: var(--african-space-xs); }
+.african-m-sm { margin: var(--african-space-sm); }
+.african-m-md { margin: var(--african-space-md); }
+.african-m-lg { margin: var(--african-space-lg); }
+.african-m-xl { margin: var(--african-space-xl); }
+
+/* Typographie */
+.african-text-display {
+  font-family: var(--african-font-display);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.african-text-body {
+  font-family: var(--african-font-body);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.african-text-accent {
+  font-family: var(--african-font-accent);
+  font-weight: 600;
+}
+
+/* Couleurs de texte */
+.african-text-earth { color: var(--african-earth-600); }
+.african-text-terracotta { color: var(--african-terracotta-600); }
+.african-text-ochre { color: var(--african-ochre-600); }
+.african-text-saffron { color: var(--african-saffron-600); }
+
+/* Arrière-plans */
+.african-bg-earth { background-color: var(--african-earth-500); }
+.african-bg-terracotta { background-color: var(--african-terracotta-500); }
+.african-bg-ochre { background-color: var(--african-ochre-500); }
+.african-bg-saffron { background-color: var(--african-saffron-500); }
+
+/* Bordures */
+.african-border-earth { border-color: var(--african-earth-300); }
+.african-border-terracotta { border-color: var(--african-terracotta-300); }
+.african-border-ochre { border-color: var(--african-ochre-300); }
+.african-border-saffron { border-color: var(--african-saffron-300); }
+
+/* === PRINT STYLES === */
+@media print {
+  .african-container,
+  .african-card {
+    box-shadow: none;
+    border: 1px solid var(--african-neutral-300);
+  }
+  
+  .african-button {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+  }
+  
+  .african-pattern-bogolan,
+  .african-pattern-kita,
+  .african-pattern-adinkra,
+  .african-pattern-wax {
+    background: none !important;
+  }
+}
+
+/* === PERFORMANCE === */
+
+/* Optimisation GPU */
+.african-gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Lazy loading des motifs */
+.african-pattern-lazy {
+  background: var(--african-earth-50);
+}
+
+.african-pattern-lazy.loaded {
+  background: var(--african-pattern-bogolan-subtle);
+}
+

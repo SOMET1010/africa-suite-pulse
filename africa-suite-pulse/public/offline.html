@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne - Africa Suite Pulse</title>
+    <style>
+        /* Styles optimisés pour l'Afrique */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
+            color: #2C1810;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(139, 69, 19, 0.2);
+        }
+
+        .african-pattern {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(45deg, #8B4513 25%, transparent 25%),
+                        linear-gradient(-45deg, #8B4513 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #D2691E 75%),
+                        linear-gradient(-45deg, transparent 75%, #D2691E 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #8B4513;
+            font-weight: 700;
+        }
+
+        .status-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #5D4037;
+            line-height: 1.6;
+        }
+
+        .connection-info {
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #8B4513;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e74c3c;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        .status-indicator.checking {
+            background: #f39c12;
+        }
+
+        .status-indicator.online {
+            background: #27ae60;
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .retry-button {
+            background: linear-gradient(135deg, #8B4513, #D2691E);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin: 10px;
+            min-width: 150px;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 69, 19, 0.3);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .retry-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tips-section {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .tips-title {
+            font-size: 1.3rem;
+            color: #8B4513;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .tip {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(139, 69, 19, 0.05);
+            border-radius: 10px;
+        }
+
+        .tip-icon {
+            color: #D2691E;
+            margin-right: 10px;
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .tip-text {
+            color: #5D4037;
+            line-height: 1.5;
+        }
+
+        .cached-data {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(39, 174, 96, 0.1);
+            border-radius: 15px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .cached-title {
+            color: #27ae60;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .cached-list {
+            list-style: none;
+            color: #2C5530;
+        }
+
+        .cached-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .cached-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive pour mobiles africains */
+        @media (max-width: 480px) {
+            .offline-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .status-message {
+                font-size: 1.1rem;
+            }
+
+            .retry-button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .african-pattern {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Mode sombre pour économiser la batterie */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #2C1810 0%, #5D4037 50%, #3E2723 100%);
+            }
+
+            .offline-container {
+                background: rgba(30, 30, 30, 0.95);
+                color: #E0E0E0;
+                border-color: rgba(139, 69, 19, 0.3);
+            }
+
+            h1 {
+                color: #D2691E;
+            }
+
+            .status-message {
+                color: #BDBDBD;
+            }
+
+            .tip-text {
+                color: #BDBDBD;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="african-pattern"></div>
+        
+        <h1>🌍 Connexion interrompue</h1>
+        
+        <p class="status-message">
+            Votre connexion internet semble interrompue. Africa Suite Pulse fonctionne en mode hors ligne avec vos données mises en cache.
+        </p>
+
+        <div class="connection-info">
+            <div class="connection-status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="connectionStatus">Vérification de la connexion...</span>
+            </div>
+            <div id="connectionDetails"></div>
+        </div>
+
+        <button class="retry-button" onclick="retryConnection()" id="retryButton">
+            🔄 Réessayer
+        </button>
+
+        <button class="retry-button" onclick="goOffline()" style="background: linear-gradient(135deg, #5D4037, #8D6E63);">
+            📱 Continuer hors ligne
+        </button>
+
+        <div class="tips-section">
+            <h3 class="tips-title">💡 Conseils pour améliorer votre connexion</h3>
+            
+            <div class="tip">
+                <span class="tip-icon">📶</span>
+                <span class="tip-text">Vérifiez que vous avez du réseau mobile ou WiFi</span>
+            </div>
+            
+            <div class="tip">
+                <span class="tip-icon">🔄</span>
+                <span class="tip-text">Essayez de vous déplacer vers une zone avec meilleur signal</span>
+            </div>
+            
+            <div class="tip">
+                <span class="tip-icon">✈️</span>
+                <span class="tip-text">Désactivez puis réactivez le mode avion</span>
+            </div>
+            
+            <div class="tip">
+                <span class="tip-icon">💾</span>
+                <span class="tip-text">Activez le mode économie de données si votre forfait est limité</span>
+            </div>
+            
+            <div class="tip">
+                <span class="tip-icon">🕐</span>
+                <span class="tip-text">Réessayez dans quelques minutes, les réseaux africains peuvent être instables</span>
+            </div>
+        </div>
+
+        <div class="cached-data" id="cachedData" style="display: none;">
+            <div class="cached-title">📦 Données disponibles hors ligne :</div>
+            <ul class="cached-list" id="cachedList">
+                <!-- Sera rempli par JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Configuration pour l'Afrique
+        const AFRICAN_CONFIG = {
+            retryInterval: 5000, // 5 secondes
+            maxRetries: 10,
+            connectionTimeout: 8000 // 8 secondes
+        }
+
+        let retryCount = 0
+        let retryInterval = null
+
+        // Vérifier la connexion au chargement
+        window.addEventListener('load', () => {
+            checkConnection()
+            loadCachedData()
+            startConnectionMonitoring()
+        })
+
+        // Vérifier la connexion internet
+        async function checkConnection() {
+            const statusIndicator = document.getElementById('statusIndicator')
+            const connectionStatus = document.getElementById('connectionStatus')
+            const retryButton = document.getElementById('retryButton')
+            
+            statusIndicator.className = 'status-indicator checking'
+            connectionStatus.textContent = 'Vérification en cours...'
+            retryButton.disabled = true
+
+            try {
+                // Test avec un endpoint léger
+                const controller = new AbortController()
+                const timeoutId = setTimeout(() => controller.abort(), AFRICAN_CONFIG.connectionTimeout)
+                
+                const response = await fetch('/?ping=' + Date.now(), {
+                    method: 'HEAD',
+                    cache: 'no-cache',
+                    signal: controller.signal
+                })
+                
+                clearTimeout(timeoutId)
+
+                if (response.ok) {
+                    // Connexion rétablie
+                    statusIndicator.className = 'status-indicator online'
+                    connectionStatus.textContent = 'Connexion rétablie !'
+                    
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1000)
+                    
+                    return true
+                } else {
+                    throw new Error('Réponse invalide')
+                }
+                
+            } catch (error) {
+                statusIndicator.className = 'status-indicator'
+                connectionStatus.textContent = 'Hors ligne'
+                retryButton.disabled = false
+                
+                // Afficher des détails sur l'erreur
+                updateConnectionDetails(error)
+                
+                return false
+            }
+        }
+
+        // Mettre à jour les détails de connexion
+        function updateConnectionDetails(error) {
+            const detailsElement = document.getElementById('connectionDetails')
+            
+            let details = ''
+            
+            // Informations sur la connexion
+            if ('connection' in navigator) {
+                const conn = navigator.connection
+                details += `Type: ${conn.effectiveType || 'inconnu'} | `
+                details += `Vitesse: ${conn.downlink || 'inconnue'} Mbps | `
+                details += `Latence: ${conn.rtt || 'inconnue'} ms`
+                
+                if (conn.saveData) {
+                    details += ' | Mode économie activé'
+                }
+            }
+            
+            // Type d'erreur
+            if (error.name === 'AbortError') {
+                details += '<br>Timeout de connexion (réseau lent)'
+            } else if (error.message.includes('Failed to fetch')) {
+                details += '<br>Impossible de joindre le serveur'
+            }
+            
+            detailsElement.innerHTML = `<small>${details}</small>`
+        }
+
+        // Réessayer la connexion
+        async function retryConnection() {
+            retryCount++
+            
+            const retryButton = document.getElementById('retryButton')
+            retryButton.textContent = `🔄 Tentative ${retryCount}...`
+            
+            const isOnline = await checkConnection()
+            
+            if (!isOnline && retryCount < AFRICAN_CONFIG.maxRetries) {
+                setTimeout(() => {
+                    retryButton.textContent = '🔄 Réessayer'
+                }, 2000)
+            } else if (retryCount >= AFRICAN_CONFIG.maxRetries) {
+                retryButton.textContent = '❌ Trop de tentatives'
+                retryButton.disabled = true
+            }
+        }
+
+        // Continuer en mode hors ligne
+        function goOffline() {
+            // Rediriger vers la page d'accueil en cache
+            window.location.href = '/'
+        }
+
+        // Charger les données mises en cache
+        async function loadCachedData() {
+            try {
+                const cacheNames = await caches.keys()
+                const cachedDataElement = document.getElementById('cachedData')
+                const cachedListElement = document.getElementById('cachedList')
+                
+                if (cacheNames.length > 0) {
+                    const cache = await caches.open(cacheNames[0])
+                    const cachedRequests = await cache.keys()
+                    
+                    const availablePages = []
+                    
+                    for (const request of cachedRequests) {
+                        const url = new URL(request.url)
+                        
+                        // Filtrer les pages importantes
+                        if (url.pathname === '/' || 
+                            url.pathname.includes('dashboard') ||
+                            url.pathname.includes('pos') ||
+                            url.pathname.includes('reservations')) {
+                            
+                            const pageName = url.pathname === '/' ? 'Accueil' : 
+                                           url.pathname.replace('/', '').charAt(0).toUpperCase() + 
+                                           url.pathname.replace('/', '').slice(1)
+                            
+                            availablePages.push(pageName)
+                        }
+                    }
+                    
+                    if (availablePages.length > 0) {
+                        cachedDataElement.style.display = 'block'
+                        cachedListElement.innerHTML = availablePages
+                            .map(page => `<li>📄 ${page}</li>`)
+                            .join('')
+                    }
+                }
+            } catch (error) {
+                console.warn('Impossible de charger les données en cache:', error)
+            }
+        }
+
+        // Surveiller la connexion en continu
+        function startConnectionMonitoring() {
+            // Écouter les événements de connexion
+            window.addEventListener('online', () => {
+                console.log('Connexion rétablie')
+                checkConnection()
+            })
+            
+            window.addEventListener('offline', () => {
+                console.log('Connexion perdue')
+                const statusIndicator = document.getElementById('statusIndicator')
+                const connectionStatus = document.getElementById('connectionStatus')
+                
+                statusIndicator.className = 'status-indicator'
+                connectionStatus.textContent = 'Connexion perdue'
+            })
+            
+            // Vérification périodique (toutes les 30 secondes)
+            setInterval(() => {
+                if (navigator.onLine) {
+                    checkConnection()
+                }
+            }, 30000)
+        }
+
+        // Gestion des erreurs JavaScript
+        window.addEventListener('error', (event) => {
+            console.error('Erreur JavaScript:', event.error)
+        })
+
+        // Optimisations pour les appareils avec peu de mémoire
+        if ('memory' in performance && performance.memory.usedJSHeapSize > 50 * 1024 * 1024) {
+            console.warn('Mémoire limitée détectée, optimisations activées')
+            
+            // Réduire la fréquence de vérification
+            AFRICAN_CONFIG.retryInterval = 10000 // 10 secondes
+        }
+
+        console.log('🌍 Page offline Africa Suite Pulse chargée')
+        console.log('📱 Optimisée pour les connexions africaines instables')
+    </script>
+</body>
+</html>
+
