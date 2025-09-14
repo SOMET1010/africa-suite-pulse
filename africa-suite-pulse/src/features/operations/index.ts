@@ -1,0 +1,11 @@
+export { OperationsDashboard } from './OperationsDashboard';
+export { OperationsKPIs } from './components/OperationsKPIs';
+export { OperationsAlerts } from './components/OperationsAlerts';
+export { OperationsMetrics } from './components/OperationsMetrics';
+export { QuickActions } from './components/QuickActions';
+export { useOperationsKPIs } from './hooks/useOperationsKPIs';
+export { useOperationsAlerts } from './hooks/useOperationsAlerts';
+export { MaintenanceRequestFromHousekeeping } from './components/MaintenanceRequestFromHousekeeping';
+export { MaintenancePartsConsumption } from './components/MaintenancePartsConsumption';
+export { HousekeepingConsumptionTracking } from './components/HousekeepingConsumptionTracking';
+export { OperationsWorkflowEngine } from './components/OperationsWorkflowEngine';

@@ -1,0 +1,584 @@
+/* 🌍 AFRICA SUITE PULSE - COMPOSANTS UI AFRICAINS AUTHENTIQUES */
+
+/* Variables CSS pour le thème africain */
+:root {
+  /* Palette de couleurs africaines authentiques */
+  --african-terracotta: #8B4513;
+  --african-gold: #FFD700;
+  --african-orange: #FF8C00;
+  --african-brown: #D2691E;
+  --african-green: #228B22;
+  --african-red: #DC143C;
+  --african-cream: #FFF8DC;
+  --african-sand: #F5DEB3;
+  --african-earth: #DEB887;
+  --african-clay: #D2B48C;
+  --african-copper: #BC9A6A;
+  
+  /* Gradients africains */
+  --african-gradient-warm: linear-gradient(135deg, var(--african-orange) 0%, var(--african-brown) 100%);
+  --african-gradient-earth: linear-gradient(135deg, var(--african-terracotta) 0%, var(--african-clay) 100%);
+  --african-gradient-gold: linear-gradient(135deg, var(--african-gold) 0%, var(--african-orange) 100%);
+  --african-gradient-sunset: linear-gradient(135deg, var(--african-cream) 0%, var(--african-sand) 25%, var(--african-earth) 50%, var(--african-clay) 75%, var(--african-copper) 100%);
+  
+  /* Ombres africaines */
+  --african-shadow-soft: 0 4px 15px rgba(139, 69, 19, 0.1);
+  --african-shadow-medium: 0 8px 25px rgba(139, 69, 19, 0.15);
+  --african-shadow-strong: 0 12px 35px rgba(139, 69, 19, 0.2);
+  --african-shadow-gold: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+/* 🎨 MOTIFS AFRICAINS DE BASE */
+.african-pattern-bogolan {
+  background-image: 
+    radial-gradient(circle at 20% 20%, var(--african-terracotta) 3px, transparent 3px),
+    radial-gradient(circle at 80% 80%, var(--african-brown) 2px, transparent 2px),
+    linear-gradient(45deg, transparent 45%, var(--african-terracotta) 45%, var(--african-terracotta) 55%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, var(--african-brown) 45%, var(--african-brown) 55%, transparent 55%);
+  background-size: 80px 80px, 60px 60px, 40px 40px, 40px 40px;
+  background-position: 0 0, 40px 40px, 0 0, 20px 20px;
+}
+
+.african-pattern-kente {
+  background: repeating-linear-gradient(
+    0deg,
+    var(--african-gold) 0px, var(--african-gold) 8px,
+    var(--african-terracotta) 8px, var(--african-terracotta) 16px,
+    var(--african-brown) 16px, var(--african-brown) 24px,
+    var(--african-green) 24px, var(--african-green) 32px,
+    var(--african-red) 32px, var(--african-red) 40px
+  );
+}
+
+.african-pattern-mudcloth {
+  background-image:
+    radial-gradient(circle at 25% 25%, var(--african-terracotta) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, var(--african-brown) 1px, transparent 1px);
+  background-size: 40px 40px, 30px 30px;
+  background-position: 0 0, 20px 20px;
+}
+
+/* 🔘 BOUTONS AFRICAINS */
+.african-button {
+  background: var(--african-gradient-warm);
+  border: 2px solid var(--african-gold);
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.3s ease;
+  box-shadow: var(--african-shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.african-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--african-pattern-mudcloth);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.african-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--african-shadow-gold);
+  background: var(--african-gradient-gold);
+}
+
+.african-button:active {
+  transform: translateY(0);
+}
+
+.african-button-secondary {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--african-brown);
+  color: var(--african-terracotta);
+}
+
+.african-button-secondary:hover {
+  background: rgba(255, 140, 0, 0.1);
+  border-color: var(--african-orange);
+}
+
+/* 📄 CARTES AFRICAINES */
+.african-card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--african-gold);
+  border-radius: 20px;
+  box-shadow: var(--african-shadow-medium);
+  overflow: hidden;
+  position: relative;
+}
+
+.african-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--african-gradient-warm);
+}
+
+.african-card-header {
+  background: var(--african-gradient-warm);
+  color: white;
+  padding: 20px;
+  position: relative;
+}
+
+.african-card-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--african-pattern-mudcloth);
+  opacity: 0.2;
+}
+
+.african-card-content {
+  padding: 24px;
+  position: relative;
+}
+
+.african-card-footer {
+  padding: 16px 24px;
+  border-top: 2px solid var(--african-sand);
+  background: var(--african-cream);
+}
+
+/* 📝 INPUTS AFRICAINS */
+.african-input {
+  width: 100%;
+  height: 48px;
+  border: 2px solid var(--african-brown);
+  border-radius: 12px;
+  padding: 0 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--african-terracotta);
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.african-input:focus {
+  outline: none;
+  border-color: var(--african-orange);
+  box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.african-input::placeholder {
+  color: var(--african-clay);
+}
+
+/* 🏷️ LABELS AFRICAINS */
+.african-label {
+  color: var(--african-terracotta);
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* 📊 TABLEAUX AFRICAINS */
+.african-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--african-shadow-medium);
+}
+
+.african-table th {
+  background: var(--african-gradient-warm);
+  color: white;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  position: relative;
+}
+
+.african-table th::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--african-pattern-mudcloth);
+  opacity: 0.1;
+}
+
+.african-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--african-sand);
+  color: var(--african-terracotta);
+}
+
+.african-table tr:hover {
+  background: rgba(255, 140, 0, 0.05);
+}
+
+/* 🔔 ALERTES AFRICAINES */
+.african-alert {
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+  border-left: 6px solid;
+  position: relative;
+}
+
+.african-alert-success {
+  background: rgba(34, 139, 34, 0.1);
+  border-left-color: var(--african-green);
+  color: var(--african-green);
+}
+
+.african-alert-warning {
+  background: rgba(255, 140, 0, 0.1);
+  border-left-color: var(--african-orange);
+  color: var(--african-orange);
+}
+
+.african-alert-error {
+  background: rgba(220, 20, 60, 0.1);
+  border-left-color: var(--african-red);
+  color: var(--african-red);
+}
+
+.african-alert-info {
+  background: rgba(139, 69, 19, 0.1);
+  border-left-color: var(--african-terracotta);
+  color: var(--african-terracotta);
+}
+
+/* 🎛️ NAVIGATION AFRICAINE */
+.african-nav {
+  background: var(--african-gradient-warm);
+  padding: 16px 0;
+  box-shadow: var(--african-shadow-medium);
+  position: relative;
+}
+
+.african-nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--african-pattern-mudcloth);
+  opacity: 0.1;
+}
+
+.african-nav-item {
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.african-nav-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.african-nav-item.active {
+  background: var(--african-gold);
+  color: var(--african-terracotta);
+  font-weight: 600;
+}
+
+/* 📱 BADGES AFRICAINS */
+.african-badge {
+  background: var(--african-gradient-warm);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  box-shadow: var(--african-shadow-soft);
+}
+
+.african-badge-gold {
+  background: var(--african-gradient-gold);
+  color: var(--african-terracotta);
+}
+
+.african-badge-success {
+  background: var(--african-green);
+}
+
+.african-badge-warning {
+  background: var(--african-orange);
+}
+
+.african-badge-error {
+  background: var(--african-red);
+}
+
+/* 🎨 CONTENEURS AFRICAINS */
+.african-container {
+  background: var(--african-gradient-sunset);
+  min-height: 100vh;
+  position: relative;
+}
+
+.african-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--african-pattern-bogolan);
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.african-sidebar {
+  background: var(--african-gradient-earth);
+  color: white;
+  position: relative;
+}
+
+.african-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  background: var(--african-pattern-kente);
+  opacity: 0.3;
+}
+
+/* 🔄 ANIMATIONS AFRICAINES */
+@keyframes african-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 140, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 140, 0, 0); }
+}
+
+.african-pulse {
+  animation: african-pulse 2s infinite;
+}
+
+@keyframes african-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.african-slide-in {
+  animation: african-slide-in 0.6s ease-out;
+}
+
+/* 🎯 UTILITAIRES AFRICAINS */
+.african-text-primary {
+  color: var(--african-terracotta);
+}
+
+.african-text-secondary {
+  color: var(--african-brown);
+}
+
+.african-text-accent {
+  color: var(--african-orange);
+}
+
+.african-text-gold {
+  color: var(--african-gold);
+}
+
+.african-bg-primary {
+  background: var(--african-gradient-warm);
+}
+
+.african-bg-secondary {
+  background: var(--african-gradient-earth);
+}
+
+.african-bg-accent {
+  background: var(--african-gradient-gold);
+}
+
+.african-border-primary {
+  border-color: var(--african-terracotta);
+}
+
+.african-border-gold {
+  border-color: var(--african-gold);
+}
+
+/* 📐 BORDURES DÉCORATIVES AFRICAINES */
+.african-border-kente {
+  border-left: 8px solid;
+  border-image: linear-gradient(
+    to bottom,
+    var(--african-gold) 0%,
+    var(--african-terracotta) 25%,
+    var(--african-brown) 50%,
+    var(--african-green) 75%,
+    var(--african-red) 100%
+  ) 1;
+}
+
+.african-border-decorative {
+  position: relative;
+}
+
+.african-border-decorative::before {
+  content: '◆ ◇ ◆ ◇ ◆';
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 0 16px;
+  color: var(--african-gold);
+  font-size: 12px;
+}
+
+/* 🎪 MODALES AFRICAINES */
+.african-modal {
+  background: rgba(139, 69, 19, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.african-modal-content {
+  background: white;
+  border: 3px solid var(--african-gold);
+  border-radius: 20px;
+  box-shadow: var(--african-shadow-strong);
+  position: relative;
+  overflow: hidden;
+}
+
+.african-modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--african-gradient-warm);
+}
+
+/* 📊 GRAPHIQUES AFRICAINS */
+.african-chart-container {
+  background: white;
+  border: 2px solid var(--african-gold);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--african-shadow-medium);
+  position: relative;
+}
+
+.african-chart-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--african-gradient-warm);
+  border-radius: 16px 16px 0 0;
+}
+
+/* 🎨 ÉLÉMENTS DÉCORATIFS */
+.african-divider {
+  height: 2px;
+  background: var(--african-gradient-warm);
+  margin: 24px 0;
+  position: relative;
+}
+
+.african-divider::before {
+  content: '🌍';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 0 16px;
+  font-size: 16px;
+}
+
+.african-quote {
+  border-left: 4px solid var(--african-gold);
+  background: rgba(255, 140, 0, 0.05);
+  padding: 16px 20px;
+  margin: 20px 0;
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  color: var(--african-terracotta);
+  position: relative;
+}
+
+.african-quote::before {
+  content: '"';
+  font-size: 48px;
+  color: var(--african-gold);
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  line-height: 1;
+}
+
+/* 🌟 RESPONSIVE AFRICAIN */
+@media (max-width: 768px) {
+  .african-card {
+    border-radius: 16px;
+    margin: 8px;
+  }
+  
+  .african-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .african-input {
+    height: 44px;
+  }
+  
+  .african-nav-item {
+    padding: 10px 16px;
+  }
+}
+
+/* 🎭 THÈME SOMBRE AFRICAIN */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --african-cream: #2C1810;
+    --african-sand: #3D2415;
+    --african-earth: #4E2F1A;
+  }
+  
+  .african-card {
+    background: rgba(44, 24, 16, 0.95);
+    color: var(--african-sand);
+  }
+  
+  .african-input {
+    background: rgba(44, 24, 16, 0.9);
+    color: var(--african-sand);
+  }
+}
+

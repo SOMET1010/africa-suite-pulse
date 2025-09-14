@@ -1,0 +1,315 @@
+/* Design Tokens pour AfricaSuite PMS 2025 - Sprint 1 UX Foundations
+   Système tactile-first, pastel professionnel AA, architecture hôtelière
+*/
+
+@layer base {
+  :root {
+  /* AfricaSuite - Palette Panafricaine */
+  --brand-primary: 30 45% 35%;             /* Marron profond #8B5A3C - Terre africaine & tradition */
+  --brand-primary-hover: 30 45% 30%;       /* Marron plus foncé hover */
+  --brand-primary-glow: 30 45% 42%;        /* Marron plus clair pour gradients */
+  --brand-accent: 35 65% 55%;              /* Caramel doré #D4A574 - Chaleur & convivialité */
+  --brand-accent-hover: 35 65% 48%;        /* Caramel plus foncé hover */
+  --brand-secondary: 50 90% 55%;           /* Jaune africain #F4D03F - Soleil & prospérité */
+  
+  /* Local African warm theme for cash visualizer */
+  --local-warm: 30 80% 55%;                /* Warm terracotta */
+  --local-warm-light: 35 70% 75%;          /* Light warm tone */
+  --local-warm-dark: 25 85% 35%;           /* Deep warm tone */
+
+    /* Status colors (semantic) - Enhanced vibrancy */
+    --status-confirmed: 142 76% 36%;     /* vibrant green #16A249 */
+    --status-present: 199 100% 43%;      /* vibrant blue #0096DB */
+    --status-option: 38 92% 50%;         /* vibrant orange #F59F0A */
+    --status-cancelled: 0 84% 60%;       /* vibrant red #EF4343 */
+    --status-maintenance: 271 81% 56%;   /* vibrant purple */
+    
+    /* Luxury neutrals */
+    --pearl: 210 20% 97%;                    /* Pearl white */
+    --charcoal: 225 39% 13%;                 /* Charcoal */
+    --platinum: 210 6% 93%;                  /* Platinum */
+
+    /* Base surfaces and text - AfricaSuite */
+    --background: 35 25% 96%;                /* Fond clair sable #F7F4F0 - Sobriété & lisibilité */
+    --foreground: 0 0% 17%;                  /* Texte principal #2B2B2B - Lisibilité optimale */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 17%;
+
+    --primary: var(--brand-primary);
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: var(--brand-secondary);
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 0 0% 43%;            /* Texte secondaire #6E6E6E - Discrétion & hiérarchie */
+
+    --accent: var(--brand-accent);
+    --accent-foreground: 30 20% 15%;
+
+    --destructive: var(--status-cancelled);
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: var(--brand-primary);
+
+    --radius: 0.875rem; /* rounded-xl default */
+
+    /* Success, Info, Warning, Danger mappings */
+    --success: var(--status-confirmed);
+    --success-foreground: 210 40% 98%;
+    --info: var(--status-present);
+    --info-foreground: 210 40% 98%;
+    --warning: var(--status-option);
+    --warning-foreground: 222 84% 5%;
+    --danger: var(--status-cancelled);
+    --danger-foreground: 210 40% 98%;
+
+    /* Light mode softness (decimal for alpha, not percentage) */
+    --softness: 0.12;
+
+    /* Soft surfaces with corrected syntax - HSL color space + alpha */
+    --soft-primary: 226 64% 33% / var(--softness);
+    --soft-accent: 45 100% 42% / var(--softness);
+    --soft-success: 142 76% 36% / var(--softness);
+    --soft-info: 199 100% 43% / var(--softness);
+    --soft-warning: 38 92% 50% / var(--softness);
+    --soft-danger: 0 84% 60% / var(--softness);
+
+    /* Luxury shadows and motion */
+    --shadow-soft: 0 8px 32px hsl(var(--brand-primary) / 0.08), 0 2px 12px hsl(var(--brand-accent) / 0.04);
+    --shadow-elevate: 0 20px 40px hsl(var(--brand-primary) / 0.12), 0 8px 16px hsl(var(--brand-accent) / 0.08);
+    --shadow-luxury: 0 25px 50px hsl(var(--brand-primary) / 0.15), 0 10px 20px hsl(var(--brand-accent) / 0.1);
+    --transition-smooth: 220ms cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-elegant: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* Glassmorphism */
+    --glass-bg: hsl(var(--background) / 0.8);
+    --glass-border: hsl(var(--brand-accent) / 0.2);
+    --blur-amount: 12px;
+
+    /* Touch-first sizing */
+    --tap-target: 44px;
+    
+    /* Form & Input tokens */
+    --input-height: 48px;
+    --input-padding: 16px;
+    --form-gap: 20px;
+    
+    /* Tactile feedback tokens */
+    --press-scale: 0.98;
+    --press-duration: 120ms;
+    --ripple-duration: 600ms;
+    
+    /* Authentication specific */
+    --auth-card-width: 400px;
+    --auth-card-padding: 32px;
+    --auth-toggle-height: 44px;
+    
+    /* Dashboard Layout */
+    --dashboard-gap: 1.5rem;
+    --dashboard-gap-compact: 1rem;
+    --dashboard-gap-comfortable: 1.5rem;
+    --dashboard-gap-spacious: 2rem;
+    --widget-radius: 1rem;
+    --sidebar-width: 280px;
+    --sidebar-collapsed: 72px;
+    
+    /* Navigation Heights */
+    --header-height: 4rem;
+    --mobile-nav-height: 4.5rem;
+    
+    /* Animation Timings */
+    --sidebar-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --widget-hover: 0.2s ease-out;
+    --layout-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: 222 40% 6%;
+      --foreground: 210 40% 96%;
+
+      --card: 222 40% 8%;
+      --card-foreground: 210 40% 96%;
+
+      --popover: 222 40% 6%;
+      --popover-foreground: 210 40% 96%;
+
+      --primary: 210 40% 98%;
+      --primary-foreground: var(--brand-primary);
+
+      --secondary: 220 18% 16%;
+      --secondary-foreground: 210 40% 96%;
+
+      --muted: 220 18% 16%;
+      --muted-foreground: 215 20% 65%;
+
+      --accent: var(--brand-accent);
+      --accent-foreground: 210 40% 96%;
+
+      --destructive: 0 70% 45%;
+      --destructive-foreground: 210 40% 98%;
+
+      --border: 220 18% 16%;
+      --input: 220 18% 16%;
+      --ring: 212 92% 59%;
+
+      /* Dark mode soft surfaces slightly stronger (16%) */
+      --softness: 0.16;
+      --soft-primary: 226 64% 33% / var(--softness);
+      --soft-accent: 45 100% 42% / var(--softness);
+      --soft-success: 142 76% 36% / var(--softness);
+      --soft-info: 199 100% 43% / var(--softness);
+      --soft-warning: 38 92% 50% / var(--softness);
+      --soft-danger: 0 84% 60% / var(--softness);
+    }
+  }
+
+  /* Luxury utility classes */
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-elevate { box-shadow: var(--shadow-elevate); }
+  .shadow-luxury { box-shadow: var(--shadow-luxury); }
+  .transition-smooth { transition: var(--transition-smooth); }
+  .transition-elegant { transition: var(--transition-elegant); }
+  .tap-target { min-height: var(--tap-target); }
+  
+  /* Form utilities */
+  .form-input { 
+    min-height: var(--input-height); 
+    padding: 0 var(--input-padding);
+    transition: var(--transition-smooth);
+  }
+  .form-gap { gap: var(--form-gap); }
+  
+  /* Tactile feedback */
+  .press-feedback { 
+    transition: transform var(--press-duration) ease-out;
+    &:active { transform: scale(var(--press-scale)); }
+  }
+  
+  /* Glassmorphism effects */
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--blur-amount));
+    border: 1px solid var(--glass-border);
+  }
+  
+  /* Luxury typography */
+  .font-luxury { font-family: 'Playfair Display', serif; }
+  .font-premium { font-family: 'Inter', sans-serif; }
+  
+  /* Gold accents */
+  .accent-gold { color: hsl(var(--brand-accent)); }
+  .bg-accent-gold { background-color: hsl(var(--brand-accent)); }
+  .border-accent-gold { border-color: hsl(var(--brand-accent)); }
+  
+  /* Caramel accents */
+  .accent-caramel { color: hsl(var(--brand-accent)); }
+  .bg-accent-caramel { background-color: hsl(var(--brand-accent)); }
+  .border-accent-caramel { border-color: hsl(var(--brand-accent)); }
+  
+  /* Pearl backgrounds */
+  .bg-pearl { background-color: hsl(var(--pearl)); }
+  .bg-platinum { background-color: hsl(var(--platinum)); }
+  .text-charcoal { color: hsl(var(--charcoal)); }
+  
+  /* Vibrant background utilities */
+  .bg-success { background-color: hsl(var(--success)); }
+  .bg-info { background-color: hsl(var(--info)); }
+  .bg-warning { background-color: hsl(var(--warning)); }
+  .bg-danger { background-color: hsl(var(--danger)); }
+  
+  /* Room status dots using semantic tokens */
+  .room-dot-clean { background-color: hsl(var(--status-confirmed)); }
+  .room-dot-inspected { background-color: hsl(var(--status-present)); }
+  .room-dot-dirty { background-color: hsl(var(--status-option)); }
+  .room-dot-maintenance { background-color: hsl(var(--status-maintenance)); }
+  .room-dot-out_of_order { background-color: hsl(var(--status-cancelled)); }
+
+  /* Hover helpers for brand exact hover shades */
+  .bg-primary-hover { background-color: hsl(var(--brand-primary-hover)); }
+  .bg-accent-hover { background-color: hsl(var(--brand-accent-hover)); }
+
+  /* Status text helpers */
+  .text-success { color: hsl(var(--success)); }
+  .text-info { color: hsl(var(--info)); }
+  .text-warning { color: hsl(var(--warning)); }
+  .text-danger { color: hsl(var(--danger)); }
+  .text-status-confirmed { color: hsl(var(--status-confirmed)); }
+  .text-status-present { color: hsl(var(--status-present)); }
+  .text-status-option { color: hsl(var(--status-option)); }
+  .text-status-cancelled { color: hsl(var(--status-cancelled)); }
+
+  /* Border utilities for status colors */
+  .border-success { border-color: hsl(var(--success)); }
+  .border-info { border-color: hsl(var(--info)); }
+  .border-warning { border-color: hsl(var(--warning)); }
+  .border-danger { border-color: hsl(var(--danger)); }
+
+  /* Soft badge backgrounds with corrected syntax */
+  .badge-soft--confirmed { 
+    background-color: hsl(var(--soft-success)); 
+    color: hsl(var(--status-confirmed)); 
+  }
+  .badge-soft--present { 
+    background-color: hsl(var(--soft-info)); 
+    color: hsl(var(--status-present)); 
+  }
+  .badge-soft--option { 
+    background-color: hsl(var(--soft-warning)); 
+    color: hsl(var(--status-option)); 
+  }
+  .badge-soft--cancelled { 
+    background-color: hsl(var(--soft-danger)); 
+    color: hsl(var(--status-cancelled)); 
+  }
+
+  /* Soft cell backgrounds for rack reservations */
+  .cell-soft--confirmed { background-color: hsl(var(--soft-success)); }
+  .cell-soft--present { background-color: hsl(var(--soft-info)); }
+  .cell-soft--option { background-color: hsl(var(--soft-warning)); }
+  .cell-soft--cancelled { background-color: hsl(var(--soft-danger)); }
+  
+  /* Dashboard utilities */
+  .dashboard-responsive-grid { 
+    display: grid; 
+    grid-template-columns: repeat(1, minmax(0, 1fr)); 
+  }
+  @media (min-width: 768px) {
+    .dashboard-responsive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .dashboard-responsive-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1536px) {
+    .dashboard-responsive-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  /* Enhanced container system for better centering */
+  .container-app { 
+    max-width: 75rem; 
+    margin: 0 auto; 
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-app {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-app {
+      max-width: 80rem;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+}
