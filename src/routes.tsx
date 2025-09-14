@@ -8,6 +8,7 @@ import RackPage from "@/pages/RackPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import AuthPage from "@/pages/AuthPage";
 import AuthLanding from "@/pages/AuthLanding";
+import AfricanAuthPage from "@/pages/AfricanAuthPage";
 import RequireAuth from "@/core/auth/RequireAuth";
 import SettingsHomePage from "@/pages/SettingsHomePage";
 import HotelSettingsFormPage from "@/pages/HotelSettingsFormPage";
@@ -34,7 +35,10 @@ import HousekeepingPage from "@/pages/HousekeepingPage";
 // Night audit now lazy loaded
 import POSLoginSecurePage from "@/pages/POSLoginSecurePage";
 import RequirePOSAuth from "@/features/pos/auth/RequirePOSAuth";
-import POSAfricanPage from "@/pages/POSAfricanPage";
+import POSAfricanPage from '@/pages/POSAfricanPage';
+import HiddenFeaturesTestPage from '@/pages/HiddenFeaturesTestPage';
+import AyaAIDemoPage from '@/pages/AyaAIDemoPage';
+import FinTechTestPageSimple from '@/pages/FinTechTestPageSimple';
 // Import lazy-loaded components for performance
 import {
   POSPage,
@@ -144,11 +148,33 @@ export function AppRoutesLegacy() {
       <Route path="analytics" element={<RequireAuth><AnalyticsPage /></RequireAuth>} />
       <Route path="reports" element={<RequireAuth><ReportsPage /></RequireAuth>} />
       <Route path="operations" element={<RequireAuth><OperationsPage /></RequireAuth>} />
-      <Route path="maintenance" element={<RequireAuth><MaintenancePage /></RequireAuth>} />
-      <Route path="housekeeping" element={<RequireAuth><HousekeepingPage /></RequireAuth>} />
       
-      {/* Still in Legacy Layout - To be migrated in next phases */}
-      <Route element={<RequireAuth><Layout /></RequireAuth>}>
+      {/* Routes publiques */}
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth-landing" element={<AuthLanding />} />
+      <Route path="/login" element={<AfricanAuthPage />} />
+      <Route path="/african-auth" element={<AfricanAuthPage />} />
+      <Route path="/pos-login" element={<POSLoginSecurePage />} />
+      
+      {/* Routes de test publiques */}
+      <Route path="/hidden-features-test" element={<HiddenFeaturesTestPage />} />
+      <Route path="/aya-demo" element={<AyaAIDemoPage />} />
+      <Route path="/fintech-test" element={<FinTechTestPageSimple />} />      
+      {/* Still in Legacy Layout - To be migrated    <Routes>
+      {/* Routes publiques */}
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/auth-landing" element={<AuthLanding />} />
+      <Route path="/login" element={<AfricanAuthPage />} />
+      <Route path="/african-auth" element={<AfricanAuthPage />} />
+      <Route path="/pos-login" element={<POSLoginSecurePage />} />
+      
+      {/* Routes de test publiques */}
+      <Route path="/hidden-features-test" element={<HiddenFeaturesTestPage />} />
+      <Route path="/aya-demo" element={<AyaAIDemoPage />} />
+      <Route path="/fintech-test" element={<FinTechTestPageSimple />} />
+
+      {/* Routes protégées avec authentification */}
+      <Route element={<RequireAuth><UnifiedLayout /></RequireAuth>}>
         <Route path="reservations/groups" element={
           <Suspense fallback={<div>Loading groups...</div>}>
             <GroupsManagementPage />

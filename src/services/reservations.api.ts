@@ -217,6 +217,12 @@ export const reservationsApi = {
     const endDate = new Date(dateDeparture);
     const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     
+    // Correction du bug : éviter les calculs avec des dates invalides
+    if (nights <= 0) {
+      console.warn('Dates invalides: la date de départ doit être postérieure à la date d\'arrivée');
+      throw new Error('Dates invalides: la date de départ doit être postérieure à la date d\'arrivée');
+    }
+    
     // Tarif de base fictif - à remplacer par la vraie logique
     const baseRate = 50000; // 50,000 XOF par nuit
     

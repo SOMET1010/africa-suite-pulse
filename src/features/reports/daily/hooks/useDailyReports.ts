@@ -119,7 +119,8 @@ export function useArrivals(selectedDate: string) {
           guest_email,
           source,
           notes,
-          rooms!inner(number, type),
+          room_id,
+          room_type,
           guests!inner(first_name, last_name, company_name, vip_status)
         `)
         .eq('org_id', orgId)
@@ -134,8 +135,8 @@ export function useArrivals(selectedDate: string) {
         reference: reservation.reference,
         guestName: `${reservation.guests?.first_name} ${reservation.guests?.last_name}`,
         company: reservation.guests?.company_name,
-        roomNumber: reservation.rooms?.number,
-        roomType: reservation.rooms?.type || 'Non assigné',
+        roomNumber: reservation.room_id ? `R${reservation.room_id}` : undefined,
+        roomType: reservation.room_type || 'Non assigné',
         source: reservation.source || 'Direct',
         arrivalTime: reservation.planned_time,
         status: reservation.status,
@@ -172,7 +173,8 @@ export function useDepartures(selectedDate: string) {
           children,
           rate_total,
           guest_name,
-          rooms!inner(number, type),
+          room_id,
+          room_type,
           invoices(id, number, total_amount)
         `)
         .eq('org_id', orgId)
@@ -192,8 +194,8 @@ export function useDepartures(selectedDate: string) {
           reservationId: reservation.id,
           reference: reservation.reference,
           guestName: reservation.guest_name,
-          roomNumber: reservation.rooms?.number || '',
-          roomType: reservation.rooms?.type || '',
+          roomNumber: reservation.room_id ? `R${reservation.room_id}` : '',
+          roomType: reservation.room_type || '',
           checkoutTime: reservation.date_departure || '',
           totalAmount,
           paidAmount,
@@ -232,7 +234,8 @@ export function useInHouse(selectedDate: string) {
           rate_total,
           guest_name,
           source,
-          rooms!inner(number, type)
+          room_id,
+          room_type
         `)
         .eq('org_id', orgId)
         .lte('date_arrival', selectedDate)
@@ -249,8 +252,8 @@ export function useInHouse(selectedDate: string) {
           reservationId: reservation.id,
           reference: reservation.reference,
           guestName: reservation.guest_name,
-          roomNumber: reservation.rooms?.number || '',
-          roomType: reservation.rooms?.type || '',
+          roomNumber: reservation.room_id ? `R${reservation.room_id}` : '',
+          roomType: reservation.room_type || '',
           arrivalDate: reservation.date_arrival,
           departureDate: reservation.date_departure,
           nights,

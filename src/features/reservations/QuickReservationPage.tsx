@@ -30,6 +30,13 @@ const quickReservationSchema = z.object({
   rate_total: z.coerce.number().optional(),
   promo_code: z.string().optional(),
   supplements: z.array(z.string()).default([]),
+}).refine((data) => {
+  const arrival = new Date(data.date_arrival);
+  const departure = new Date(data.date_departure);
+  return departure > arrival;
+}, {
+  message: "La date de départ doit être postérieure à la date d'arrivée",
+  path: ["date_departure"]
 });
 
 type FormData = z.infer<typeof quickReservationSchema>;

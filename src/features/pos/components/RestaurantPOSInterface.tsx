@@ -390,7 +390,7 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-orange-50 to-red-50">
       {/* En-tête Restaurant */}
-      <div className="h-20 bg-primary text-primary-foreground flex items-center justify-between px-8 shadow-elevate">
+      <div className="h-20 bg-gradient-to-r from-orange-600 to-red-600 text-white flex items-center justify-between px-8 shadow-lg">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <ChefHat className="h-8 w-8" />
@@ -401,7 +401,7 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
           </div>
           
           {selectedTable && (
-            <Card className="glass-card border-0">
+            <Card className="bg-white/10 border-white/20 backdrop-blur-sm">
               <CardContent className="p-4 flex items-center gap-3">
                 <MapPin className="h-5 w-5" />
                 <div>
@@ -447,23 +447,23 @@ export const RestaurantPOSInterface: React.FC<RestaurantPOSInterfaceProps> = ({
         {/* Zone Menu Restaurant - Gauche */}
         <div className="w-2/3 p-6 space-y-6">
           {/* Sélection de Table */}
-          <Card className="glass-card shadow-soft border-0">
+          <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <Users className="h-6 w-6 text-primary" />
-                <h2 className="text-xl font-bold">Sélection de Table</h2>
+                <Users className="h-6 w-6 text-orange-600" />
+                <h2 className="text-xl font-bold text-gray-800">Sélection de Table</h2>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 touch-spacing">
+              <div className="grid grid-cols-6 gap-3">
                 {tables.map((table) => (
                   <Button
                     key={table.id}
                     variant={selectedTable?.id === table.id ? 'default' : 'outline'}
                     size="lg"
                     onClick={() => setSelectedTable(table)}
-                    className={`tap-target min-h-[56px] min-w-[80px] text-lg font-bold transition-elegant press-feedback ${
+                    className={`h-16 text-lg font-bold transition-all ${
                       selectedTable?.id === table.id 
-                        ? 'bg-primary hover:bg-primary-hover text-primary-foreground shadow-soft' 
-                        : 'border-2 border-border hover:border-primary/40 hover:bg-primary/5'
+                        ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg' 
+                        : 'border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50'
                     }`}
                   >
                     <div className="text-center">

@@ -121,22 +121,22 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                className="tap-target h-11 w-11 p-0 press-feedback"
+                className="h-7 w-7 p-0"
                 onClick={() => onCustomerCountChange(Math.max(1, customerCount - 1))}
               >
-                <Minus className="h-4 w-4" />
+                <Minus className="h-3 w-3" />
               </Button>
-              <span className="flex items-center gap-1 px-3 py-2 min-w-[60px] justify-center">
-                <Users className="h-4 w-4" />
+              <span className="flex items-center gap-1 px-2">
+                <Users className="h-3 w-3" />
                 {customerCount}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                className="tap-target h-11 w-11 p-0 press-feedback"
+                className="h-7 w-7 p-0"
                 onClick={() => onCustomerCountChange(customerCount + 1)}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3 w-3" />
               </Button>
             </div>
           </div>
@@ -180,39 +180,39 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
               )}
 
               <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 touch-spacing">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="tap-target h-11 w-11 p-0 press-feedback"
-                  onClick={() => onUpdateQuantity(item.product_id || item.id, item.quantity - 1)}
-                  disabled={item.quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                
-                <span className="min-w-[48px] text-center text-lg font-bold tap-target flex items-center justify-center">
-                  {item.quantity}
-                </span>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="tap-target h-11 w-11 p-0 press-feedback"
-                  onClick={() => onUpdateQuantity(item.product_id || item.id, item.quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="tap-target h-11 w-11 p-0 text-destructive hover:text-destructive hover:bg-destructive/10 press-feedback"
-                  onClick={() => onRemoveFromCart(item.product_id || item.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => onUpdateQuantity(item.product_id || item.id, item.quantity - 1)}
+                    disabled={item.quantity <= 1}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  
+                  <span className="w-8 text-center text-lg font-bold">
+                    {item.quantity}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => onUpdateQuantity(item.product_id || item.id, item.quantity + 1)}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                    onClick={() => onRemoveFromCart(item.product_id || item.id)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
 
                 <div className="text-right">
                   <span className="text-lg font-bold text-primary">
@@ -226,23 +226,23 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
       </div>
 
       {/* Totaux */}
-      <div className="p-4 border-t bg-card">
+      <div className="p-4 border-t bg-gradient-to-br from-card to-primary/5">
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
             <span>Sous-total</span>
-            <span className="font-medium">{totals.subtotal.toLocaleString()} F</span>
+            <span>{totals.subtotal.toLocaleString()} F</span>
           </div>
           {totals.serviceCharge > 0 && (
             <div className="flex justify-between text-sm">
               <span>Service (10%)</span>
-              <span className="font-medium">{totals.serviceCharge.toLocaleString()} F</span>
+              <span>{totals.serviceCharge.toLocaleString()} F</span>
             </div>
           )}
           <div className="flex justify-between text-sm">
             <span>TVA (18%)</span>
-            <span className="font-medium">{totals.taxAmount.toLocaleString()} F</span>
+            <span>{totals.taxAmount.toLocaleString()} F</span>
           </div>
-          <div className="border-t pt-2 bg-soft-primary/20 rounded-lg p-2">
+          <div className="border-t pt-2">
             <div className="flex justify-between items-center">
               <span className="text-lg font-bold">Total TTC</span>
               <span className="text-xl font-bold text-primary">
@@ -253,11 +253,11 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
         </div>
 
         {/* Boutons d'action */}
-        <div className="space-y-3 touch-spacing">
+        <div className="space-y-2">
           <Button
             onClick={onSendToKitchen}
             disabled={cartItems.length === 0 || !selectedTable}
-            className="w-full tap-target bg-info hover:bg-info/90 text-info-foreground press-feedback"
+            className="w-full h-10 bg-blue-600 hover:bg-blue-700"
           >
             <Send className="h-4 w-4 mr-2" />
             Envoyer en cuisine (F3)
@@ -266,7 +266,7 @@ export const POSOrderZone: React.FC<POSOrderZoneProps> = ({
           <Button
             onClick={onShowBillPreview}
             disabled={cartItems.length === 0 || !selectedTable}
-            className="w-full tap-target bg-warning hover:bg-warning/90 text-warning-foreground press-feedback"
+            className="w-full h-10 bg-amber-600 hover:bg-amber-700"
             variant="secondary"
           >
             <Receipt className="h-4 w-4 mr-2" />

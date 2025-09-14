@@ -67,7 +67,7 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
   return (
     <div className="h-full flex flex-col">
       {/* Zone de saisie code */}
-      <div className="p-4 border-b bg-muted/30">
+      <div className="p-4 border-b bg-muted/50">
         <div className="text-center">
           <h3 className="text-lg font-bold mb-3 flex items-center justify-center gap-2">
             <Keyboard className="h-5 w-5" />
@@ -78,7 +78,7 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
             onChange={(e) => onProductCodeChange(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && onProductCodeSubmit()}
             placeholder="Code produit..."
-            className="text-center text-2xl tap-target font-mono font-bold mb-2 transition-elegant"
+            className="text-center text-2xl h-12 font-mono font-bold mb-2"
             autoFocus
           />
           <div className="text-sm text-muted-foreground">
@@ -90,15 +90,15 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
       {/* Onglets catégories */}
       <div className="p-4 border-b bg-background">
         <Tabs value={selectedCategory} onValueChange={onCategoryChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 tap-target">
+          <TabsList className="grid w-full grid-cols-6 h-12">
             {categoryTabs.map((category) => (
               <TabsTrigger 
                 key={category} 
                 value={category}
-                className="flex flex-col gap-1 text-xs tap-target press-feedback responsive-text-sm"
+                className="flex flex-col gap-1 text-xs h-10"
               >
                 <span className="text-base">{getCategoryIcon(category)}</span>
-                <span className="font-medium text-xs truncate-mobile">{category}</span>
+                <span className="font-medium text-xs">{category}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -107,14 +107,14 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
 
       {/* Grille des produits */}
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="grid grid-adaptive-2 mobile-container touch-spacing">
+        <div className="grid grid-cols-3 gap-3">
           {filteredProducts.map((product) => (
             <Card
               key={product.code}
-              className={`cursor-pointer transition-elegant hover:scale-105 shadow-soft tap-target press-feedback ${getCategoryColor(product.category)}`}
+              className={`cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md ${getCategoryColor(product.category)}`}
               onClick={() => onProductSelect(product)}
             >
-              <CardContent className="p-3 min-h-[120px] flex flex-col touch-manipulation">
+              <CardContent className="p-3 h-28 flex flex-col">
                 {/* Image/Emoji du produit */}
                 <div className="flex-1 flex items-center justify-center mb-2">
                   {product.image_url && product.image_url !== '/placeholder.svg' ? (
@@ -138,14 +138,14 @@ export const POSProductGrid: React.FC<POSProductGridProps> = ({
 
                 {/* Infos produit */}
                 <div className="text-center">
-                  <div className="font-bold responsive-text-sm mb-1 truncate" title={product.name}>
+                  <div className="font-bold text-xs mb-1 truncate" title={product.name}>
                     {product.name}
                   </div>
                   <div className="flex items-center justify-between">
                     <Badge variant="secondary" className="text-xs px-1">
                       {product.code}
                     </Badge>
-                    <div className="text-primary font-bold responsive-text-sm">
+                    <div className="text-primary font-bold text-xs">
                       {product.price.toLocaleString()}
                     </div>
                   </div>
